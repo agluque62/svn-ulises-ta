@@ -1,0 +1,23 @@
+﻿<SolutionProfile xmlns="http://schemas.microsoft.com/pag/cab-profile/2.0">
+	<Section Name="Engine">
+		<Modules>
+			<ModuleInfo AssemblyFile="CD40.Module.dll" />
+		</Modules>
+	</Section>
+	<Section Name="Model">
+		<Dependencies>
+			<Dependency Name="Engine" />
+		</Dependencies>
+		<Modules>
+			<ModuleInfo AssemblyFile="Model.Module.dll" />
+		</Modules>
+	</Section>
+	<Section Name="Apps">
+		<Dependencies>
+			<Dependency Name="Model" />
+		</Dependencies>
+		<Modules>
+			<ModuleInfo AssemblyFile="Presentation.Twr.dll" />
+		</Modules>
+	</Section>
+</SolutionProfile>

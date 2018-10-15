@@ -1,0 +1,133 @@
+<h3 translate>Generales</h3>
+<section id="_tabs">
+    <ul class="nav nav-tabs">
+        <li data-ng-class="{'active': ctrl.pagina==0}">
+            <a href="" data-ng-click="ctrl.pagina=0" translate>Estado Global</a>
+        </li>
+        <li data-ng-class="{'active': ctrl.pagina==1}">
+            <a href="" data-ng-click="ctrl.pagina=1" translate>Preconfiguraciones</a>
+        </li>
+    </ul>
+</section>
+<section id="_contenido">
+    <div id="stdGlobal" data-ng-show="ctrl.pagina==0">
+        <h1><strong translate>Estado Global</strong></h1>
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td class="text-primary col-xs-3" translate>Version del Servicio</td>
+                <td class="text-success col-xs-6">{{ctrl.std.nbx_version}}</td>
+                <td><button type="button" class="btn btn-default" ng-click="ctrl.VersionDetailShow()" translate>Detalle</button></td>
+            </tr>
+            <tr>
+                <td class="text-primary col-xs-3" translate>Configuracion Activa</td>
+                <td class="text-success col-xs-6">{{ctrl.std.cfg_activa}}</td>
+                <td></td>
+            </tr>
+        </table>
+        <h1><strong translate>Estado de Servicios</strong></h1>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th translate>Servicio</th>
+                    <th translate>Modo</th>
+                    <th translate>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.cfg)">
+                    <td class="text-primary"><strong translate>Configuracion Puestos</strong></td>
+                    <td>{{ctrl.txtModo(ctrl.std.cfg)}}</td>
+					<td>{{ctrl.txtEstado(ctrl.std.cfg)}}</td>
+                </tr>
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.rad)">
+                    <td class="text-primary"><strong translate>Radio</strong></td>
+                    <td>{{ctrl.txtModo(ctrl.std.rad)}}</td>
+                    <td>{{ctrl.txtEstado(ctrl.std.rad)}}</td>
+                </tr>
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.rad)">
+                    <td class="text-primary"><strong translate>Gestor MN</strong></td>
+                    <td>{{ctrl.txtModo(ctrl.std.rad)}}</td>
+                    <td>{{ctrl.txtEstadoMn(ctrl.std.mn)}}</td>
+                </tr>
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.ifx)">
+                    <td class="text-primary"><strong translate>Interfaces Analogicas</strong></td>
+                    <td>{{ctrl.txtModo(ctrl.std.ifx)}}</td>
+                    <td>{{ctrl.txtEstado(ctrl.std.ifx)}}</td>
+                </tr>
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.pbx)">
+                    <td class="text-primary"><strong translate>Servicio de Presencia</strong></td>
+                    <td>{{ctrl.txtModo(ctrl.std.pbx)}}</td>
+                    <td>{{ctrl.txtEstado(ctrl.std.pbx)}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <table id="tbLogs" class="table table-bordered table-striped">
+            <tr>
+                <td>
+                    <button class="btn btn-default" data-ng-click="ctrl.logs()">LOGS</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="cfConfiguracion" data-ng-show="ctrl.pagina==1">
+        <h1><strong translate>Preconfiguraciones</strong></h1>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th translate>Fecha</th>
+                    <th translate>Nombre</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="pre in ctrl.preconf">
+                    <td>{{pre.fecha}}</td>
+                    <td>{{pre.nombre}}</td>
+                    <td ><button class="btn btn-default" data-ng-click="ctrl.activar_pre(pre)" translate>Activar</button></td>
+                    <td ><button class="btn btn-warning" data-ng-click="ctrl.eliminar_pre(pre)" translate>Eliminar</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="salvar" class="btn btn-primary" data-ng-click="ctrl.salvar_como()" translate>Salvar Activa Como</button>
+    </div>
+
+    <div id="VersionDetail" class="modal fade" role="dialog" tabindex='-1'>
+        <div class="modal-dialog modal-lg"">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" translate>Detalle de Version Software Instalada</h4>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group">
+                        <li class="list-group-item ndf-ver-01">{{"Ulises V 5000." + " Version " + ctrl.versiones.Version + " (" + ctrl.versiones.Fecha + ")"}}</li>
+                        <li class="list-group-item">
+                            <ul class="list-group">
+                                <li class="list-group-item" data-ng_repeat="comp in ctrl.versiones.Components">
+                                    <button type="button" class="btn btn-default ndf-ver-02" data-toggle="collapse" data-target="#comp-{{$index}}">{{comp.Name + " Ver " + ctrl.versiones.Version}}</button>
+                                    <div id="comp-{{$index}}" class="collapse">
+                                        <ul class="list-group">
+                                            <li class="list-group-item  ndf-ver-03" data-ng_repeat="file in comp.Files">
+                                                <div class="row">
+                                                    <div class="col-md-4 text-primary"><small>{{file.Path.substring(file.Path.lastIndexOf("\\") + 1)}}</small></div>
+                                                    <div class="col-md-2 text-success"><small>{{file.Size}}</small></div>
+                                                    <div class="col-md-2 text-success"><small>{{file.Date}}</small></div>
+                                                    <div class="col-md-4 text-success"><small>{{file.MD5}}</small></div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default bhis"  ng_click="ctrl.versiones_export()" translate>Exportar</button>
+                </div>
+            </div>
+        </div>
+        </div>
+
+</section>

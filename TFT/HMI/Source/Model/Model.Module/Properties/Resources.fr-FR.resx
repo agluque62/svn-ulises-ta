@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BadOperation" xml:space="preserve">
+    <value>Fausse manœuvre</value>
+  </data>
+  <data name="BrightnessError" xml:space="preserve">
+    <value>Erreur en train d'ouvrir le contrôleur de luminosité</value>
+  </data>
+  <data name="DisableTft" xml:space="preserve">
+    <value>Désactiver TFT</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Sortir</value>
+  </data>
+  <data name="HoldByTlfStateDescription" xml:space="preserve">
+    <value>Retenu par :</value>
+  </data>
+  <data name="HoldToTlfStateDescription" xml:space="preserve">
+    <value>En attente:</value>
+  </data>
+  <data name="InterruptedByDescription" xml:space="preserve">
+    <value>Intervenu par :</value>
+  </data>
+  <data name="IntrudedByDescription" xml:space="preserve">
+    <value>Intrusion par :</value>
+  </data>
+  <data name="IntrudeToDescription" xml:space="preserve">
+    <value>Intrusion sur:</value>
+  </data>
+  <data name="ListenByConfirmation" xml:space="preserve">
+    <value>Position sous écoute. Autoriser ?</value>
+  </data>
+  <data name="ListenByStateDescription" xml:space="preserve">
+    <value>Ecouté par:</value>
+  </data>
+  <data name="ListenToStateDescription" xml:space="preserve">
+    <value>Écoute:</value>
+  </data>
+  <data name="MessageErrorCaption" xml:space="preserve">
+    <value>Erreur</value>
+  </data>
+  <data name="MessageInfoCaption" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="MessageWarningCaption" xml:space="preserve">
+    <value>Avertissement</value>
+  </data>
+  <data name="NoJacksError" xml:space="preserve">
+    <value>Aucun jacks</value>
+  </data>
+  <data name="NoJacksStateDescription" xml:space="preserve">
+    <value>Aucun jacks du contrôleur</value>
+  </data>
+  <data name="RdFrAsignedToOtherConfirmation" xml:space="preserve">
+    <value>Fréquence {0} a déjà été sélectionnée par un autre poste</value>
+  </data>
+  <data name="RdFrAsignedToOtherNotification" xml:space="preserve">
+    <value>La position {0} a sélectionnée la fréquence: {1}</value>
+  </data>
+  <data name="RtxMaxFrError" xml:space="preserve">
+    <value>Dépassé le nombre maximal des fréquences dans le groupe Rtx</value>
+  </data>
+  <data name="RtxNeedMoreFrecuenties" xml:space="preserve">
+    <value>Un groupe de Rtx doit avoir plus d'une fréquence</value>
+  </data>
+  <data name="RtxOperationRunning" xml:space="preserve">
+    <value>Patientez jusqu'à ce que l'opération de Rtx est finie</value>
+  </data>
+  <data name="TalkTlfStateDescription" xml:space="preserve">
+    <value>Parle avec :</value>
+  </data>
+  <data name="BriefingFunction" xml:space="preserve">
+    <value>Voulez-vous commencer la fonction "Briefing"?</value>
+  </data>
+  <data name="DeleteSessionGLP" xml:space="preserve">
+    <value>Voulez-vous supprimer la séance d'enregistrement local à la poste?</value>
+  </data>
+  <data name="RdHfFrAssignedEngine" xml:space="preserve">
+    <value>Seulement une fréquence HF sélectionnée pour transmission est permise</value>
+  </data>
+  <data name="RdHfEquipment" xml:space="preserve">
+    <value>Erreur à l'équipe HF</value>
+  </data>
+  <data name="RdHfResourceError" xml:space="preserve">
+    <value>On ne peut pas établir une connexion avec la ressource de radio correspondant à la fréquence {0}.</value>
+  </data>
+  <data name="EngineInfo" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="RtxActiveNoRemove" xml:space="preserve">
+    <value>Squelch actif, il n'est pas possible enlever l'élément du groupe Rtx </value>
+  </data>
+</root>

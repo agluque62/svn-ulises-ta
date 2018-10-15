@@ -1,0 +1,95 @@
+{
+	"Server": "SERV01",
+	"Version" : "2.5.9",
+	"Fecha": "27/07/2018",
+	"Components" : [
+		{
+			"Name": "UV5K-HMI Terminal de Audio",
+			"Files" : [
+				{
+					"Path": ".\\hmi.exe",
+					"Date": "",
+					"Size": "",
+					"MD5": ""
+				},
+				{
+					"Path": ".\\cd40.module.dll",
+					"MD5": "",
+					"Date": "",
+					"Size": ""
+				},
+				{
+					"Path": ".\\model.module.dll",
+					"MD5": "",
+					"Date": "",
+					"Size": ""
+				},
+				{
+					"Path": ".\\Presentation.Twr.dll",
+					"MD5": "",
+					"Date": "",
+					"Size": ""
+				},
+				{
+					"Path": ".\\Presentation.Asecna.dll",
+					"MD5": "",
+					"Date": "",
+					"Size": ""
+				},
+				{
+					"Path": ".\\U5ki.Infrastructure.dll",
+					"MD5": "",
+					"Date": "",
+					"Size": ""
+				},
+				{
+					"Path": ".\\coresip-voter.dll",
+					"Date": "",
+					"Size": "",
+					"MD5": ""
+				},
+				{
+					"Path": ".\\Utilities.dll",
+					"MD5": "",
+					"Date": "",
+					"Size": ""
+				},
+				{
+					"Path": ".\\Infrastructure.Interface.dll",
+					"MD5": "",
+					"Date": "",
+					"Size": ""
+				},
+				{
+					"Path": ".\\Infrastructure.Library.dll",
+					"MD5": "",
+					"Date": "",
+					"Size": ""
+				},
+				{
+					"Path": ".\\WINAUDIO\\Winaudio.ini",
+					"MD5": "",
+					"Date": "",
+					"Size": ""
+				}
+			]
+		},
+		{
+			"Name": "UV5K-HMI Gestor de Grabaciones ED137",
+			"Files" : [
+				{
+					"Path": ".\\Ed137b4Service\\ED137B4WindowsService.exe",
+					"Date": "",
+					"Size": "",
+					"MD5": ""
+				},
+				{
+					"Path": ".\\Ed137b4Service\\UG5KEd137b4Service.exe",
+					"Date": "",
+					"Size": "",
+					"MD5": ""
+				}
+			]
+		}
+	]
+}

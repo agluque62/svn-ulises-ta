@@ -1,0 +1,22 @@
+Inclusion Gestion CMEDIA. Proyecto Engine/cd40.module. 
+
+	Define:
+		_AUDIOGENERIC_
+
+			Nuevo Parámetro 'TipoAudioUsb'...
+			Modificado HwManager, para incluir las dos opciones.
+			Modificado MixedManager, para incluir las dos opciones.
+			Modificado RecorderManager para nueva interfaz de señalizacion de grabacion
+			Nueva DLL Interop.ASIO, para detectar los canales de audio.
+			Supervision de Errores en Tarjetas de AUDIO.
+		
+		_NEWSTART_
+			Modificado INIT y START de TOP
+			
+		_HF_GLOBAL_STATUS_
+			Gestion del estado global del subsistema HF.
+
+	
+Actualizacion NLOG a version 3.
+
+

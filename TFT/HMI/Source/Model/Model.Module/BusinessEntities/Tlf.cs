@@ -1,0 +1,1411 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Timers;
+using System.Diagnostics;
+using Microsoft.Practices.ObjectBuilder;
+using Microsoft.Practices.CompositeUI.EventBroker;
+using HMI.Model.Module.Messages;
+using HMI.Model.Module.Constants;
+using HMI.Model.Module.Properties;
+using Utilities;
+using HMI.Infrastructure.Interface;
+
+namespace HMI.Model.Module.BusinessEntities
+{
+	// Los valores están ordenados según prioridad
+	// y empezando desde cero incrementandose de uno en uno (debido a _NumDstInState)
+	public enum TlfState
+	{
+		UnChanged,
+		Unavailable,
+		Idle,
+		PaPBusy,
+		RemoteMem,
+		Mem,
+		NotAllowed,
+		Hold,
+		RemoteHold,
+		Out,
+		Set,
+		Conf,
+		Congestion,
+		Busy,
+		RemoteIn,
+		In,
+		InPrio,
+		OutOfService
+	}
+
+	public enum TlfType
+	{
+		Unknown,
+		Ad,
+		Ai
+	}
+
+	public enum PriorityState
+	{
+		Idle,
+		Ready,
+		Executing,
+		Error
+	}
+
+	public enum ListenState
+	{
+		Idle,
+		Ready,
+		Executing,
+		Error
+	}
+
+	public enum TransferState
+	{
+		Idle,
+		Ready,
+		Executing,
+		Error
+	}
+
+	public enum ConfState
+	{
+		Idle,
+		Hold,
+		Executing
+	}
+
+	public enum UnhangState
+	{
+		Idle = TlfState.Idle,
+		RemoteHold = TlfState.RemoteHold,
+		Hold = TlfState.Hold,
+		Congestion = TlfState.Congestion,
+		Busy = TlfState.Busy,
+		Set = TlfState.Set,
+		Conf = TlfState.Conf,
+		Out = TlfState.Out,
+		OutOfService = TlfState.OutOfService,
+		NotAllowed = TlfState.NotAllowed
+	}
+
+	public sealed class TlfDst
+	{
+		private int _Id;
+		private string _Dst = "";
+		private string _Number = "";
+		private string _Digits = "";
+		private TlfState _State = TlfState.Idle;
+		private TlfState _PrevState = TlfState.Idle;
+		private string _StateDescription = "";
+		private string _PreviusStateDescription = "";
+		private UiTimer _MemNotifTimer = null;
+		private UiTimer _IaTimer = null;
+        private bool _PriorityAllowed = true;
+
+		public event GenericEventHandler StChanged;
+
+		public int Id
+		{
+			get { return _Id; }
+		}
+
+		public string Dst
+		{
+			get { return _Dst; }
+		}
+
+		public string Number
+		{
+			get { return _Number; }
+		}
+
+		public string Digits
+		{
+			get { return _Digits; }
+			set { _Digits = value; }
+		}
+
+		public TlfState State
+		{
+			get { return _State; }
+		}
+
+		public TlfState PrevState
+		{
+			get { return _PrevState; }
+		}
+
+		public string StateDescription
+		{
+			get { return _StateDescription; }
+		}
+
+		public string PreviusStateDescription
+		{
+			get { return _PreviusStateDescription; }
+		}
+
+		public bool IsConfigurated
+		{
+			get { return _Dst != null && _Dst.Length > 0; }
+		}
+
+		public bool Unavailable
+		{
+			get { return (_State == TlfState.Unavailable); }
+		}
+
+        public bool PriorityAllowed
+        {
+            get { return _PriorityAllowed; }
+        }
+
+		public TlfDst(int id)
+		{
+			_Id = id;
+
+			if (Settings.Default.TlfMemNotifSg > 0)
+			{
+				_MemNotifTimer = new UiTimer(Settings.Default.TlfMemNotifSg * 1000);
+				_MemNotifTimer.AutoReset = false;
+				_MemNotifTimer.Elapsed += OnMemNotifTimerElapsed;
+			}
+
+			if ((id == Tlf.IaMappedPosition) && (Settings.Default.IaMemTimerSg > 0))
+			{
+				_IaTimer = new UiTimer(Settings.Default.IaMemTimerSg * 1000);
+				_IaTimer.AutoReset = false;
+				_IaTimer.Elapsed += OnIaTimerElapsed;
+			}
+		}
+
+		public void Reset()
+		{
+			if (_MemNotifTimer != null)
+			{
+				_MemNotifTimer.Enabled = false;
+			}
+			if (_IaTimer != null)
+			{
+				_IaTimer.Enabled = false;
+			}
+
+			_Dst = "";
+			_Number = "";
+			_Digits = "";
+			_PrevState = _State;
+			_PreviusStateDescription = _StateDescription;
+			_State = TlfState.Idle;
+			_StateDescription = "";
+		}
+
+		public void Reset(TlfInfo dst)
+		{
+			if (dst.Dst == "")
+			{
+				Reset();
+			}
+			else if (dst.Dst != _Dst)
+			{
+				_Dst = dst.Dst;
+                _PriorityAllowed = dst._PriorityAllowed;
+				ChangeState(dst.St);
+				ChangeStateDescription();
+			}
+			else
+			{
+				Reset(dst.St);
+			}
+		}
+
+		public void Reset(TlfDestination dst)
+		{
+			if (dst.Dst == "")
+			{
+				Reset();
+			}
+			else if (dst.Dst != _Dst)
+			{
+				_Dst = dst.Dst;
+				ChangeState(TlfState.Idle);
+				ChangeStateDescription();
+			}
+			else
+			{
+				// Después de llamarse a esta función se va a notificar el cambio
+				// por lo que hay que actualizar _PreviusStateDescription
+				_PrevState = _State;
+				_PreviusStateDescription = _StateDescription;
+			}
+		}
+
+		public void Reset(TlfState st)
+		{
+			if ((st != TlfState.Idle) || 
+				((_State != TlfState.Mem) && (_State != TlfState.RemoteMem)) ||
+				(st==TlfState.Idle && _State==TlfState.NotAllowed && _PrevState==TlfState.NotAllowed))
+			{
+				ChangeState(st);
+				ChangeStateDescription();
+			}
+			else
+			{
+				_PrevState = _State;
+				_PreviusStateDescription = _StateDescription;
+			}
+		}
+
+		public void Reset(TlfIaDestination dst)
+		{
+			Debug.Assert(_Id >= Tlf.NumDestinations);
+
+			_Dst = dst.Alias;
+			_Number = dst.Number;
+
+			Reset(dst.State);
+
+			if (_IaTimer != null)
+			{
+				_IaTimer.Enabled = ((_Number != "") && ((_State == TlfState.Idle) ||
+					(_State == TlfState.PaPBusy) || (_State == TlfState.Mem) || (_State == TlfState.NotAllowed) || (_State == TlfState.RemoteMem)));
+			}
+		}
+
+		public void ResetMem()
+		{
+			if ((_State == TlfState.Mem) || (_State == TlfState.NotAllowed) || (_State == TlfState.RemoteMem))
+			{
+				ChangeState(TlfState.Idle);
+				ChangeStateDescription();
+			}
+			else
+			{
+				_PrevState = _State;
+				_PreviusStateDescription = _StateDescription;
+			}
+		}
+
+		private void ChangeState(TlfState st)
+		{
+			_PrevState = _State;
+
+			if ((st != TlfState.UnChanged) && (st != _State))
+			{
+				_State = st;
+
+				switch (_State)
+				{
+					case TlfState.Unavailable:
+					case TlfState.PaPBusy:
+					case TlfState.Idle:
+					case TlfState.Mem:
+					case TlfState.RemoteMem:
+					case TlfState.In:
+					case TlfState.InPrio:
+					case TlfState.RemoteIn:
+					case TlfState.NotAllowed:
+						_Digits = "";
+						break;
+				}
+
+				if (_MemNotifTimer != null)
+				{
+					_MemNotifTimer.Enabled = (_State == TlfState.Mem) || (_State == TlfState.NotAllowed) || (_State == TlfState.RemoteMem);
+				}
+			}
+		}
+
+		private void ChangeStateDescription()
+		{
+			_PreviusStateDescription = _StateDescription;
+
+			switch (_State)
+			{
+				case TlfState.Set:
+				case TlfState.Conf:
+					_StateDescription = Resources.TalkTlfStateDescription + " " + _Dst;
+					break;
+				case TlfState.Hold:
+					_StateDescription = Resources.HoldToTlfStateDescription + " " + _Dst;
+					break;
+				case TlfState.RemoteHold:
+					_StateDescription = Resources.HoldByTlfStateDescription + " " + _Dst;
+					break;
+				//case TlfState.InPrio:
+				//    _StateDescription = Resources.IntrudedByDescription + " " + _Dst;
+				//    break;
+				default:
+					_StateDescription = "";
+					break;
+			}
+		}
+
+		private void OnMemNotifTimerElapsed(object sender, ElapsedEventArgs e)
+		{
+			if ((_State == TlfState.Mem) || (_State == TlfState.NotAllowed) || (_State == TlfState.RemoteMem))
+			{
+				_PrevState = _State;
+				_PreviusStateDescription = _StateDescription;
+
+				_State = TlfState.Idle;
+
+				General.SafeLaunchEvent(StChanged, this);
+			}
+		}
+
+		private void OnIaTimerElapsed(object sender, ElapsedEventArgs e)
+		{
+			if ((_Number != "") && ((_State == TlfState.Idle) ||
+				(_State == TlfState.PaPBusy) || (_State == TlfState.Mem) || (_State == TlfState.NotAllowed) || (_State == TlfState.RemoteMem)))
+			{
+				Reset();
+
+				General.SafeLaunchEvent(StChanged, this);
+			}
+		}
+	}
+
+	public sealed class Priority
+	{
+		private int _AssociatePosition = -1;
+		private PriorityState _State = PriorityState.Idle;
+
+		[EventPublication(EventTopicNames.TlfPriorityChanged, PublicationScope.Global)]
+		public event EventHandler TlfPriorityChanged;
+
+		public PriorityState State
+		{
+			get { return _State; }
+			private set
+			{
+				if (_State != value)
+				{
+					_State = value;
+					General.SafeLaunchEvent(TlfPriorityChanged, this);
+				}
+			}
+		}
+
+		public int AssociatePosition
+		{
+			get { return _AssociatePosition; }
+		}
+
+		public void Reset()
+		{
+			_AssociatePosition = -1;
+			State = PriorityState.Idle;
+		}
+
+		public void Reset(int associatePosition)
+		{
+			_AssociatePosition = associatePosition;
+			State = PriorityState.Ready;
+		}
+
+		public void Reset(PriorityState st)
+		{
+			if ((_State == PriorityState.Ready) || (_State == PriorityState.Executing))
+			{
+				_AssociatePosition = -1;
+				State = st;
+			}
+		}
+
+		public bool NewCall(int id)
+		{
+			if ((_State == PriorityState.Ready) && (_AssociatePosition == -1))
+			{
+				_AssociatePosition = id;
+				return true;
+			}
+
+			_AssociatePosition = -1;
+			State = PriorityState.Idle;
+
+			return false;
+		}
+
+		public void CheckTlfStChanged(TlfDst dst)
+		{
+			if (_AssociatePosition == dst.Id)
+			{
+				Debug.Assert((_State == PriorityState.Ready) || (_State == PriorityState.Executing));
+
+				switch (dst.State)
+				{
+					case TlfState.Idle:
+					case TlfState.Unavailable:
+					case TlfState.PaPBusy:
+						if (_State == PriorityState.Executing)
+						{
+							// Puede ocurrir que antes realizar la llamada por acceso indirecto
+							// tengamos que colgar una ya existente. De ahí la comprobación
+							_AssociatePosition = -1;
+							State = PriorityState.Error;
+						}
+						break;
+					case TlfState.Out:
+						State = PriorityState.Executing;
+						break;
+					case TlfState.Congestion:
+					case TlfState.OutOfService:
+					case TlfState.Busy:
+						_AssociatePosition = -1;
+						State = PriorityState.Error;
+						break;
+					default:
+						_AssociatePosition = -1;
+						State = PriorityState.Idle;
+						break;
+				}
+			}
+			else if ((_State == PriorityState.Ready) && (_AssociatePosition >= Tlf.NumDestinations) && (dst.Id < Tlf.NumDestinations))
+			{
+				// Puede ocurrir que una llamada por acceso indirecto coincida con una tecla de acceso directo
+				switch (dst.State)
+				{
+					case TlfState.Out:
+						_AssociatePosition = dst.Id;
+						State = PriorityState.Executing;
+						break;
+					case TlfState.Congestion:
+					case TlfState.OutOfService:
+					case TlfState.Busy:
+						_AssociatePosition = -1;
+						State = PriorityState.Error;
+						break;
+				}
+			}
+		}
+	}
+
+	public sealed class IntrudedBy
+	{
+		private string _By = "";
+		private string _StateDescription = "";
+		private string _PreviusStateDescription = "";
+
+		[EventPublication(EventTopicNames.TlfIntrudedByChanged, PublicationScope.Global)]
+		public event EventHandler TlfIntrudedByChanged;
+
+        public string By
+        {
+            get { return _By; }
+        }
+
+		public string StateDescription
+		{
+			get { return _StateDescription; }
+		}
+
+		public string PreviusStateDescription
+		{
+			get { return _PreviusStateDescription; }
+		}
+
+		public void Reset()
+		{
+			if (_By != "")
+			{
+				_By = "";
+				_PreviusStateDescription = _StateDescription;
+				_StateDescription = "";
+
+				General.SafeLaunchEvent(TlfIntrudedByChanged, this);
+			}
+		}
+
+		public void Reset(StateMsg<string> msg)
+		{
+			if (_By != msg.State)
+			{
+				_By = msg.State;
+				_PreviusStateDescription = _StateDescription;
+				_StateDescription = _By.Length > 0 ? Resources.IntrudedByDescription + " " + _By : "";
+
+				General.SafeLaunchEvent(TlfIntrudedByChanged, this);
+			}
+		}
+	}
+
+	public sealed class IntrudeTo
+	{
+		private string _To = "";
+		private string _StateDescription = "";
+		private string _PreviusStateDescription = "";
+
+		[EventPublication(EventTopicNames.TlfIntrudeToChanged, PublicationScope.Global)]
+		public event EventHandler TlfIntrudeToChanged;
+
+		public string StateDescription
+		{
+			get { return _StateDescription; }
+		}
+
+		public string PreviusStateDescription
+		{
+			get { return _PreviusStateDescription; }
+		}
+
+		public bool IsIntrudingTo
+		{
+			get { return (_To.Length > 0); }
+		}
+
+		public string To
+		{
+			get { return _To; }
+		}
+
+		public void Reset()
+		{
+			if (_To != "")
+			{
+				_To = "";
+				_PreviusStateDescription = _StateDescription;
+				_StateDescription = "";
+
+				General.SafeLaunchEvent(TlfIntrudeToChanged, this);
+			}
+		}
+
+		public void Reset(StateMsg<string> msg)
+		{
+			if (_To != msg.State)
+			{
+				_To = msg.State;
+				_PreviusStateDescription = _StateDescription;
+				_StateDescription = _To.Length > 0 ? Resources.IntrudeToDescription + " " + _To : "";
+
+				General.SafeLaunchEvent(TlfIntrudeToChanged, this);
+			}
+		}
+	}
+
+	public sealed class InterruptedBy
+	{
+		private string _By = "";
+		private string _StateDescription = "";
+		private string _PreviusStateDescription = "";
+
+		[EventPublication(EventTopicNames.TlfInterruptedByChanged, PublicationScope.Global)]
+		public event EventHandler TlfInterruptedByChanged;
+
+		public string StateDescription
+		{
+			get { return _StateDescription; }
+		}
+
+		public string PreviusStateDescription
+		{
+			get { return _PreviusStateDescription; }
+		}
+
+		public void Reset()
+		{
+			if (_By != "")
+			{
+				_By = "";
+				_PreviusStateDescription = _StateDescription;
+				_StateDescription = "";
+
+				General.SafeLaunchEvent(TlfInterruptedByChanged, this);
+			}
+		}
+
+		public void Reset(StateMsg<string> msg)
+		{
+			if (_By != msg.State)
+			{
+				_By = msg.State;
+				_PreviusStateDescription = _StateDescription;
+				_StateDescription = _By.Length > 0 ? Resources.InterruptedByDescription + " " + _By : "";
+
+				General.SafeLaunchEvent(TlfInterruptedByChanged, this);
+			}
+		}
+	}
+
+	public sealed class ListenBy
+	{
+		private Dictionary<int, string> _By = new Dictionary<int, string>();
+		private string _StateDescription = "";
+		private string _PreviusStateDescription = "";
+
+		[EventPublication(EventTopicNames.TlfListenByChanged, PublicationScope.Global)]
+		public event EventHandler TlfListenByChanged;
+
+		public string StateDescription
+		{
+			get { return _StateDescription; }
+		}
+
+		public string PreviusStateDescription
+		{
+			get { return _PreviusStateDescription; }
+		}
+
+		public bool IsListen
+		{
+			get { return _By.Count > 0; }
+		}
+
+		public void Reset()
+		{
+			Dictionary<int, string> listeners = new Dictionary<int, string>(_By);
+			_By.Clear();
+
+			foreach (string by in listeners.Values)
+			{
+				_PreviusStateDescription = Resources.ListenByStateDescription + " " + by;
+				_StateDescription = "";
+
+				General.SafeLaunchEvent(TlfListenByChanged, this);
+			}
+		}
+
+		public void Reset(ListenMsg msg)
+		{
+			if (msg.State == ListenState.Executing)
+			{
+				_By[msg.Id] = msg.Dst;
+				_PreviusStateDescription = "";
+				_StateDescription = Resources.ListenByStateDescription + " " + msg.Dst;
+
+				General.SafeLaunchEvent(TlfListenByChanged, this);
+			}
+			else
+			{
+				Debug.Assert(msg.State == ListenState.Idle);
+				string by;
+
+				if (_By.TryGetValue(msg.Id, out by))
+				{
+					_By.Remove(msg.Id);
+					_PreviusStateDescription = Resources.ListenByStateDescription + " " + by;
+					_StateDescription = "";
+
+					General.SafeLaunchEvent(TlfListenByChanged, this);
+				}
+			}
+		}
+	}
+
+	public sealed class ConfList
+	{
+		private List<string> _Participants = new List<string>();
+		private string _StateDescription = "";
+		private string _PreviusStateDescription = "";
+
+		[EventPublication(EventTopicNames.TlfConfListChanged, PublicationScope.Global)]
+		public event EventHandler TlfConfListChanged;
+
+		public string StateDescription
+		{
+			get { return _StateDescription; }
+		}
+
+		public string PreviusStateDescription
+		{
+			get { return _PreviusStateDescription; }
+		}
+
+		public void Reset()
+		{
+			foreach (string p in _Participants)
+			{
+				_PreviusStateDescription = Resources.TalkTlfStateDescription + " " + p;
+				_StateDescription = "";
+
+				General.SafeLaunchEvent(TlfConfListChanged, this);
+			}
+
+			_Participants.Clear();
+		}
+
+		public void Reset(RangeMsg<string> msg)
+		{
+			List<string> newParticipants = new List<string>(msg.Info);
+			_Participants.RemoveAll(delegate(string p)
+			{
+				if (!newParticipants.Contains(p))
+				{
+					_PreviusStateDescription = Resources.TalkTlfStateDescription + " " + p;
+					_StateDescription = "";
+
+					General.SafeLaunchEvent(TlfConfListChanged, this);
+					return true;
+				}
+
+				return false;
+			});
+			newParticipants.ForEach(delegate(string p)
+			{
+				if (!_Participants.Contains(p))
+				{
+					_Participants.Add(p);
+
+					_PreviusStateDescription = "";
+					_StateDescription = Resources.TalkTlfStateDescription + " " + p;
+
+					General.SafeLaunchEvent(TlfConfListChanged, this);
+				}
+			});
+		}
+	}
+
+	public sealed class Listen
+	{
+		private ListenState _State = ListenState.Idle;
+		private string _StateDescription = "";
+		private string _PreviusStateDescription = "";
+
+		[EventPublication(EventTopicNames.TlfListenChanged, PublicationScope.Global)]
+		public event EventHandler TlfListenChanged;
+
+		public ListenState State
+		{
+			get { return _State; }
+			set
+			{
+				if (value != _State)
+				{
+					_State = value;
+					General.SafeLaunchEvent(TlfListenChanged, this);
+				}
+			}
+		}
+
+		public string StateDescription
+		{
+			get { return _StateDescription; }
+		}
+
+		public string PreviusStateDescription
+		{
+			get { return _PreviusStateDescription; }
+		}
+
+		public void Reset()
+		{
+			if (_State != ListenState.Idle)
+			{
+				_PreviusStateDescription = _StateDescription;
+				_StateDescription = "";
+				State = ListenState.Idle;
+			}
+		}
+
+		public void Reset(ListenMsg msg)
+		{
+			if (_State != msg.State)
+			{
+				_PreviusStateDescription = _StateDescription;
+				_StateDescription = msg.State == ListenState.Executing ? Resources.ListenToStateDescription + " " + msg.Dst : "";
+				State = msg.State;
+			}
+		}
+	}
+
+	public sealed class Transfer
+	{
+		private bool _Direct = false;
+		private TransferState _State = TransferState.Idle;
+
+		[EventPublication(EventTopicNames.TlfTransferChanged, PublicationScope.Global)]
+		public event EventHandler TlfTransferChanged;
+
+		public TransferState State
+		{
+			get { return _State; }
+			set
+			{
+				if (_State != value)
+				{
+					_State = value;
+					General.SafeLaunchEvent(TlfTransferChanged, this);
+				}
+			}
+		}
+
+		public bool Direct
+		{
+			get { return _Direct; }
+			set { _Direct = value; }
+		}
+
+		public void Reset()
+		{
+			State = TransferState.Idle;
+		}
+
+		public void Reset(StateMsg<TransferState> msg)
+		{
+			State = msg.State;
+		}
+	}
+
+	public sealed class HangTone
+	{
+		private bool _On = false;
+
+		[EventPublication(EventTopicNames.TlfHangToneChanged, PublicationScope.Global)]
+		public event EventHandler TlfHangToneChanged;
+
+		public bool On
+		{
+			get { return _On; }
+			set
+			{
+				if (_On != value)
+				{
+					_On = value;
+					General.SafeLaunchEvent(TlfHangToneChanged, this);
+				}
+			}
+		}
+
+		public void Reset()
+		{
+			On = false;
+		}
+
+		public void Reset(StateMsg<bool> msg)
+		{
+			On = msg.State;
+		}
+	}
+
+	public sealed class Unhang
+	{
+		private int _AssociatePosition = -1;
+		private UnhangState _State = UnhangState.Idle;
+
+		[EventPublication(EventTopicNames.TlfUnhangChanged, PublicationScope.Global)]
+		public event EventHandler TlfUnhangChanged;
+
+		public int AssociatePosition
+		{
+			get { return _AssociatePosition; }
+		}
+
+		public UnhangState State
+		{
+			get { return _State; }
+			private set
+			{
+				if (_State != value)
+				{
+					_State = value;
+					General.SafeLaunchEvent(TlfUnhangChanged, this);
+				}
+			}
+		}
+
+		public void Reset()
+		{
+			_AssociatePosition = -1;
+			State = UnhangState.Idle;
+		}
+
+		public void NewCall(bool ia)
+		{
+			_AssociatePosition = ia ? Tlf.IaMappedPosition : -1;
+			State = UnhangState.Idle;
+		}
+
+		public void CheckTlfStChanged(TlfDst dst)
+		{
+			if (_AssociatePosition == dst.Id)
+			{
+				switch (dst.State)
+				{
+					case TlfState.Unavailable:
+					case TlfState.Idle:
+					case TlfState.PaPBusy:
+						if (_State != UnhangState.Idle)
+						{
+							// Puede ocurrir que antes realizar la llamada por acceso indirecto
+							// tengamos que colgar una ya existente. De ahí la comprobación
+							_AssociatePosition = -1;
+							State = UnhangState.Idle;
+						}
+						break;
+					case TlfState.Out:
+						State = UnhangState.Out;
+						break;
+					case TlfState.Set:
+						State = UnhangState.Set;
+						break;
+					case TlfState.Conf:
+						State = UnhangState.Conf;
+						break;
+					case TlfState.Busy:
+						State = UnhangState.Busy;
+						break;
+					case TlfState.RemoteHold:
+						State = UnhangState.RemoteHold;
+						break;
+					case TlfState.Hold:
+						State = UnhangState.Hold;
+						break;
+					case TlfState.Congestion:
+						State = UnhangState.Congestion;
+						break;
+					case TlfState.OutOfService:
+						State = UnhangState.OutOfService;
+						break;
+					case TlfState.NotAllowed:
+						State = UnhangState.NotAllowed;
+						break;
+					default:
+						_AssociatePosition = -1;
+						State = UnhangState.Idle;
+						break;
+				}
+			}
+		}
+	}
+
+	public sealed class Tlf
+	{
+		public static int NumIaDestinations = 1;
+		public static int NumDestinations = Settings.Default.NumTlfDestinations;
+		public static int IaMappedPosition = NumDestinations;
+
+		private TlfDst[] _Dst = new TlfDst[NumDestinations + NumIaDestinations];
+		private int[] _NumDstInState = new int[Enum.GetValues(typeof(TlfState)).Length];
+		private Priority _Priority;
+		private IntrudedBy _IntrudedBy;
+		private InterruptedBy _InterruptedBy;
+		private IntrudeTo _IntrudeTo;
+		private Listen _Listen;
+		private ListenBy _ListenBy;
+		private Transfer _Transfer;
+		private HangTone _HangTone;
+		private Unhang _Unhang;
+		private ConfList _ConfList;
+        private bool _AltavozTlfEstado = Settings.Default.TlfSpeaker;
+        private bool _AltavozTlfEnable = Settings.Default.SpeakerTlfEnable && !Settings.Default.OnlySpeakerMode;
+        private bool _SoloAltavoces = Settings.Default.OnlySpeakerMode;
+
+		[EventPublication(EventTopicNames.TlfChanged, PublicationScope.Global)]
+		public event EventHandler<RangeMsg> TlfChanged;
+
+        [EventPublication(EventTopicNames.ChangeTlfSpeaker, PublicationScope.Global)]
+        public event EventHandler<EventArgs<bool>> ChangeTlfSpeaker;
+
+		[CreateNew]
+		public Priority Priority
+		{
+			get { return _Priority; }
+			set { _Priority = value; }
+		}
+
+		[CreateNew]
+		public IntrudedBy IntrudedBy
+		{
+			get { return _IntrudedBy; }
+			set { _IntrudedBy = value; }
+		}
+
+		[CreateNew]
+		public InterruptedBy InterruptedBy
+		{
+			get { return _InterruptedBy; }
+			set { _InterruptedBy = value; }
+		}
+
+		[CreateNew]
+		public IntrudeTo IntrudeTo
+		{
+			get { return _IntrudeTo; }
+			set { _IntrudeTo = value; }
+		}
+
+		[CreateNew]
+		public Listen Listen
+		{
+			get { return _Listen; }
+			set { _Listen = value; }
+		}
+
+		[CreateNew]
+		public ListenBy ListenBy
+		{
+			get { return _ListenBy; }
+			set { _ListenBy = value; }
+		}
+
+		[CreateNew]
+		public Transfer Transfer
+		{
+			get { return _Transfer; }
+			set { _Transfer = value; }
+		}
+
+		[CreateNew]
+		public HangTone HangTone
+		{
+			get { return _HangTone; }
+			set { _HangTone = value; }
+		}
+
+		[CreateNew]
+		public Unhang Unhang
+		{
+			get { return _Unhang; }
+			set { _Unhang = value; }
+		}
+
+		[CreateNew]
+		public ConfList ConfList
+		{
+			get { return _ConfList; }
+			set { _ConfList = value; }
+		}
+
+		public TlfDst this[int i]
+		{
+			get { return _Dst[i]; }
+		}
+
+		public int this[TlfState st]
+		{
+			get { return _NumDstInState[(int)st]; }
+		}
+
+        public bool AltavozTlfEstado
+        {
+            get { return _AltavozTlfEstado; }
+            set {
+                bool oldState = _AltavozTlfEstado;
+
+                _AltavozTlfEstado = value;
+                Settings.Default.TlfSpeaker = value;
+                Settings.Default.Save();
+                if (oldState != _AltavozTlfEstado)
+                    General.SafeLaunchEvent(ChangeTlfSpeaker, this, new EventArgs<bool>(_AltavozTlfEstado));
+            }
+        }
+
+        public bool AltavozTlfHabilitado
+        {
+            get { return _AltavozTlfEnable; }
+        }
+
+        public bool SoloAltavoces
+        {
+            get { return _SoloAltavoces; }
+        }
+
+        public Tlf()
+		{
+			for (int i = 0; i < NumDestinations + NumIaDestinations; i++)
+			{
+				_Dst[i] = new TlfDst(i);
+				_Dst[i].StChanged += OnTlfStChanged;
+			}
+
+            if (SoloAltavoces)
+                _AltavozTlfEstado = true;
+            else if (AltavozTlfHabilitado)
+                // Se inicializa con el estado guardado 
+                _AltavozTlfEstado = Settings.Default.TlfSpeaker;
+            else
+                _AltavozTlfEstado = false;
+			_NumDstInState[(int)TlfState.Idle] = NumDestinations + NumIaDestinations;
+		}
+
+		public void Reset()
+		{
+			for (int i = 0; i < _NumDstInState.Length; i++)
+			{
+				_NumDstInState[i] = 0;
+			}
+			_NumDstInState[(int)TlfState.Idle] = NumDestinations + NumIaDestinations;
+
+			_Priority.Reset();
+			_IntrudedBy.Reset();
+			_IntrudeTo.Reset();
+			_InterruptedBy.Reset();
+			_Listen.Reset();
+			_ListenBy.Reset();
+			_Transfer.Reset();
+			_HangTone.Reset();
+			_Unhang.Reset();
+			_ConfList.Reset();
+
+			for (int i = 0; i < NumDestinations + NumIaDestinations; i++)
+			{
+				_Dst[i].Reset();
+			}
+
+			General.SafeLaunchEvent(TlfChanged, this, new RangeMsg(0, NumDestinations + NumIaDestinations));
+		}
+
+		public void Reset(RangeMsg<TlfInfo> msg)
+		{
+			Debug.Assert(msg.From + msg.Count <= NumDestinations);
+
+			for (int i = 0; i < msg.Count; i++)
+			{
+				TlfDst dst = _Dst[i + msg.From];
+				dst.Reset(msg.Info[i]);
+
+				if (dst.PrevState != dst.State)
+				{
+					_NumDstInState[(int)dst.PrevState]--;
+					_NumDstInState[(int)dst.State]++;
+
+					Debug.Assert(_NumDstInState[(int)dst.PrevState] >= 0);
+					Debug.Assert(_NumDstInState[(int)dst.State] >= 0);
+
+					_Priority.CheckTlfStChanged(dst);
+				}
+			}
+
+			General.SafeLaunchEvent(TlfChanged, this, (RangeMsg)msg);
+
+			if ((_Transfer.State == TransferState.Ready) && 
+				(_NumDstInState[(int)TlfState.Set] + _NumDstInState[(int)TlfState.Conf] != 1))
+			{
+				_Transfer.State = TransferState.Idle;
+			}
+		}
+
+		public void Reset(RangeMsg<TlfDestination> msg)
+		{
+			Debug.Assert(msg.From + msg.Count <= NumDestinations);
+
+			for (int i = 0; i < msg.Count; i++)
+			{
+				TlfDst dst = _Dst[i + msg.From];
+				dst.Reset(msg.Info[i]);
+
+				if (dst.PrevState != dst.State)
+				{
+					_NumDstInState[(int)dst.PrevState]--;
+					_NumDstInState[(int)dst.State]++;
+
+					Debug.Assert(_NumDstInState[(int)dst.PrevState] >= 0);
+					Debug.Assert(_NumDstInState[(int)dst.State] >= 0);
+
+					_Priority.CheckTlfStChanged(dst);
+				}
+			}
+
+			General.SafeLaunchEvent(TlfChanged, this, (RangeMsg)msg);
+
+			if ((_Transfer.State == TransferState.Ready) &&
+				(_NumDstInState[(int)TlfState.Set] + _NumDstInState[(int)TlfState.Conf] != 1))
+			{
+				_Transfer.State = TransferState.Idle;
+			}
+		}
+
+		public void Reset(RangeMsg<TlfState> msg)
+		{
+			for (int i = 0; i < msg.Count; i++)
+			{
+				TlfDst dst = _Dst[i + msg.From];
+				dst.Reset(msg.Info[i]);
+
+
+				if (msg.Info[i] == TlfState.Idle && IntrudeTo.IsIntrudingTo && IntrudeTo.To == dst.Dst)
+				{
+					IntrudeTo.Reset();
+				}
+
+				if (i + msg.From == IaMappedPosition)
+					_Unhang.CheckTlfStChanged(dst);
+
+				if (dst.PrevState != dst.State)
+				{
+					_NumDstInState[(int)dst.PrevState]--;
+					_NumDstInState[(int)dst.State]++;
+
+					Debug.Assert(_NumDstInState[(int)dst.PrevState] >= 0);
+					Debug.Assert(_NumDstInState[(int)dst.State] >= 0);
+
+					_Priority.CheckTlfStChanged(dst);
+				}
+			}
+
+			General.SafeLaunchEvent(TlfChanged, this, (RangeMsg)msg);
+
+			if ((_Transfer.State == TransferState.Ready) &&
+				(_NumDstInState[(int)TlfState.Set] + _NumDstInState[(int)TlfState.Conf] != 1))
+			{
+				_Transfer.State = TransferState.Idle;
+			}
+		}
+
+		public void Reset(RangeMsg<TlfIaDestination> msg)
+		{
+			Debug.Assert((msg.From >= NumDestinations) && (msg.From + msg.Count <= NumDestinations + NumIaDestinations));
+
+			for (int i = 0; i < msg.Count; i++)
+			{
+				TlfIaDestination info = msg.Info[i];
+				TlfDst dst = _Dst[i + msg.From];
+
+				dst.Reset(info);
+
+                // 29112016. JCAM.  Poder intruir una llamada prioritaria desde AI
+                if (info.State ==  TlfState.Idle && IntrudeTo.IsIntrudingTo && IntrudeTo.To == dst.Dst)
+                {
+                    IntrudeTo.Reset();
+                }
+
+				if (dst.PrevState != dst.State)
+				{
+					_NumDstInState[(int)dst.PrevState]--;
+					_NumDstInState[(int)dst.State]++;
+
+					Debug.Assert(_NumDstInState[(int)dst.PrevState] >= 0);
+					Debug.Assert(_NumDstInState[(int)dst.State] >= 0);
+
+					_Unhang.CheckTlfStChanged(dst);
+					_Priority.CheckTlfStChanged(dst);
+				}
+			}
+
+			General.SafeLaunchEvent(TlfChanged, this, (RangeMsg)msg);
+
+			if ((_Transfer.State == TransferState.Ready) &&
+				(_NumDstInState[(int)TlfState.Set] + _NumDstInState[(int)TlfState.Conf] != 1))
+			{
+				_Transfer.State = TransferState.Idle;
+			}
+		}
+
+		public void ResetMem(int id)
+		{
+			Debug.Assert(id < NumDestinations + NumIaDestinations);
+
+			TlfDst dst = _Dst[id];
+			dst.ResetMem();
+
+			if (dst.PrevState != dst.State)
+			{
+				_NumDstInState[(int)dst.PrevState]--;
+				_NumDstInState[(int)dst.State]++;
+
+				Debug.Assert(_NumDstInState[(int)dst.PrevState] >= 0);
+				Debug.Assert(_NumDstInState[(int)dst.State] >= 0);
+
+				if (id == IaMappedPosition)
+					_Unhang.CheckTlfStChanged(dst);
+
+				General.SafeLaunchEvent(TlfChanged, this, new RangeMsg(id, 1));
+			}
+		}
+
+		public TlfState GetTlfState(int from, int count)
+		{
+			Debug.Assert(from + count <= NumDestinations + NumIaDestinations);
+			TlfState st = TlfState.Idle;
+
+			if ((from == 0) && (count == NumDestinations + NumIaDestinations))
+			{
+				for (int i = _NumDstInState.Length - 1; i >= 0; i--)
+				{
+					if (_NumDstInState[i] > 0)
+					{
+						st = (TlfState)i;
+						break;
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < count; i++)
+				{
+					TlfDst dst = _Dst[i + from];
+					st = (TlfState)Math.Max((int)st, (int)dst.State);
+				}
+			}
+
+			return st;
+		}
+
+		public int GetFirstInState(params TlfState[] st)
+		{
+			for (int i = 0; i < NumDestinations + NumIaDestinations; i++)
+			{
+				if (Array.IndexOf(st, _Dst[i].State) >= 0)
+				{
+					return i;
+				}
+			}
+
+			return -1;
+		}
+
+		public static bool ValidateNumber(string number)
+		{
+			string[] atsDigit = Settings.Default.ATSNetFirstDigit.Split(',');
+
+            if (number.Length < 2)
+                return false;
+
+            string foundAtsDigit = Array.Find(atsDigit, s => s.Equals(number[0].ToString()));
+
+
+            //if ((number.Length < 2) ||
+            //    ((atsDigit != '0') && (number[0] == atsDigit) && (number.Length != 6)) ||
+            //    (number.StartsWith("03") && (number.Length != 8)))
+            if (((foundAtsDigit != null) && (number.Length != 6)) ||
+                (number.StartsWith("03") && (number.Length != 8)))
+            {
+				return false;
+			}
+
+			return true;
+		}
+
+		public static string NumberToEngine(string number)
+		{
+			string[] atsDigit = Settings.Default.ATSNetFirstDigit.Split(',');
+			Debug.Assert(number.Length >= 2);
+
+            string foundAtsDigit = Array.Find(atsDigit, s => s.Equals(number[0].ToString()));
+
+            if ((foundAtsDigit != null) && (number.Length == 6))
+			{
+                return "03" + number;
+                //return foundAtsDigit + number;
+            }
+
+			return number;
+		}
+
+		public static string NumberToPresentation(string number)
+		{
+			ulong num;
+			if ((number.Length == 8) && number.StartsWith("03") && ulong.TryParse(number, out num))
+			{
+				return number.Substring(2);
+			}
+            else if (number.StartsWith("02"))
+            {
+                return number.Split('@')[0];
+            }
+
+			return number;
+		}
+
+		private void OnTlfStChanged(object sender)
+		{
+			TlfDst dst = (TlfDst)sender;
+
+			_NumDstInState[(int)dst.PrevState]--;
+			_NumDstInState[(int)dst.State]++;
+
+			General.SafeLaunchEvent(TlfChanged, this, new RangeMsg(dst.Id, 1));
+		}
+	}
+}

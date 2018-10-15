@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Aceptar" xml:space="preserve">
+    <value>EN_Aceptar</value>
+  </data>
+  <data name="AGVN" xml:space="preserve">
+    <value>EN_AGVN:</value>
+  </data>
+  <data name="Cancelar" xml:space="preserve">
+    <value>EN_Cancelar</value>
+  </data>
+  <data name="Cerrar" xml:space="preserve">
+    <value>EN_Cerrar</value>
+  </data>
+  <data name="DirectorioDependeciasUsuario" xml:space="preserve">
+    <value>EN_Directorio de Dependecias-Usuario</value>
+  </data>
+  <data name="Escucha" xml:space="preserve">
+    <value>EN_Escucha</value>
+  </data>
+  <data name="Funcion" xml:space="preserve">
+    <value>EN_Función:</value>
+  </data>
+  <data name="GlobalDisconnected" xml:space="preserve">
+    <value>EN_Desconectado</value>
+  </data>
+  <data name="GlobalIsolated" xml:space="preserve">
+    <value>EN_Aislado</value>
+  </data>
+  <data name="GlobalOk" xml:space="preserve">
+    <value>EN_Comunicaciones Ok</value>
+  </data>
+  <data name="Llamar" xml:space="preserve">
+    <value>EN_Llamar</value>
+  </data>
+  <data name="Num1" xml:space="preserve">
+    <value>EN_Num 1.</value>
+  </data>
+  <data name="Num2" xml:space="preserve">
+    <value>EN_Num 2.</value>
+  </data>
+  <data name="Num3" xml:space="preserve">
+    <value>EN_Num 3.</value>
+  </data>
+  <data name="Num4" xml:space="preserve">
+    <value>EN_Num 4.</value>
+  </data>
+  <data name="Prioridad" xml:space="preserve">
+    <value>EN_Prioridad</value>
+  </data>
+  <data name="RdNoOk" xml:space="preserve">
+    <value>EN_Desconectado sistema radio</value>
+  </data>
+  <data name="RdOk" xml:space="preserve">
+    <value>EN_Comunicaciones radio Ok</value>
+  </data>
+  <data name="Retener" xml:space="preserve">
+    <value>EN_Retener</value>
+  </data>
+  <data name="RTB" xml:space="preserve">
+    <value>EN_RTB:</value>
+  </data>
+  <data name="Tipo" xml:space="preserve">
+    <value>EN_Tipo:</value>
+  </data>
+  <data name="TlfNoOk" xml:space="preserve">
+    <value>EN_Desconectado sistema telefonía</value>
+  </data>
+  <data name="TlfOk" xml:space="preserve">
+    <value>EN_Comunicaciones telefonía Ok</value>
+  </data>
+  <data name="TlfOk1" xml:space="preserve">
+    <value>EN_Comunicaciones telefonía Ok</value>
+  </data>
+  <data name="Transferir" xml:space="preserve">
+    <value>EN_Transferir</value>
+  </data>
+  <data name="AD" xml:space="preserve">
+    <value>EN_AD</value>
+  </data>
+  <data name="AI" xml:space="preserve">
+    <value>EN_AI</value>
+  </data>
+  <data name="Mem" xml:space="preserve">
+    <value>EN_MEM</value>
+  </data>
+  <data name="Normal" xml:space="preserve">
+    <value>EN_Normal</value>
+  </data>
+  <data name="INF" xml:space="preserve">
+    <value>EN_INFO</value>
+  </data>
+  <data name="Rtx" xml:space="preserve">
+    <value>EN_Rtx</value>
+  </data>
+  <data name="BriefingSession" xml:space="preserve">
+    <value>Breafing session</value>
+  </data>
+  <data name="Conferencia" xml:space="preserve">
+    <value>Conference</value>
+  </data>
+  <data name="BrfSession" xml:space="preserve">
+    <value>Briefing</value>
+  </data>
+  <data name="RxLcSession" xml:space="preserve">
+    <value>Rx. AI</value>
+  </data>
+  <data name="RxSession" xml:space="preserve">
+    <value>Rx Radio</value>
+  </data>
+  <data name="TelfSession" xml:space="preserve">
+    <value>Telephone</value>
+  </data>
+  <data name="TxLcSession" xml:space="preserve">
+    <value>Tx AI</value>
+  </data>
+  <data name="TxSession" xml:space="preserve">
+    <value>Tx Radio</value>
+  </data>
+  <data name="DateTime" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="Session" xml:space="preserve">
+    <value>Session</value>
+  </data>
+  <data name="Reproduccion" xml:space="preserve">
+    <value>Reproduction</value>
+  </data>
+  <data name="BadOperation" xml:space="preserve">
+    <value>Bad operation</value>
+  </data>
+  <data name="CarrierDetectionError" xml:space="preserve">
+    <value>Carrier not found</value>
+  </data>
+  <data name="TxConfirmationDetectionError" xml:space="preserve">
+    <value>Transmission not confirmed</value>
+  </data>
+</root>

@@ -1,0 +1,39 @@
+Notas Envio 18-11-2014
+
+	Define:
+		_AUDIOGENERIC_: Modificaciones en Gestión Dispositivos de Audio...
+
+			Nuevos Parámetros:
+				'TipoAudioUsb'...
+				'RdSpkAsioId'
+				'LcSpkAsioId'
+				'MicAsioId'
+				'CasAsioId'
+				
+			Modificado HwManager, para incluir las diferentes opciones.
+			Modificado MixedManager, para incluir las dos opciones.
+			Modificado RecorderManager para nueva interfaz de señalizacion de grabacion.
+			Añadidos:
+				Source/Engine/CD40/CD40.Module/BusinessEntities/CMediaHwManager.cs
+				Source/Engine/CD40/CD40.Module/BusinessEntities/GenericHwManager.cs
+				Source/Engine/CD40/CD40.Module/BusinessEntities/Hid.cs
+
+			Añadido:
+				Source/Infrastructure/BlueWave.Interop.Asio: Nueva DLL, para detectar los canales de audio.
+				
+			Supervision de Errores en Tarjetas de AUDIO. 
+				!!! Sin Terminar ¡¡¡¡
+		
+		_NEWSTART_: Modificado nuevo arranque del modulo 'Top', para detectar errores...
+		
+			Modificado INIT y START de TOP
+			
+		_HF_GLOBAL_STATUS_: Código Correspondiente al estado global HF.
+		
+			Gestion del estado global del subsistema HF.
+
+	
+	Actualizacion NLOG a version 3.
+
+
+	

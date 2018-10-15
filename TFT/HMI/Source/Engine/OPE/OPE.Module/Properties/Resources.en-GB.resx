@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CallError" xml:space="preserve">
+    <value>EN_Llamada en curso</value>
+  </data>
+  <data name="CodeError" xml:space="preserve">
+    <value>EN_Código erróneo</value>
+  </data>
+  <data name="ConfError" xml:space="preserve">
+    <value>EN_Máximo de participantes en conferencia</value>
+  </data>
+  <data name="CoorJacksError" xml:space="preserve">
+    <value>No Jacks coordinador</value>
+  </data>
+  <data name="DependCodeError" xml:space="preserve">
+    <value>EN_Código no pertenece a la dependencia</value>
+  </data>
+  <data name="FacilityError" xml:space="preserve">
+    <value>EN_Facilidad imposible</value>
+  </data>
+  <data name="FrecuencyRtxError" xml:space="preserve">
+    <value>EN_Imposible, hay una frecuencia en RTX</value>
+  </data>
+  <data name="GenericError" xml:space="preserve">
+    <value>EN_Código de error: {0}</value>
+  </data>
+  <data name="IsolatedError" xml:space="preserve">
+    <value>EN_Sistema aislado</value>
+  </data>
+  <data name="JacksError" xml:space="preserve">
+    <value>EN_No Jacks</value>
+  </data>
+  <data name="LinkError" xml:space="preserve">
+    <value>EN_Enlace ya configurado</value>
+  </data>
+  <data name="OpeErrorCaption" xml:space="preserve">
+    <value>EN_Falsa maniobra</value>
+  </data>
+  <data name="OpenDrv422Error" xml:space="preserve">
+    <value>EN_Error abriendo puerto de comunicaciones con la OPE (Port={0}, Settings={1})</value>
+  </data>
+  <data name="OperativityError" xml:space="preserve">
+    <value>EN_Error de operatividad</value>
+  </data>
+  <data name="PlacementError" xml:space="preserve">
+    <value>EN_Imposible, emplazamiento único</value>
+  </data>
+  <data name="PttError" xml:space="preserve">
+    <value>EN_PTT error</value>
+  </data>
+  <data name="PttRunningError" xml:space="preserve">
+    <value>EN_PTT pulsado</value>
+  </data>
+  <data name="PttTimeoutError" xml:space="preserve">
+    <value>EN_Tiempo máximo en PTT</value>
+  </data>
+  <data name="RtxError" xml:space="preserve">
+    <value>EN_Imposible, frecuencia implicada en RTX</value>
+  </data>
+  <data name="RtxGroupError" xml:space="preserve">
+    <value>EN_RTX no aceptada</value>
+  </data>
+  <data name="RtxGroupMaxError" xml:space="preserve">
+    <value>EN_Imposible, máximo 10 frecuencias en grupo RTX</value>
+  </data>
+  <data name="RtxGroupSquelchError" xml:space="preserve">
+    <value>EN_RTX no aceptada. Squelch en más de una frecuencia</value>
+  </data>
+  <data name="ScvInfo" xml:space="preserve">
+    <value>EN_Información SCV</value>
+  </data>
+  <data name="ServerError" xml:space="preserve">
+    <value>EN_Error obteniendo configuración del servidor</value>
+  </data>
+  <data name="SrvError" xml:space="preserve">
+    <value>EN_Servicios no capturados</value>
+  </data>
+  <data name="TlfUnavailableError" xml:space="preserve">
+    <value>EN_Telefonía no disponible</value>
+  </data>
+  <data name="TlfUnsectorError" xml:space="preserve">
+    <value>EN_Telefonía fuera de sector</value>
+  </data>
+  <data name="TlfUsedError" xml:space="preserve">
+    <value>EN_Subsistema de telefonía usado</value>
+  </data>
+</root>
