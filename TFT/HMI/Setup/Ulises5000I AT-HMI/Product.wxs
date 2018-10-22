@@ -168,7 +168,7 @@
     
     <UIRef Id="MyWixUI_Minimal"/>
     <WixVariable Id="WixUIDialogBmp" Value="bkg-image.jpg"/>
-    <WixVariable Id="WixUIBannerBmp " Value="banner-image.jpg"/>
+    <WixVariable Id="WixUIBannerBmp" Value="banner-image.jpg"/>
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
 
     <!-- DLL Custom Actions -->
