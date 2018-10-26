@@ -25,7 +25,7 @@ angular.module("Uv5kinbx")
         var txt = document.createElement("textarea");
         txt.innerHTML = html;
         return txt.value;
-    }
+    };
 
     /** Funciones o servicios */
     function getInci() {
@@ -66,8 +66,8 @@ angular.module("Uv5kinbx")
 
 		ctrl.timer++;
 
-		if ((ctrl.timer % 5) == 0) {
-		    getInci();
+		if (ctrl.timer % 5 == 0) {
+            getInci();
 		}
 
 	}, 1000);
@@ -86,7 +86,7 @@ angular.module("Uv5kinbx")
 
     /** Salida del Controlador. Borrado de Variables */
 	$scope.$on("$destroy", function () {
-	    $interval.cancel(timer);
+        $interval.cancel(timer);
 	});
 	
 });

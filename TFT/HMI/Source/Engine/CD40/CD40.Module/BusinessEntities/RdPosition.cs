@@ -211,7 +211,8 @@ namespace HMI.CD40.Module.BusinessEntities
             _TipoFrecuencia = TipoFrecuencia_t.Basica;
             _Estado = RdSrvFrRs.FrequencyStatusType.NotAvailable;
             _RxOnly = false;
-		}
+        
+        }
 
 		public void Reset(CfgEnlaceExterno cfg)
 		{
@@ -346,7 +347,9 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				Top.Registry.SetTx(_Literal, true, _Priority, _Tx == AssignState.Trying);
 			}
-		}
+        
+            //LogManager.GetLogger("agldebug").Trace("RdPosition {0} Rx=>{2}, Tx=>{1}", Literal, _Rx, _Tx);
+        }
 
 		public void SetRx(bool on, bool forced = false)
 		{
