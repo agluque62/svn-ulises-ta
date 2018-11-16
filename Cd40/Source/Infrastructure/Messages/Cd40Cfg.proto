@@ -250,6 +250,7 @@ message ParametrosSectorSCVKeepAlive
 	optional bool Intruido = 8;
 	optional uint32 KeepAlivePeriod = 9;
 	optional uint32 KeepAliveMultiplier = 10;
+	optional bool GrabacionEd137 = 11;
 }
 
 message PermisosRedesSCV
@@ -351,6 +352,8 @@ message CfgEnlaceExterno
 	optional int32 MetodosBssOfrecidos = 19;
 	optional string Alias = 20;
 	optional Tipo_ModoTransmision ModoTransmision = 21;
+    optional string EmplazamientoDefecto = 22;
+	optional int32 TiempoVueltaADefecto = 23;
 }
 
 message CfgRecursoEnlaceInterno

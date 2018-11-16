@@ -1040,8 +1040,9 @@ namespace HMI.CD40.Module.BusinessEntities
             answer.Value = SIPanswer;
 		}
 
-         /// <summary>
-        /// 
+        /// <summary>
+        /// Procesa el campo info que se recibe para intrusiones e interrupciones
+        /// En ambas, se envia un tono de aviso al intruido o interrumpido
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="call"></param>
@@ -1050,10 +1051,18 @@ namespace HMI.CD40.Module.BusinessEntities
  
 		private void OnInfoReceived(object sender, int call, string info, uint lenInfo)
 		{
-            if (info == TlfIntrusion.INTRUSION_IN_PROGRESS)
+            if (info == TlfIntrusion.INTRUSION_IN_PROGRESS) 
 			{
                    setShortTone(1000, "Warning_Operator_Intervening.wav");
 			}
+            else if (info == TlfIntrusion.INTERRUPTION_IMPENDING)
+            {
+                if (_IntrusionTone == -1)
+                {
+                    _IntrusionTone = SipAgent.CreateWavPlayer("Resources/Tones/Interrupt_Warning.wav", true);
+                    Top.Mixer.LinkTlf(_IntrusionTone, MixerDir.Send, Mixer.TLF_PRIORITY);
+                }
+            }
 			else if (info.StartsWith("Intruido por "))
 			{
 				foreach (TlfPosition tlf in _TlfPositions)
@@ -1066,7 +1075,7 @@ namespace HMI.CD40.Module.BusinessEntities
 					}
 				}
 			}
-            else if (info == TlfIntrusion.INTRUSION_COMPLETED)
+            else if (info == TlfIntrusion.INTERRUPTION_TERMINATED) 
             {
                 // Si se ha interrumpido una llamada por prioridad hay que eliminar el tono de interrupción por prioridad
                 if (_IntrusionTone != -1)
@@ -1079,6 +1088,8 @@ namespace HMI.CD40.Module.BusinessEntities
                 // Eliminar el mensaje de "Intervenido por:"
                 General.SafeLaunchEvent(IntrudeToStateEngine, this, null); ;
             }
+            else
+                _Logger.Warn("Info Received not implemented " + info);
 		}
 
         /// <summary>

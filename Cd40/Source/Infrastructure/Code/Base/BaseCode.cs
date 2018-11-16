@@ -339,7 +339,7 @@ namespace U5ki.Infrastructure
                 Log<T>(LogLevel.Error, message, U5kiIncidencias.U5kiIncidencia.IGNORE);
 
             /** */
-            LogManager.GetLogger(typeof(T).Name).Trace(message + ": ", ex);
+            LogManager.GetLogger(typeof(T).Name).Error(message + ": ", ex);
         }
 
         #endregion

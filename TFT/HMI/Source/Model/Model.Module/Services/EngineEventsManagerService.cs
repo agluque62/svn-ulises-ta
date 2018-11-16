@@ -196,6 +196,13 @@ namespace HMI.Model.Module.Services
             _StateManager.RdSpeaker.Presencia = msg.LeftJack;
         }
 
+        [EventSubscription(EventTopicNames.ProxyStateChangedEngine, ThreadOption.UserInterface)]
+        public void OnProxyStateChangedEngine(object sender, StateMsg<bool> msg)
+        {
+            _Logger.Trace("Procesando {0}: state {1}", EventTopicNames.ProxyStateChangedEngine, msg.State);
+            _StateManager.Scv.ProxyState = msg.State;
+        }
+
         [EventSubscription(EventTopicNames.SpeakerExtStateEngine, ThreadOption.UserInterface)]
         public void OnSpeakerExtStateEngine(object sender, JacksStateMsg msg)
         {

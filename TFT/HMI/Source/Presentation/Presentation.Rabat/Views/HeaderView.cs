@@ -137,6 +137,12 @@ namespace HMI.Presentation.Rabat.Views
             _InfoBT.Text = _Info;   // Miguel
 		}
 
+        [EventSubscription(EventTopicNames.ProxyPresent, ThreadOption.Publisher)]
+        public void OnProxyPresent(object sender, EventArgs e)
+        {
+            BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : BackColor = System.Drawing.Color.Khaki;
+        }
+
 		[EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
 		[EventSubscription(EventTopicNames.EngineStateChanged, ThreadOption.Publisher)]
 		public void OnTftEnabledChanged(object sender, EventArgs e)

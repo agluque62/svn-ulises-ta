@@ -522,7 +522,8 @@ namespace U5ki.CfgService
 			}
             /** 20180321. Rellenar con ALIAS cuando venga en Configuracion */
             cfg.Alias = soapCfg.AliasEnlace ?? "NoAlias";
-
+            cfg.EmplazamientoDefecto = "";
+            cfg.TiempoVueltaADefecto = 0;
             if (soapCfg.ModoTransmision == null)
                 cfg.ModoTransmision = Tipo_ModoTransmision.Ninguno;
             else
@@ -530,6 +531,8 @@ namespace U5ki.CfgService
             {
                 case "R":
                     cfg.ModoTransmision = Tipo_ModoTransmision.UltimoReceptor;
+                    cfg.EmplazamientoDefecto = soapCfg.EmplazamientoDefecto;
+                    cfg.TiempoVueltaADefecto = soapCfg.TiempoVueltaADefecto;
                     break;
                 case "M":
                     cfg.ModoTransmision = Tipo_ModoTransmision.Manual;

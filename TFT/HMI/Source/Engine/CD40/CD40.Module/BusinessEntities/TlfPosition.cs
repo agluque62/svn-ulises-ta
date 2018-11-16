@@ -1313,6 +1313,8 @@ namespace HMI.CD40.Module.BusinessEntities
 					}
 
 					SipAgent.HangupCall(_SipCall.Id, reason);
+                    _Logger.Debug("HangupCall: {0}", _SipCall.RemoteId);
+
 				}
 				else
 				{

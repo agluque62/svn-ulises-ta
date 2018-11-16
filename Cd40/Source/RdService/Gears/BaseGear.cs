@@ -157,7 +157,6 @@ namespace U5ki.RdService.Gears
         /// Hay que recordar que es un supuesto estado, puesto que no hay sistema de comunicación directa.
         /// Es la aplicación la que tiene que estar preguntando regularmente y actualizando el estado.
         /// 
-        /// IMPORTANTE: Usar el campo para lectura interna, para no bloquear el hilo. con el semaforo.
         /// </summary>
         public override GearStatus Status 
         { 
@@ -193,19 +192,13 @@ namespace U5ki.RdService.Gears
             }
         }
 
-        /// <summary>
-        /// 20161117. Para utilizar el Callbacks y evitar lazos de muerte en los procesos...
-        /// </summary>
-        public GearStatus ROStatus
-        {
-            get { return _status; }
-        }
-
         public Boolean IsAvailable
         {
             get
             {
-                return (this._status != Enums.GearStatus.Fail && this._status != Enums.GearStatus.Forbidden);
+                return (this._status != Enums.GearStatus.Fail && 
+                        this._status != Enums.GearStatus.Forbidden &&
+                        this._status != Enums.GearStatus.AssignationInProgress);
             }
         }
 

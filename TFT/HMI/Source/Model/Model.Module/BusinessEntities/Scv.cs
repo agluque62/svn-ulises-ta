@@ -13,6 +13,22 @@ namespace HMI.Model.Module.BusinessEntities
 
 		[EventPublication(EventTopicNames.ActiveScvChanged, PublicationScope.Global)]
 		public event EventHandler ActiveScvChanged;
+        [EventPublication(EventTopicNames.ProxyPresent, PublicationScope.Global)]
+        public event EventHandler ProxyPresent;
+        private bool _Proxy = true;
+
+        public bool ProxyState
+        {
+            get { return _Proxy; }
+            set
+            {
+                if (_Proxy != value)
+                {
+                    _Proxy = value;
+                    General.SafeLaunchEvent(ProxyPresent, this);
+                }
+            }
+        }
 
 		public int Active
 		{

@@ -23,6 +23,20 @@ namespace Utilities
 			_Stop = false;
 			_WorkingThread.Start();
 		}
+        public void Start(string name, int overloadThreshold)
+        {
+            Debug.Assert(_Stop);
+
+            _NewEvent = new AutoResetEvent(false);
+            _StopEvent = new ManualResetEvent(false);
+            _WorkingThread = new Thread(ProcessEvents);
+            _WorkingThread.IsBackground = true;
+
+            _Stop = false;
+            _WorkingThread.Start();
+            _Name = name;
+            _OverloadThreshold = overloadThreshold;
+        }
 
 		public void Stop()
 		{
@@ -79,6 +93,17 @@ namespace Utilities
 					{
 						_Queue.Enqueue(new Event(id, handler));
 						_NewEvent.Set();
+                        string listaEventos = "";
+                        if (_Queue.Count > _OverloadThreshold)
+                        {
+                            LogManager.GetCurrentClassLogger().Info("Event Queue {1} overloaded {0} with {2}", _Queue.Count, _Name, id);
+                            foreach (Event evento in _Queue.ToArray())
+                            {
+                                listaEventos += " ";
+                                listaEventos += evento.Id;
+                            }
+                            LogManager.GetCurrentClassLogger().Trace("ev:{0} ", listaEventos);                           
+                        }
 					}
 				}
 			}
@@ -107,7 +132,8 @@ namespace Utilities
 		private AutoResetEvent _NewEvent;
 		private ManualResetEvent _StopEvent;
 		private Thread _WorkingThread;
-
+        private string _Name = "NoName";
+        private int _OverloadThreshold = 100;
 		private void ProcessEvents()
 		{
 			WaitHandle[] waitHandles = new WaitHandle[] { _StopEvent, _NewEvent };

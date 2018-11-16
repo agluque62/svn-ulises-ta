@@ -183,9 +183,17 @@ namespace U5ki.RdService
         /// Sirve para gestionar el atributo txSeleccionado de sus recursos
         /// </summary>
         private Tipo_ModoTransmision _ModoTransmision = Tipo_ModoTransmision.Ninguno;
-        //Para optimizar busquedas se guarda los recursos seleccionados
+        // Guarda el tx con el emplazamiento configurado por defecto
+        private RdResource _TxRsDefault = null;
+        // Guarda el tiempo configurado para ir a emplazamiento por defecto para tx, 0 significa que no tiene efecto
+        private int _TimeToTxDefault = 0;
+        //Timer para Tx por el emplazamiento de defecto en caso de inactividad de la FD
+        private Timer _TimerTxDefault = null;
+        //Para optimizar busquedas se guarda el recursos seleccionados
         private RdResource _TxRsSelected = null;
-        private String _LastSQSite = "";
+        //Guarda el ultimo emplazamiento seleccionado bien por SQ, bien por selección del de defecto. 
+        //Se usa para elegir el _TxRsSelected en la funcion de evaluacion
+        private String _LastSelectedSite = "";
         /// <summary>
         /// 
         /// </summary>
@@ -238,6 +246,10 @@ namespace U5ki.RdService
                 _DisableFrequencyTimer.Enabled = false;
                 _DisableFrequencyTimer.Elapsed += OnDisableFrequencyElapsed;
             }
+            _TimerTxDefault = new Timer();
+            _TimerTxDefault.AutoReset = false;
+            _TimerTxDefault.Enabled = false;
+            _TimerTxDefault.Elapsed += OnTxDefaultElapsed;
         }
 
         #region IDisposable Members
@@ -411,7 +423,8 @@ namespace U5ki.RdService
                     }
                 }
             }
-
+            if (_FrRs != null)
+                RdRegistry.Publish(_Frecuency, _FrRs);
             ConfiguraModoTransmision(cfg);
         }
 
@@ -1021,8 +1034,9 @@ namespace U5ki.RdService
                                 //Este caso es de SQ no provocado por PTT propio (avion u otro SCV).
                                 if ((_CurrentSrcPtt == null) && (info.PttId == 0))
                                 {
-                                    _LastSQSite = rdRs.Site;
+                                    _LastSelectedSite = rdRs.Site;
                                     EvaluaTxMute();
+                                    StartTimerTxDefault();
                                 }
                                 _FrRs.Squelch = RdSrvFrRs.SquelchType.SquelchOnlyPort;
                             }
@@ -1103,15 +1117,41 @@ namespace U5ki.RdService
                         }
                     }
                 }
-                //VMG 21/09/2018
-                //Se añade la condicion para publicar las frecuencias degradadas al HMI
-                if ((_FrRs != null) && (_FrRs.FrequencyStatus == RdSrvFrRs.FrequencyStatusType.Degraded))
-                    RdRegistry.Publish(_Frecuency, _FrRs);
                 return true;
             }
             return false;
         }
 
+        /// <summary>
+        /// Temporizador que se utiliza para transmitir por el emplazamiento por defecto en FD
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnTxDefaultElapsed(object sender, ElapsedEventArgs e)
+        {
+            RdService.evQueueRd.Enqueue("OnTxDefaultElapsed", delegate()
+            {
+               if ((_TxRsDefault.Connected) && (_TxRsDefault != _TxRsSelected))
+               {
+                LogTrace<RdFrecuency>("TX seleccionado por timeout " + _TxRsDefault);
+                    _TxRsDefault.TxMute = false;
+                    _TxRsSelected.TxMute = true;
+                    //Cambio dinámico del PTT por cambio de TX seleccionado 
+                    if (!string.IsNullOrEmpty(PttSrc))
+                    {
+                        SipAgent.PttOn(_TxRsSelected.SipCallId, _TxRsSelected.PttId, _CurrentSrcPtt.Type, _TxRsSelected.PttMute);
+                        SipAgent.PttOn(_TxRsDefault.SipCallId, _TxRsDefault.PttId, _CurrentSrcPtt.Type, _TxRsDefault.PttMute);
+                        //Esto provoca que salte el aviso acustico de falsa maniobra,
+                        //lo comentamos porque se ha elegido de momento el cambio dinámico de TX
+                        //    _FrRs.PttSrcId = "ERROR"; ;
+                        //    RdRegistry.Publish(_Frecuency, _FrRs);
+                    }
+                    _TxRsSelected = _TxRsDefault;
+                    _LastSelectedSite = _TxRsDefault.Site;
+                    LogDebug<RdFrecuency>(String.Format("Nuevo tx seleccionado por timeout {0}", _TxRsSelected.Site));
+                }
+            });
+        }
         /// <summary>
         /// Temporizador que se utiliza para para retrasar el ptt coupling. 
         /// Se utiliza en dos casos:
@@ -1755,6 +1795,8 @@ namespace U5ki.RdService
                         }
                     }
                 }
+                if ((_TxRsDefault != null) && (rdRs.Site == _TxRsDefault.Site))
+                    StartTimerTxDefault();
             }
 
             if ((_FrRs == null) && HasSIPSession())     
@@ -1837,6 +1879,8 @@ namespace U5ki.RdService
                             }
                         }
                     }
+                    if ((_TxRsDefault != null) && (rdRs != null) && (rdRs.Site == _TxRsDefault.Site))
+                        StopTimerTxDefault();
                 }
 
             /** AGL. 20151022. Reseteo la frecuencia cuando no haya receptores o no haya transmisores. */
@@ -2016,7 +2060,8 @@ namespace U5ki.RdService
                 {
                     LogTrace<RdFrecuency>("PttOff_1 " + p.Value.Frecuency + ",srcPtts.Count " + _SrcPtts.Count.ToString());
                     SipAgent.PttOff(p.Key);
-
+                    StartTimerTxDefault();
+                    
                     //Al receptor del mismo emplazamiento y frecuencia se le envia el mismo PTT off
                     foreach (KeyValuePair<int, RdResource> q in _SipRxCalls)
                     {
@@ -2049,6 +2094,7 @@ namespace U5ki.RdService
                     // Todos los recursos asociados a la frecuencia en transmisión hacen PTT
                     LogTrace<RdFrecuency>("PttOn_1 " + p.Value.Frecuency + "," + _CurrentSrcPtt.Type.ToString() + ",srcPtts.Count " + _SrcPtts.Count.ToString());
                     SipAgent.PttOn(p.Key, p.Value.PttId, _CurrentSrcPtt.Type, p.Value.PttMute);
+                    StopTimerTxDefault();
 
                     //EDU 08/06/2017
                     //Al receptor del mismo emplazamiento y frecuencia se le envia el PTT type
@@ -2249,6 +2295,7 @@ namespace U5ki.RdService
                 }
                 if ((_CurrentSrcPtt != null) && (_SipTxCalls.Count > 0))
                 {
+                    StartTimerTxDefault();
                     foreach (int sipTxCall in _SipTxCalls.Keys)
                     {
                         SipAgent.PttOff(sipTxCall);
@@ -2441,8 +2488,17 @@ namespace U5ki.RdService
         /// </summary>
         /// <param name="cfg"></param>
         private void ConfiguraModoTransmision(CfgEnlaceExterno cfg)
-        {
-
+        {           
+            RdResource oldTxRsDefault = _TxRsDefault;
+            _TxRsDefault = null;
+            if (_TimeToTxDefault != cfg.TiempoVueltaADefecto)
+            {
+                _TimeToTxDefault = cfg.TiempoVueltaADefecto;
+                if (cfg.TiempoVueltaADefecto > 0)
+                    _TimerTxDefault.Interval = cfg.TiempoVueltaADefecto * 1000;
+                else
+                    StopTimerTxDefault();
+            }
             if (cfg.TipoFrecuencia == Tipo_Frecuencia.FD)
             {
                 if (_ModoTransmision != cfg.ModoTransmision)
@@ -2452,8 +2508,25 @@ namespace U5ki.RdService
                     foreach (RdResource rdRs in _RdRs.Values)
                         if (rdRs.isTx)
                             rdRs.TxMute = _ModoTransmision == Tipo_ModoTransmision.UltimoReceptor ? true : false;
-                    _TxRsSelected = null;
-                }                
+                    _TxRsSelected = null;                    
+                }
+                if (!String.IsNullOrEmpty(cfg.EmplazamientoDefecto))
+                {
+                    foreach (RdResource rdRs in _RdRs.Values)
+                        if (rdRs.isTx)
+                            if (rdRs.Site == cfg.EmplazamientoDefecto)
+                            {
+                                _TxRsDefault = rdRs;
+                                    StartTimerTxDefault();
+                                    if (String.IsNullOrEmpty(_LastSelectedSite))
+                                        _LastSelectedSite = cfg.EmplazamientoDefecto;
+                                break;
+                            }
+                }
+                else
+                {
+                    StopTimerTxDefault();
+                }
                 EvaluaTxMute();
             }
             else
@@ -2464,7 +2537,7 @@ namespace U5ki.RdService
                         if (rdRs.isTx)
                             rdRs.TxMute = false;
                     _TxRsSelected = null;
-                    _LastSQSite = "";
+                    _LastSelectedSite = "";
                 }
                 _ModoTransmision = Tipo_ModoTransmision.Ninguno;
             }
@@ -2472,8 +2545,9 @@ namespace U5ki.RdService
 
         /// <summary>
         /// Selecciona un transmisor de entre los conectados con estos criterios:
-        /// -El que tenga el emplazamiento guardado en _LastSQSite siempre tiene preferencia
-        /// -si no hay uno ya seleccionado previamente, cualquiera conectado
+        /// 1-El que tenga el emplazamiento guardado en _LastSQSite siempre tiene preferencia
+        /// 2-El siguiente que se elige es el de defecto
+        /// 3-si no hay uno ya seleccionado previamente, cualquiera conectado
         /// Si no hay ninguna radio conectada, deselecciona el TX, si lo hay
         /// Si no tiene valor _LastSQSite, se le pone el del seleccionado (para poder conservar M+N)
         /// Si hay un cambio de seleccion de TX, con Ptt en curso, se actualizan los Ptt 
@@ -2482,7 +2556,6 @@ namespace U5ki.RdService
         /// <param name="cfg"></param>
         private void EvaluaTxMute()
         {
-            bool hayTxSeleccionado = false;
             bool hayTxEnSite = false;
             RdResource txSelected = null;
             RdResource txConnected = null;
@@ -2492,16 +2565,20 @@ namespace U5ki.RdService
                 //Para optimizar busquedas se usa _TxRsSelected
                 if ((_TxRsSelected != null) && 
                     (_TxRsSelected.Connected) &&
-                    (_TxRsSelected.Site == _LastSQSite))
+                    (_TxRsSelected.Site == _LastSelectedSite))
                     return;
                 //Se busca el seleccionado entre los recursos
                 foreach (RdResource rdRs in _RdRs.Values)
                     if (rdRs.isTx)
                     {
-                        hayTxSeleccionado |= !rdRs.TxMute;
                         if (rdRs.Connected)
                         {
-                            if (rdRs.Site == _LastSQSite)
+                            if (rdRs.Site == _LastSelectedSite)
+                            {
+                                hayTxEnSite = true;
+                                txConnected = rdRs;
+                            }
+                            else if (!hayTxEnSite && (_TxRsDefault != null ) && (rdRs == _TxRsDefault))
                             {
                                 hayTxEnSite = true;
                                 txConnected = rdRs;
@@ -2511,30 +2588,51 @@ namespace U5ki.RdService
                         }
                         if (!rdRs.TxMute) txSelected = rdRs;
                     }
+                if (txSelected == txConnected)
+                    return;
                 //Deselecciona
-                if (hayTxSeleccionado && 
+                if (txSelected != null && 
                     (!txSelected.Connected || hayTxEnSite))
                 {
                     txSelected.TxMute = true;
-                    hayTxSeleccionado = false;
                     _TxRsSelected = null;
                     //Cambio dinámico del PTT por cambio de TX seleccionado 
                     if (!string.IsNullOrEmpty(PttSrc))
-                        SipAgent.PttOn(txSelected.SipCallId, txSelected.PttId, _CurrentSrcPtt.Type, txSelected.PttMute);
+                    {
+                        if (txSelected.SipCallId != -1)
+                            SipAgent.PttOn(txSelected.SipCallId, txSelected.PttId, _CurrentSrcPtt.Type, txSelected.PttMute);
+                        //Esto provoca que salte el aviso acustico de falsa maniobra,
+                        //lo comentamos porque se ha elegido de momento el cambio dinámico de TX
+                        //    _FrRs.PttSrcId = "ERROR"; ;
+                        //    RdRegistry.Publish(_Frecuency, _FrRs);
+                    }
+                    LogDebug<RdFrecuency>(String.Format("tx deseleccionado {0}", txSelected.Site));
+                    txSelected = null;
                 }
                 //Selecciona
-                if (!hayTxSeleccionado && (txConnected != null))
+                if (txSelected == null && (txConnected != null))
                 {
                     txConnected.TxMute = false;
                     _TxRsSelected = txConnected;
                     //Cambio dinámico del PTT por cambio de TX seleccionado 
                     if (!string.IsNullOrEmpty(PttSrc))
                         SipAgent.PttOn(txConnected.SipCallId, txConnected.PttId, _CurrentSrcPtt.Type, txConnected.PttMute);
-                    //Para evitar cambios por M+N o por sectorización, si no ha habido ningun SQ antes.
-                    if (_LastSQSite == "")
-                        _LastSQSite = _TxRsSelected.Site;
+                    _LastSelectedSite = _TxRsSelected.Site;
+                    LogDebug<RdFrecuency>(String.Format("Nuevo tx seleccionado {0}", _TxRsSelected.Site));
                 }
             }
+        }
+        private void StartTimerTxDefault()
+        {
+            if ((_TimeToTxDefault > 0) && (_TxRsDefault != null))
+                if (_TxRsDefault != _TxRsSelected)
+                    _TimerTxDefault.Enabled = true;
+        }
+
+        private void StopTimerTxDefault()
+        {
+            if (_TimerTxDefault.Enabled)
+                _TimerTxDefault.Enabled = false;
         }
 
         #endregion
@@ -2550,7 +2648,7 @@ namespace U5ki.RdService
                     SanityCheckCallsFailures = sanityCheckCallsFailures,
                     ModoTransmision = _ModoTransmision,
                     TxRsSelected = _TxRsSelected,
-                    LastSQSite = _LastSQSite,
+                    LastSQSite = _LastSelectedSite,
                     Flag = _flag,
                     RtxGroups = from g in _RtxGroups select new { key = g.Key, grp = from f in g.Value select new { id = f.Frecuency } },
                     FrRs = _FrRs,

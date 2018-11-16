@@ -39,7 +39,10 @@ namespace HMI.CD40.Module.Services
 	{
 		#region Events
 
-		[EventPublication(EventTopicNames.ConnectionStateEngine, PublicationScope.Global)]
+        [EventPublication(EventTopicNames.ProxyStateChangedEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<bool>> ProxyStateChangedEngine;
+
+        [EventPublication(EventTopicNames.ConnectionStateEngine, PublicationScope.Global)]
 		public event EventHandler<EngineConnectionStateMsg> ConnectionStateEngine;
 
 		[EventPublication(EventTopicNames.IsolatedStateEngine, PublicationScope.Global)]
@@ -223,7 +226,11 @@ namespace HMI.CD40.Module.Services
 
 				if (Top.Mixer != null) Top.Mixer.SplitModeChanged += OnSplitModeChanged;
 
-				if (Top.Cfg != null) Top.Cfg.ConfigChanged += OnConfigChanged;
+                if (Top.Cfg != null)
+                {
+                    Top.Cfg.ConfigChanged += OnConfigChanged;
+                    Top.Cfg.ProxyStateChangeCfg += OnProxyStateChange;
+                }
                 if (Top.Tlf != null)
                 {
                     Top.Tlf.NewPositions += OnNewTlfPositions;
@@ -1229,7 +1236,16 @@ namespace HMI.CD40.Module.Services
 			Process.Start("Launcher.exe", "HMI.exe");
 		}
 
-		private void OnJacksChanged(object sender, JacksStateMsg msg)
+        //Evento recibido por cambio en el estado del SCV propio
+        private void OnProxyStateChange(object sender, bool state)
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.ProxyStateChangedEngine, delegate()
+            {
+                General.SafeLaunchEvent(ProxyStateChangedEngine, this, new StateMsg<bool>(state));
+            });
+        }
+
+        private void OnJacksChanged(object sender, JacksStateMsg msg)
 		{
 			Top.PublisherThread.Enqueue(EventTopicNames.JacksStateEngine, delegate()
 			{

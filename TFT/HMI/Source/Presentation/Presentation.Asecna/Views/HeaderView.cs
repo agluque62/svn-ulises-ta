@@ -107,7 +107,7 @@ namespace HMI.Presentation.Asecna.Views
 		{
 			InitializeComponent();
 			BackColor = VisualStyle.Colors.HeaderBlue;
-
+            pnlHora.BackColor = VisualStyle.Colors.HeaderBlue;
 			_CmdManager = cmdManager;
 			_StateManager = stateManager;
 
@@ -136,7 +136,14 @@ namespace HMI.Presentation.Asecna.Views
             _InfoBT.Text = _Info;   // Miguel
 		}
 
-		[EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.ProxyPresent, ThreadOption.Publisher)]
+        public void OnProxyPresent(object sender, EventArgs e)
+        {
+            pnlHora.BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : System.Drawing.Color.Khaki;
+            BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : System.Drawing.Color.Khaki;
+        }
+
+        [EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
 		[EventSubscription(EventTopicNames.EngineStateChanged, ThreadOption.Publisher)]
 		public void OnTftEnabledChanged(object sender, EventArgs e)
 		{

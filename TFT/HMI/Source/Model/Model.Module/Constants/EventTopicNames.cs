@@ -28,6 +28,7 @@ namespace HMI.Model.Module.Constants
 		public const string BuzzerLevelChanged = "BuzzerLevelChanged";
 		public const string BuzzerStateChanged = "BuzzerStateChanged";
 		public const string ActiveScvChanged = "ActiveScvChanged";
+        public const string ProxyPresent = "ProxyPresent";
         public const string RdHfSpeakerLevelChanged = "RdHfSpeakerLevelChanged";
         public const string RdSpeakerLevelChanged = "RdSpeakerLevelChanged";
         public const string RdHeadPhonesLevelChanged = "RdHeadPhonesLevelChanged";
@@ -87,7 +88,8 @@ namespace HMI.Model.Module.Constants
 		public const string PositionIdEngine = "PositionIdEngine";
 		public const string ResetEngine = "ResetEngine";
 		public const string SplitModeEngine = "SplitModeEngine";
-		public const string JacksStateEngine = "JacksStateEngine";
+        public const string ProxyStateChangedEngine = "ProxyStateChangedEngine";
+        public const string JacksStateEngine = "JacksStateEngine";
         public const string SpeakerStateEngine = "SpeakerStateEngine";
         public const string SpeakerExtStateEngine = "SpeakerExtStateEngine";
         public const string BuzzerStateEngine = "BuzzerStateEngine";

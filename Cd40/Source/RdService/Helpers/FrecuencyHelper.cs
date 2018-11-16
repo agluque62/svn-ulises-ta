@@ -117,6 +117,7 @@ namespace U5ki.RdService.Helpers
             frecuency.RemoveSipCall(resource);
             resource.Dispose();
             resource.IsForbidden = true;
+            frecuency.RdRs.Remove(key);
             return true;
         }
 
@@ -147,17 +148,17 @@ namespace U5ki.RdService.Helpers
         /// <param name="resourceType"></param>
         /// <param name="sipUri"></param>
         /// <returns></returns>
-        public Boolean ResourceFree(RdFrecuency frecuency, RdRsType resourceType, String sipUri)
+        public Boolean RsIsInFrec(RdFrecuency frecuency, RdRsType resourceType, String sipUri)
         {
             String key = ResourceIdGet(sipUri, resourceType);
 
-            // Si la frecuencia ya tiene el recurso, retorna indicando que no hay que seguir con el proceso de asignacion
+            // Si la frecuencia ya tiene el recurso, retorna y no hay que seguir con el proceso de asignacion
             if (frecuency.RdRs.ContainsKey(key))
             {
                 if (frecuency.RdRs[key].IsForbidden == false)
-                    return false;
+                    return true;
             }            
-            return true;
+            return false;
         }
 #endregion
 

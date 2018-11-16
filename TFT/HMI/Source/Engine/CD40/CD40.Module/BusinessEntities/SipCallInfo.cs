@@ -67,6 +67,10 @@ namespace HMI.CD40.Module.BusinessEntities
                 return _Ch.LastErrorInIP(_Remote, _Priority);
         }
 
+        public string RemoteId
+        {
+            get { return _RemoteId; }
+        }
         public bool IsValid(IEnumerable<SipChannel> channels)
 		{
             //Si el Id es -1, la clase no tiene todos sus miembros rellenos (crash en _Ch)

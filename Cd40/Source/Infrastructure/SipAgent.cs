@@ -381,6 +381,8 @@ namespace U5ki.Infrastructure
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_BSS_LENGTH + 1)]
         public string bss_method;
+
+        int RecursoPasarela;			//Si es distinto de cero significa que es un recurso de pasarela
 	}
     /// <summary>
     /// 

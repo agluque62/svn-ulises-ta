@@ -188,6 +188,9 @@ namespace HMI.CD40.Module.BusinessEntities
 		public RdPosition(int pos)
 		{
 			_Pos = pos;
+            _PttOffTimer.Interval = 100;
+            _PttOffTimer.AutoReset = false;
+            _PttOffTimer.Elapsed += OnPttOffTimer;
 		}
 
 		public void Reset()
@@ -211,8 +214,7 @@ namespace HMI.CD40.Module.BusinessEntities
             _TipoFrecuencia = TipoFrecuencia_t.Basica;
             _Estado = RdSrvFrRs.FrequencyStatusType.NotAvailable;
             _RxOnly = false;
-        
-        }
+		}
 
 		public void Reset(CfgEnlaceExterno cfg)
 		{
@@ -347,9 +349,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				Top.Registry.SetTx(_Literal, true, _Priority, _Tx == AssignState.Trying);
 			}
-        
-            //LogManager.GetLogger("agldebug").Trace("RdPosition {0} Rx=>{2}, Tx=>{1}", Literal, _Rx, _Tx);
-        }
+		}
 
 		public void SetRx(bool on, bool forced = false)
 		{
@@ -762,7 +762,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		private Dictionary<string, int> _RxPorts = new Dictionary<string, int>();
         private Dictionary<string, string> _RscSite = new Dictionary<string, string>();
 
-        private UiTimer _PttOffTimer = new UiTimer();       //Timer que se activa al producirse un PTT off
+        private Timer _PttOffTimer = new Timer();       //Timer que se activa al producirse un PTT off
 
         private void OnPttOffTimer(object sender, ElapsedEventArgs e)
         {
@@ -783,7 +783,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         MixerDev dev = (_AudioVia == RdRxAudioVia.HeadPhones ? MixerDev.MhpRd : (_AudioVia == RdRxAudioVia.HfSpeaker ? MixerDev.SpkHf : MixerDev.SpkRd));
                         Top.Mixer.Link(port, dev, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
                     }
-                } 
+                }
             });              
         }
 
@@ -821,7 +821,7 @@ namespace HMI.CD40.Module.BusinessEntities
 				{
 					Top.Mixer.Unlink(port);
                     SipAgent.DestroyRdRxPort(port);
-                    _Logger.Debug("*** RxOff. Llamando a DestroyRdRxPort({0})", port);
+                    _Logger.Debug("*** RxOff. Llamando a DestroyRdRxPort({0}) {1}", port, Literal);
 				}
 				_RxPorts.Clear();
 
@@ -852,14 +852,14 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				ptt = PttState.CarrierError;
 			}
-			else if (!string.IsNullOrEmpty(pttSrcId))
+            else if (pttSrcId == "ERROR")
+            {
+                ptt = PttState.Error;
+            }
+            else if (!string.IsNullOrEmpty(pttSrcId))
 			{
 				ptt = PttState.Blocked;
 			}
-			//else
-			//{
-			//    ptt = PttState.Error;
-			//}
 
 			return ptt;
 		}
@@ -1056,6 +1056,8 @@ namespace HMI.CD40.Module.BusinessEntities
                 // Tratamiento del cambio en el estado de PTT
                 //
                 PttState ptt = GetPtt(frRs.PttSrcId);
+                if ((frRs.PttSrcId != _PttSrcId) && (ptt == PttState.Error) )
+                    Top.Rd.GenerateBadOperationTone(2000);
                 // Es posible que no cambie el ptt (externo) pero si cambie su procedencia:
                 // Cambio de ptt externo de rtx a externo de otro HMI. 
                 // En este caso hay que evaluar el audio
@@ -1066,9 +1068,6 @@ namespace HMI.CD40.Module.BusinessEntities
                         if (ptt == PttState.NoPtt)
                         {
                             //Al desactivarse el Ptt arranca un timer durante el cual se inhibe el audio de Rd Rx
-                            _PttOffTimer.Interval = 100;
-                            _PttOffTimer.AutoReset = false;
-                            _PttOffTimer.Elapsed += OnPttOffTimer;
                             _PttOffTimer.Enabled = true;
                         }
                         else 
@@ -1208,6 +1207,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 MixerDev dev = (_AudioVia == RdRxAudioVia.HeadPhones ? MixerDev.MhpRd : (_AudioVia == RdRxAudioVia.HfSpeaker ? MixerDev.SpkHf : MixerDev.SpkRd));
                 Top.Mixer.Link(port, dev, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
             }
+            _Logger.Debug("*** CreateRxAudio. Llamando a CreateRdRxPort({0}) {1}", port, Literal);
         }
 
         private void OnSelCalMsg(object msg, short type)

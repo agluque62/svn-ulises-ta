@@ -318,7 +318,7 @@ namespace U5ki.RdService
                                             grp = eq.FrecuencyType == Tipo_Frecuencia.VHF ? 0 : 1,
                                             mod = eq.IsEmitter == true ? 0 : 1,
                                             tip = eq.ChannelType == Tipo_Canal.Monocanal ? 0 : 1,
-                                            std = (int)eq.ROStatus,
+                                            std = (int)eq.Status,
                                             frec = eq.Frecuency,
                                             prio = eq.Priority == null ? 0 : (int)eq.Priority,
                                             sip = CoberturaSip(eq),
@@ -512,9 +512,7 @@ namespace U5ki.RdService
         /// <returns>0: NA. 1: Con Cobertura. 2: Sin Cobertura</returns>
         private int CoberturaSip(BaseGear gear)
         {
-            // 20161117. Status bloquea con SEMAFORO...
-            //if (gear.Status == GearStatus.Assigned)
-            if (gear.ROStatus == GearStatus.Assigned)
+            if (gear.Status == GearStatus.Assigned)
             {
                 RdFrecuency frec = Frecuencies.Values.Where(f => f.Frecuency == gear.Frecuency).FirstOrDefault();
                 if (frec == null)
@@ -557,8 +555,7 @@ namespace U5ki.RdService
                                 resp.Count < 16 ? 3 : 4) :
                                 (resp.Count < 10 ? 1 : 2),
 #else
-                            //(int)eq.Status,                                     // 20160912. AGL. eq.IsAvailable ? 1 : 0,
-                            (int)eq.ROStatus,                                     // 20161117. AGL. Status bloquea con SEMAFORO...
+                            (int)eq.Status,                                     // 20160912. AGL. eq.IsAvailable ? 1 : 0,
 #endif
                             eq.Frecuency,
                             eq.Priority,
@@ -1383,11 +1380,6 @@ namespace U5ki.RdService
                 Dictionary<string, RdFrecuency> rdFrToRemove = new Dictionary<string, RdFrecuency>(Frecuencies);
                 Frecuencies.Clear();
 
-                // Borrar en Coresip los puertos asociados a cada puesto de operador
-                foreach (int port in _SndRxPorts.Values)
-                    SipAgent.DestroySndRxPort(port);
-
-                _SndRxPorts.Clear();
                 _UsrFreq.Clear();
 				
 				//JOI 201709 NEWRDRP INI
@@ -1707,6 +1699,7 @@ namespace U5ki.RdService
                     if (!_SndRxPorts.TryGetValue(ask.HostId, out sndRxPort))
                     {
                         sndRxPort = SipAgent.CreateSndRxPort(ask.HostId);
+                        LogTrace<RdService>("ProcessPttChangeAsk "+ sndRxPort.ToString() +", " + ask.Src);
                         _SndRxPorts[ask.HostId] = sndRxPort;
                     }
 
@@ -2031,7 +2024,7 @@ namespace U5ki.RdService
                                     /**********************************/
                                 }
                                 /****************************/
-                                LogDebug<RdService>(String.Format("Sesion SIP Radio <{0};{1}>: {2} with {3}", rdFr.Value.Frecuency, rdRes.ID,
+                                LogDebug<RdService>(String.Format("Sesion SIP Radio <{0};{1}>: {2} con {3}", rdFr.Value.Frecuency, rdRes.ID,
                                     stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED ? "Conectada" : "Desconectada", rdRes.Uri1
                                     ));
                                 eventZombie = false;
@@ -2402,7 +2395,7 @@ namespace U5ki.RdService
                     RdFrecuency frecuency = Frecuencies.Values.Where(e => e.Frecuency == frec).FirstOrDefault();
                     if (null == frecuency)
                     {
-                        LogFatal<RdService>("Frecuencia no Encontrada y asignada a Equipo " + gearId,
+                        LogInfo<RdService>("Frecuencia no Encontrada y asignada a Equipo " + gearId,
                             U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GENERIC_ERROR,
                             frec, CTranslate.translateResource("Equipo: "+ gearId + ". Frecuencia de equipo no configurada." ));
                         return;
@@ -2412,7 +2405,7 @@ namespace U5ki.RdService
                     newconfparams = RdRParamGet(gearId);
                     if (null == newconfparams)
                     {
-                        LogFatal<RdService>("Equipo Master no encontrado para obtención parámetros " + gearId,
+                        LogInfo<RdService>("Equipo Master no encontrado para obtención parámetros " + gearId,
                             U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GENERIC_ERROR,
                             frec, CTranslate.translateResource("Equipo: " + gearId + ". Equipo no configurado."));
                         return;
@@ -2421,7 +2414,7 @@ namespace U5ki.RdService
 #if _MN_SET_RESET_RESOURCES_V0
                     // 20161116. AGL. Desasigno por si las moscas...
                     // Esto habría que revisarlo para los 1+1 en M+N...
-                    if (!new FrecuencyHelper(Frecuencies).ResourceFree(frecuency, tipo, uri))
+                    if (new FrecuencyHelper(Frecuencies).RsIsInFrec(frecuency, tipo, uri))
                     {
                         return;
                     }
@@ -2528,20 +2521,20 @@ namespace U5ki.RdService
                         if (Status != GearStatus.Initial)
                         {
                             //LogInfo<RdService>("Frecuencia NO encontrada liberando equipo. " + gear.ToString(), U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_FRECUENCY_DEALLOCATE_ERROR);
-                            LogFatal<RdService>("Frecuencia NO encontrada liberando equipo. ",
+                            LogInfo<RdService>("Frecuencia NO encontrada liberando equipo. ",
                                 U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GENERIC_ERROR,
                                 frec, "URI: " + uri);
                         }
                         return;
                     }
 
-                    // Dasignacion de recurso.
+                    // Desasignacion de recurso.
                     if (!new FrecuencyHelper(Frecuencies).ResourceFree(frecuency, uri, tipo))
                     {
                         if (!IsSlave && Status != GearStatus.Initial)
                         {
                             //LogWarn<RdService>("Frecuencia/Recurso no liberado. " + gear.ToString(), U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_FRECUENCY_DEALLOCATE_ERROR);
-                            LogFatal<RdService>("Frecuencia/Recurso no liberado. ",
+                            LogError<RdService>("Frecuencia/Recurso no liberado. ",
                                 U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GENERIC_ERROR,
                                 frec, "URI: " + uri);
                         }

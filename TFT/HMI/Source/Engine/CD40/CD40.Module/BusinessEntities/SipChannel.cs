@@ -501,7 +501,7 @@ namespace HMI.CD40.Module.BusinessEntities
             if (!line.centralIP)
                 return line.IsAvailable;
             else
-                return (line.IsAvailable && RsProxyPropio.IsValid);
+                return (line.IsAvailable && RsProxyPropio != null && RsProxyPropio.IsValid);
         }
 
 		public virtual SipPath GetPreferentPath(CORESIP_Priority priority)

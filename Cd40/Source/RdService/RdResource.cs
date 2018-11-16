@@ -327,13 +327,13 @@ namespace U5ki.RdService
 		{
 			_Ports.Remove(_McastPort);
 
-			if (_SipCallId >= 0)
+            int call = _SipCallId;
+
+            Reset();
+            if (call >= 0)
 			{
 				//WG67Subscribe(null, false);
 
-				int call = _SipCallId;
-
-				Reset();
 				SipAgent.HangupCall(call);
 			}
 		}
@@ -709,7 +709,7 @@ namespace U5ki.RdService
         /// </summary>
 		private void Reset()
 		{
-			if (_SipCallSt == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED)
+			if (_SipCallSt != CORESIP_CallState.CORESIP_CALL_STATE_CONNECTING)
 			{
 				if (isRx)
 				{

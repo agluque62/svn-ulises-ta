@@ -728,14 +728,7 @@ namespace HMI.Presentation.Twr.Views
 						case PttState.Blocked:
 							ptt = Resources.PttBlocked;
 							break;
-                        //VMG 04/09/2018 Cambios en los estados
-                        case PttState.Error://Error en portadora
-                            title = VisualStyle.Colors.Red;
-                            txForeColor = VisualStyle.Colors.Red;
-                            msg = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.CarrierDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
-                            General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
-                            break;
-                        //VMG 05/09/2018 Cambios en los estados
+                       //VMG 05/09/2018 Cambios en los estados
                         case PttState.CarrierError://Error en portadora
                             title = VisualStyle.Colors.Red;
                             txForeColor = VisualStyle.Colors.Red;

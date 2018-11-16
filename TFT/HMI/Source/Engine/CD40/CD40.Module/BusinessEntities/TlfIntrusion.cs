@@ -19,7 +19,8 @@ namespace HMI.CD40.Module.BusinessEntities
 		// public event GenericEventHandler<HMI.Model.Module.Messages.StateMsg<string>> CompletedIntrusion;
         public static String INTRUSION_IN_PROGRESS = "Intrusion in progress";
         public static String INTRUSION_COMPLETED = "Intrusion completed";
-        
+        public static String INTERRUPTION_IMPENDING = "Interruption is impending";
+        public static String INTERRUPTION_TERMINATED = "Interruption Terminated";
 
 		public TlfIntrusion(TlfPosition intruderCall)
 		{

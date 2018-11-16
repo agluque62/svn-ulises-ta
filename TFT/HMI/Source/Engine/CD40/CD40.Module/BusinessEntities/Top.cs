@@ -337,10 +337,26 @@ namespace HMI.CD40.Module.BusinessEntities
             _RecorderManager.Init();
 #endif
             /** */
+#if _NICMON_V0_
             NetworkIFSupervisor.AutoReset = true;
             NetworkIFSupervisor.Elapsed += /* 20181026. NetworkChange_NetworkAvailabilityChanged*/NetworkChange_NetworkAvailabilityChanged;
             NetworkIFSupervisor.Enabled = Settings.Default.SNMPEnabled == 1;
             _Logger.Info("TIMER NetworkIFSupervisor Arrancado...");
+#else
+            string jconfig = Properties.Settings.Default.LanTeamConfigs.Count > Properties.Settings.Default.LanTeamType ?
+                Properties.Settings.Default.LanTeamConfigs[Properties.Settings.Default.LanTeamType] : "";
+            mon = new NicEventMonitor(jconfig,
+                    (lan, status) =>
+                    {
+                        string oid = lan == 0 ? Settings.Default.NetworkIF_1_Oid : Settings.Default.NetworkIF_2_Oid;
+                        SnmpIntObject.Get(oid).Value = (int)status;
+
+                        _Logger.Info($"Notificado cambio en LAN {lan} => {status}");
+                    }, (m, x) =>
+                    {
+                        _Logger.Error($"Error Message: {m}");
+                    }/*, filePath*/);
+#endif
 
             /** 20170309. AGL. Supervision Cliente NTP. */
             NtpClientSupervisor.AutoReset = true;
@@ -481,9 +497,17 @@ namespace HMI.CD40.Module.BusinessEntities
                 SnmpAgent.Close();
             }
 
+#if _NICMON_V0_
             /** 20170309. AGL. No se cerraban los TIMER. */
             NetworkIFSupervisor.Enabled = false;
             NetworkIFSupervisor.Elapsed -= /* 20181026 NetworkChange_NetworkAvailabilityChanged*/NetworkChange_NetworkAvailabilityChanged;
+#else
+            if (mon != null)
+            {
+                mon.Dispose();
+                mon = null;
+            }
+#endif
 
             NtpClientSupervisor.Enabled = false;
             NtpClientSupervisor.Elapsed -= NtpClientSupervisor_tick;
@@ -500,7 +524,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 SnmpIntObject.Get(Settings.Default.StandbyPanelOid).Value = status ? 0 : 1;
         }
 
-        #region Private Members
+#region Private Members
         private static bool _ScreenSaverEnabled = false;
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
 
@@ -520,7 +544,12 @@ namespace HMI.CD40.Module.BusinessEntities
         private static RecorderManager _RecorderManager;
         private static ReplayManager _ReplayManager;
 
+#if _NICMON_V0_
         private static Timer NetworkIFSupervisor = new Timer(5000);
+#else
+        private static NicEventMonitor mon = null;
+#endif
+
         /** 20170309. AGL. Supervision NTP Client */
         private static Timer NtpClientSupervisor = new Timer(5000);
         /*************/
@@ -622,12 +651,14 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
+#if _NICMON_V0_
         /** 20160908. */
         static NICEventMonitor monitor = null;
         static void NetworkChange_NetworkAvailabilityChanged(object sender, ElapsedEventArgs e)
         {
             if (monitor == null)
             {
+                // 20181106. Configurar los eventos e ID de las LAN's
                 monitor = new NICEventMonitor("Marvell");
                 //monitor.StatusChanged += MonitorStatusChanged;
                 //monitor.MessageError += MonitorError;
@@ -645,31 +676,32 @@ namespace HMI.CD40.Module.BusinessEntities
 
             _Logger.Trace("NetworkChange_NetworkAvailabilityChanged Tick OUT {0},{1}", (int)lan1, (int)lan2);
         }
+#endif
 
-        /** 20181026. Configurar los eventos e ID de las LAN's */
-        static Task taskMonitorLan = null;
-        static void NetworkChange_NetworkAvailabilityChanged_01(object sender, ElapsedEventArgs e)
-        {
-            if (taskMonitorLan == null)
-            {
-                taskMonitorLan = Task.Factory.StartNew(() =>
-                {
-                    using (NicEventMonitor monitor = new NicEventMonitor(Properties.Settings.Default.LanTeamConfig, ""))
-                    {
-                        _Logger.Trace("NetworkChange_NetworkAvailabilityChanged_01 Tick IN");
+        ///** 20181026. Configurar los eventos e ID de las LAN's */
+        //static Task taskMonitorLan = null;
+        //static void NetworkChange_NetworkAvailabilityChanged_01(object sender, ElapsedEventArgs e)
+        //{
+        //    if (taskMonitorLan == null)
+        //    {
+        //        taskMonitorLan = Task.Factory.StartNew(() =>
+        //        {
+        //            using (NicEventMonitor monitor = new NicEventMonitor(Properties.Settings.Default.LanTeamConfig, ""))
+        //            {
+        //                _Logger.Trace("NetworkChange_NetworkAvailabilityChanged_01 Tick IN");
 
-                        NicEventMonitor.LanStatus lan1 = monitor.NICList.Count > 0 ? monitor.NICList[0].Status : NicEventMonitor.LanStatus.Unknown;
-                        NicEventMonitor.LanStatus lan2 = monitor.NICList.Count > 1 ? monitor.NICList[1].Status : NicEventMonitor.LanStatus.Unknown;
+        //                NicEventMonitor.LanStatus lan1 = monitor.NICList.Count > 0 ? monitor.NICList[0].Status : NicEventMonitor.LanStatus.Unknown;
+        //                NicEventMonitor.LanStatus lan2 = monitor.NICList.Count > 1 ? monitor.NICList[1].Status : NicEventMonitor.LanStatus.Unknown;
 
-                        SnmpIntObject.Get(Settings.Default.NetworkIF_1_Oid).Value = (int)lan1;
-                        SnmpIntObject.Get(Settings.Default.NetworkIF_2_Oid).Value = (int)lan2;
+        //                SnmpIntObject.Get(Settings.Default.NetworkIF_1_Oid).Value = (int)lan1;
+        //                SnmpIntObject.Get(Settings.Default.NetworkIF_2_Oid).Value = (int)lan2;
 
-                        _Logger.Trace("NetworkChange_NetworkAvailabilityChanged_01 Tick OUT {0},{1}", (int)lan1, (int)lan2);
-                    }
-                    taskMonitorLan = null;
-                });
-            }
-        }
+        //                _Logger.Trace("NetworkChange_NetworkAvailabilityChanged_01 Tick OUT {0},{1}", (int)lan1, (int)lan2);
+        //            }
+        //            taskMonitorLan = null;
+        //        });
+        //    }
+        //}
 
 
         /** 20170309. AGL. Supervision Estado Ntp Client */
@@ -702,10 +734,10 @@ namespace HMI.CD40.Module.BusinessEntities
         }
         /*************/
 
-        #endregion
+#endregion
 
 
-        #region pruebas
+#region pruebas
 
         static void test1()
         {
@@ -728,6 +760,6 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
-        #endregion
+#endregion
     }
 }

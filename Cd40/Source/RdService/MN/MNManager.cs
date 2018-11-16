@@ -1035,7 +1035,7 @@ namespace U5ki.RdService.NM
             // Asignamos al maestro.
             // master.Allocate();
 
-            // Y trabajamos con el exclavo que lo sustituia.
+            // Y trabajamos con el esclavo que lo sustituia.
             if (null != slave)
             {
                 // Tenemos que hacer deallocate si o si, para forzar el proceso de Allocate desde cero si es necesario.
@@ -1131,7 +1131,7 @@ namespace U5ki.RdService.NM
                 gearKO.Deallocate(deallocateStatus);
 
                 // Allocate.
-                if (replacement.ROStatus == GearStatus.Assigned)        // 20161117. AGL. parece que Status Bloqueaba...
+                if (replacement.Status == GearStatus.Assigned)     
                 {
                     // 20160921. AGL. Se está utilizando como Reemplazo un asignado de menor prioridad...
                     String replacementFrecuency = replacement.Frecuency;
@@ -1139,11 +1139,12 @@ namespace U5ki.RdService.NM
                         replacement.IsReceptor ? U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_FRECUENCY_RX_NONPRIORITY_ONERROR : U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_FRECUENCY_TX_NONPRIORITY_ONERROR,
                         replacement.Frecuency, "Equipo: " + replacement.Id);
 
-                    replacement.Deallocate(GearStatus.Ready);
+                    replacement.Deallocate(GearStatus.AssignationInProgress);
 
                     // 20160921. AGL. La frecuencia sin cobertura debe quedar asignada al equipo por defecto...
                     AllocateDefault(replacementFrecuency, replacement.ResourceType, gearKO.IdEmplazamiento);
                  }
+                replacement.Status = GearStatus.AssignationInProgress;
                 replacement.Allocate(gearToReplace);
             }
 
@@ -1355,7 +1356,9 @@ namespace U5ki.RdService.NM
                 }
 
                 // Si frecuencia valida y estado preparado, localizado.
-                if (gear.Status == GearStatus.Ready || gear.Status == GearStatus.Initial)
+                // No se admite GearStatus.Initial porque no está bien gestionado casos 
+                // de N apagado en los arranques de Nodebox
+                if (gear.Status == GearStatus.Ready /*|| gear.Status == GearStatus.Initial*/)
                 {
 #if DEBUG
                     LogTrace<MNManager>("[REPLACEMENT FOUND] " + input.ToString() + ": " + gear.ToString());
@@ -1407,10 +1410,19 @@ namespace U5ki.RdService.NM
                     bAsignado = true;
                     break;
                 }
-                if (gear.Status == GearStatus.Ready || gear.Status == GearStatus.Initial)
+                // No se admite GearStatus.Initial porque no está bien gestionado casos 
+                // de N apagado en los arranques de Nodebox
+                if (gear.Status == GearStatus.Ready /*|| gear.Status == GearStatus.Initial*/)
                 {
                    HayReservas = true;
-                }              
+                   break;
+                }    
+                if ((gear.Status == GearStatus.Assigned) && (gear.Priority > input.Priority))
+                {
+                    //Hay un reserva asignado a otra frecuencia con menos prioridad
+                    HayReservas = true;
+                    break;
+                }    
             }
             if (bAsignado == true || HayReservas == false)
                 return true;

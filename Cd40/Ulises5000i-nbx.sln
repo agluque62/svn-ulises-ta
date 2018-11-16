@@ -38,6 +38,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notas", "Notas", "{988B11CB
 	EndProjectSection
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Ulises5000I AT-Utilities", "Setup\Ulises5000I AT-Utilities\Ulises5000I AT-Utilities.wixproj", "{B7343B9B-E6A1-43D2-A70C-B7A2BE23C0F1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{83350A9D-B360-4AAD-91E3-E77C4E029E56} = {83350A9D-B360-4AAD-91E3-E77C4E029E56}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9F8CFAEC-8D70-4AEE-8BA0-E335CDDB5C80}"
 	ProjectSection(SolutionItems) = preProject

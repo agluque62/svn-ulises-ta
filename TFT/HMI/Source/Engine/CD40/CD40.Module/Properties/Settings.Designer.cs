@@ -785,11 +785,23 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{ \"TeamingType\": \"Intel\", \"WindowsLog\": \"System\", \"EventSource\":\"iANSMiniport\", \"" +
-            "UpEventId\": 15, \"DownEventId\": 11, \"PropertyIndex\": 1 }")]
-        public string LanTeamConfig {
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <string>{ ""TeamingType"": ""Marvell"", ""WindowsLog"": ""System"", ""EventSource"":""yukonw7"", ""UpEventId"": 123, ""DownEventId"": 83, ""PropertyIndex"": 0 }</string>
+  <string>{ ""TeamingType"": ""Intel"", ""WindowsLog"": ""System"", ""EventSource"":""iANSMiniport"", ""UpEventId"": 15, ""DownEventId"": 11, ""PropertyIndex"": 1 }</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection LanTeamConfigs {
             get {
-                return ((string)(this["LanTeamConfig"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["LanTeamConfigs"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int LanTeamType {
+            get {
+                return ((int)(this["LanTeamType"]));
             }
         }
     }

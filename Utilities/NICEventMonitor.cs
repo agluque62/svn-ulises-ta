@@ -11,7 +11,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Management;
 
-using NLog;
+// using NLog;
 using Newtonsoft.Json;
 
 namespace Utilities
@@ -21,7 +21,7 @@ namespace Utilities
         /// <summary>
         /// Log this class
         /// </summary>
-        private static Logger _Logger = LogManager.GetCurrentClassLogger();
+        // private static Logger _Logger = LogManager.GetCurrentClassLogger();
         /// <summary>
         /// 
         /// </summary>
@@ -33,20 +33,9 @@ namespace Utilities
         /// <summary>
         /// 
         /// </summary>
-        public event Action<int> StatusChanged;
-        public event Action<string> MessageError;
+        public event Action<int, LanStatus> StatusChanged = null;            // Lan 0/1, Estado LanStatus
+        public event Action<String, Exception> MessageError = null;
 
-        public class NICItem : IEquatable<NICItem>
-        {
-            public int Index { get; set; }
-            public string DeviceId { get; set; }
-            public LanStatus Status { get; set; }
-            public bool Equals(NICItem other)
-            {
-                return other.DeviceId == DeviceId;
-            }
-        }
-        public List<NICItem> NICList = new List<NICItem>();
         /// <summary>
         /// 
         /// </summary>
@@ -69,7 +58,7 @@ namespace Utilities
                 EventSource = "iANSMiniport";
                 UpEventId = 15;
                 DownEventId = 11;
-                PropertyIndex = 0;
+                PropertyIndex = 1;
             }
         }
 
@@ -77,35 +66,43 @@ namespace Utilities
         /// 
         /// </summary>
         /// <param name="cfg"></param>
-        public NicEventMonitor(NicEventMonitorConfig cfg, string filepath = "")
+        public NicEventMonitor(NicEventMonitorConfig cfg,
+            Action<int, LanStatus> change,
+            Action<String, Exception> message,
+            string filepath = "")
         {
             try
             {
+                StatusChanged = change;
+                MessageError = message;
                 Cfg = cfg;
                 FilePath = filepath;
                 Init();
             }
             catch (Exception x)
             {
-                _Logger.Error(String.Format("NICEventMonitor Contructor 1 Exception {0}", x.Message), x);
-                RaiseMessageError(x.Message);
+                RaiseMessageError(x);
             }
             Cfg = cfg;
             FilePath = filepath;
         }
 
-        public NicEventMonitor(string jconfig, string filepath)
+        public NicEventMonitor(string jconfig,
+            Action<int, LanStatus> change,
+            Action<String, Exception> message,
+            string filepath = "")
         {
             try
             {
+                StatusChanged = change;
+                MessageError = message;
                 Cfg = JsonConvert.DeserializeObject<NicEventMonitorConfig>(jconfig);
                 FilePath = filepath;
                 Init();
             }
             catch (Exception x)
             {
-                _Logger.Error(String.Format("NICEventMonitor Contructor 2 Exception {0}", x.Message), x);
-                RaiseMessageError(x.Message);
+                RaiseMessageError(x);
             }
         }
 
@@ -116,12 +113,13 @@ namespace Utilities
         {
             try
             {
+                watcher.Enabled = false;
+                watcher.Dispose();
                 NICList.Clear();
             }
             catch (Exception x)
             {
-                _Logger.Error(String.Format("NICEventMonitor Stop Exception {0}", x.Message), x);
-                RaiseMessageError(x.Message);
+                RaiseMessageError(x);
             }
         }
 
@@ -134,31 +132,33 @@ namespace Utilities
         {
             try
             {
-                if (lan < NICList.Count)
+                using (EventLog eventLog = new EventLog(Cfg.WindowsLog, Environment.MachineName, Cfg.EventSource))
                 {
-                    using (EventLog eventLog = new EventLog(Cfg.WindowsLog))
-                    {
-                        eventLog.Source = "EventSimulate";
-                        eventLog.WriteEntry(String.Format("Log message {0} example", NICList[lan].DeviceId),
-                            EventLogEntryType.Information,
-                            status == false ? Cfg.DownEventId : Cfg.UpEventId, 1);
-
-                        eventLog.Close();
-                    }
+                    string idLan = lan < NICList.Count ? NICList[lan].DeviceId : "IDLan " + lan.ToString();
+                    EventInstance eventInstance = new EventInstance(status == false ? Cfg.DownEventId : Cfg.UpEventId, 1, EventLogEntryType.Information);
+                    object[] prop = new object[] { Cfg.PropertyIndex == 0 ? idLan : "", Cfg.PropertyIndex == 1 ? idLan : "" };
+                    eventLog.WriteEvent(eventInstance, prop);
                 }
             }
             catch (Exception x)
             {
-                _Logger.Error(String.Format("NICEventMonitor Simulate Exception {0}", x.Message), x);
-                RaiseMessageError(x.Message);
+                RaiseMessageError(x);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected void Init()
         {
             LogEntriesGet();
             SearchForPhysicalDevices();
             InitialStatusGet();
+
+            EventLogQuery logquery = FilePath == "" ? new EventLogQuery(Cfg.WindowsLog, PathType.LogName) : new EventLogQuery(FilePath, PathType.FilePath);
+            watcher = new EventLogWatcher(logquery);
+            watcher.EventRecordWritten += new EventHandler<EventRecordWrittenEventArgs>(watcher_EventRecordWritten);
+            watcher.Enabled = true;
         }
 
         /// <summary>
@@ -168,7 +168,6 @@ namespace Utilities
         {
             try
             {
-                int Index = 0;
                 NICList.Clear();
                 foreach (EventRecord evento in _LogEntries)
                 {
@@ -181,16 +180,18 @@ namespace Utilities
                         if (NICList.Count < 2 && NICList.Contains(new NICItem() { DeviceId = idDevice }) == false)
 #endif
                         {
-                            NICList.Add(new NICItem() { DeviceId = idDevice, Status = LanStatus.Down, Index = Index++ });
+                            NICList.Add(new NICItem() { DeviceId = idDevice, Status = LanStatus.Down/*, Index = Index++*/ });
                         }
                     }
                 }
+
+                int Index = 0;
                 NICList = NICList.OrderBy(lan => lan.DeviceId).ToList();
+                NICList.ForEach(i => { i.Index = Index++; });
             }
             catch (Exception x)
             {
-                _Logger.Error(String.Format("NICEventMonitor SearchForPhysicalDevices Exception {0}", x.Message), x);
-                RaiseMessageError(x.Message);
+                RaiseMessageError(x);
             }
         }
 
@@ -225,12 +226,12 @@ namespace Utilities
                     long last_lan_up = last_lan_ev_up.Count == 0 ? DateTime.MinValue.Ticks : last_lan_ev_up[0].TimeCreated.Value.Ticks;
 
                     NICList[lan].Status = last_lan_up > last_lan_down ? LanStatus.Up : LanStatus.Down;
+                    RaiseStatusChanged(lan);
                 }
             }
             catch (Exception x)
             {
-                _Logger.Error(String.Format("NICEventMonitor InitialStatusGet Exception {0}", x.Message), x);
-                RaiseMessageError(x.Message);
+                RaiseMessageError(x);
             }
         }
 
@@ -257,22 +258,73 @@ namespace Utilities
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="mensaje"></param>
-        private void RaiseMessageError(string mensaje)
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void watcher_EventRecordWritten(object sender, EventRecordWrittenEventArgs e)
         {
-            if (MessageError != null) MessageError(mensaje);
+            if (e.EventRecord.LogName == Cfg.WindowsLog && e.EventRecord.ProviderName == Cfg.EventSource &&
+                (e.EventRecord.Id == Cfg.UpEventId || e.EventRecord.Id == Cfg.DownEventId))
+            {
+                lock (NICList)
+                {
+                    // 20181106. Configurar los eventos e ID de las LAN's
+                    if (e.EventRecord.Properties.Count > Cfg.PropertyIndex)
+                    {
+                        string idLan = e.EventRecord.Properties[Cfg.PropertyIndex/*0*/].Value.ToString();
+                        NICItem lan = NICList.Where(nic => nic.DeviceId == idLan).FirstOrDefault();
+                        if (lan != null)
+                        {
+                            lan.Status = e.EventRecord.Id == Cfg.UpEventId ? LanStatus.Up : LanStatus.Down;
+                            RaiseStatusChanged(lan.Index);
+                        }
+                    }
+                }
+            }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mensaje"></param>
+        private void RaiseMessageError(Exception x,
+        [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
+        [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (MessageError != null)
+            {
+                MessageError(String.Format("[{0},{1},{2}]: {3}",
+                    System.IO.Path.GetFileName(sourceFilePath), sourceLineNumber,x.Message, memberName), x);
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="lan"></param>
         private void RaiseStatusChanged(int lan)
         {
-            if (StatusChanged != null) StatusChanged(lan);
+            if (lan < NICList.Count && StatusChanged != null)
+                StatusChanged(lan, NICList[lan].Status);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private string FilePath { get; set; }
         private NicEventMonitorConfig Cfg { get; set; }
         private List<EventRecord> _LogEntries = new List<EventRecord>();
+        private class NICItem : IEquatable<NICItem>
+        {
+            public int Index { get; set; }
+            public string DeviceId { get; set; }
+            public LanStatus Status { get; set; }
+            public bool Equals(NICItem other)
+            {
+                return other.DeviceId == DeviceId;
+            }
+        }
+        private List<NICItem> NICList = new List<NICItem>();
+        private EventLogWatcher watcher = null;
     }
 }

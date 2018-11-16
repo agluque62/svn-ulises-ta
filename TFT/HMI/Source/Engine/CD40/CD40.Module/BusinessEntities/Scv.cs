@@ -18,6 +18,8 @@ namespace HMI.CD40.Module.BusinessEntities
     {
         public enum RolScv { SCV_PRINCIPAL = 0,  SCV_ALTERNATIVO1 = 1, SCV_ALTERNATIVO2 = 2};
         public enum TipoRangoScv { OPERADOR = 0, PRIVILEGIADO = 1};
+        public event GenericEventHandler<bool> ProxyStateChange;
+
         private class RangeTlf
         {
             public RangosSCV rango;
@@ -87,6 +89,11 @@ namespace HMI.CD40.Module.BusinessEntities
             Id = objCfg.IdHost;
             Propio = objCfg.Interno;
             SetIpData(objCfg);
+            if (Propio)
+            {
+                ManageProxyState();
+            }
+
         }
 
         //Constructor normal, completo
@@ -94,8 +101,11 @@ namespace HMI.CD40.Module.BusinessEntities
         public Scv(NumeracionATS scvAts)
         {
             id = scvAts.Central;
-            propio = scvAts.CentralPropia;
-
+            Propio = scvAts.CentralPropia;
+            if (Propio)
+            {
+                ManageProxyState();
+            }
             rangos = new List<RangeTlf>();
             foreach (RangosSCV rango in scvAts.RangosOperador)
                 rangos.Add(new RangeTlf(rango, TipoRangoScv.OPERADOR));
@@ -120,23 +130,47 @@ namespace HMI.CD40.Module.BusinessEntities
             return (found != null);
         }
         #region Private Members
-            private const int SCV_MAX_IP_ADDR = 3;
-            /// <summary>
-            /// Datos procedentes de configuracion 
-            /// </summary>
-         	private string id;
-            // TODO Probablemente no hace falta
-            private bool propio;
+        private const int SCV_MAX_IP_ADDR = 3;
+        /// <summary>
+        /// Datos procedentes de configuracion 
+        /// </summary>
+        private string id;
+        private bool propio;
 
-            private List<RangeTlf> rangos;
-            private bool esCentralIp;
-            /// <summary>
-            /// Lista de IPs de proxies y servidores de presencia y su correspondiente estado de presencia 
-            /// y estado como activo/reserva. El primero es el principal y los otros son alternativos.
-            /// </summary>
-            private IPEndPoint[] ipProxy = new IPEndPoint[SCV_MAX_IP_ADDR];
-            private IPEndPoint[] srvPresencia = new IPEndPoint[SCV_MAX_IP_ADDR];
+        private List<RangeTlf> rangos;
+        private bool esCentralIp;
+        /// <summary>
+        /// Lista de IPs de proxies y servidores de presencia.
+        /// El primero es el principal y los otros son alternativos.
+        /// </summary>
+        private IPEndPoint[] ipProxy = new IPEndPoint[SCV_MAX_IP_ADDR];
+        private IPEndPoint[] srvPresencia = new IPEndPoint[SCV_MAX_IP_ADDR];
+        private enum ProxyStateValue { UNKNOWN = 0,  PRESENT = 1, NOT_PRESENT = 2};
+        private ProxyStateValue proxyState = ProxyStateValue.UNKNOWN;
+        
+        private void ManageProxyState()
+        {
+            Resource recursoProxy = Top.Registry.GetRs<GwTlfRs>(Id);
+            recursoProxy.Changed += OnStateProxyChanged;
+            //Valor inicial del recurso, forzar el refresco
+            proxyState = ProxyStateValue.UNKNOWN;
+            OnStateProxyChanged(recursoProxy);
+        }
 
+        //Se utiliza para señalizar el modo de funcionamiento sin proxy
+        private void OnStateProxyChanged(object resource)
+        {
+            Top.PublisherThread.Enqueue("ProxyStateChanged", delegate()
+            {
+                ProxyStateValue oldProxyState = proxyState;
+                proxyState = ((Resource)resource).IsValid ? ProxyStateValue.PRESENT : ProxyStateValue.NOT_PRESENT;
+                //filtrar eventos redundantes
+                if ((oldProxyState != proxyState))
+                {
+                    General.SafeLaunchEvent(ProxyStateChange, this, ((Resource)resource).IsValid);
+                }
+            });
+        }
         #endregion
     }
 }

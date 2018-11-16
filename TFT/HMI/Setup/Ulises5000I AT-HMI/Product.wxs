@@ -155,6 +155,13 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='ECLC_Property' Type='raw' />
     </Property>
+    <!-- 20181107. Tipo de TEAM para Supervision -->
+    <Property Id="NICTEAM" Value="0">
+      <RegistrySearch Id='UV5KI_HMI_NICTEAM' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_HMI'
+                     Name='NICTEAM_Property' Type='raw' />
+    </Property>
+
 
     <Feature Id="ProductFeature" Title="Ulises5000I_TA" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
@@ -279,11 +286,7 @@
         <util:XmlFile Id="DirectorioGlp_3" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Presentation.Asecna.Properties.Settings/setting[\[]@name='DirectorioGLP'[\]]/value"
-                        Value="[GLPDIR]"/>
-        <util:XmlFile Id="DirectorioGlp_4" Action="setValue"
-                        File = "[#HMI.config]"
-                        ElementPath="/configuration/applicationSettings/HMI.Presentation.Urr.Properties.Settings/setting[\[]@name='DirectorioGLP'[\]]/value"
-                        Value="[GLPDIR]"/>
+                        Value="[GLPDIR]"/>        
         <!-- Record ED137 -->
         <util:XmlFile Id="RecordingEd137" Action="setValue"
                         File = "[#HMI.config]"
@@ -461,6 +464,12 @@
                   File = "[#HMI.config]"
                   ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='ECHandsFreeLC'[\]]/value"
                   Value="[ECLC]"/>
+
+        <!-- Cancelador Manos Libres para Linea Caliente -->
+        <util:XmlFile Id="LanTypeSet" Action="setValue"
+                  File = "[#HMI.config]"
+                  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='LanTeamType'[\]]/value"
+                  Value="[NICTEAM]"/>
       </Component>
       
       <Component Id='ConditionalUpdatesForENAIRE' Guid='{D4F30EE1-F85F-4A5C-B233-8C63F6F1A74F}' KeyPath='yes'>
@@ -473,6 +482,11 @@
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='GLP'[\]]/value"
                         Value="False"/>
+        <util:XmlFile Id="AppsEnaire" Action="setValue"
+                        File = "[#ProfileCatalog]"
+                        ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
+                        Name="AssemblyFile"
+                        Value="Presentation.Twr.dll"/>
       </Component>
       <Component Id='ConditionalUpdatesForASECNA' Guid='{E5EDC4B5-F751-4C1E-89FF-AAEE404367DE}' KeyPath='yes'>
         <Condition >CLIENTE="ASECNA"</Condition>
@@ -505,22 +519,23 @@
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
                         Value="Resources/ENNA.jpg"/>
+        <util:XmlFile Id="AppsEnna" Action="setValue"
+                        File = "[#ProfileCatalog]"
+                        ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
+                        Name="AssemblyFile"
+                        Value="Presentation.Twr.dll"/>
+      </Component>
+      <Component Id='ConditionalUpdatesForURR' Guid='{2682C805-2050-4400-B253-D6F2A6BC2931}' KeyPath='yes'>
+        <Condition >CLIENTE="URR"</Condition>
+        <util:XmlFile Id="LogoUrr" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
+                        Value="Resources/logo_AENA.PNG"/>
         <util:XmlFile Id="AppsUrr" Action="setValue"
                         File = "[#ProfileCatalog]"
                         ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
                         Name="AssemblyFile"
-                        Value="Presentation.Urr.dll"/>
-      </Component>
-      <Component Id='ConditionalUpdatesForURR' Guid='{B2DC22A5-09DF-4920-B1E7-8CEA0CED2FA4}' KeyPath='yes'>
-        <Condition >CLIENTE="URR"</Condition>
-        <util:XmlFile Id="LogoEnaireUrr" Action="setValue"
-                        File = "[#HMI.config]"
-                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
-                        Value="Resources/logo_AENA.PNG"/>
-        <util:XmlFile Id="GlpForUrr" Action="setValue"
-                        File = "[#HMI.config]"
-                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='GLP'[\]]/value"
-                        Value="False"/>
+                        Value="Presentation.AUrr.dll"/>
       </Component>
       <!-- El doble altavoz condiciona la configuracion de HFSpeaker -->
       <Component Id='ConditionalUpdatesForDoubleRadioSpeaker' Guid='{54DAE262-4D25-49F7-8AD5-484150EFDAA4}' KeyPath='yes'>
@@ -588,6 +603,9 @@
       <Component Id='Presentation.Urr' Guid='{CE2CBB42-949A-45AF-B358-CAE745B25799}'>
         <File Id='Presentation.Urr' Name='Presentation.Urr.dll'/>
       </Component>
+      <Component Id='Presentation.AUrr' Guid='{3797292D-C3AB-483D-A2E3-00A0255E9C91}'>
+        <File Id='Presentation.AUrr' Name='Presentation.AUrr.dll'/>
+      </Component>
       <Component Id='ProfileCatalog' Guid='{0D45FA04-DDCA-4D7A-8DE2-97B38678F056}' >
         <File Id='ProfileCatalog' Name='ProfileCatalog.xml'/>
         <util:XmlFile Id="Engine" Action="setValue"
@@ -633,6 +651,7 @@
           <RegistryValue Name='RDRTXREC_Property' Value='[RDRTXREC]' Type='string' />
           <!--<RegistryValue Name='ECTLF_Property' Value='[ECTLF]' Type='string' />-->
           <RegistryValue Name='ECLC_Property' Value='[ECLC]' Type='string' />
+          <RegistryValue Name='NICTEAM_Property' Value='[NICTEAM]' Type='string' />
         </RegistryKey>
       </Component>      
     </ComponentGroup>
@@ -655,6 +674,9 @@
       <Component Id='En.Presentation.Urr.resources' Guid='{AAE37A34-FF86-47E6-AE03-1AC27957B69C}'>
         <File Id='En.Presentation.Urr.resources' Name='Presentation.Urr.resources.dll' />
       </Component>
+      <Component Id='En.Presentation.AUrr.resources' Guid='{35C9C29D-B6A6-4B97-8DDC-FE6649BC9BE9}'>
+        <File Id='En.Presentation.AUrr.resources' Name='Presentation.AUrr.resources.dll' />
+      </Component>
     </ComponentGroup>
   </Fragment>
 
@@ -674,6 +696,9 @@
       </Component>
       <Component Id='Fr.Presentation.Urr.resources' Guid='{FBC1C931-8FF5-4D17-90B7-0DC95D85590C}'>
         <File Id='Fr.Presentation.Urr.resources' Name='Presentation.Urr.resources.dll' />
+      </Component>
+      <Component Id='Fr.Presentation.AUrr.resources' Guid='{DC154E40-7050-45BC-905A-3C206C4DF6FC}'>
+        <File Id='Fr.Presentation.AUrr.resources' Name='Presentation.AUrr.resources.dll' />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -997,7 +1022,15 @@
           <Condition Action="enable">
             <![CDATA[CLIENTE <> "ASECNA"]]>
           </Condition>
-
+        </Control>
+        
+        <!-- LAN Team Type -->
+        <Control Id="LanTeamTypeLabel"       Type="Text"     X="10" Y="192" Width="90" Height="18" TabSkip="no" Text="Team de Red" />
+        <Control Id="LanTeamTypeOptions"     Type="ComboBox" X="85" Y="190" Width="90" Height="18" Property="NICTEAM" ComboList="yes" >
+          <ComboBox Property="NICTEAM">
+            <ListItem Value="0" Text="Marvell" />
+            <ListItem Value="1" Text="Intel" />
+          </ComboBox>
         </Control>
 
         <Control Id="DoubleRadioSpeakerLabel"  Type="Text" X="10" Y="150" Width="60" Height="18" TabSkip="no" Text="Doble altavoz" />

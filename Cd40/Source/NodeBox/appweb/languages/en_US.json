@@ -16,6 +16,7 @@
 	"Configuracion Activa": "Active Configuration",
 	"Detalle": "Detail",
 	"Estado de Servicios": "Services Status",
+	"Servicio": "Service",
 	"Modo": "Mode",
 	"Estado": "Status",
 	"Configuracion Puestos": "CWP Configuration",
@@ -51,10 +52,12 @@
 	"Frecuencia": "Frequency",
 	"Tipo": "Type",
 	"URI": "URI",
+	"Modo": "Mode",
 	"Tipo/Prioridad": "Type/Prio",
 	"SEL": "SEL",
 	"Climax": "Climax",
 	"BSS-W": "BSS-W",
+	"Parametros": "Parametters",
 	"RTPTx": "RTPTx",
 	"CLD": "CLD",
 	"OWD": "OWD",
@@ -143,10 +146,9 @@
     "Externo": "External",
     "Principal": "Main",
     "Alternativo": "Alternative",
+    "Disponible": "Available",
     "No Disponible": "Not Available",
-  "Abonado": "Subscriber",
-
-  "Gestor 1+1": "1+1 Manager",
+    "Abonado": "Subscriber",
 
 
 	"FINAL": "final"

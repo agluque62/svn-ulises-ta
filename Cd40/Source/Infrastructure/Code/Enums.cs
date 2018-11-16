@@ -41,7 +41,10 @@ namespace U5ki.Enums
         /// Este estado se utiliza para marcar un elemento como no "validable" y como no utilizable. 
         /// Se debe asignar solo de forma manual desde el Commander, para mantenimiento.
         /// </summary>
-        Forbidden = 4
+        Forbidden = 4,
+        /// Este estado es temporal entre el ready y el assigned. 
+        /// Se usa para marcar el recurso como no disponible para una conmutación
+        AssignationInProgress = 5
     }
 
     public enum GearActivationState

@@ -41,7 +41,7 @@ namespace HMI.CD40.Module.BusinessEntities
         private string STR_PUESTO_FS = "__FS__";
 
 		public event GenericEventHandler ConfigChanged;
-
+        public event GenericEventHandler<bool> ProxyStateChangeCfg;
 		public string MainId
 		{
 			get 
@@ -809,6 +809,10 @@ namespace HMI.CD40.Module.BusinessEntities
         private Scv _MiScv;
         // La key es el id del Scv, para facilitar las búsquedas
         private Dictionary<string, Scv> _OtrosScv = new Dictionary<string,Scv>();
+        private void OnProxyStateChangeCfg(object sender, bool state)
+        {
+            General.SafeLaunchEvent(ProxyStateChangeCfg, this, state);
+        }
 
 		private void OnNewConfig(object sender, Cd40Cfg cfg)
 		{
@@ -866,10 +870,13 @@ namespace HMI.CD40.Module.BusinessEntities
             foreach (NumeracionATS scvAts in _SystemCfg.PlanNumeracionATS)
             {
                 if (scvAts.CentralPropia)
+                {
                     _MiScv = new Scv(scvAts);
-                    //Esta protección es porque pueden llegar de configuración SCV sin rango y sin nombre
+                    _MiScv.ProxyStateChange += OnProxyStateChangeCfg;
+                }
+                //Esta protección es porque pueden llegar de configuración SCV sin rango y sin nombre
                 else if (scvAts.Central.Length > 0)
-                   _OtrosScv.Add(scvAts.Central, new Scv(scvAts));
+                    _OtrosScv.Add(scvAts.Central, new Scv(scvAts));
             }
 
             foreach (DireccionamientoIP obj in _SystemCfg.PlanDireccionamientoIP)

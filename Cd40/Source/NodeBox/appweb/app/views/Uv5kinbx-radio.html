@@ -13,9 +13,6 @@
         <li data-ng-class="{'active': ctrl.pagina==3}">
             <a href="" data-ng-click="ctrl.Pagina(3)">{{ctrl.txtPestana(3)}}</a>
         </li>
-        <li data-ng-class="{'active': ctrl.pagina==4}">
-            <a href="" data-ng-click="ctrl.Pagina(4)">{{ctrl.txtPestana(4)}}</a>
-        </li>
     </ul>
 </section>
 <section id="_contenido">
@@ -60,11 +57,9 @@
                         <div class="col-md-1 level-1">{{ctrl.TxSelected(fr)}}</div>
                         <div class="col-md-2">
                             <button type="button"
-                                    class="btn btn-default level-1"
-                                    ng-disabled="(ctrl.enableOnFD(fr.ftipo)==false)"
-                                    data-toggle="collapse" data-target="#par-{{ifrec}}" translate>
-                                Parametros
-                            </button>
+                                class="btn btn-default level-1"
+                                ng-disabled="(ctrl.enableOnFD(fr.ftipo)==false)"
+                                data-toggle="collapse" data-target="#par-{{ifrec}}" translate>Parametros</button>
                             <div id="par-{{ifrec}}" class="collapse">
                                 <table>
                                     <tr>
@@ -80,11 +75,9 @@
                         </div>
                         <div class="col-md-5">
                             <button type="button"
-                                    class="btn btn-default level-1"
-                                    data-toggle="collapse"
-                                    data-target="#ses-{{ifrec}}" translate>
-                                Sesiones
-                            </button>
+                                class="btn btn-default level-1"
+                                data-toggle="collapse"
+                                data-target="#ses-{{ifrec}}" translate>Sesiones</button>
                             <div id="ses-{{ifrec}}" class="collapse">
                                 <ul class="list-group">
                                     <li class="list-group-item" data-ng_repeat="ses in fr.ses" ng-init="ises = $index">
@@ -93,10 +86,8 @@
                                             <div class="col-md-6 level-2">{{ses.uri}}</div>
                                             <div class="col-md-5 level-2">
                                                 <button type="button" class="btn btn-default level-2"
-                                                        data-toggle="collapse"
-                                                        data-target="#pses-{{ifrec}}-{{ises}}" translate>
-                                                    Parametros
-                                                </button>
+                                                    data-toggle="collapse"
+                                                    data-target="#pses-{{ifrec}}-{{ises}}" translate>Parametros</button>
                                                 <div id="pses-{{ifrec}}-{{ises}}" class="collapse">
                                                     <table>
                                                         <tr ng-show="ctrl.showOnTx(ses.tipo)">
@@ -214,11 +205,10 @@
                 <!--            Tabla de VHF-->
                 <li class="list-group-item">
                     <button type="button"
-                            class="btn btn-default"
-                            ng-disabled="false"
-                            data-toggle="collapse" data-target="#VHF">
-                        {{ctrl.txtOnVHF()}}
-                    </button>
+                        class="btn btn-default"
+                        ng-disabled="false"
+                        data-toggle="collapse" data-target="#VHF">
+                        {{ctrl.txtOnVHF()}}</button>
                     <div id="VHF" class="collapse in">
                         <h4 class="text-info">{{ctrl.txtMdSelect(ctrl.vhf_mode_select)}}</h4>
                         <table class="table table-bordered table-striped test">
@@ -244,15 +234,13 @@
                                     <td>{{eq.sip==0 ? "" : eq.sip==1 ? "No" : eq.sip==2 ? "Disc" : "Conn"}}</td>
                                     <td>
                                         <button class="btn btn-default"
-                                                data-ng-click="ctrl.EnableDisable(eq)"
-                                                data-ng-show="{{ctrl.gearEnableDisableShow(eq.std)}}">
-                                            {{ctrl.txtHabilitar(eq)}}
-                                        </button>
+                                            data-ng-click="ctrl.EnableDisable(eq)"
+                                            data-ng-show="{{ctrl.gearEnableDisableShow(eq.std)}}">
+                                            {{ctrl.txtHabilitar(eq)}}</button>
                                         <button class="btn btn-default"
-                                                data-ng-click="ctrl.Asignar(eq)"
-                                                data-ng-show="{{ctrl.gearAsignarShow(eq)}}">
-                                            {{ctrl.gearAsignarText(eq)}}
-                                        </button>
+                                            data-ng-click="ctrl.Asignar(eq)"
+                                            data-ng-show="{{ctrl.gearAsignarShow(eq)}}">
+                                            {{ctrl.gearAsignarText(eq)}}</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -260,14 +248,11 @@
                         <!--            Selector de Tx o Rx.-->
                         <ul class="pager mdsel">
                             <li>
-                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.vhf_mode_select=0" translate>Tx</button>
-                            </li>
+                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.vhf_mode_select=0" translate>Tx</button></li>
                             <li>
-                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.vhf_mode_select=1" translate>Rx</button>
-                            </li>
+                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.vhf_mode_select=1" translate>Rx</button></li>
                             <li>
-                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.vhf_mode_select=-1" translate>Ambos</button>
-                            </li>
+                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.vhf_mode_select=-1" translate>Ambos</button></li>
                         </ul>
                     </div>
                 </li>
@@ -275,11 +260,10 @@
                 <!--            Tabla de UHF-->
                 <li class="list-group-item">
                     <button type="button"
-                            class="btn btn-default"
-                            ng-disabled="false"
-                            data-toggle="collapse" data-target="#UHF">
-                        {{ctrl.txtOnUHF()}}
-                    </button>
+                        class="btn btn-default"
+                        ng-disabled="false"
+                        data-toggle="collapse" data-target="#UHF">
+                        {{ctrl.txtOnUHF()}}</button>
                     <div id="UHF" class="collapse">
                         <h4 class="text-info">{{ctrl.txtMdSelect(ctrl.uhf_mode_select)}}</h4>
                         <table class="table table-bordered table-striped">
@@ -305,15 +289,13 @@
                                     <td>{{eq.sip==0 ? "" : eq.sip==1 ? "No" : eq.sip==2 ? "Disc" : "Conn"}}</td>
                                     <td>
                                         <button class="btn btn-default"
-                                                data-ng-click="ctrl.EnableDisable(eq)"
-                                                data-ng-show="{{ctrl.gearEnableDisableShow(eq.std)}}">
-                                            {{ctrl.txtHabilitar(eq)}}
-                                        </button>
+                                            data-ng-click="ctrl.EnableDisable(eq)"
+                                            data-ng-show="{{ctrl.gearEnableDisableShow(eq.std)}}">
+                                            {{ctrl.txtHabilitar(eq)}}</button>
                                         <button class="btn btn-default"
-                                                data-ng-click="ctrl.Asignar(eq)"
-                                                data-ng-show="{{ctrl.gearAsignarShow(eq)}}">
-                                            {{ctrl.gearAsignarText(eq)}}
-                                        </button>
+                                            data-ng-click="ctrl.Asignar(eq)"
+                                            data-ng-show="{{ctrl.gearAsignarShow(eq)}}">
+                                            {{ctrl.gearAsignarText(eq)}}</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -321,14 +303,11 @@
                         <!--            Selector de Tx o Rx.-->
                         <ul class="pager mdsel">
                             <li>
-                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.uhf_mode_select=0" translate>Tx</button>
-                            </li>
+                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.uhf_mode_select=0" translate>Tx</button></li>
                             <li>
-                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.uhf_mode_select=1" translate>Rx</button>
-                            </li>
+                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.uhf_mode_select=1" translate>Rx</button></li>
                             <li>
-                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.uhf_mode_select=-1" translate>Ambos</button>
-                            </li>
+                                <button class="btn btn-xs btn-primary" data-ng-click="ctrl.uhf_mode_select=-1" translate>Ambos</button></li>
                         </ul>
                     </div>
                 </li>
@@ -423,70 +402,35 @@
         </div>
     </div>
     <div id="setHf" data-ng-show="ctrl.pagina==3">
-        <h1><strong translate>Trasmisores HF</strong></h1>
-        <div class="TX">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th translate>Equipo</th>
-                        <th translate>Gestor</th>
-                        <th translate>OID</th>
-                        <th translate>Estado</th>
-                        <th translate>Usuario</th>
-                        <th translate>Frec.</th>
-                        <th translate>Sip</th>
-                        <th translate>...</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr data-ng-repeat="eq in ctrl.gestorhf" data-ng-class="ctrl.hfColorEstado(eq.std)">
-                        <td>{{eq.id}}</td>
-                        <td>{{eq.gestor}}</td>
-                        <td>{{eq.oid}}</td>
-                        <td>{{ctrl.hfTextoEstadoEquipo(eq.std)}}</td>
-                        <td>{{eq.user}}</td>
-                        <td>{{eq.fre}}</td>
-                        <td>{{eq.uri}}</td>
-                        <td>
-                            <button class="btn btn-default" data-ng-click="ctrl.hfLiberar(eq)" data-ng-show="{{ctrl.hfEnableDisableShow(eq.std)}}" translate>Liberar</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="set11" data-ng-show="ctrl.pagina==4">
-        <h1><strong translate>Gestor 1+1</strong></h1>
-        <!--<div class="TX">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th translate>Equipo</th>
-                        <th translate>Gestor</th>
-                        <th translate>OID</th>
-                        <th translate>Estado</th>
-                        <th translate>Usuario</th>
-                        <th translate>Frec.</th>
-                        <th translate>Sip</th>
-                        <th translate>...</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr data-ng-repeat="eq in ctrl.gestorhf" data-ng-class="ctrl.hfColorEstado(eq.std)">
-                        <td>{{eq.id}}</td>
-                        <td>{{eq.gestor}}</td>
-                        <td>{{eq.oid}}</td>
-                        <td>{{ctrl.hfTextoEstadoEquipo(eq.std)}}</td>
-                        <td>{{eq.user}}</td>
-                        <td>{{eq.fre}}</td>
-                        <td>{{eq.uri}}</td>
-                        <td>
-                            <button class="btn btn-default" data-ng-click="ctrl.hfLiberar(eq)" data-ng-show="{{ctrl.hfEnableDisableShow(eq.std)}}" translate>Liberar</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>-->
-    </div>
+            <h1><strong translate>Trasmisores HF</strong></h1>
+            <div class="TX">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th translate>Equipo</th>
+                            <th translate>Gestor</th>
+                            <th translate>OID</th>
+                            <th translate>Estado</th>
+                            <th translate>Usuario</th>
+                            <th translate>Frec.</th>
+                            <th translate>Sip</th>
+                            <th translate>...</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="eq in ctrl.gestorhf" data-ng-class="ctrl.hfColorEstado(eq.std)">
+                            <td>{{eq.id}}</td>
+                            <td>{{eq.gestor}}</td>
+                            <td>{{eq.oid}}</td>
+                            <td>{{ctrl.hfTextoEstadoEquipo(eq.std)}}</td>
+                            <td>{{eq.user}}</td>
+                            <td>{{eq.fre}}</td>
+                            <td>{{eq.uri}}</td>
+                            <td>
+                                <button class="btn btn-default" data-ng-click="ctrl.hfLiberar(eq)" data-ng-show="{{ctrl.hfEnableDisableShow(eq.std)}}" translate>Liberar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>    </div>
 </section>

@@ -5657,8 +5657,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string cnfTipoFrecuenciaField;
         
-        private string modoTransmisionField;
-        /// <comentarios/>
+       /// <comentarios/>
         public int Fk_Metodosbss {
             get {
                 return this.fk_MetodosbssField;
@@ -9404,6 +9403,10 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string modoTransmisionField  ;
 
+        private string emplazamientoDefectoField;
+
+        private int tiempoVueltaADefectoField;
+
         /// <comentarios/>
         public string Literal {
             get {
@@ -9620,6 +9623,29 @@ namespace U5ki.CfgService.SoapCfg {
             }
             set {
                 this.modoTransmisionField = value;
+            }
+        }
+
+        public string EmplazamientoDefecto
+        {
+            get {
+                return this.emplazamientoDefectoField;
+            }
+            set {
+                this.emplazamientoDefectoField = value;
+            }
+        }
+
+        /// <comentarios/>
+        public int TiempoVueltaADefecto
+        {
+            get
+            {
+                return this.tiempoVueltaADefectoField;
+            }
+            set
+            {
+                this.tiempoVueltaADefectoField = value;
             }
         }
 

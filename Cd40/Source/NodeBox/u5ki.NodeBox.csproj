@@ -107,7 +107,9 @@
     <Compile Include="NodeBoxInstaller.Designer.cs">
       <DependentUpon>NodeBoxInstaller.cs</DependentUpon>
     </Compile>
-    <Compile Include="NodeBoxSrv.cs" />
+    <Compile Include="NodeBoxSrv.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="NodeBoxSrv.Designer.cs">
       <DependentUpon>NodeBoxSrv.cs</DependentUpon>
     </Compile>
@@ -199,7 +201,7 @@
     <Content Include="appweb\app\views\Uv5kinbx-radio.html" />
     <Content Include="appweb\app\views\Uv5kinbx-tlf.html" />
     <Content Include="appweb\favicon.ico" />
-    <Content Include="appweb\images\Corporativo.png" />
+    <Content Include="appweb\images\nucleo-df-new.jpg" />
     <Content Include="appweb\index.html" />
     <Content Include="appweb\login.html" />
     <Content Include="appweb\mongoose-free-5.6.exe" />

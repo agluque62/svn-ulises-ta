@@ -364,4 +364,7 @@
   <data name="TxConfirmationDetectionError" xml:space="preserve">
     <value>Transmisión no confirmada.</value>
   </data>
+  <data name="TxFailure" xml:space="preserve">
+    <value>Fallo en transmisión</value>
+  </data>
 </root>

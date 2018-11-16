@@ -790,6 +790,15 @@ namespace U5ki.Infrastructure
       get { return _KeepAliveMultiplier; }
       set { _KeepAliveMultiplier = value; }
     }
+
+    private bool _GrabacionEd137 = default(bool);
+    [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"GrabacionEd137", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool GrabacionEd137
+    {
+      get { return _GrabacionEd137; }
+      set { _GrabacionEd137 = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1506,6 +1515,24 @@ namespace U5ki.Infrastructure
     {
       get { return _ModoTransmision; }
       set { _ModoTransmision = value; }
+    }
+
+    private string _EmplazamientoDefecto = "";
+    [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"EmplazamientoDefecto", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string EmplazamientoDefecto
+    {
+      get { return _EmplazamientoDefecto; }
+      set { _EmplazamientoDefecto = value; }
+    }
+
+    private int _TiempoVueltaADefecto = default(int);
+    [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"TiempoVueltaADefecto", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int TiempoVueltaADefecto
+    {
+      get { return _TiempoVueltaADefecto; }
+      set { _TiempoVueltaADefecto = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

@@ -16,12 +16,6 @@
             <Component Id="cmpCDFCA7F9CFC45961D6BFFAD89149D521" Directory="dir5B045DDCC6E4975275A0D9932CAA50F2" Guid="*">
                 <File Id="filE0CD906BEC6A1DF6723802FA68B73428" KeyPath="yes" Source="$(var.SourcePath)\login.html" />
             </Component>
-            <Component Id="cmpFB3151DC7229C6F1DA3AB20DCA7211BD" Directory="dir5B045DDCC6E4975275A0D9932CAA50F2" Guid="*">
-                <File Id="fil3110AD9C38EF014B12C7A316BDD3EEDB" KeyPath="yes" Source="$(var.SourcePath)\mongoose-free-5.6.exe" />
-            </Component>
-            <Component Id="cmp4B67AF64D37A3308C6969BC5489DB95E" Directory="dir5B045DDCC6E4975275A0D9932CAA50F2" Guid="*">
-                <File Id="fil2398B8778E4B567CC1C6C8CD7E9C5B58" KeyPath="yes" Source="$(var.SourcePath)\mongoose-free-6.1.exe" />
-            </Component>
             <Component Id="cmpC685778F516C8906029D4716A38FE86A" Directory="dir5B045DDCC6E4975275A0D9932CAA50F2" Guid="*">
                 <File Id="fil6F9F7750DE22E1E856307733911B0CA2" KeyPath="yes" Source="$(var.SourcePath)\mongoose.conf" />
             </Component>
@@ -69,6 +63,9 @@
             </Component>
             <Component Id="cmp9B37DDB8B2C73CC1BF8E9B33821638CF" Directory="dir85BCC3EAF2E721CB10BA1B66A6AA38B0" Guid="*">
                 <File Id="filB2794003433BCAD2243E1FBBE5F15027" KeyPath="yes" Source="$(var.SourcePath)\app\views\Uv5kinbx-tlf.html" />
+            </Component>
+            <Component Id="cmp3E6E7867C2A2E505A0BFD1323902120A" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
+                <File Id="fil20B6C7D6E3DD756C8161901FAF65FA8B" KeyPath="yes" Source="$(var.SourcePath)\images\corporativo.png" />
             </Component>
             <Component Id="cmp8065EE4DAFA407FEA968CA3DB445FDDC" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
                 <File Id="filFAB7D3A5F4AAA6FB8630A2537994842F" KeyPath="yes" Source="$(var.SourcePath)\images\nucleo-df-new.jpg" />
