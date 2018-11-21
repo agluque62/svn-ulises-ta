@@ -23,7 +23,7 @@ namespace U5ki.CfgService.SoapCfg {
     
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name="InterfazSOAPConfiguracionSoap", Namespace="http://CD40.es/")]
@@ -880,8 +880,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -892,7 +892,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private EstadoNode estadoNode2Field;
         
-        /// <comentarios/>
+        /// <remarks/>
         public EstadoNode EstadoNode1 {
             get {
                 return this.estadoNode1Field;
@@ -902,7 +902,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public EstadoNode EstadoNode2 {
             get {
                 return this.estadoNode2Field;
@@ -913,8 +913,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -927,7 +927,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private int estadoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Name {
             get {
                 return this.nameField;
@@ -937,7 +937,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Presencia {
             get {
                 return this.presenciaField;
@@ -947,7 +947,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Estado {
             get {
                 return this.estadoField;
@@ -958,8 +958,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -970,7 +970,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint fMaxField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint FMin {
             get {
                 return this.fMinField;
@@ -980,7 +980,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint FMax {
             get {
                 return this.fMaxField;
@@ -991,9 +991,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Node))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1010,7 +1010,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private HfRangoFrecuencias[] frecsField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Id {
             get {
                 return this.idField;
@@ -1020,7 +1020,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string SipUri {
             get {
                 return this.sipUriField;
@@ -1030,7 +1030,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpGestor {
             get {
                 return this.ipGestorField;
@@ -1040,7 +1040,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Oid {
             get {
                 return this.oidField;
@@ -1050,7 +1050,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public HfRangoFrecuencias[] Frecs {
             get {
                 return this.frecsField;
@@ -1061,8 +1061,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1099,7 +1099,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idEmplazamientoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool EsReceptor {
             get {
                 return this.esReceptorField;
@@ -1109,7 +1109,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool EsTransmisor {
             get {
                 return this.esTransmisorField;
@@ -1119,7 +1119,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public Tipo_Frecuencia TipoDeFrecuencia {
             get {
                 return this.tipoDeFrecuenciaField;
@@ -1129,7 +1129,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string FrecuenciaPrincipal {
             get {
                 return this.frecuenciaPrincipalField;
@@ -1139,7 +1139,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public Tipo_Canal TipoDeCanal {
             get {
                 return this.tipoDeCanalField;
@@ -1149,7 +1149,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public Tipo_Formato_Trabajo FormaDeTrabajo {
             get {
                 return this.formaDeTrabajoField;
@@ -1159,7 +1159,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Prioridad {
             get {
                 return this.prioridadField;
@@ -1169,7 +1169,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Puerto {
             get {
                 return this.puertoField;
@@ -1179,7 +1179,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public GearCarrierOffStatus Offset {
             get {
                 return this.offsetField;
@@ -1189,7 +1189,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public GearChannelSpacings Canalizacion {
             get {
                 return this.canalizacionField;
@@ -1199,7 +1199,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public GearModulations Modulacion {
             get {
                 return this.modulacionField;
@@ -1209,7 +1209,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public GearPowerLevels NivelDePotencia {
             get {
                 return this.nivelDePotenciaField;
@@ -1219,7 +1219,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public Tipo_Formato_Frecuencia FormatoFrecuenciaPrincipal {
             get {
                 return this.formatoFrecuenciaPrincipalField;
@@ -1229,7 +1229,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int ModeloEquipo {
             get {
                 return this.modeloEquipoField;
@@ -1239,7 +1239,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdEmplazamiento {
             get {
                 return this.idEmplazamientoField;
@@ -1250,178 +1250,178 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum Tipo_Frecuencia {
         
-        /// <comentarios/>
+        /// <remarks/>
         Basica,
         
-        /// <comentarios/>
+        /// <remarks/>
         HF,
         
-        /// <comentarios/>
+        /// <remarks/>
         VHF,
         
-        /// <comentarios/>
+        /// <remarks/>
         UHF,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum Tipo_Canal {
         
-        /// <comentarios/>
+        /// <remarks/>
         Monocanal,
         
-        /// <comentarios/>
+        /// <remarks/>
         Multicanal,
         
-        /// <comentarios/>
+        /// <remarks/>
         Otros,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum Tipo_Formato_Trabajo {
         
-        /// <comentarios/>
+        /// <remarks/>
         Principal,
         
-        /// <comentarios/>
+        /// <remarks/>
         Reserva,
         
-        /// <comentarios/>
+        /// <remarks/>
         Ambos,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum GearCarrierOffStatus {
         
-        /// <comentarios/>
+        /// <remarks/>
         Off,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_7_5,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_5_0,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_2_5,
         
-        /// <comentarios/>
+        /// <remarks/>
         Hz_0_0,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_minus_2_5,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_minus_5_0,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_minus_7_5,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_8,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_4,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_minus_4,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_minus_8,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_7_3,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_minus_7_3,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum GearChannelSpacings {
         
-        /// <comentarios/>
+        /// <remarks/>
         ChannelSpacingsDefault,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_8_33,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_12_5,
         
-        /// <comentarios/>
+        /// <remarks/>
         kHz_25_00,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum GearModulations {
         
-        /// <comentarios/>
+        /// <remarks/>
         AM,
         
-        /// <comentarios/>
+        /// <remarks/>
         Reserved,
         
-        /// <comentarios/>
+        /// <remarks/>
         ACARS,
         
-        /// <comentarios/>
+        /// <remarks/>
         VDL2,
         
-        /// <comentarios/>
+        /// <remarks/>
         AM_CT,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum GearPowerLevels {
         
-        /// <comentarios/>
+        /// <remarks/>
         PowerLevelsDefault,
         
-        /// <comentarios/>
+        /// <remarks/>
         Low,
         
-        /// <comentarios/>
+        /// <remarks/>
         Normal,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum Tipo_Formato_Frecuencia {
         
-        /// <comentarios/>
+        /// <remarks/>
         MHz,
         
-        /// <comentarios/>
+        /// <remarks/>
         Hz,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1432,7 +1432,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint puertoMulticastConfiguracionField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string GrupoMulticastConfiguracion {
             get {
                 return this.grupoMulticastConfiguracionField;
@@ -1442,7 +1442,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PuertoMulticastConfiguracion {
             get {
                 return this.puertoMulticastConfiguracionField;
@@ -1453,8 +1453,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1467,7 +1467,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string numeroAbonadoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdAgrupacion {
             get {
                 return this.idAgrupacionField;
@@ -1477,7 +1477,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prefijo {
             get {
                 return this.prefijoField;
@@ -1487,7 +1487,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NumeroAbonado {
             get {
                 return this.numeroAbonadoField;
@@ -1498,8 +1498,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1510,7 +1510,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private StrNumeroAbonado[] numerosAbonadoQueAtiendeField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdUsuario {
             get {
                 return this.idUsuarioField;
@@ -1520,7 +1520,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         [System.Xml.Serialization.XmlArrayItemAttribute(IsNullable=false)]
         public StrNumeroAbonado[] NumerosAbonadoQueAtiende {
             get {
@@ -1532,8 +1532,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1546,7 +1546,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint sipPortField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -1556,7 +1556,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdHost {
             get {
                 return this.idHostField;
@@ -1566,7 +1566,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint SipPort {
             get {
                 return this.sipPortField;
@@ -1577,8 +1577,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1595,7 +1595,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private int rtspPortField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdUsuario {
             get {
                 return this.idUsuarioField;
@@ -1605,7 +1605,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdHost {
             get {
                 return this.idHostField;
@@ -1615,7 +1615,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpGrabador1 {
             get {
                 return this.ipGrabador1Field;
@@ -1625,7 +1625,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpGrabador2 {
             get {
                 return this.ipGrabador2Field;
@@ -1635,7 +1635,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int RtspPort {
             get {
                 return this.rtspPortField;
@@ -1646,8 +1646,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1660,7 +1660,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private PlanRecursos[] listaRecursosField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRed {
             get {
                 return this.idRedField;
@@ -1670,7 +1670,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prefijo {
             get {
                 return this.prefijoField;
@@ -1680,7 +1680,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public PlanRecursos[] ListaRecursos {
             get {
                 return this.listaRecursosField;
@@ -1691,8 +1691,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1703,7 +1703,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private TipoInterface tipoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -1713,7 +1713,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public TipoInterface Tipo {
             get {
                 return this.tipoField;
@@ -1724,60 +1724,63 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum TipoInterface {
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_Radio,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_LCEN,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_BC,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_BL,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_AB,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_ATS_R2,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_ATS_N5,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_ATS_QSIG,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_ISDN_2BD,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_ISDN_30BD,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_I_O,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_DATOS,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_RRC,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_EM_PP,
         
-        /// <comentarios/>
+        /// <remarks/>
         TI_EM_MARC,
+        
+        /// <remarks/>
+        TI_NOT_FOUND,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1790,7 +1793,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private PlanRecursos[] listaRecursosField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdTroncal {
             get {
                 return this.idTroncalField;
@@ -1800,7 +1803,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NumeroTest {
             get {
                 return this.numeroTestField;
@@ -1810,7 +1813,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public PlanRecursos[] ListaRecursos {
             get {
                 return this.listaRecursosField;
@@ -1821,8 +1824,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1853,7 +1856,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string srvPresenciaIpRed3Field;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdHost {
             get {
                 return this.idHostField;
@@ -1863,7 +1866,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpRed1 {
             get {
                 return this.ipRed1Field;
@@ -1873,7 +1876,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpRed2 {
             get {
                 return this.ipRed2Field;
@@ -1883,7 +1886,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpRed3 {
             get {
                 return this.ipRed3Field;
@@ -1893,7 +1896,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public Tipo_Elemento_HW TipoHost {
             get {
                 return this.tipoHostField;
@@ -1903,7 +1906,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Interno {
             get {
                 return this.internoField;
@@ -1913,7 +1916,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public long Min {
             get {
                 return this.minField;
@@ -1923,7 +1926,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public long Max {
             get {
                 return this.maxField;
@@ -1933,7 +1936,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool EsCentralIP {
             get {
                 return this.esCentralIPField;
@@ -1943,7 +1946,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string SrvPresenciaIpRed1 {
             get {
                 return this.srvPresenciaIpRed1Field;
@@ -1953,7 +1956,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string SrvPresenciaIpRed2 {
             get {
                 return this.srvPresenciaIpRed2Field;
@@ -1963,7 +1966,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string SrvPresenciaIpRed3 {
             get {
                 return this.srvPresenciaIpRed3Field;
@@ -1974,33 +1977,33 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum Tipo_Elemento_HW {
         
-        /// <comentarios/>
+        /// <remarks/>
         TEH_TOP,
         
-        /// <comentarios/>
+        /// <remarks/>
         TEH_TIFX,
         
-        /// <comentarios/>
+        /// <remarks/>
         TEH_EXTERNO_RADIO,
         
-        /// <comentarios/>
+        /// <remarks/>
         TEH_EXTERNO_TELEFONIA,
         
-        /// <comentarios/>
+        /// <remarks/>
         TEH_SISTEMA,
         
-        /// <comentarios/>
+        /// <remarks/>
         TEH_GRABADOR,
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2011,7 +2014,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string[] listaTroncalesField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string TipoRuta {
             get {
                 return this.tipoRutaField;
@@ -2021,7 +2024,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string[] ListaTroncales {
             get {
                 return this.listaTroncalesField;
@@ -2032,8 +2035,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2054,7 +2057,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string numTestField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Central {
             get {
                 return this.centralField;
@@ -2064,7 +2067,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool CentralPropia {
             get {
                 return this.centralPropiaField;
@@ -2074,7 +2077,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Throwswitching {
             get {
                 return this.throwswitchingField;
@@ -2084,7 +2087,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public RangosSCV[] RangosOperador {
             get {
                 return this.rangosOperadorField;
@@ -2094,7 +2097,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public RangosSCV[] RangosPrivilegiados {
             get {
                 return this.rangosPrivilegiadosField;
@@ -2104,7 +2107,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public PlanRutas[] ListaRutas {
             get {
                 return this.listaRutasField;
@@ -2114,7 +2117,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NumTest {
             get {
                 return this.numTestField;
@@ -2125,9 +2128,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Rangos))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2142,7 +2145,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string finalField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -2152,7 +2155,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdAbonado {
             get {
                 return this.idAbonadoField;
@@ -2162,7 +2165,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Inicial {
             get {
                 return this.inicialField;
@@ -2172,7 +2175,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Final {
             get {
                 return this.finalField;
@@ -2183,7 +2186,7 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(TifX))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Top))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Sistema))]
@@ -2249,7 +2252,7 @@ namespace U5ki.CfgService.SoapCfg {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SectoresAgrupacion))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SectoresSCV))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Sectores))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2258,7 +2261,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private long insertedIdField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public long InsertedId {
             get {
                 return this.insertedIdField;
@@ -2269,8 +2272,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2305,7 +2308,11 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string grabador2Field;
         
-        /// <comentarios/>
+        private byte iSupervLanGWField;
+        
+        private byte itmmaxSupervLanGWField;
+        
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -2315,7 +2322,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdTifx {
             get {
                 return this.idTifxField;
@@ -2325,7 +2332,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string ModoArranque {
             get {
                 return this.modoArranqueField;
@@ -2335,7 +2342,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint ModoSincronizacion {
             get {
                 return this.modoSincronizacionField;
@@ -2345,7 +2352,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Master {
             get {
                 return this.masterField;
@@ -2355,7 +2362,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint SNMPPortLocal {
             get {
                 return this.sNMPPortLocalField;
@@ -2365,7 +2372,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint SNMPPortRemoto {
             get {
                 return this.sNMPPortRemotoField;
@@ -2375,7 +2382,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint SNMPTraps {
             get {
                 return this.sNMPTrapsField;
@@ -2385,7 +2392,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint SIPPortLocal {
             get {
                 return this.sIPPortLocalField;
@@ -2395,7 +2402,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TimeSupervision {
             get {
                 return this.timeSupervisionField;
@@ -2405,7 +2412,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpRed1 {
             get {
                 return this.ipRed1Field;
@@ -2415,7 +2422,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpRed2 {
             get {
                 return this.ipRed2Field;
@@ -2425,7 +2432,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Grabador1 {
             get {
                 return this.grabador1Field;
@@ -2435,7 +2442,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Grabador2 {
             get {
                 return this.grabador2Field;
@@ -2444,10 +2451,30 @@ namespace U5ki.CfgService.SoapCfg {
                 this.grabador2Field = value;
             }
         }
+        
+        /// <remarks/>
+        public byte iSupervLanGW {
+            get {
+                return this.iSupervLanGWField;
+            }
+            set {
+                this.iSupervLanGWField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public byte itmmaxSupervLanGW {
+            get {
+                return this.itmmaxSupervLanGWField;
+            }
+            set {
+                this.itmmaxSupervLanGWField = value;
+            }
+        }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2476,7 +2503,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string grabador2Field;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -2486,7 +2513,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdTop {
             get {
                 return this.idTopField;
@@ -2496,7 +2523,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string ModoArranque {
             get {
                 return this.modoArranqueField;
@@ -2506,7 +2533,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosicionSacta {
             get {
                 return this.posicionSactaField;
@@ -2516,7 +2543,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpRed1 {
             get {
                 return this.ipRed1Field;
@@ -2526,7 +2553,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpRed2 {
             get {
                 return this.ipRed2Field;
@@ -2536,7 +2563,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool ConexionJacksEjecutivo {
             get {
                 return this.conexionJacksEjecutivoField;
@@ -2546,7 +2573,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool ConexionJacksAyudante {
             get {
                 return this.conexionJacksAyudanteField;
@@ -2556,7 +2583,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int NumAltavoces {
             get {
                 return this.numAltavocesField;
@@ -2566,7 +2593,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Grabador1 {
             get {
                 return this.grabador1Field;
@@ -2576,7 +2603,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Grabador2 {
             get {
                 return this.grabador2Field;
@@ -2587,8 +2614,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2645,7 +2672,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint numEnlacesAIField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -2655,7 +2682,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TiempoPtt {
             get {
                 return this.tiempoPttField;
@@ -2665,7 +2692,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TiempoSinJack1 {
             get {
                 return this.tiempoSinJack1Field;
@@ -2675,7 +2702,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TiempoSinJack2 {
             get {
                 return this.tiempoSinJack2Field;
@@ -2685,7 +2712,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralEnlExt {
             get {
                 return this.tamLiteralEnlExtField;
@@ -2695,7 +2722,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralDA {
             get {
                 return this.tamLiteralDAField;
@@ -2705,7 +2732,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralIA {
             get {
                 return this.tamLiteralIAField;
@@ -2715,7 +2742,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralAG {
             get {
                 return this.tamLiteralAGField;
@@ -2725,7 +2752,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralEmplazamiento {
             get {
                 return this.tamLiteralEmplazamientoField;
@@ -2735,7 +2762,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint VersionIP {
             get {
                 return this.versionIPField;
@@ -2745,7 +2772,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string GrupoMulticastConfiguracion {
             get {
                 return this.grupoMulticastConfiguracionField;
@@ -2755,7 +2782,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PuertoMulticastConfiguracion {
             get {
                 return this.puertoMulticastConfiguracionField;
@@ -2765,7 +2792,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint EstadoScv1 {
             get {
                 return this.estadoScv1Field;
@@ -2775,7 +2802,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint EstadoScv2 {
             get {
                 return this.estadoScv2Field;
@@ -2785,7 +2812,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint KeepAlivePeriod {
             get {
                 return this.keepAlivePeriodField;
@@ -2795,7 +2822,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint KeepAliveMultiplier {
             get {
                 return this.keepAliveMultiplierField;
@@ -2805,7 +2832,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumLlamadasEntrantesIda {
             get {
                 return this.numLlamadasEntrantesIdaField;
@@ -2815,7 +2842,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumLlamadasEnIda {
             get {
                 return this.numLlamadasEnIdaField;
@@ -2825,7 +2852,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumFrecPagina {
             get {
                 return this.numFrecPaginaField;
@@ -2835,7 +2862,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumPagFrec {
             get {
                 return this.numPagFrecField;
@@ -2845,7 +2872,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumEnlacesInternosPag {
             get {
                 return this.numEnlacesInternosPagField;
@@ -2855,7 +2882,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumPagEnlacesInt {
             get {
                 return this.numPagEnlacesIntField;
@@ -2865,7 +2892,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumDestinosInternosPag {
             get {
                 return this.numDestinosInternosPagField;
@@ -2875,7 +2902,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumPagDestinosInt {
             get {
                 return this.numPagDestinosIntField;
@@ -2885,7 +2912,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumEnlacesAI {
             get {
                 return this.numEnlacesAIField;
@@ -2896,8 +2923,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -2922,7 +2949,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string comentariosField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdOperador {
             get {
                 return this.idOperadorField;
@@ -2932,7 +2959,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -2942,7 +2969,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Clave {
             get {
                 return this.claveField;
@@ -2952,7 +2979,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NivelAcceso {
             get {
                 return this.nivelAccesoField;
@@ -2962,7 +2989,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Nombre {
             get {
                 return this.nombreField;
@@ -2972,7 +2999,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Apellidos {
             get {
                 return this.apellidosField;
@@ -2982,7 +3009,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Telefono {
             get {
                 return this.telefonoField;
@@ -2992,7 +3019,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public System.DateTime FechaUltimoAcceso {
             get {
                 return this.fechaUltimoAccesoField;
@@ -3002,7 +3029,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Comentarios {
             get {
                 return this.comentariosField;
@@ -3013,8 +3040,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3025,7 +3052,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idSistemaField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdEmplazamiento {
             get {
                 return this.idEmplazamientoField;
@@ -3035,7 +3062,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3046,8 +3073,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3058,7 +3085,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idSistemaField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -3068,7 +3095,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3079,8 +3106,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3091,7 +3118,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idSistemaField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -3101,7 +3128,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3112,8 +3139,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3128,7 +3155,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private System.DateTime fechaActivacionField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSectorizacion {
             get {
                 return this.idSectorizacionField;
@@ -3138,7 +3165,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3148,7 +3175,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Activa {
             get {
                 return this.activaField;
@@ -3158,7 +3185,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public System.DateTime FechaActivacion {
             get {
                 return this.fechaActivacionField;
@@ -3169,8 +3196,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3185,7 +3212,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool bPrefijoMayorField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRed {
             get {
                 return this.idRedField;
@@ -3195,7 +3222,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3205,7 +3232,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prefijo {
             get {
                 return this.prefijoField;
@@ -3215,7 +3242,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool bPrefijoMayor {
             get {
                 return this.bPrefijoMayorField;
@@ -3226,9 +3253,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(PermisosRedes))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3241,7 +3268,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool recibirField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRed {
             get {
                 return this.idRedField;
@@ -3251,7 +3278,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Llamar {
             get {
                 return this.llamarField;
@@ -3261,7 +3288,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Recibir {
             get {
                 return this.recibirField;
@@ -3272,8 +3299,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3290,7 +3317,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private System.Nullable<uint> tipoRecursoPrefField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3300,7 +3327,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -3310,7 +3337,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -3320,7 +3347,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecursoPref {
             get {
                 return this.idRecursoPrefField;
@@ -3330,7 +3357,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public System.Nullable<uint> TipoRecursoPref {
             get {
@@ -3342,8 +3369,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3356,7 +3383,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string numTestField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdTroncal {
             get {
                 return this.idTroncalField;
@@ -3366,7 +3393,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3376,7 +3403,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NumTest {
             get {
                 return this.numTestField;
@@ -3387,8 +3414,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3405,7 +3432,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idTopField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3415,7 +3442,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSectorizacion {
             get {
                 return this.idSectorizacionField;
@@ -3425,7 +3452,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -3435,7 +3462,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -3445,7 +3472,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdTop {
             get {
                 return this.idTopField;
@@ -3456,8 +3483,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3476,7 +3503,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool centralIpField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Central {
             get {
                 return this.centralField;
@@ -3486,7 +3513,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3496,7 +3523,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool CentralPropia {
             get {
                 return this.centralPropiaField;
@@ -3506,7 +3533,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Throwswitching {
             get {
                 return this.throwswitchingField;
@@ -3516,7 +3543,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NumTest {
             get {
                 return this.numTestField;
@@ -3526,7 +3553,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool CentralIp {
             get {
                 return this.centralIpField;
@@ -3537,8 +3564,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3555,7 +3582,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private int ordenField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -3565,7 +3592,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Central {
             get {
                 return this.centralField;
@@ -3575,7 +3602,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRuta {
             get {
                 return this.idRutaField;
@@ -3585,7 +3612,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Tipo {
             get {
                 return this.tipoField;
@@ -3595,7 +3622,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Orden {
             get {
                 return this.ordenField;
@@ -3606,7 +3633,7 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRDSCV))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursoRadio))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursosRadioKeepAlive))]
@@ -3621,7 +3648,7 @@ namespace U5ki.CfgService.SoapCfg {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosLCENSCV))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursoLCEN))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosLCEN))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3629,13 +3656,13 @@ namespace U5ki.CfgService.SoapCfg {
     public abstract partial class ParametrosRecursoGeneral : Tablas {
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursoRadio))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursosRadioKeepAlive))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursosRadioKASiccip))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosRadio))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosRadioForGateway))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3692,7 +3719,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint numFlujosAudioField;
         
-        /// <comentarios/>
+        /// <remarks/>
         [System.Xml.Serialization.XmlArrayItemAttribute(IsNullable=false)]
         public RecursosExternos[] ListaEnlacesRecursosExternos {
             get {
@@ -3703,7 +3730,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool EM {
             get {
                 return this.emField;
@@ -3713,7 +3740,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string SQ {
             get {
                 return this.sqField;
@@ -3723,7 +3750,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string PTT {
             get {
                 return this.pTTField;
@@ -3733,7 +3760,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint FrqTonoE {
             get {
                 return this.frqTonoEField;
@@ -3743,7 +3770,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int UmbralTonoE {
             get {
                 return this.umbralTonoEField;
@@ -3753,7 +3780,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint FrqTonoM {
             get {
                 return this.frqTonoMField;
@@ -3763,7 +3790,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int UmbralTonoM {
             get {
                 return this.umbralTonoMField;
@@ -3773,7 +3800,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint FrqTonoSQ {
             get {
                 return this.frqTonoSQField;
@@ -3783,7 +3810,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int UmbralTonoSQ {
             get {
                 return this.umbralTonoSQField;
@@ -3793,7 +3820,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint FrqTonoPTT {
             get {
                 return this.frqTonoPTTField;
@@ -3803,7 +3830,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int UmbralTonoPTT {
             get {
                 return this.umbralTonoPTTField;
@@ -3813,7 +3840,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool BSS {
             get {
                 return this.bSSField;
@@ -3823,7 +3850,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool NTZ {
             get {
                 return this.nTZField;
@@ -3833,7 +3860,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoNTZ {
             get {
                 return this.tipoNTZField;
@@ -3843,7 +3870,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Cifrado {
             get {
                 return this.cifradoField;
@@ -3853,7 +3880,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SupervPortadoraTx {
             get {
                 return this.supervPortadoraTxField;
@@ -3863,7 +3890,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SupervModuladoraTx {
             get {
                 return this.supervModuladoraTxField;
@@ -3873,7 +3900,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint ModoConfPTT {
             get {
                 return this.modoConfPTTField;
@@ -3883,7 +3910,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint RepSQyBSS {
             get {
                 return this.repSQyBSSField;
@@ -3893,7 +3920,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint DesactivacionSQ {
             get {
                 return this.desactivacionSQField;
@@ -3903,7 +3930,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TimeoutPTT {
             get {
                 return this.timeoutPTTField;
@@ -3913,7 +3940,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int UmbralVAD {
             get {
                 return this.umbralVADField;
@@ -3923,7 +3950,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TiempoPTT {
             get {
                 return this.tiempoPTTField;
@@ -3933,7 +3960,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumFlujosAudio {
             get {
                 return this.numFlujosAudioField;
@@ -3944,8 +3971,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3960,7 +3987,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint tipoPttField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Nombre {
             get {
                 return this.nombreField;
@@ -3970,7 +3997,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Tipo {
             get {
                 return this.tipoField;
@@ -3980,7 +4007,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint ModoConfirmacionPtt {
             get {
                 return this.modoConfirmacionPttField;
@@ -3990,7 +4017,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoPtt {
             get {
                 return this.tipoPttField;
@@ -4001,12 +4028,12 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursosRadioKeepAlive))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursosRadioKASiccip))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosRadio))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosRadioForGateway))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4029,7 +4056,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool grabacionEd137Field;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint GananciaAGCTX {
             get {
                 return this.gananciaAGCTXField;
@@ -4039,7 +4066,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public float GananciaAGCTXdBm {
             get {
                 return this.gananciaAGCTXdBmField;
@@ -4049,7 +4076,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint GananciaAGCRX {
             get {
                 return this.gananciaAGCRXField;
@@ -4059,7 +4086,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public float GananciaAGCRXdBm {
             get {
                 return this.gananciaAGCRXdBmField;
@@ -4069,7 +4096,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SupresionSilencio {
             get {
                 return this.supresionSilencioField;
@@ -4079,7 +4106,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamRTP {
             get {
                 return this.tamRTPField;
@@ -4089,7 +4116,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Codec {
             get {
                 return this.codecField;
@@ -4099,7 +4126,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool GrabacionEd137 {
             get {
                 return this.grabacionEd137Field;
@@ -4110,11 +4137,11 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursosRadioKASiccip))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosRadio))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosRadioForGateway))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4125,7 +4152,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint keepAliveMultiplierField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint KeepAlivePeriod {
             get {
                 return this.keepAlivePeriodField;
@@ -4135,7 +4162,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint KeepAliveMultiplier {
             get {
                 return this.keepAliveMultiplierField;
@@ -4146,10 +4173,10 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosRadio))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosRadioForGateway))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4158,7 +4185,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string uriRecursoDestinoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string UriRecursoDestino {
             get {
                 return this.uriRecursoDestinoField;
@@ -4169,9 +4196,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosRadioForGateway))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4214,7 +4241,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint destRad_tipoFrecField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -4224,7 +4251,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -4234,7 +4261,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoDestino {
             get {
                 return this.tipoDestinoField;
@@ -4244,7 +4271,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -4254,7 +4281,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdEmplazamiento {
             get {
                 return this.idEmplazamientoField;
@@ -4264,7 +4291,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NameTablaBss {
             get {
                 return this.nameTablaBssField;
@@ -4274,7 +4301,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Tipo {
             get {
                 return this.tipoField;
@@ -4284,7 +4311,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string MetodoBSS {
             get {
                 return this.metodoBSSField;
@@ -4294,7 +4321,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Zonas_IdZonas {
             get {
                 return this.zonas_IdZonasField;
@@ -4304,7 +4331,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Radio_param_idradio_param {
             get {
                 return this.radio_param_idradio_paramField;
@@ -4314,7 +4341,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int IdTablaBss {
             get {
                 return this.idTablaBssField;
@@ -4324,7 +4351,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NombreZona {
             get {
                 return this.nombreZonaField;
@@ -4334,7 +4361,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int GrsDelay {
             get {
                 return this.grsDelayField;
@@ -4344,7 +4371,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int OffSetFrequency {
             get {
                 return this.offSetFrequencyField;
@@ -4354,7 +4381,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool EnableEventPttSq {
             get {
                 return this.enableEventPttSqField;
@@ -4364,7 +4391,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Metodos_bss_idmetodos_bss {
             get {
                 return this.metodos_bss_idmetodos_bssField;
@@ -4374,7 +4401,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string idTIFX {
             get {
                 return this.idTIFXField;
@@ -4384,7 +4411,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint DestRad_tipoFrec {
             get {
                 return this.destRad_tipoFrecField;
@@ -4395,8 +4422,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4405,7 +4432,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private int[] valuesTablaBssField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public int[] ValuesTablaBss {
             get {
                 return this.valuesTablaBssField;
@@ -4416,12 +4443,12 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursoTelefonia))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosEM))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosGrabacionTf))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosTF))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4434,7 +4461,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string modoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string[] ListaEnlacesInternos {
             get {
                 return this.listaEnlacesInternosField;
@@ -4444,7 +4471,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Lado {
             get {
                 return this.ladoField;
@@ -4454,7 +4481,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Modo {
             get {
                 return this.modoField;
@@ -4465,11 +4492,11 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosEM))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosGrabacionTf))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosTF))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4490,7 +4517,27 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint codecField;
         
-        /// <comentarios/>
+        private uint iPrTmLlamEntranteField;
+        
+        private byte iPrDetDtmfField;
+        
+        private uint tPrReleaseBLField;
+        
+        private uint iPrPeriodoSpvRingField;
+        
+        private uint iPrFiltroSpvRingField;
+        
+        private byte iPrDetCallerIdField;
+        
+        private uint iPrTmCallerIdField;
+        
+        private byte iPrDetInversionPolField;
+        
+        private uint iPrTmDetFinLlamadaField;
+        
+        private TipoInterface tipoInterfaceField;
+        
+        /// <remarks/>
         public uint GananciaAGCTX {
             get {
                 return this.gananciaAGCTXField;
@@ -4500,7 +4547,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public float GananciaAGCTXdBm {
             get {
                 return this.gananciaAGCTXdBmField;
@@ -4510,7 +4557,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint GananciaAGCRX {
             get {
                 return this.gananciaAGCRXField;
@@ -4520,7 +4567,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public float GananciaAGCRXdBm {
             get {
                 return this.gananciaAGCRXdBmField;
@@ -4530,7 +4577,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SupresionSilencio {
             get {
                 return this.supresionSilencioField;
@@ -4540,7 +4587,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamRTP {
             get {
                 return this.tamRTPField;
@@ -4550,7 +4597,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Codec {
             get {
                 return this.codecField;
@@ -4559,12 +4606,112 @@ namespace U5ki.CfgService.SoapCfg {
                 this.codecField = value;
             }
         }
+        
+        /// <remarks/>
+        public uint iPrTmLlamEntrante {
+            get {
+                return this.iPrTmLlamEntranteField;
+            }
+            set {
+                this.iPrTmLlamEntranteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public byte iPrDetDtmf {
+            get {
+                return this.iPrDetDtmfField;
+            }
+            set {
+                this.iPrDetDtmfField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint TPrReleaseBL {
+            get {
+                return this.tPrReleaseBLField;
+            }
+            set {
+                this.tPrReleaseBLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint iPrPeriodoSpvRing {
+            get {
+                return this.iPrPeriodoSpvRingField;
+            }
+            set {
+                this.iPrPeriodoSpvRingField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint iPrFiltroSpvRing {
+            get {
+                return this.iPrFiltroSpvRingField;
+            }
+            set {
+                this.iPrFiltroSpvRingField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public byte iPrDetCallerId {
+            get {
+                return this.iPrDetCallerIdField;
+            }
+            set {
+                this.iPrDetCallerIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint iPrTmCallerId {
+            get {
+                return this.iPrTmCallerIdField;
+            }
+            set {
+                this.iPrTmCallerIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public byte iPrDetInversionPol {
+            get {
+                return this.iPrDetInversionPolField;
+            }
+            set {
+                this.iPrDetInversionPolField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint iPrTmDetFinLlamada {
+            get {
+                return this.iPrTmDetFinLlamadaField;
+            }
+            set {
+                this.iPrTmDetFinLlamadaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TipoInterface tipoInterface {
+            get {
+                return this.tipoInterfaceField;
+            }
+            set {
+                this.tipoInterfaceField = value;
+            }
+        }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosGrabacionTf))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosTF))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4573,7 +4720,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private Tipo_EM tipoEMField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public Tipo_EM TipoEM {
             get {
                 return this.tipoEMField;
@@ -4584,31 +4731,31 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://CD40.es/")]
     public enum Tipo_EM {
         
-        /// <comentarios/>
+        /// <remarks/>
         Type_I,
         
-        /// <comentarios/>
+        /// <remarks/>
         Type_II,
         
-        /// <comentarios/>
+        /// <remarks/>
         Type_III,
         
-        /// <comentarios/>
+        /// <remarks/>
         Type_IV,
         
-        /// <comentarios/>
+        /// <remarks/>
         Type_V,
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosTF))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4617,7 +4764,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool grabacionEd137Field;
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool GrabacionEd137 {
             get {
                 return this.grabacionEd137Field;
@@ -4628,8 +4775,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4650,7 +4797,29 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idRedField;
         
-        /// <comentarios/>
+        private uint tReleaseBLField;
+        
+        private byte isuperv_optionsField;
+        
+        private uint itm_superv_optionsField;
+        
+        private byte iDetCallerIdField;
+        
+        private uint iTmCallerIdField;
+        
+        private byte iDetInversionPolField;
+        
+        private uint iTmLlamEntranteField;
+        
+        private uint iTmDetFinLlamadaField;
+        
+        private uint iPeriodoSpvRingField;
+        
+        private uint iFiltroSpvRingField;
+        
+        private byte iDetDtmfField;
+        
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -4660,7 +4829,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -4670,7 +4839,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -4680,7 +4849,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoDestino {
             get {
                 return this.tipoDestinoField;
@@ -4690,7 +4859,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -4700,7 +4869,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdTroncal {
             get {
                 return this.idTroncalField;
@@ -4710,7 +4879,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRed {
             get {
                 return this.idRedField;
@@ -4719,12 +4888,122 @@ namespace U5ki.CfgService.SoapCfg {
                 this.idRedField = value;
             }
         }
+        
+        /// <remarks/>
+        public uint TReleaseBL {
+            get {
+                return this.tReleaseBLField;
+            }
+            set {
+                this.tReleaseBLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public byte isuperv_options {
+            get {
+                return this.isuperv_optionsField;
+            }
+            set {
+                this.isuperv_optionsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint itm_superv_options {
+            get {
+                return this.itm_superv_optionsField;
+            }
+            set {
+                this.itm_superv_optionsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public byte iDetCallerId {
+            get {
+                return this.iDetCallerIdField;
+            }
+            set {
+                this.iDetCallerIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint iTmCallerId {
+            get {
+                return this.iTmCallerIdField;
+            }
+            set {
+                this.iTmCallerIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public byte iDetInversionPol {
+            get {
+                return this.iDetInversionPolField;
+            }
+            set {
+                this.iDetInversionPolField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint iTmLlamEntrante {
+            get {
+                return this.iTmLlamEntranteField;
+            }
+            set {
+                this.iTmLlamEntranteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint iTmDetFinLlamada {
+            get {
+                return this.iTmDetFinLlamadaField;
+            }
+            set {
+                this.iTmDetFinLlamadaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint iPeriodoSpvRing {
+            get {
+                return this.iPeriodoSpvRingField;
+            }
+            set {
+                this.iPeriodoSpvRingField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint iFiltroSpvRing {
+            get {
+                return this.iFiltroSpvRingField;
+            }
+            set {
+                this.iFiltroSpvRingField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public byte iDetDtmf {
+            get {
+                return this.iDetDtmfField;
+            }
+            set {
+                this.iDetDtmfField = value;
+            }
+        }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosRecursoLCEN))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosLCEN))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4787,7 +5066,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint longRafagasField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string[] ListaEnlacesInternos {
             get {
                 return this.listaEnlacesInternosField;
@@ -4797,7 +5076,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T1 {
             get {
                 return this.t1Field;
@@ -4807,7 +5086,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T1Max {
             get {
                 return this.t1MaxField;
@@ -4817,7 +5096,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T2 {
             get {
                 return this.t2Field;
@@ -4827,7 +5106,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T2Max {
             get {
                 return this.t2MaxField;
@@ -4837,7 +5116,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T3 {
             get {
                 return this.t3Field;
@@ -4847,7 +5126,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T4 {
             get {
                 return this.t4Field;
@@ -4857,7 +5136,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T4Max {
             get {
                 return this.t4MaxField;
@@ -4867,7 +5146,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T5 {
             get {
                 return this.t5Field;
@@ -4877,7 +5156,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T5Max {
             get {
                 return this.t5MaxField;
@@ -4887,7 +5166,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T6 {
             get {
                 return this.t6Field;
@@ -4897,7 +5176,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T6Max {
             get {
                 return this.t6MaxField;
@@ -4907,7 +5186,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T8 {
             get {
                 return this.t8Field;
@@ -4917,7 +5196,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T8Max {
             get {
                 return this.t8MaxField;
@@ -4927,7 +5206,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T9 {
             get {
                 return this.t9Field;
@@ -4937,7 +5216,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T9Max {
             get {
                 return this.t9MaxField;
@@ -4947,7 +5226,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T10 {
             get {
                 return this.t10Field;
@@ -4957,7 +5236,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T10Max {
             get {
                 return this.t10MaxField;
@@ -4967,7 +5246,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T11 {
             get {
                 return this.t11Field;
@@ -4977,7 +5256,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T11Max {
             get {
                 return this.t11MaxField;
@@ -4987,7 +5266,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint T12 {
             get {
                 return this.t12Field;
@@ -4997,7 +5276,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint FrqTonoSQ {
             get {
                 return this.frqTonoSQField;
@@ -5007,7 +5286,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int UmbralTonoSQ {
             get {
                 return this.umbralTonoSQField;
@@ -5017,7 +5296,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint FrqTonoPTT {
             get {
                 return this.frqTonoPTTField;
@@ -5027,7 +5306,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int UmbralTonoPTT {
             get {
                 return this.umbralTonoPTTField;
@@ -5037,7 +5316,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint RefrescoEstados {
             get {
                 return this.refrescoEstadosField;
@@ -5047,7 +5326,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Timeout {
             get {
                 return this.timeoutField;
@@ -5057,7 +5336,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint LongRafagas {
             get {
                 return this.longRafagasField;
@@ -5068,9 +5347,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RecursosLCEN))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5093,7 +5372,11 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool grabacionEd137Field;
         
-        /// <comentarios/>
+        private byte isuperv_optionsField;
+        
+        private uint itm_superv_optionsField;
+        
+        /// <remarks/>
         public uint GananciaAGCTX {
             get {
                 return this.gananciaAGCTXField;
@@ -5103,7 +5386,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public float GananciaAGCTXdBm {
             get {
                 return this.gananciaAGCTXdBmField;
@@ -5113,7 +5396,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint GananciaAGCRX {
             get {
                 return this.gananciaAGCRXField;
@@ -5123,7 +5406,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public float GananciaAGCRXdBm {
             get {
                 return this.gananciaAGCRXdBmField;
@@ -5133,7 +5416,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SupresionSilencio {
             get {
                 return this.supresionSilencioField;
@@ -5143,7 +5426,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamRTP {
             get {
                 return this.tamRTPField;
@@ -5153,7 +5436,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Codec {
             get {
                 return this.codecField;
@@ -5163,7 +5446,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool GrabacionEd137 {
             get {
                 return this.grabacionEd137Field;
@@ -5172,10 +5455,30 @@ namespace U5ki.CfgService.SoapCfg {
                 this.grabacionEd137Field = value;
             }
         }
+        
+        /// <remarks/>
+        public byte isuperv_options {
+            get {
+                return this.isuperv_optionsField;
+            }
+            set {
+                this.isuperv_optionsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public uint itm_superv_options {
+            get {
+                return this.itm_superv_optionsField;
+            }
+            set {
+                this.itm_superv_optionsField = value;
+            }
+        }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5192,7 +5495,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idDestinoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -5202,7 +5505,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -5212,7 +5515,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -5222,7 +5525,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoDestino {
             get {
                 return this.tipoDestinoField;
@@ -5232,7 +5535,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -5243,9 +5546,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Recursos))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5266,7 +5569,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool diffservField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -5276,7 +5579,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Tipo {
             get {
                 return this.tipoField;
@@ -5286,7 +5589,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public TipoInterface Interface {
             get {
                 return this.interfaceField;
@@ -5296,7 +5599,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int SlotPasarela {
             get {
                 return this.slotPasarelaField;
@@ -5306,7 +5609,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int NumDispositivoSlot {
             get {
                 return this.numDispositivoSlotField;
@@ -5316,7 +5619,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string ServidorSIP {
             get {
                 return this.servidorSIPField;
@@ -5326,7 +5629,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Diffserv {
             get {
                 return this.diffservField;
@@ -5337,8 +5640,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5355,7 +5658,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint puertoSipField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -5365,7 +5668,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoRecurso {
             get {
                 return this.tipoRecursoField;
@@ -5375,7 +5678,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdEquipo {
             get {
                 return this.idEquipoField;
@@ -5385,7 +5688,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdTifX {
             get {
                 return this.idTifXField;
@@ -5395,7 +5698,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PuertoSip {
             get {
                 return this.puertoSipField;
@@ -5406,8 +5709,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5424,7 +5727,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idSectorField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -5434,7 +5737,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -5444,7 +5747,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdAbonado {
             get {
                 return this.idAbonadoField;
@@ -5454,7 +5757,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -5464,7 +5767,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -5475,12 +5778,12 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinosTelefonia))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinosExternos))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinosInternos))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinosRadio))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5493,7 +5796,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint tipoDestinoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -5503,7 +5806,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -5513,7 +5816,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoDestino {
             get {
                 return this.tipoDestinoField;
@@ -5524,10 +5827,10 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinosExternos))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinosInternos))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5538,7 +5841,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idGrupoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -5548,7 +5851,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdGrupo {
             get {
                 return this.idGrupoField;
@@ -5559,8 +5862,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5569,7 +5872,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idAbonadoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdAbonado {
             get {
                 return this.idAbonadoField;
@@ -5580,8 +5883,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5592,7 +5895,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idNucleoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -5602,7 +5905,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -5613,8 +5916,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5657,7 +5960,13 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string cnfTipoFrecuenciaField;
         
-       /// <comentarios/>
+        private string modoTransmisionField;
+        
+        private string emplazamientoDefectoField;
+        
+        private int tiempoVueltaADefectoField;
+        
+        /// <remarks/>
         public int Fk_Metodosbss {
             get {
                 return this.fk_MetodosbssField;
@@ -5667,7 +5976,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Zonas_IdZonas {
             get {
                 return this.zonas_IdZonasField;
@@ -5677,7 +5986,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoFrec {
             get {
                 return this.tipoFrecField;
@@ -5687,7 +5996,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool ExclusividadTXRX {
             get {
                 return this.exclusividadTXRXField;
@@ -5697,7 +6006,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Frecuencia {
             get {
                 return this.frecuenciaField;
@@ -5707,7 +6016,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int MetodoCalculoClimax {
             get {
                 return this.metodoCalculoClimaxField;
@@ -5717,7 +6026,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int VentanaSeleccionBss {
             get {
                 return this.ventanaSeleccionBssField;
@@ -5727,7 +6036,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SincronizaGrupoClimax {
             get {
                 return this.sincronizaGrupoClimaxField;
@@ -5737,7 +6046,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool AudioPrimerSqBss {
             get {
                 return this.audioPrimerSqBssField;
@@ -5747,7 +6056,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         [System.Xml.Serialization.XmlArrayItemAttribute(IsNullable=false)]
         public MetodosBssDelRecurso[] MetodosBss {
             get {
@@ -5758,7 +6067,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool FrecuenciaNoDesasignable {
             get {
                 return this.frecuenciaNoDesasignableField;
@@ -5768,7 +6077,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int VentanaReposoZonaTxDefecto {
             get {
                 return this.ventanaReposoZonaTxDefectoField;
@@ -5778,7 +6087,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int PrioridadSesionSip {
             get {
                 return this.prioridadSesionSipField;
@@ -5788,7 +6097,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int MetodosBssOfrecidos {
             get {
                 return this.metodosBssOfrecidosField;
@@ -5798,7 +6107,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int CldSupervisionTime {
             get {
                 return this.cldSupervisionTimeField;
@@ -5808,7 +6117,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NombreZonaTxDefecto {
             get {
                 return this.nombreZonaTxDefectoField;
@@ -5818,7 +6127,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string CnfModoDestino {
             get {
                 return this.cnfModoDestinoField;
@@ -5828,7 +6137,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string CnfTipoFrecuencia {
             get {
                 return this.cnfTipoFrecuenciaField;
@@ -5837,10 +6146,40 @@ namespace U5ki.CfgService.SoapCfg {
                 this.cnfTipoFrecuenciaField = value;
             }
         }
+        
+        /// <remarks/>
+        public string ModoTransmision {
+            get {
+                return this.modoTransmisionField;
+            }
+            set {
+                this.modoTransmisionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string EmplazamientoDefecto {
+            get {
+                return this.emplazamientoDefectoField;
+            }
+            set {
+                this.emplazamientoDefectoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int TiempoVueltaADefecto {
+            get {
+                return this.tiempoVueltaADefectoField;
+            }
+            set {
+                this.tiempoVueltaADefectoField = value;
+            }
+        }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5851,7 +6190,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string nombreMetodoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public int idMetodo {
             get {
                 return this.idMetodoField;
@@ -5861,7 +6200,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string nombreMetodo {
             get {
                 return this.nombreMetodoField;
@@ -5872,8 +6211,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5906,7 +6245,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string grupoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -5916,7 +6255,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSectorizacion {
             get {
                 return this.idSectorizacionField;
@@ -5926,7 +6265,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -5936,7 +6275,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -5946,7 +6285,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -5956,7 +6295,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -5966,7 +6305,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosHMI {
             get {
                 return this.posHMIField;
@@ -5976,7 +6315,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prioridad {
             get {
                 return this.prioridadField;
@@ -5986,7 +6325,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string OrigenR2 {
             get {
                 return this.origenR2Field;
@@ -5996,7 +6335,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PrioridadSIP {
             get {
                 return this.prioridadSIPField;
@@ -6006,7 +6345,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string TipoAcceso {
             get {
                 return this.tipoAccesoField;
@@ -6016,7 +6355,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Literal {
             get {
                 return this.literalField;
@@ -6026,7 +6365,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Grupo {
             get {
                 return this.grupoField;
@@ -6037,8 +6376,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6073,7 +6412,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idDestinoLCENField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -6083,7 +6422,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -6093,7 +6432,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoDestino {
             get {
                 return this.tipoDestinoField;
@@ -6103,7 +6442,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -6113,7 +6452,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -6123,7 +6462,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -6133,7 +6472,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosHMI {
             get {
                 return this.posHMIField;
@@ -6143,7 +6482,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prioridad {
             get {
                 return this.prioridadField;
@@ -6153,7 +6492,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string OrigenR2 {
             get {
                 return this.origenR2Field;
@@ -6163,7 +6502,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PrioridadSIP {
             get {
                 return this.prioridadSIPField;
@@ -6173,7 +6512,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string TipoAcceso {
             get {
                 return this.tipoAccesoField;
@@ -6183,7 +6522,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Literal {
             get {
                 return this.literalField;
@@ -6193,7 +6532,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
         public System.Nullable<uint> IdPrefijoDestinoLCEN {
             get {
@@ -6204,7 +6543,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestinoLCEN {
             get {
                 return this.idDestinoLCENField;
@@ -6215,8 +6554,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6227,7 +6566,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idGrupoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -6237,7 +6576,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdGrupo {
             get {
                 return this.idGrupoField;
@@ -6248,8 +6587,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6280,7 +6619,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string literalField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -6290,7 +6629,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -6300,7 +6639,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoDestino {
             get {
                 return this.tipoDestinoField;
@@ -6310,7 +6649,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -6320,7 +6659,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -6330,7 +6669,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -6340,7 +6679,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosHMI {
             get {
                 return this.posHMIField;
@@ -6350,7 +6689,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prioridad {
             get {
                 return this.prioridadField;
@@ -6360,7 +6699,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string OrigenR2 {
             get {
                 return this.origenR2Field;
@@ -6370,7 +6709,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PrioridadSIP {
             get {
                 return this.prioridadSIPField;
@@ -6380,7 +6719,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string TipoAcceso {
             get {
                 return this.tipoAccesoField;
@@ -6390,7 +6729,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Literal {
             get {
                 return this.literalField;
@@ -6401,8 +6740,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6433,7 +6772,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool supervisionPortadoraField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -6443,7 +6782,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -6453,7 +6792,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -6463,7 +6802,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -6473,7 +6812,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoDestino {
             get {
                 return this.tipoDestinoField;
@@ -6483,7 +6822,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosHMI {
             get {
                 return this.posHMIField;
@@ -6493,7 +6832,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prioridad {
             get {
                 return this.prioridadField;
@@ -6503,7 +6842,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PrioridadSIP {
             get {
                 return this.prioridadSIPField;
@@ -6513,7 +6852,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string ModoOperacion {
             get {
                 return this.modoOperacionField;
@@ -6523,7 +6862,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Cascos {
             get {
                 return this.cascosField;
@@ -6533,7 +6872,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Literal {
             get {
                 return this.literalField;
@@ -6543,7 +6882,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SupervisionPortadora {
             get {
                 return this.supervisionPortadoraField;
@@ -6554,8 +6893,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6580,7 +6919,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string estadoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -6590,7 +6929,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -6600,7 +6939,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -6610,7 +6949,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosHMI {
             get {
                 return this.posHMIField;
@@ -6620,7 +6959,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -6630,7 +6969,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoRecurso {
             get {
                 return this.tipoRecursoField;
@@ -6640,7 +6979,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -6650,7 +6989,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoDestino {
             get {
                 return this.tipoDestinoField;
@@ -6660,7 +6999,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Estado {
             get {
                 return this.estadoField;
@@ -6671,8 +7010,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6703,7 +7042,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool supervisionPortadoraField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -6713,7 +7052,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSectorizacion {
             get {
                 return this.idSectorizacionField;
@@ -6723,7 +7062,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -6733,7 +7072,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -6743,7 +7082,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosHMI {
             get {
                 return this.posHMIField;
@@ -6753,7 +7092,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -6763,7 +7102,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prioridad {
             get {
                 return this.prioridadField;
@@ -6773,7 +7112,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PrioridadSIP {
             get {
                 return this.prioridadSIPField;
@@ -6783,7 +7122,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string ModoOperacion {
             get {
                 return this.modoOperacionField;
@@ -6793,7 +7132,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Cascos {
             get {
                 return this.cascosField;
@@ -6803,7 +7142,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Literal {
             get {
                 return this.literalField;
@@ -6813,7 +7152,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SupervisionPortadora {
             get {
                 return this.supervisionPortadoraField;
@@ -6824,9 +7163,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Niveles))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6841,7 +7180,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint cPIPLField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint CICL {
             get {
                 return this.cICLField;
@@ -6851,7 +7190,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint CIPL {
             get {
                 return this.cIPLField;
@@ -6861,7 +7200,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint CPICL {
             get {
                 return this.cPICLField;
@@ -6871,7 +7210,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint CPIPL {
             get {
                 return this.cPIPLField;
@@ -6882,8 +7221,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6896,7 +7235,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idSistemaField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -6906,7 +7245,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -6916,7 +7255,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -6927,8 +7266,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6951,7 +7290,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string estadoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -6961,7 +7300,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -6971,7 +7310,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoDestino {
             get {
                 return this.tipoDestinoField;
@@ -6981,7 +7320,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -6991,7 +7330,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -7001,7 +7340,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosHMI {
             get {
                 return this.posHMIField;
@@ -7011,7 +7350,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumAltavoz {
             get {
                 return this.numAltavozField;
@@ -7021,7 +7360,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Estado {
             get {
                 return this.estadoField;
@@ -7032,8 +7371,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7050,7 +7389,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool esDominanteField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -7060,7 +7399,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -7070,7 +7409,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -7080,7 +7419,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSectorOriginal {
             get {
                 return this.idSectorOriginalField;
@@ -7090,7 +7429,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool EsDominante {
             get {
                 return this.esDominanteField;
@@ -7101,8 +7440,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7117,7 +7456,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idRutaField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -7127,7 +7466,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdTroncal {
             get {
                 return this.idTroncalField;
@@ -7137,7 +7476,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Central {
             get {
                 return this.centralField;
@@ -7147,7 +7486,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRuta {
             get {
                 return this.idRutaField;
@@ -7158,9 +7497,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(TeclasSector))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7209,7 +7548,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool glpField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool TransConConsultaPrev {
             get {
                 return this.transConConsultaPrevField;
@@ -7219,7 +7558,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool TransDirecta {
             get {
                 return this.transDirectaField;
@@ -7229,7 +7568,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Conferencia {
             get {
                 return this.conferenciaField;
@@ -7239,7 +7578,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Escucha {
             get {
                 return this.escuchaField;
@@ -7249,7 +7588,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Retener {
             get {
                 return this.retenerField;
@@ -7259,7 +7598,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Captura {
             get {
                 return this.capturaField;
@@ -7269,7 +7608,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Redireccion {
             get {
                 return this.redireccionField;
@@ -7279,7 +7618,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool RepeticionUltLlamada {
             get {
                 return this.repeticionUltLlamadaField;
@@ -7289,7 +7628,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool RellamadaAut {
             get {
                 return this.rellamadaAutField;
@@ -7299,7 +7638,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool TeclaPrioridad {
             get {
                 return this.teclaPrioridadField;
@@ -7309,7 +7648,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Tecla55mas1 {
             get {
                 return this.tecla55mas1Field;
@@ -7319,7 +7658,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Monitoring {
             get {
                 return this.monitoringField;
@@ -7329,7 +7668,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool CoordinadorTF {
             get {
                 return this.coordinadorTFField;
@@ -7339,7 +7678,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool CoordinadorRD {
             get {
                 return this.coordinadorRDField;
@@ -7349,7 +7688,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool IntegracionRDTF {
             get {
                 return this.integracionRDTFField;
@@ -7359,7 +7698,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool LlamadaSelectiva {
             get {
                 return this.llamadaSelectivaField;
@@ -7369,7 +7708,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool GrupoBSS {
             get {
                 return this.grupoBSSField;
@@ -7379,7 +7718,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool LTT {
             get {
                 return this.lTTField;
@@ -7389,7 +7728,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SayAgain {
             get {
                 return this.sayAgainField;
@@ -7399,7 +7738,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool InhabilitacionRedirec {
             get {
                 return this.inhabilitacionRedirecField;
@@ -7409,7 +7748,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Glp {
             get {
                 return this.glpField;
@@ -7420,8 +7759,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7434,7 +7773,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idSistemaField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -7444,7 +7783,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -7454,7 +7793,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -7465,11 +7804,11 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosSectorSCVKeepAlive))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosSectorRecording))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosSector))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7494,7 +7833,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool intruidoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumLlamadasEntrantesIda {
             get {
                 return this.numLlamadasEntrantesIdaField;
@@ -7504,7 +7843,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumLlamadasEnIda {
             get {
                 return this.numLlamadasEnIdaField;
@@ -7514,7 +7853,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumFrecPagina {
             get {
                 return this.numFrecPaginaField;
@@ -7524,7 +7863,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumPagFrec {
             get {
                 return this.numPagFrecField;
@@ -7534,7 +7873,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumEnlacesInternosPag {
             get {
                 return this.numEnlacesInternosPagField;
@@ -7544,7 +7883,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumPagEnlacesInt {
             get {
                 return this.numPagEnlacesIntField;
@@ -7554,7 +7893,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumEnlacesAI {
             get {
                 return this.numEnlacesAIField;
@@ -7564,7 +7903,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Intrusion {
             get {
                 return this.intrusionField;
@@ -7574,7 +7913,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool Intruido {
             get {
                 return this.intruidoField;
@@ -7585,10 +7924,10 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosSectorRecording))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosSector))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7599,7 +7938,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint keepAliveMultiplierField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint KeepAlivePeriod {
             get {
                 return this.keepAlivePeriodField;
@@ -7609,7 +7948,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint KeepAliveMultiplier {
             get {
                 return this.keepAliveMultiplierField;
@@ -7620,9 +7959,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ParametrosSector))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7631,7 +7970,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private bool grabacionEd137Field;
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool GrabacionEd137 {
             get {
                 return this.grabacionEd137Field;
@@ -7642,8 +7981,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7660,7 +7999,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint numPagDestinosIntField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -7670,7 +8009,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -7680,7 +8019,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -7690,7 +8029,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumDestinosInternosPag {
             get {
                 return this.numDestinosInternosPagField;
@@ -7700,7 +8039,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumPagDestinosInt {
             get {
                 return this.numPagDestinosIntField;
@@ -7711,8 +8050,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7757,7 +8096,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private int modeloEquipoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -7767,7 +8106,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -7777,7 +8116,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string SipUri {
             get {
                 return this.sipUriField;
@@ -7787,7 +8126,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpGestor {
             get {
                 return this.ipGestorField;
@@ -7797,7 +8136,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Oid {
             get {
                 return this.oidField;
@@ -7807,7 +8146,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Frecuencia {
             get {
                 return this.frecuenciaField;
@@ -7817,7 +8156,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdEmplazamiento {
             get {
                 return this.idEmplazamientoField;
@@ -7827,7 +8166,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Puerto {
             get {
                 return this.puertoField;
@@ -7837,7 +8176,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Offset {
             get {
                 return this.offsetField;
@@ -7847,7 +8186,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Canalizacion {
             get {
                 return this.canalizacionField;
@@ -7857,7 +8196,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Modulacion {
             get {
                 return this.modulacionField;
@@ -7867,7 +8206,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int Potencia {
             get {
                 return this.potenciaField;
@@ -7877,7 +8216,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int TipoEquipo {
             get {
                 return this.tipoEquipoField;
@@ -7887,7 +8226,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int TipoCanal {
             get {
                 return this.tipoCanalField;
@@ -7897,7 +8236,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int TipoFrecuencia {
             get {
                 return this.tipoFrecuenciaField;
@@ -7907,7 +8246,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int TipoModo {
             get {
                 return this.tipoModoField;
@@ -7917,7 +8256,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int PrioridadEquipo {
             get {
                 return this.prioridadEquipoField;
@@ -7927,7 +8266,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int FormatoFrecuenciaPrincipal {
             get {
                 return this.formatoFrecuenciaPrincipalField;
@@ -7937,7 +8276,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int ModeloEquipo {
             get {
                 return this.modeloEquipoField;
@@ -7948,8 +8287,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7964,7 +8303,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint maxField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -7974,7 +8313,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -7984,7 +8323,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Min {
             get {
                 return this.minField;
@@ -7994,7 +8333,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Max {
             get {
                 return this.maxField;
@@ -8005,8 +8344,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8037,7 +8376,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string literalField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -8047,7 +8386,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSectorizacion {
             get {
                 return this.idSectorizacionField;
@@ -8057,7 +8396,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -8067,7 +8406,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -8077,7 +8416,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdDestino {
             get {
                 return this.idDestinoField;
@@ -8087,7 +8426,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint IdPrefijo {
             get {
                 return this.idPrefijoField;
@@ -8097,7 +8436,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosHMI {
             get {
                 return this.posHMIField;
@@ -8107,7 +8446,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prioridad {
             get {
                 return this.prioridadField;
@@ -8117,7 +8456,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string OrigenR2 {
             get {
                 return this.origenR2Field;
@@ -8127,7 +8466,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PrioridadSIP {
             get {
                 return this.prioridadSIPField;
@@ -8137,7 +8476,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string TipoAcceso {
             get {
                 return this.tipoAccesoField;
@@ -8147,7 +8486,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Literal {
             get {
                 return this.literalField;
@@ -8158,8 +8497,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8170,7 +8509,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idSistemaField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdAgrupacion {
             get {
                 return this.idAgrupacionField;
@@ -8180,7 +8519,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -8191,8 +8530,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8207,7 +8546,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idNucleoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdAgrupacion {
             get {
                 return this.idAgrupacionField;
@@ -8217,7 +8556,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -8227,7 +8566,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -8237,7 +8576,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -8248,9 +8587,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Sectores))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8265,7 +8604,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint tipoHMIField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdParejaUCS {
             get {
                 return this.idParejaUCSField;
@@ -8275,7 +8614,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string TipoPosicion {
             get {
                 return this.tipoPosicionField;
@@ -8285,7 +8624,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PrioridadR2 {
             get {
                 return this.prioridadR2Field;
@@ -8295,7 +8634,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoHMI {
             get {
                 return this.tipoHMIField;
@@ -8306,8 +8645,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8330,7 +8669,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint numSactaField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -8340,7 +8679,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSector {
             get {
                 return this.idSectorField;
@@ -8350,7 +8689,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleo {
             get {
                 return this.idNucleoField;
@@ -8360,7 +8699,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdNucleoParejaUCS {
             get {
                 return this.idNucleoParejaUCSField;
@@ -8370,7 +8709,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistemaParejaUCS {
             get {
                 return this.idSistemaParejaUCSField;
@@ -8380,7 +8719,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SectorSimple {
             get {
                 return this.sectorSimpleField;
@@ -8390,7 +8729,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Tipo {
             get {
                 return this.tipoField;
@@ -8400,7 +8739,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumSacta {
             get {
                 return this.numSactaField;
@@ -8411,8 +8750,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8425,7 +8764,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string tipoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdSistema {
             get {
                 return this.idSistemaField;
@@ -8435,7 +8774,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Central {
             get {
                 return this.centralField;
@@ -8445,7 +8784,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Tipo {
             get {
                 return this.tipoField;
@@ -8456,8 +8795,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8480,7 +8819,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private uint tamLiteralEmplazamientoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TiempoMaximoPTT {
             get {
                 return this.tiempoMaximoPTTField;
@@ -8490,7 +8829,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TiempoSinJack1 {
             get {
                 return this.tiempoSinJack1Field;
@@ -8500,7 +8839,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TiempoSinJack2 {
             get {
                 return this.tiempoSinJack2Field;
@@ -8510,7 +8849,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralEnlExt {
             get {
                 return this.tamLiteralEnlExtField;
@@ -8520,7 +8859,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralEnlDA {
             get {
                 return this.tamLiteralEnlDAField;
@@ -8530,7 +8869,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralEnlIA {
             get {
                 return this.tamLiteralEnlIAField;
@@ -8540,7 +8879,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralEnlAG {
             get {
                 return this.tamLiteralEnlAGField;
@@ -8550,7 +8889,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TamLiteralEmplazamiento {
             get {
                 return this.tamLiteralEmplazamientoField;
@@ -8561,8 +8900,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8585,7 +8924,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private DireccionamientoSIP[] planDireccionamientoSIPField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public ParametrosGeneralesSistema ParametrosGenerales {
             get {
                 return this.parametrosGeneralesField;
@@ -8595,7 +8934,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public NumeracionATS[] PlanNumeracionATS {
             get {
                 return this.planNumeracionATSField;
@@ -8605,7 +8944,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public DireccionamientoIP[] PlanDireccionamientoIP {
             get {
                 return this.planDireccionamientoIPField;
@@ -8615,7 +8954,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public ListaTroncales[] PlanTroncales {
             get {
                 return this.planTroncalesField;
@@ -8625,7 +8964,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public ListaRedes[] PlanRedes {
             get {
                 return this.planRedesField;
@@ -8635,7 +8974,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public AsignacionUsuariosTV[] PlanAsignacionUsuarios {
             get {
                 return this.planAsignacionUsuariosField;
@@ -8645,7 +8984,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public AsignacionRecursosGW[] PlanAsignacionRecursos {
             get {
                 return this.planAsignacionRecursosField;
@@ -8655,7 +8994,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public DireccionamientoSIP[] PlanDireccionamientoSIP {
             get {
                 return this.planDireccionamientoSIPField;
@@ -8666,8 +9005,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8696,9 +9035,13 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string ipGrabador2Field;
         
+        private byte iSupervLanGWField;
+        
+        private byte itmmaxSupervLanGWField;
+        
         private RecursosSCV[] listaRecursosField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Nombre {
             get {
                 return this.nombreField;
@@ -8708,7 +9051,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int NumRecursos {
             get {
                 return this.numRecursosField;
@@ -8718,7 +9061,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int ModoSincronizacion {
             get {
                 return this.modoSincronizacionField;
@@ -8728,7 +9071,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string MasterSincronizacion {
             get {
                 return this.masterSincronizacionField;
@@ -8738,7 +9081,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PuertoLocalSNMP {
             get {
                 return this.puertoLocalSNMPField;
@@ -8748,7 +9091,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PuertoRemotoSNMP {
             get {
                 return this.puertoRemotoSNMPField;
@@ -8758,7 +9101,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PuertoRemotoTrapsSNMP {
             get {
                 return this.puertoRemotoTrapsSNMPField;
@@ -8768,7 +9111,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PuertoLocalSIP {
             get {
                 return this.puertoLocalSIPField;
@@ -8778,7 +9121,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PeriodoSupervisionSIP {
             get {
                 return this.periodoSupervisionSIPField;
@@ -8788,7 +9131,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpGrabador1 {
             get {
                 return this.ipGrabador1Field;
@@ -8798,7 +9141,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IpGrabador2 {
             get {
                 return this.ipGrabador2Field;
@@ -8808,7 +9151,27 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
+        public byte iSupervLanGW {
+            get {
+                return this.iSupervLanGWField;
+            }
+            set {
+                this.iSupervLanGWField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public byte itmmaxSupervLanGW {
+            get {
+                return this.itmmaxSupervLanGWField;
+            }
+            set {
+                this.itmmaxSupervLanGWField = value;
+            }
+        }
+        
+        /// <remarks/>
         public RecursosSCV[] ListaRecursos {
             get {
                 return this.listaRecursosField;
@@ -8819,8 +9182,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8831,7 +9194,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string numeroField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prefijo {
             get {
                 return this.prefijoField;
@@ -8841,7 +9204,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Numero {
             get {
                 return this.numeroField;
@@ -8852,8 +9215,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8880,7 +9243,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private NivelesSCV nivelesDelSectorField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Nombre {
             get {
                 return this.nombreField;
@@ -8890,7 +9253,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdIdentificador {
             get {
                 return this.idIdentificadorField;
@@ -8900,7 +9263,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public NumerosAbonado[] ListaAbonados {
             get {
                 return this.listaAbonadosField;
@@ -8910,7 +9273,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int NumeroEnlacesInternos {
             get {
                 return this.numeroEnlacesInternosField;
@@ -8920,7 +9283,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int NumeroEnlacesExternos {
             get {
                 return this.numeroEnlacesExternosField;
@@ -8930,7 +9293,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public SectoresSCV Sector {
             get {
                 return this.sectorField;
@@ -8940,7 +9303,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public ParametrosSectorSCVKeepAlive ParametrosDelSector {
             get {
                 return this.parametrosDelSectorField;
@@ -8950,7 +9313,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public PermisosRedesSCV[] PermisosRedDelSector {
             get {
                 return this.permisosRedDelSectorField;
@@ -8960,7 +9323,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public TeclasSectorSCV TeclasDelSector {
             get {
                 return this.teclasDelSectorField;
@@ -8970,7 +9333,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public NivelesSCV NivelesDelSector {
             get {
                 return this.nivelesDelSectorField;
@@ -8981,8 +9344,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8993,7 +9356,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idUsuarioField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string ModoLogin {
             get {
                 return this.modoLoginField;
@@ -9003,7 +9366,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdUsuario {
             get {
                 return this.idUsuarioField;
@@ -9014,9 +9377,9 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
+    /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(CfgRecursoEnlaceInternoConInterface))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9029,7 +9392,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string numeroAbonadoField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prefijo {
             get {
                 return this.prefijoField;
@@ -9039,7 +9402,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NombreRecurso {
             get {
                 return this.nombreRecursoField;
@@ -9049,7 +9412,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NumeroAbonado {
             get {
                 return this.numeroAbonadoField;
@@ -9060,8 +9423,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9070,7 +9433,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private TipoInterface interfaceField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public TipoInterface Interface {
             get {
                 return this.interfaceField;
@@ -9081,8 +9444,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9103,7 +9466,7 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string origenR2Field;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Literal {
             get {
                 return this.literalField;
@@ -9113,7 +9476,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint PosicionHMI {
             get {
                 return this.posicionHMIField;
@@ -9123,7 +9486,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string TipoEnlaceInterno {
             get {
                 return this.tipoEnlaceInternoField;
@@ -9133,7 +9496,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public CfgRecursoEnlaceInternoConInterface[] ListaRecursos {
             get {
                 return this.listaRecursosField;
@@ -9143,7 +9506,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Dependencia {
             get {
                 return this.dependenciaField;
@@ -9153,7 +9516,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prioridad {
             get {
                 return this.prioridadField;
@@ -9163,7 +9526,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string OrigenR2 {
             get {
                 return this.origenR2Field;
@@ -9174,8 +9537,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9208,9 +9571,9 @@ namespace U5ki.CfgService.SoapCfg {
         
         private int offSetFrequencyField;
         
-        private bool enableEventPttSqField; 
+        private bool enableEventPttSqField;
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdRecurso {
             get {
                 return this.idRecursoField;
@@ -9220,7 +9583,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Tipo {
             get {
                 return this.tipoField;
@@ -9230,7 +9593,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string Estado {
             get {
                 return this.estadoField;
@@ -9240,7 +9603,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint ModoConfPTT {
             get {
                 return this.modoConfPTTField;
@@ -9250,7 +9613,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint NumFlujosAudio {
             get {
                 return this.numFlujosAudioField;
@@ -9260,7 +9623,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdEmplazamiento {
             get {
                 return this.idEmplazamientoField;
@@ -9270,7 +9633,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NombreZona {
             get {
                 return this.nombreZonaField;
@@ -9280,7 +9643,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int MetodoBss {
             get {
                 return this.metodoBssField;
@@ -9290,7 +9653,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string IdMetodoBss {
             get {
                 return this.idMetodoBssField;
@@ -9300,7 +9663,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NameTablaBss {
             get {
                 return this.nameTablaBssField;
@@ -9310,7 +9673,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int[] ValuesTablaBss {
             get {
                 return this.valuesTablaBssField;
@@ -9320,7 +9683,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int GrsDelay {
             get {
                 return this.grsDelayField;
@@ -9330,7 +9693,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int OffSetFrequency {
             get {
                 return this.offSetFrequencyField;
@@ -9340,7 +9703,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool EnableEventPttSq {
             get {
                 return this.enableEventPttSqField;
@@ -9351,8 +9714,8 @@ namespace U5ki.CfgService.SoapCfg {
         }
     }
     
-    /// <comentarios/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2053.0")]
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.3062.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9401,13 +9764,13 @@ namespace U5ki.CfgService.SoapCfg {
         
         private int metodosBssOfrecidosField;
         
-        private string modoTransmisionField  ;
-
+        private string modoTransmisionField;
+        
         private string emplazamientoDefectoField;
-
+        
         private int tiempoVueltaADefectoField;
-
-        /// <comentarios/>
+        
+        /// <remarks/>
         public string Literal {
             get {
                 return this.literalField;
@@ -9417,7 +9780,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string AliasEnlace {
             get {
                 return this.aliasEnlaceField;
@@ -9427,7 +9790,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint[] ListaPosicionesEnHmi {
             get {
                 return this.listaPosicionesEnHmiField;
@@ -9437,7 +9800,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint TipoFrecuencia {
             get {
                 return this.tipoFrecuenciaField;
@@ -9447,7 +9810,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool ExclusividadTxRx {
             get {
                 return this.exclusividadTxRxField;
@@ -9457,7 +9820,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public CfgRecursoEnlaceExterno[] ListaRecursos {
             get {
                 return this.listaRecursosField;
@@ -9467,7 +9830,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string EstadoAsignacion {
             get {
                 return this.estadoAsignacionField;
@@ -9477,7 +9840,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string[] DestinoAudio {
             get {
                 return this.destinoAudioField;
@@ -9487,7 +9850,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public uint Prioridad {
             get {
                 return this.prioridadField;
@@ -9497,7 +9860,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SupervisionPortadora {
             get {
                 return this.supervisionPortadoraField;
@@ -9507,7 +9870,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int FrecuenciaSintonizada {
             get {
                 return this.frecuenciaSintonizadaField;
@@ -9517,7 +9880,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int MetodoCalculoClimax {
             get {
                 return this.metodoCalculoClimaxField;
@@ -9527,7 +9890,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int VentanaSeleccionBss {
             get {
                 return this.ventanaSeleccionBssField;
@@ -9537,7 +9900,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool SincronizaGrupoClimax {
             get {
                 return this.sincronizaGrupoClimaxField;
@@ -9547,7 +9910,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool AudioPrimerSqBss {
             get {
                 return this.audioPrimerSqBssField;
@@ -9557,7 +9920,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public bool FrecuenciaNoDesasignable {
             get {
                 return this.frecuenciaNoDesasignableField;
@@ -9567,7 +9930,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int VentanaReposoZonaTxDefecto {
             get {
                 return this.ventanaReposoZonaTxDefectoField;
@@ -9577,7 +9940,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public string NombreZonaTxDefecto {
             get {
                 return this.nombreZonaTxDefectoField;
@@ -9587,7 +9950,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int PrioridadSesionSIP {
             get {
                 return this.prioridadSesionSIPField;
@@ -9597,7 +9960,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int CldSupervisionTime {
             get {
                 return this.cldSupervisionTimeField;
@@ -9607,7 +9970,7 @@ namespace U5ki.CfgService.SoapCfg {
             }
         }
         
-        /// <comentarios/>
+        /// <remarks/>
         public int MetodosBssOfrecidos {
             get {
                 return this.metodosBssOfrecidosField;
@@ -9616,7 +9979,8 @@ namespace U5ki.CfgService.SoapCfg {
                 this.metodosBssOfrecidosField = value;
             }
         }
-                /// <comentarios/>
+        
+        /// <remarks/>
         public string ModoTransmision {
             get {
                 return this.modoTransmisionField;
@@ -9625,9 +9989,9 @@ namespace U5ki.CfgService.SoapCfg {
                 this.modoTransmisionField = value;
             }
         }
-
-        public string EmplazamientoDefecto
-        {
+        
+        /// <remarks/>
+        public string EmplazamientoDefecto {
             get {
                 return this.emplazamientoDefectoField;
             }
@@ -9635,32 +9999,28 @@ namespace U5ki.CfgService.SoapCfg {
                 this.emplazamientoDefectoField = value;
             }
         }
-
-        /// <comentarios/>
-        public int TiempoVueltaADefecto
-        {
-            get
-            {
+        
+        /// <remarks/>
+        public int TiempoVueltaADefecto {
+            get {
                 return this.tiempoVueltaADefectoField;
             }
-            set
-            {
+            set {
                 this.tiempoVueltaADefectoField = value;
             }
         }
-
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetVersionConfiguracion_XMLCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetVersionConfiguracionCompletedEventHandler(object sender, GetVersionConfiguracionCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetVersionConfiguracionCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9682,11 +10042,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetScvActivoCompletedEventHandler(object sender, GetScvActivoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetScvActivoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9708,11 +10068,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetEstadoClusterCompletedEventHandler(object sender, GetEstadoClusterCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetEstadoClusterCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9734,11 +10094,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetListaEnlacesExternosCompletedEventHandler(object sender, GetListaEnlacesExternosCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetListaEnlacesExternosCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9760,11 +10120,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetListaEnlacesInternosCompletedEventHandler(object sender, GetListaEnlacesInternosCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetListaEnlacesInternosCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9786,11 +10146,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void LoginTopCompletedEventHandler(object sender, LoginTopCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class LoginTopCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9812,11 +10172,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetCfgUsuarioCompletedEventHandler(object sender, GetCfgUsuarioCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetCfgUsuarioCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9838,11 +10198,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetCfgPasarelaCompletedEventHandler(object sender, GetCfgPasarelaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetCfgPasarelaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9864,11 +10224,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetParametrosRecursoByIdCompletedEventHandler(object sender, GetParametrosRecursoByIdCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetParametrosRecursoByIdCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9890,11 +10250,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetParametrosRecursoCompletedEventHandler(object sender, GetParametrosRecursoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetParametrosRecursoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9916,11 +10276,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetConfigSistemaCompletedEventHandler(object sender, GetConfigSistemaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetConfigSistemaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9942,11 +10302,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetParametrosGeneralesCompletedEventHandler(object sender, GetParametrosGeneralesCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetParametrosGeneralesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9968,11 +10328,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetPlanNumeracionATSCompletedEventHandler(object sender, GetPlanNumeracionATSCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPlanNumeracionATSCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -9994,11 +10354,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetPlanDireccionamientoIPCompletedEventHandler(object sender, GetPlanDireccionamientoIPCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPlanDireccionamientoIPCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -10020,11 +10380,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetPlanTroncalesCompletedEventHandler(object sender, GetPlanTroncalesCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPlanTroncalesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -10046,11 +10406,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetPlanRedesCompletedEventHandler(object sender, GetPlanRedesCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPlanRedesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -10072,11 +10432,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetPlanAsignacionUsuariosCompletedEventHandler(object sender, GetPlanAsignacionUsuariosCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPlanAsignacionUsuariosCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -10098,11 +10458,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetPlanAsignacionRecursosCompletedEventHandler(object sender, GetPlanAsignacionRecursosCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPlanAsignacionRecursosCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -10124,11 +10484,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetPlanDireccionamientoSIPCompletedEventHandler(object sender, GetPlanDireccionamientoSIPCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPlanDireccionamientoSIPCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -10150,11 +10510,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetParametrosMulticastCompletedEventHandler(object sender, GetParametrosMulticastCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetParametrosMulticastCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -10176,11 +10536,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetPoolHfElementCompletedEventHandler(object sender, GetPoolHfElementCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPoolHfElementCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -10202,11 +10562,11 @@ namespace U5ki.CfgService.SoapCfg {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     public delegate void GetPoolNMElementsCompletedEventHandler(object sender, GetPoolNMElementsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.3062.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPoolNMElementsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {

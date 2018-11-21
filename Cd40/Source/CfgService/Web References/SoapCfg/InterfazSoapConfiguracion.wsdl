@@ -108,7 +108,7 @@
           <s:element minOccurs="1" maxOccurs="1" name="MetodosBssOfrecidos" type="s:int" />
           <s:element minOccurs="0" maxOccurs="1" name="ModoTransmision" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="EmplazamientoDefecto" type="s:string" />
-          <s:element minOccurs="0" maxOccurs="1" name="TiempoVueltaADefecto" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="TiempoVueltaADefecto" type="s:int" />
         </s:sequence>
       </s:complexType>
       <s:complexType name="ArrayOfUnsignedInt">
@@ -218,6 +218,7 @@
           <s:enumeration value="TI_RRC" />
           <s:enumeration value="TI_EM_PP" />
           <s:enumeration value="TI_EM_MARC" />
+          <s:enumeration value="TI_NOT_FOUND" />
         </s:restriction>
       </s:simpleType>
       <s:element name="LoginTop">
@@ -695,6 +696,9 @@
               <s:element minOccurs="0" maxOccurs="1" name="NombreZonaTxDefecto" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="CnfModoDestino" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="CnfTipoFrecuencia" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ModoTransmision" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="EmplazamientoDefecto" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="TiempoVueltaADefecto" type="s:int" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -833,6 +837,8 @@
               <s:element minOccurs="1" maxOccurs="1" name="TamRTP" type="s:unsignedInt" />
               <s:element minOccurs="1" maxOccurs="1" name="Codec" type="s:unsignedInt" />
               <s:element minOccurs="1" maxOccurs="1" name="GrabacionEd137" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="isuperv_options" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="itm_superv_options" type="s:unsignedInt" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -872,6 +878,16 @@
               <s:element minOccurs="1" maxOccurs="1" name="SupresionSilencio" type="s:boolean" />
               <s:element minOccurs="1" maxOccurs="1" name="TamRTP" type="s:unsignedInt" />
               <s:element minOccurs="1" maxOccurs="1" name="Codec" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iPrTmLlamEntrante" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iPrDetDtmf" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="TPrReleaseBL" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iPrPeriodoSpvRing" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iPrFiltroSpvRing" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iPrDetCallerId" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="iPrTmCallerId" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iPrDetInversionPol" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="iPrTmDetFinLlamada" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="tipoInterface" type="tns:TipoInterface" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -914,6 +930,17 @@
               <s:element minOccurs="0" maxOccurs="1" name="IdDestino" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="IdTroncal" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="IdRed" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="TReleaseBL" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="isuperv_options" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="itm_superv_options" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iDetCallerId" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="iTmCallerId" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iDetInversionPol" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="iTmLlamEntrante" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iTmDetFinLlamada" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iPeriodoSpvRing" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iFiltroSpvRing" type="s:unsignedInt" />
+              <s:element minOccurs="1" maxOccurs="1" name="iDetDtmf" type="s:unsignedByte" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1273,6 +1300,8 @@
               <s:element minOccurs="0" maxOccurs="1" name="IpRed2" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="Grabador1" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="Grabador2" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="iSupervLanGW" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="itmmaxSupervLanGW" type="s:unsignedByte" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1326,6 +1355,8 @@
           <s:element minOccurs="1" maxOccurs="1" name="PeriodoSupervisionSIP" type="s:unsignedInt" />
           <s:element minOccurs="0" maxOccurs="1" name="IpGrabador1" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="IpGrabador2" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="iSupervLanGW" type="s:unsignedByte" />
+          <s:element minOccurs="1" maxOccurs="1" name="itmmaxSupervLanGW" type="s:unsignedByte" />
           <s:element minOccurs="0" maxOccurs="1" name="ListaRecursos" type="tns:ArrayOfRecursosSCV" />
         </s:sequence>
       </s:complexType>
