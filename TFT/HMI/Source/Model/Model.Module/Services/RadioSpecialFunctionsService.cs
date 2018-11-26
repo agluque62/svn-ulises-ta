@@ -299,8 +299,14 @@ namespace HMI.Model.Module.Services
                 
                 if (OffOnTransition(onlinepos) == true)
                 {
+                    /** Retraso un poco las restauraciones para evitar que se queden en dos vias cuando se recuperan frecuencias del lado del tx con sqh vivo */
+                    Task.Factory.StartNew(() =>
+                    {
+                        Task.Delay(100).Wait();
+                        Restore(pos);
+                    });
+
                     LogManager.GetLogger("RSFService").Trace("Restoring {0}", pos);
-                    Restore(pos);
                 }
                 else if (onlinepos.Unavailable == false)
                 {
