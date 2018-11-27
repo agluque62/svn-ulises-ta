@@ -3,7 +3,7 @@
   <Product
     Id="*"
     Name="Ulises5000I Audio Terminal Utilities"
-    Language="1033" Version="2.5.9"
+    Language="1033" Version="2.5.10"
     Manufacturer="DF Nucleo"
     UpgradeCode="c17a4cae-94cf-4435-ada9-69eaefc872eb">
 
@@ -17,7 +17,7 @@
     <Property Id="MCAST_INSTALLFOLDER_NAME" Value="Ulises5000I-MCast"></Property>
     <Property Id="NBOX_INSTALLFOLDER_NAME" Value="Ulises5000I-NodeBox"></Property>
     <Property Id="NBOX_AUT" Value="True"></Property>
-    <Property Id="PVERSION" Value="2.5.9"></Property>
+    <Property Id="PVERSION" Value="2.5.10"></Property>
 
     <!-- Propiedades para los directorios de Instalacion -->
     <Property Id="MCAST_FOLDER">
