@@ -336,8 +336,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
             _RecorderManager.Init();
 #endif
-            /** */
 #if _NICMON_V0_
+            /** */        
             NetworkIFSupervisor.AutoReset = true;
             NetworkIFSupervisor.Elapsed += /* 20181026. NetworkChange_NetworkAvailabilityChanged*/NetworkChange_NetworkAvailabilityChanged;
             NetworkIFSupervisor.Enabled = Settings.Default.SNMPEnabled == 1;
@@ -351,11 +351,12 @@ namespace HMI.CD40.Module.BusinessEntities
                         string oid = lan == 0 ? Settings.Default.NetworkIF_1_Oid : Settings.Default.NetworkIF_2_Oid;
                         SnmpIntObject.Get(oid).Value = (int)status;
 
-                        _Logger.Info($"Notificado cambio en LAN {lan} => {status}");
+                        _Logger.Info(String.Format("Notificado cambio en LAN {0} => {1}",lan,status));
                     }, (m, x) =>
                     {
-                        _Logger.Error($"Error Message: {m}");
+                        _Logger.Error(String.Format("Error Message: {0}",m));
                     }/*, filePath*/);
+            _Logger.Info("NetworkIFSupervisor Arrancado...");
 #endif
 
             /** 20170309. AGL. Supervision Cliente NTP. */
@@ -373,11 +374,11 @@ namespace HMI.CD40.Module.BusinessEntities
         {
 #if _NEWSTART_
             /** AGL.START Controlado */
-            var StartList = new List<VoidDelegate>
-            {
-                SnmpAgent.Start,
-                delegate() { if (_WorkingThread != null) _WorkingThread.Start();},
-                delegate() { if (_PublisherThread != null) _PublisherThread.Start();},
+            var StartList = new List<VoidDelegate> 
+            { 
+                SnmpAgent.Start, 
+                delegate() { if (_WorkingThread != null) _WorkingThread.Start("working",Settings.Default.OverloadQueueWarning);}, 
+                delegate() { if (_PublisherThread != null) _PublisherThread.Start("publisher", Settings.Default.OverloadQueueWarning);},
                 delegate() { if (_RdManager != null) _RdManager.Start();},
                 delegate() { if (_LcManager != null) _LcManager.Start();},
                 delegate() { if (_TlfManager != null) _TlfManager.Start();},
@@ -508,6 +509,13 @@ namespace HMI.CD40.Module.BusinessEntities
                 mon = null;
             }
 #endif
+#else
+            if (mon != null)
+            {
+                mon.Dispose();
+                mon = null;
+            }
+#endif
 
             NtpClientSupervisor.Enabled = false;
             NtpClientSupervisor.Elapsed -= NtpClientSupervisor_tick;
@@ -549,7 +557,6 @@ namespace HMI.CD40.Module.BusinessEntities
 #else
         private static NicEventMonitor mon = null;
 #endif
-
         /** 20170309. AGL. Supervision NTP Client */
         private static Timer NtpClientSupervisor = new Timer(5000);
         /*************/
