@@ -4,8 +4,8 @@
     Id="*"
     Name="Ulises5000I Services"
     Language="1033" Version="2.5.10"
-    Manufacturer="Nucleo CC"
-    UpgradeCode="c17a4cae-94cf-4435-ada9-69eaefc872eb">
+    Manufacturer="NucleoCC"
+    UpgradeCode="{9DE84BBF-F425-4262-AADA-F09A40603AB8}">
 
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <PropertyRef Id="NETFRAMEWORK45"/>
@@ -15,19 +15,20 @@
     <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
     <!-- -->
     <Property Id="MCAST_INSTALLFOLDER_NAME" Value="Ulises5000I-MCast"></Property>
-    <Property Id="NBOX_INSTALLFOLDER_NAME" Value="Ulises5000I-NodeBox"></Property>
-    <Property Id="NBOX_AUT" Value="True"></Property>
+    <Property Id="RDS_INSTALLFOLDER_NAME" Value="Ulises5000I-RadioService"></Property>
+    <Property Id="PHS_INSTALLFOLDER_NAME" Value="Ulises5000I-PhoneService"></Property>
+    <Property Id="SERVICE_AUT" Value="True"></Property>
     <Property Id="PVERSION" Value="2.5.10"></Property>
 
-    <!-- Propiedades para los directorios de Instalacion -->
-    <Property Id="MCAST_FOLDER">
+    <!-- MARCADO PARA BORRAR Propiedades para los directorios de Instalacion -->
+    <!--<Property Id="MCAST_FOLDER">
       <RegistrySearch Id="UV5KI_MCAST_FOLDER" Root="HKLM" Key='SOFTWARE\Wix\UV5KI_MCAST' Name='FOLDER_Property' Type='raw'  />
     </Property>
     <Property Id="NBX_FOLDER">
       <RegistrySearch Id="UV5KI_NBX_FOLDER" Root="HKLM" Key='SOFTWARE\Wix\UV5KI_NBX' Name='FOLDER_Property' Type='raw'  />
-    </Property>
+    </Property>-->
 
-    <!-- Propiedades de existencia de Ficheros de configuracion -->
+    <!--  MARCADO PARA BORRAR Propiedades de existencia de Ficheros de configuracion -->
     <!--<Property Id='SPREAD_CONF'>
       <DirectorySearch Id='SPREAD_CONF_DIR' Path='c:\Program Files\DF Nucleo\Ulises5000I-MCast' Depth='0'>
         <FileSearch Id='SPREAD_CONF_FILE' Name='spread.conf'/>    
@@ -38,6 +39,7 @@
     <Condition Message="Spread.conf: File does exist.">
       <![CDATA[Installed OR SPREAD_CONF]]>
     </Condition>-->
+    
     <Property Id='SPREAD' Value='1'></Property>
 
     <!-- Propiedades que se preservan entre instalaciones / actualizaciones -->
@@ -67,7 +69,8 @@
                      Key='SOFTWARE\Wix\UV5KI_NBX'
                      Name='SERVERIP_Property' Type='raw' />
     </Property>
-<!--  20180208. Se sustituye por el servicio de Presencia  
+    
+<!--  MARCADO PARA BORRAR  20180208. Se sustituye por el servicio de Presencia  
     <Property Id="PBX" Value="False">
       <RegistrySearch Id='UV5KI_NBX_PBX' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_NBX'
@@ -86,30 +89,12 @@
     </Property>
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes"/>
-
     <MediaTemplate EmbedCab="yes" />
 
     <Condition Message="This application requires .NET Framework 4.5. Please install the .NET Framework then run this installer again.">
       <![CDATA[Installed OR NETFRAMEWORK45 OR NETFRAMEWORK451 = "#378758"]]>
     </Condition>
     
-    <Feature Id="U5ki.MCast.ProductFeature" Title="Ulises5000I Mcast" Level="1">
-      <ComponentGroupRef Id="U5ki.MCast.ProductComponents" />
-      <ComponentGroupRef Id="uvki_tools_mcast" />
-    <!--</Feature>
-
-    <Feature Id="U5ki.NodeBox.ProductFeature" Title="Ulises5000I Mcast" Level="1">-->
-      <ComponentGroupRef Id="U5ki.NodeBox.ProductComponents" />
-      <ComponentGroupRef Id="U5ki.NodeBox.WebAppComponents" />
-      <ComponentGroupRef Id="EnComponents" />
-      <ComponentGroupRef Id="FrComponents" />
-      <ComponentGroupRef Id="ServicesComponents" />
-      <ComponentGroupRef Id="DebuggingMain" />
-      <ComponentGroupRef Id="DebuggingServices" />
-      <ComponentRef Id="CreateProgramFolder"/>
-      <ComponentGroupRef Id="uvki_tools_nbox" />
-    </Feature>
-
     <UIRef Id="MyWixUI_Minimal"/>
     <!--<UIRef Id="WixUI_FeatureTree"/>-->
     <WixVariable Id="WixUIDialogBmp" Value="bkg-image.jpg"/>
@@ -119,34 +104,71 @@
     <!-- DLL Custom Actions -->
     <Binary Id="Ulises5000I_Setup_CustomActions" 
             SourceFile="..\Ulises5000I-Setup-CustomActions\bin\$(var.Configuration)\Ulises5000I-Setup-CustomActions.CA.dll" />  
+    
+    <Feature Id="U5ki.MCast.ProductFeature" Title="Ulises5000I Mcast" Level="1">
+      <ComponentGroupRef Id="U5ki.MCast.ProductComponents" />
+      <ComponentGroupRef Id="uvki_tools_mcast" />
+      
+      <ComponentGroupRef Id="U5ki.NodeBox.ProductComponents" />
+      <ComponentGroupRef Id="U5ki.NodeBox.WebAppComponents" />
+      <ComponentGroupRef Id="EnComponents" />
+      <ComponentGroupRef Id="FrComponents" />
+      <ComponentGroupRef Id="ServicesComponents" />
+      <ComponentGroupRef Id="DebuggingMain" />
+      <ComponentGroupRef Id="DebuggingServices" />
+      <ComponentGroupRef Id="uvki_tools_nbox" />
+      
+      <ComponentGroupRef Id="U5ki.Phone.ProductComponents" />
+      <ComponentGroupRef Id="U5ki.PhoneService.WebAppComponents" />
+      <ComponentGroupRef Id="ps_EnComponents" />
+      <ComponentGroupRef Id="ps_FrComponents" />
+      <ComponentGroupRef Id="ps_ServicesComponents" />
+      <ComponentGroupRef Id="ps_DebuggingMain" />
+      <ComponentGroupRef Id="ps_DebuggingServices" />
+      <ComponentGroupRef Id="ps_uvki_tools_nbox" />
+
+      <ComponentRef Id="CreateProgramFolder_rd"/>
+      <ComponentRef Id="CreateProgramFolder_ph"/>
+    </Feature>
   </Product>
 
-  <Fragment>
+  <!-- Creacion Directorios -->
+  <Fragment Id="CreateDirectorioFragment">
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="COMPANYFOLDER" Name="DF Nucleo">
+        <Directory Id="COMPANYFOLDER" Name="NucleoCC">
+          
           <Directory Id="U5ki.MCast.INSTALLFOLDER" Name="Ulises5000I-MCast"/>
-          <Directory Id="U5ki.NodeBox.INSTALLFOLDER" Name="Ulises5000I-NodeBox">
-            <Component Id="CreateProgramFolder" Guid="{2718F974-886C-49BB-8C4E-B7282AB16A14}">
+          <Directory Id="U5ki.NodeBox.INSTALLFOLDER" Name="Ulises5000I-RadioService">
+            <Component Id="CreateProgramFolder_rd" Guid="{2718F974-886C-49BB-8C4E-B7282AB16A14}" >
               <CreateFolder>
-                <util:PermissionEx User="Users" GenericAll="yes" />
+                <util:PermissionEx User="Users" GenericAll="yes"/>
               </CreateFolder>
-              <!--<RegistryValue Root="HKLM" Key="SOFTWARE\Wix\UV5KI_NBX" Name="FOLDER_Property" Type="string" Value="[U5ki.NodeBox.INSTALLFOLDER]" KeyPath="yes" />
-              <util:RemoveFolderEx Id="RemoveProgramFolder" On="uninstall" Property="NBX_FOLDER"/>-->
             </Component>
-            <Directory Id="EN" Name="en" />
-            <Directory Id="FR" Name="fr" />
-            <Directory Id="SERVICES" Name="Services"/>
-          </Directory>
+            <Directory Id="EN_rd" Name="en"/>
+            <Directory Id="FR_rd" Name="fr"/>
+            <Directory Id="SERVICES_rd" Name="Services"/>
+          </Directory>          
+          <Directory Id="U5ki.PhoneService.INSTALLFOLDER" Name="Ulises5000I-PhoneService">
+            <Component Id="CreateProgramFolder_ph" Guid="{9A90072E-0D05-49F8-B163-4341F3F61BA7}" >
+              <CreateFolder>
+                <util:PermissionEx User="Users" GenericAll="yes"/>
+              </CreateFolder>
+            </Component>
+            <Directory Id="EN_ph" Name="en" />
+            <Directory Id="FR_ph" Name="fr" />
+            <Directory Id="SERVICES_ph" Name="Services"/>
+          </Directory>          
         </Directory>
       </Directory>
-      <Directory Id="DesktopFolder" Name="Desktop" />
+      <Directory Id="DesktopFolder" Name="Desktop"/>
     </Directory>
   </Fragment>
+  <!-- FIN Creacion Directorios -->
 
   <!-- U5ki.MCast installation -->
-  <Fragment>
-    <ComponentGroup Id="U5ki.MCast.ProductComponents" Directory="U5ki.MCast.INSTALLFOLDER" Source="..\..\bin\Release">
+  <Fragment Id ="MCASTFragment">
+    <ComponentGroup Id="U5ki.MCast.ProductComponents" Directory="U5ki.MCast.INSTALLFOLDER" Source="..\..\bin\Release" >
       <Component Id='spread_exe' Guid='{B386B60D-4413-4A23-A546-5E22629A457F}'>
         <File Id='spread_exe' Name='spread.exe'/>
       </Component>
@@ -175,8 +197,8 @@
         <ServiceInstall
           Id="MCastInstaller"
           Type="ownProcess"
-          Name="u5ki.Mcast"
-          DisplayName="U5kI.Mcast"
+          Name="u5ki.Mcast.ncc"
+          DisplayName="U5kI.Mcast.ncc"
           Description="Spread service for Ulises-5000I"
           Start="auto"
           Account="LocalSystem"
@@ -191,7 +213,7 @@
                   RestartServiceDelayInSeconds='30'
                   ResetPeriodInDays='1'/> 
         </ServiceInstall>
-        <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="u5ki.Mcast" Wait="yes" />
+        <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="u5ki.Mcast.ncc" Wait="yes" />
       </Component>
       <Component Id="mcast_registry" Guid="{9C50679C-B343-46E7-86B6-DA38743358D5}" Permanent="yes">
         <RegistryKey Id="mcast_registry_entries" Root="HKLM" Key="SOFTWARE\Wix\UV5KI_MCAST" Action="create">
@@ -201,10 +223,16 @@
         </RegistryKey>        
     </Component>
     </ComponentGroup>
+    <ComponentGroup Id='uvki_tools_mcast' Directory="U5ki.MCast.INSTALLFOLDER" Source=".">
+      <Component Id ="sfk1" Guid="{EB624F62-C84B-482C-A229-21F6D374F678}">
+        <File Id="sfk.exe.1" Name="sfk.exe"></File>
+      </Component>
+    </ComponentGroup>
   </Fragment>
-
-  <!-- U5ki.NodeBox installation -->
-  <Fragment>
+  <!-- U5ki.Radio Service installation -->
+  
+  <!-- U5ki.Radio Service installation -->
+  <Fragment Id="RadioServiceFragment">
     <ComponentGroup Id="U5ki.NodeBox.ProductComponents" Directory="U5ki.NodeBox.INSTALLFOLDER" Source="..\..\bin\Release">
       <Component Id='Newtonsoft.Json' Guid='{7CF02408-E94E-4766-BCB2-12455A574D55}'>
         <File Id='Newtonsoft.Json' Name='Newtonsoft.Json.dll'/>
@@ -245,7 +273,7 @@
       </Component>
       <Component Id='U5ki.NodeBox.cfg' Guid='{862BF10F-006A-4A91-A9BE-31C60AC07A72}' >
         <!--Permanent='yes' >-->
-        <File Id='U5ki.NodeBox.cfg' Name='U5ki.NodeBox.exe.config' />
+        <File Id='U5ki.NodeBox.cfg' Name='U5ki.RadioService.exe.config' Source="..\..\bin\Release\U5ki.NodeBox.exe.config"/>
         <util:XmlFile Id="IpPrincipal" Action="setValue"
                         File = "[#U5ki.NodeBox.cfg]"
                         ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='IpPrincipal'[\]]/value"
@@ -254,6 +282,18 @@
                         File = "[#U5ki.NodeBox.cfg]"
                         ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='HistServer'[\]]/value"
                         Value="[SERVERIP]"/>
+        <util:XmlFile Id="SipPort" Action="setValue"
+                        File = "[#U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='SipPort'[\]]/value"
+                        Value="5260"/>
+        <util:XmlFile Id="SipUser" Action="setValue"
+                        File = "[#U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='SipUser'[\]]/value"
+                        Value="UV5KI-RD"/>
+        <util:XmlFile Id="PuertoControlRemoto" Action="setValue"
+                        File = "[#U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='PuertoControlRemoto'[\]]/value"
+                        Value="8100"/>
 <!-- 20180208. Se sustituye por el servicio de Presencia
         <util:XmlFile Id="Pabx" Action="setValue"
                         File = "[#U5ki.NodeBox.cfg]"
@@ -269,7 +309,6 @@
                         File = "[#U5ki.NodeBox.cfg]"
                         ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='IgmpQueryPeriodSeconds'[\]]/value"
                         Value="0"/>
-
         <util:XmlFile Id="RecordingEd137" Action="setValue"
                         File = "[#U5ki.NodeBox.cfg]"
                         ElementPath="/configuration/applicationSettings/U5ki.Infrastructure.Properties.Settings/setting[\[]@name='RecordingEd137'[\]]/value"
@@ -341,23 +380,23 @@
         <File Id='favicon' Name='favicon.ico'/>
       </Component>
       <Component Id="NodeBox_AutInstall" Guid="{1FF09F92-B731-4767-979F-690001574B8B}">
-        <Condition><![CDATA[NBOX_AUT = "True"]]></Condition>
-        <File Id="nbx_aut" Name="U5ki.NodeBox.exe">
+        <Condition><![CDATA[SERVICE_AUT = "True"]]></Condition>
+        <File Id="nbx_aut" Name="U5ki.RadioService.exe" Source="..\..\bin\Release\U5ki.NodeBox.exe">
           <Shortcut Id='desktopNodeBox_aut' Directory='DesktopFolder' Name='Ulises5000I-NodeBox' WorkingDirectory='U5ki.NodeBox.INSTALLFOLDER' Advertise='yes' Arguments='-console'></Shortcut>
         </File>
         <ServiceInstall
             Id="NodeBoxInstaller"
             Type="ownProcess"
             Vital="yes"
-            Name="u5ki.NodeBox.aut"
-            DisplayName="U5kI.NodeBox"
+            Name="U5ki.RadioService"
+            DisplayName="U5ki.RadioService"
             Description="Radio Service for Ulises 5000-I."
             Start="auto"
             Account="LocalSystem"
             ErrorControl="ignore"
             Interactive="no" >
           <ServiceConfig DelayedAutoStart="no" OnInstall="yes"  OnReinstall="yes" OnUninstall="no"></ServiceConfig>
-          <ServiceDependency Id="u5ki.Mcast"/>
+          <ServiceDependency Id="u5ki.Mcast.ncc"/>
           <util:ServiceConfig
                   FirstFailureActionType='restart'
                   SecondFailureActionType='restart'
@@ -365,26 +404,26 @@
                   RestartServiceDelayInSeconds='30'
                   ResetPeriodInDays='1' />
         </ServiceInstall>
-        <ServiceControl Id="StartNodeBox_aut" Start="install" Stop="both" Remove="uninstall" Name="u5ki.NodeBox.aut" Wait="yes" />
+        <ServiceControl Id="StartNodeBox_aut" Start="install" Stop="both" Remove="uninstall" Name="U5kI.RadioService" Wait="yes" />
       </Component>
       <Component Id="NodeBox_ManInstall" Guid="{7E05E84F-66B9-445F-BD24-1A7BAD678ED6}">
-        <Condition><![CDATA[NBOX_AUT <> "True"]]></Condition>
-        <File Id="nbx_man" Name="U5ki.NodeBox.exe">
+        <Condition><![CDATA[SERVICE_AUT <> "True"]]></Condition>
+        <File Id="nbx_man" Name="U5ki.RadioService.exe" Source="..\..\bin\Release\U5ki.NodeBox.exe">
           <Shortcut Id='desktopNodeBox_man' Directory='DesktopFolder' Name='Ulises5000I-NodeBox' WorkingDirectory='U5ki.NodeBox.INSTALLFOLDER' Advertise='yes' Arguments='-console'></Shortcut>
         </File>
         <ServiceInstall
             Id="ManNodeBoxInstaller"
             Type="ownProcess"
             Vital="yes"
-            Name="u5ki.NodeBox.man"
-            DisplayName="U5kI.NodeBox"
+            Name="U5kI.RadioService.Man"
+            DisplayName="U5kI.RadioService"
             Description="Radio Service for Ulises 5000-I."
             Start="demand"
             Account="LocalSystem"
             ErrorControl="ignore"
             Interactive="no" >
           <ServiceConfig DelayedAutoStart="no" OnInstall="yes"  OnReinstall="yes" OnUninstall="no"></ServiceConfig>
-          <ServiceDependency Id="u5ki.Mcast"/>
+          <ServiceDependency Id="u5ki.Mcast.ncc"/>
           <util:ServiceConfig
                   FirstFailureActionType='restart'
                   SecondFailureActionType='restart'
@@ -392,7 +431,7 @@
                   RestartServiceDelayInSeconds='30'
                   ResetPeriodInDays='1' />
         </ServiceInstall>
-        <ServiceControl Id="StartNodeBox_man" Stop="both" Remove="uninstall" Name="u5ki.NodeBox.man" Wait="yes" />
+        <ServiceControl Id="StartNodeBox_man" Stop="both" Remove="uninstall" Name="U5kI.RadioService.Man" Wait="yes" />
       </Component>
       <Component Id="nbx_registry" Guid="{446FED71-88DE-496B-A570-6440C0DAF72B}" Permanent="yes">
         <RegistryKey Id="nbx_registry_entries" Root="HKLM" Key="SOFTWARE\Wix\UV5KI_NBX" Action="create">
@@ -409,79 +448,242 @@
         <File Id='translate' Name='translate.dll'></File>
         <File Id='translate_data' Name='data.xml'></File>        
       </Component>
-    </ComponentGroup>
-
-    <ComponentGroup Id='uvki_tools_mcast' Directory="U5ki.MCast.INSTALLFOLDER" Source=".">
-      <Component Id ="sfk1" Guid="{EB624F62-C84B-482C-A229-21F6D374F678}">
-        <File Id="sfk.exe.1" Name="sfk.exe"></File>
-      </Component>
-    </ComponentGroup>
-    
-    <ComponentGroup Id='uvki_tools_nbox' Directory="U5ki.NodeBox.INSTALLFOLDER" Source=".">
-      <Component Id ="sfk2" Guid="{EF47489E-E928-4605-9EA1-E4BB5F429A53}">
-        <File Id="sfk.exe.2" Name="sfk.exe"></File>
-      </Component>
-    </ComponentGroup>
-  </Fragment>
-
-  <Fragment>
-    <ComponentGroup Id='EnComponents' Directory='EN' Source='..\..\bin\release\en'>
-      <!--<Component Id='U5ki.NodeBox.resources.en' Guid='{FDFC5492-1362-4E1E-87E9-A7D65120C842}'>
-        <File Id='U5ki.NodeBox.resources.en' Name='U5ki.NodeBox.resources.dll' />
-      </Component>-->
-    </ComponentGroup>
-  </Fragment>
-
-  <Fragment>
-    <ComponentGroup Id='FrComponents' Directory='FR' Source='..\..\bin\release\fr'>
-      <!--<Component Id='U5ki.NodeBox.resources.fr' Guid='{3818A540-0F7E-459D-8BD5-2F0327A44122}'>
-        <File Id='U5ki.NodeBox.resources.fr' Name='U5ki.NodeBox.resources.dll' />
-      </Component>-->
-    </ComponentGroup>
-  </Fragment>
-
-  <Fragment>
-    <ComponentGroup Id='ServicesComponents' Directory='SERVICES' Source='..\..\bin\release\services'>
+    </ComponentGroup>    
+    <ComponentGroup Id='ServicesComponents' Directory='SERVICES_rd' Source='..\..\bin\release\services'>
       <Component Id='U5ki.CfgService' Guid='{3A2FF9CE-FA71-4B5F-8AA3-8071CF28E8B4}'>
         <File Id='U5ki.CfgService' Name='U5ki.CfgService.dll' />
       </Component>
       <Component Id='U5ki.RdService' Guid='{772C935D-5D3E-4A4A-B410-0ACE277B85EE}'>
         <File Id='U5ki.RdService' Name='U5ki.RdService.dll' />
       </Component>
-      <Component Id='U5ki.TifxService' Guid='{B9411F13-64D5-4903-9789-DD84809F1686}'>
+      <!--<Component Id='U5ki.TifxService' Guid='{B9411F13-64D5-4903-9789-DD84809F1686}'>
         <File Id='U5ki.TifxService' Name='U5ki.TifxService.dll' />
       </Component>
-<!-- 20180208. Se sustituye por el servicio de Presencia     
-      <Component Id='U5ki.PabxItfService' Guid='{C7EA26EA-CA7B-436A-9A9D-8F8A429154E0}'>
-        <File Id='U5ki.PabxItfService' Name='U5ki.PabxItfService.dll' />
-      </Component>
--->
       <Component Id='U5ki.PresenceService' Guid='{856EEECD-40A6-4D69-A866-157714F39286}'>
         <File Id='U5ki.PresenceService' Name='U5ki.PresenceService.dll' />
-      </Component>
-
+      </Component>-->
       <Component Id='u5ki.RemoteControlService' Guid='{D34B1DD6-9A4C-4304-934A-1660FEA98AC7}'>
         <File Id='u5ki.RemoteControlService' Name='u5ki.RemoteControlService.dll' />
       </Component>
+    </ComponentGroup>    
+    <ComponentGroup Id='uvki_tools_nbox' Directory="U5ki.NodeBox.INSTALLFOLDER" Source=".">
+      <Component Id ="sfk2" Guid="{EF47489E-E928-4605-9EA1-E4BB5F429A53}">
+        <File Id="sfk.exe.2" Name="sfk.exe"></File>
+      </Component>
+    </ComponentGroup>  
+    <ComponentGroup Id='EnComponents' Directory='EN_rd' Source='..\..\bin\release\en'>
+      <!--<Component Id='U5ki.NodeBox.resources.en' Guid='{FDFC5492-1362-4E1E-87E9-A7D65120C842}'>
+        <File Id='U5ki.NodeBox.resources.en' Name='U5ki.NodeBox.resources.dll' />
+      </Component>-->
     </ComponentGroup>
-  </Fragment>
-
-  <Fragment>
+    <ComponentGroup Id='FrComponents' Directory='FR_rd' Source='..\..\bin\release\fr'>
+      <!--<Component Id='U5ki.NodeBox.resources.fr' Guid='{3818A540-0F7E-459D-8BD5-2F0327A44122}'>
+        <File Id='U5ki.NodeBox.resources.fr' Name='U5ki.NodeBox.resources.dll' />
+      </Component>-->
+    </ComponentGroup>
     <ComponentGroup Id='DebuggingMain' Directory='U5ki.NodeBox.INSTALLFOLDER' Source='..\..\bin\release'>
-    </ComponentGroup>
-    <ComponentGroup Id='DebuggingServices' Directory='SERVICES' Source='..\..\bin\release\services'>
+    </ComponentGroup>    
+    <ComponentGroup Id='DebuggingServices' Directory='SERVICES_rd' Source='..\..\bin\release\services'>
       <Component Id='U5ki.Deb.Files' Guid='{2CB9DD1B-9A52-4A6B-A2BF-727784B32D53}'>
         <File Id='U5ki.PresenceService.dev' Name='U5ki.PresenceService.pdb' />
       </Component>
     </ComponentGroup>
   </Fragment>
+  <!-- FIN U5ki.Radio Service installation --> 
 
+  <!-- U5ki.Phone Service installation -->
+  <Fragment Id="PhoneServiceFragment">
+    <ComponentGroup Id="U5ki.Phone.ProductComponents" Directory="U5ki.PhoneService.INSTALLFOLDER" Source="..\..\bin\Release">
+      <Component Id='Newtonsoft.Json.ps' Guid='{E2363F2E-A2E4-4311-9C58-2EE8799EB682}'>
+        <File Id='Newtonsoft.Json.ps' Name='Newtonsoft.Json.dll'/>
+      </Component>
+      <Component Id='WebSocket4Net.ps' Guid='{4EBB3C25-D2A4-4781-8DEA-1F03EF0C30A9}'>
+        <File Id='WebSocket4Net.ps' Name='WebSocket4Net.dll'/>
+      </Component>
+      <Component Id='SharpSnmpLib.ps' Guid='{14B075CA-4456-4B1B-A476-F3A6B5D1C6AA}'>
+        <File Id='SharpSnmpLib.ps' Name='SharpSnmpLib.dll'/>
+      </Component>
+      <Component Id='protobuf_net.ps' Guid='*'>
+        <File Id='protobuf_net.ps' Name='protobuf-net.dll'/>
+      </Component>
+      <Component Id='libspread.ps' Guid='*'>
+        <File Id='libspread.ps' Name='libspread.dll'/>
+      </Component>
+      <Component Id='ps_spread_exe' Guid='*'>
+        <File Id='ps_spread_exe' Name='spread.exe'/>
+      </Component>
+      <Component Id='ps_nlog' Guid='*'>
+        <File Id='ps_nlog' Name='nlog.dll'/>
+      </Component>
+      <Component Id='ps_spread_conf' Guid='*'>
+        <File Id='ps_spread_conf' Name='spread.conf' />
+      </Component>
+      <Component Id='ps_coresip' Guid='*'>
+        <File Id='ps_coresip_voter' Name='coresip-voter.dll'/>
+      </Component>
+      <Component Id='ps_utilities' Guid='*'>
+        <File Id='ps_utilities' Name='utilities.dll'/>
+      </Component>
+      <Component Id='ps_U5ki.Infrastructure' Guid='*'>
+        <File Id='ps_U5ki.Infrastructure' Name='U5ki.Infrastructure.dll'/>
+      </Component>
+      <Component Id='ps_versiones' Guid='*'>
+        <File Id='ps_versiones' Name='versiones.json'/>
+      </Component>
+      <Component Id='ps_U5ki.NodeBox.cfg' Guid='*' >
+        <File Id='ps_U5ki.NodeBox.cfg' Name='U5ki.PhoneService.exe.config' Source="..\..\bin\Release\U5ki.NodeBox.exe.config"/>
+        <util:XmlFile Id="ps_IpPrincipal" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='IpPrincipal'[\]]/value"
+                        Value="[DIRIP]"/>
+        <util:XmlFile Id="ps_HistServer" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='HistServer'[\]]/value"
+                        Value="[SERVERIP]"/>
+        <util:XmlFile Id="ps_NetworkOnDelay" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='NetworkOnDelay'[\]]/value"
+                        Value="20"/>
+        <util:XmlFile Id="ps_SipPort" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='SipPort'[\]]/value"
+                        Value="6260"/>
+        <util:XmlFile Id="ps_SipUser" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='SipUser'[\]]/value"
+                        Value="UV5KI-PH"/>
+        <util:XmlFile Id="ps_PuertoControlRemoto" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='PuertoControlRemoto'[\]]/value"
+                        Value="8101"/>
+        <!-- 20180614. Por defecto a reinstalar debe valer 0 (deshabilitado) -->
+        <util:XmlFile Id="ps_IgmpQueryPeriodSeconds" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='IgmpQueryPeriodSeconds'[\]]/value"
+                        Value="0"/>
+        <util:XmlFile Id="ps_RecordingEd137" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.Infrastructure.Properties.Settings/setting[\[]@name='RecordingEd137'[\]]/value"
+                        Value="0"/>        
+        <util:XmlFile Id="ps_tifxMcastSrc" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.TifxService.Properties.Settings/setting[\[]@name='tifxMcastSrc'[\]]/value"
+                        Value="[DIRIP]"/>
+        <util:XmlFile Id="ps_MulticastGroupInterfazIp" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.PresenceService.Properties.Settings/setting[\[]@name='MulticastGroupInterfazIp'[\]]/value"
+                        Value="[DIRIP]"/>
+        <util:XmlFile Id="ps_Lang2" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/Translate.Properties.Settings/setting[\[]@name='language'[\]]/value"
+                        Value="[NBOX_LANG]"/>
+      </Component>
+      <Component Id='ps_NodeBox_nlog_config' Guid='*' >
+        <File Id='ps_NodeBox_nlog_config' Name='nlog.config'/>
+      </Component>
+      <Component Id="ps_NodeBox_AutInstall" Guid="*">
+        <Condition><![CDATA[SERVICE_AUT = "True"]]></Condition>
+        <File Id="ps_nbx_aut" Name="U5ki.PhoneService.exe" Source="..\..\bin\Release\U5ki.NodeBox.exe">
+          <Shortcut Id='ps_desktopNodeBox_aut' Directory='DesktopFolder' Name='Ulises5000I-PhoneService' WorkingDirectory='U5ki.PhoneService.INSTALLFOLDER' Advertise='yes' Arguments='-console'></Shortcut>
+        </File>
+        <ServiceInstall
+            Id="ps_NodeBoxInstaller"
+            Type="ownProcess"
+            Vital="yes"
+            Name="U5kI.PhoneService"
+            DisplayName="U5kI.PhoneService"
+            Description="Phone Service for Ulises 5000-I."
+            Start="auto"
+            Account="LocalSystem"
+            ErrorControl="ignore"
+            Interactive="no" >
+          <ServiceConfig DelayedAutoStart="no" OnInstall="yes"  OnReinstall="yes" OnUninstall="no"></ServiceConfig>
+          <ServiceDependency Id="u5ki.Mcast.ncc"/>
+          <util:ServiceConfig
+                  FirstFailureActionType='restart'
+                  SecondFailureActionType='restart'
+                  ThirdFailureActionType='restart'
+                  RestartServiceDelayInSeconds='30'
+                  ResetPeriodInDays='1' />
+        </ServiceInstall>
+        <ServiceControl Id="StartNodeBox_ps_aut" Start="install" Stop="both" Remove="uninstall" Name="U5kI.PhoneService" Wait="yes" />
+      </Component>
+      <Component Id="NodeBox_ps_ManInstall" Guid="*">
+        <Condition><![CDATA[SERVICE_AUT <> "True"]]></Condition>
+        <File Id="ps_nbx_man" Name="U5ki.PhoneService.exe" Source="..\..\bin\Release\U5ki.NodeBox.exe">
+          <Shortcut Id='ps_desktopNodeBox_man' Directory='DesktopFolder' Name='Ulises5000I-PhoneService' WorkingDirectory='U5ki.PhoneService.INSTALLFOLDER' Advertise='yes' Arguments='-console'></Shortcut>
+        </File>
+        <ServiceInstall
+            Id="ps_ManNodeBoxInstaller"
+            Type="ownProcess"
+            Vital="yes"
+            Name="U5kI.PhoneService.Man"
+            DisplayName="U5kI.PhoneService"
+            Description="Phone Service for Ulises 5000-I."
+            Start="demand"
+            Account="LocalSystem"
+            ErrorControl="ignore"
+            Interactive="no" >
+          <ServiceConfig DelayedAutoStart="no" OnInstall="yes"  OnReinstall="yes" OnUninstall="no"></ServiceConfig>
+          <ServiceDependency Id="u5ki.Mcast"/>
+          <util:ServiceConfig
+                  FirstFailureActionType='restart'
+                  SecondFailureActionType='restart'
+                  ThirdFailureActionType='restart'
+                  RestartServiceDelayInSeconds='30'
+                  ResetPeriodInDays='1' />
+        </ServiceInstall>
+        <ServiceControl Id="StartNodeBox_ps_man" Stop="both" Remove="uninstall" Name="U5kI.PhoneService.Man" Wait="yes" />
+      </Component>
+            
+      <Component Id='ps_translate' Guid='*'>
+        <File Id='ps_translate' Name='translate.dll'></File>
+        <File Id='ps_translate_data' Name='data.xml'></File>        
+      </Component>
+    
+    </ComponentGroup>    
+    <ComponentGroup Id='ps_ServicesComponents' Directory='SERVICES_ph' Source='..\..\bin\release\services'>
+      <Component Id='U5ki.TifxService' Guid='*'>
+        <File Id='U5ki.TifxService' Name='U5ki.TifxService.dll' />
+      </Component>
+      <Component Id='U5ki.PresenceService' Guid='*'>
+        <File Id='U5ki.PresenceService' Name='U5ki.PresenceService.dll' />
+      </Component>
+      <Component Id='U5ki.PhoneService' Guid='*'>
+        <File Id='U5ki.PhoneService' Name='U5ki.PhoneService.dll' />
+      </Component>
+    </ComponentGroup>    
+    <ComponentGroup Id='ps_uvki_tools_nbox' Directory="U5ki.PhoneService.INSTALLFOLDER" Source=".">
+      <Component Id ="ps_sfk2" Guid="*">
+        <File Id="ps_sfk.exe.2" Name="sfk.exe"></File>
+      </Component>
+    </ComponentGroup>  
+    <ComponentGroup Id='ps_EnComponents' Directory='EN_ph' Source='..\..\bin\release\en'>
+      <!--<Component Id='U5ki.NodeBox.resources.en' Guid='{FDFC5492-1362-4E1E-87E9-A7D65120C842}'>
+        <File Id='U5ki.NodeBox.resources.en' Name='U5ki.NodeBox.resources.dll' />
+      </Component>-->
+    </ComponentGroup>
+    <ComponentGroup Id='ps_FrComponents' Directory='FR_ph' Source='..\..\bin\release\fr'>
+      <!--<Component Id='U5ki.NodeBox.resources.fr' Guid='{3818A540-0F7E-459D-8BD5-2F0327A44122}'>
+        <File Id='U5ki.NodeBox.resources.fr' Name='U5ki.NodeBox.resources.dll' />
+      </Component>-->
+    </ComponentGroup>
+    <ComponentGroup Id='ps_DebuggingMain' Directory='U5ki.PhoneService.INSTALLFOLDER' Source='..\..\bin\release'>
+    </ComponentGroup>    
+    <ComponentGroup Id='ps_DebuggingServices' Directory='SERVICES_ph' Source='..\..\bin\release\services'>
+      <Component Id='ps_U5ki.Deb.Files' Guid='*'>
+        <File Id='ps_U5ki.PresenceService.dev' Name='U5ki.PresenceService.pdb' />
+      </Component>
+    </ComponentGroup>  
+  </Fragment>  
+  <!-- FIN U5ki.Phone Service installation -->  
+  
   <!-- UI y Acciones -->
-  <Fragment>
+  <Fragment Id='UIFragment'>
     <CustomAction Id='Md5NboxMark' Directory="U5ki.NodeBox.INSTALLFOLDER"
                   Execute='deferred'
                   Impersonate='no'
-                  ExeCommand='"[U5ki.NodeBox.INSTALLFOLDER]sfk.exe" select "[COMPANYFOLDER][NBOX_INSTALLFOLDER_NAME]" .exe .dll +md5gento "[U5ki.NodeBox.INSTALLFOLDER]md5mark_[PVERSION].md5" -rel'
+                  ExeCommand='"[U5ki.NodeBox.INSTALLFOLDER]sfk.exe" select "[COMPANYFOLDER][RDS_INSTALLFOLDER_NAME]" .exe .dll +md5gento "[U5ki.NodeBox.INSTALLFOLDER]md5mark_[PVERSION].md5" -rel'
                   Return='check' />
     <CustomAction Id='Md5McastMark' Directory="U5ki.MCast.INSTALLFOLDER"
                   Execute='deferred'
@@ -619,11 +821,11 @@
         <Control Id="PbxIpLabel" Type="Text" X="45" Y="133" Width="60" Height="18" TabSkip="no" Text="IP-PBX" />
         <Control Id="PbxIpEdit"  Type="Edit" X="110" Y="130" Width="160" Height="18" Property="PBXIP" Text="{80}" />
 -->
-        <Control Id="ModoLabel" Type="Text" X="45" Y="113" Width="60" Height="18" TabSkip="no" Text="Modo Nodebox ?" />
-        <Control Id="ModoCheck" Type="ComboBox" X="110" Y="110" Width="160" Height="18" Property="NBOX_AUT" ComboList="yes" >
-          <ComboBox Property="NBOX_AUT">
-            <ListItem Value="True" Text="Automatico" />
-            <ListItem Value="False" Text="Manual" />
+        <Control Id="ModoLabel" Type="Text" X="45" Y="113" Width="60" Height="18" TabSkip="no" Text="Servicios" />
+        <Control Id="ModoCheck" Type="ComboBox" X="110" Y="110" Width="160" Height="18" Property="SERVICE_AUT" ComboList="yes" >
+          <ComboBox Property="SERVICE_AUT">
+            <ListItem Value="True" Text="Automaticos" />
+            <ListItem Value="False" Text="Manuales" />
           </ComboBox>
         </Control>
 
@@ -659,4 +861,5 @@
 
 
   </Fragment>
+
 </Wix>

@@ -509,14 +509,6 @@ namespace HMI.CD40.Module.BusinessEntities
                 mon = null;
             }
 #endif
-#else
-            if (mon != null)
-            {
-                mon.Dispose();
-                mon = null;
-            }
-#endif
-
             NtpClientSupervisor.Enabled = false;
             NtpClientSupervisor.Elapsed -= NtpClientSupervisor_tick;
             /*****************/

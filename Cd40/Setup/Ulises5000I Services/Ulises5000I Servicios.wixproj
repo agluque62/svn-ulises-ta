@@ -7,7 +7,7 @@
     <ProjectGuid>{eb918366-2f84-4621-853f-96bd925f0a92}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputName>Ulises5000I-Services</OutputName>
-    <OutputType>Bundle</OutputType>
+    <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
   </PropertyGroup>
@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="appweb.wxs" />
+    <Compile Include="appweb1.wxs" />
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +81,8 @@
 	-->
   <Target Name="BeforeBuild">
     <HeatDirectory DirectoryRefId="U5ki.NodeBox.INSTALLFOLDER" OutputFile="appweb.wxs" Directory="..\..\bin\Release\appweb" ComponentGroupName="U5ki.NodeBox.WebAppComponents" ToolPath="$(WixToolPath)" PreprocessorVariable="var.SourcePath" AutogenerateGuids="true">
+    </HeatDirectory>
+    <HeatDirectory DirectoryRefId="U5ki.PhoneService.INSTALLFOLDER" OutputFile="appweb1.wxs" Directory="..\..\bin\Release\appweb" ComponentGroupName="U5ki.PhoneService.WebAppComponents" ToolPath="$(WixToolPath)" PreprocessorVariable="var.SourcePath" AutogenerateGuids="true">
     </HeatDirectory>
   </Target>
 </Project>

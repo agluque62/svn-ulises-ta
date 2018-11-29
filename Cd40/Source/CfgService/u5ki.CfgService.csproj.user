@@ -8,4 +8,14 @@
   <PropertyGroup>
     <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugRadioService|AnyCPU'">
+    <StartProgram>D:\Datos\Empresa\work\_SharedPrj\Ulises5000i-asecna\ulises-ta\Sources\Cd40\bin\Debug\U5ki.NodeBox.exe</StartProgram>
+    <StartArguments>-console</StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugPhoneService|AnyCPU'">
+    <StartProgram>D:\Datos\Empresa\work\_SharedPrj\Ulises5000i-asecna\ulises-ta\Sources\Cd40\bin\Debug\U5ki.NodeBox.exe</StartProgram>
+    <StartArguments>-console</StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
 </Project>
