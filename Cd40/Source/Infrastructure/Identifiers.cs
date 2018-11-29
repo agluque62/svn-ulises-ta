@@ -44,7 +44,12 @@ namespace U5ki.Infrastructure
         /// <summary>
         /// 
         /// </summary>
-		public const short FR_RX_CHANGE_ASK_MSG = 1;
+        public const string PhoneTopic = "UvkiPhone";
+        public const string PhoneMasterTopic = "UvkiPhoSrv";
+        /// <summary>
+        /// 
+        /// </summary>
+        public const short FR_RX_CHANGE_ASK_MSG = 1;
         /// <summary>
         /// 
         /// </summary>
