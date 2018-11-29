@@ -87,6 +87,7 @@
     <Compile Include="ReaderWriterLock.cs" />
     <Compile Include="RegistrySettingsProvider.cs" />
     <Compile Include="NLogTraceListener.cs" />
+    <Compile Include="ServicesHelpers.cs" />
     <Compile Include="SipUtilities.cs" />
     <Compile Include="StartSync.cs" />
     <Compile Include="UdpSocket.cs" />
