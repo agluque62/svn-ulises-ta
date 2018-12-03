@@ -3,12 +3,15 @@ angular.module("Uv5kinbx")
 .controller("uv5kiGeneralesCtrl", function ($scope, $interval, $serv, $lserv) {
     /** Inicializacion */
     var ctrl = this;
-    var stdcodes = { Error: 0, Esclavo: 1, Maestro: 2 }
 
     ctrl.pagina = 0;
 
     /** Estados.. */
     ctrl.std = {} /* 0 = Disabled. 1 = Enabled. */
+    $lserv.globalType(srvtypes.None);
+
+    //ctrl.std.type = srvtypes.None;
+
     load_std();
 
     /** Lista de Preconfiguraciones */
@@ -19,29 +22,49 @@ angular.module("Uv5kinbx")
     /** Servicios Pagina de Estado*/
     /** */
     ctrl.txtModo = function (std) {
-        return std == stdcodes.Error ? $lserv.translate("Parado") :
-            std == stdcodes.Esclavo ?  $lserv.translate("Esclavo") :
-            std == stdcodes.Maestro ?  $lserv.translate("Maestro") : $lserv.translate("Estado Erroneo");
-    }
+        //return std == stdcodes.Error ? $lserv.translate("Parado") :
+        //    std == stdcodes.Esclavo ?  $lserv.translate("Esclavo") :
+        //    std == stdcodes.Maestro ?  $lserv.translate("Maestro") : $lserv.translate("Estado Erroneo");
+        return std === undefined ? "" : std.level;
+    };
+
     /** */
     ctrl.colorEstado = function (std) {
-        return std == stdcodes.Error ? "danger" :
-            std == stdcodes.Esclavo ?  "info" :
-            std == stdcodes.Maestro ?  "success" : "danger";
-    }
+        //return std == stdcodes.Error ? "danger" :
+        //    std == stdcodes.Esclavo ? "info" :
+        //    std == stdcodes.Maestro ? "success" : "danger";
+
+        return std===undefined || std.std === states.Disabled || std.level === levels.Error ? "danger" :
+            std.level === levels.Slave && std.std===states.Running ? "info" :
+            std.level === levels.Master && std.std === states.Running ? "success" : "danger";
+    };
+
     /** */
     ctrl.txtEstado = function (std) {
-        return std == stdcodes.Error ? $lserv.translate("Parado") :
-            std == stdcodes.Esclavo ?  $lserv.translate("En Espera") :
-            std == stdcodes.Maestro ?  $lserv.translate("Activado") : $lserv.translate("Estado Erroneo");
-    }
+        //return std == stdcodes.Error ? $lserv.translate("Parado") :
+        //    std == stdcodes.Esclavo ?  $lserv.translate("En Espera") :
+        //    std == stdcodes.Maestro ?  $lserv.translate("Activado") : $lserv.translate("Estado Erroneo");
+        return std === undefined ? "" : std.std;
+    };
+
     /** */
     ctrl.txtEstadoMn = function (std) {
-        return std == "ERROR" ? $lserv.translate("Parado") :
-            std == "Disabled" ? $lserv.translate("En Espera") :
-            std == "Stopped" ? $lserv.translate("Parado") :
-            std == "Running" ? $lserv.translate("Activado") : $lserv.translate("Estado Erroneo");
-    }
+        //return std == "ERROR" ? $lserv.translate("Parado") :
+        //    std == "Disabled" ? $lserv.translate("En Espera") :
+        //    std == "Stopped" ? $lserv.translate("Parado") :
+        //    std == "Running" ? $lserv.translate("Activado") : $lserv.translate("Estado Erroneo");
+        return std === undefined ? "" : std.std;
+    };
+
+    ctrl.DisableRadioServiceComponent = function () {
+        var type = $lserv.globalType();
+        return (type != srvtypes.Radio && type != srvtypes.Mixed);
+    };
+
+    ctrl.DisablePhoneServiceComponent = function () {
+        var type = $lserv.globalType();
+        return (type != srvtypes.Phone && type != srvtypes.Mixed);
+    };
 
     /** Servicios Pagina de Preconfiguraciones*/
     /** */
@@ -183,6 +206,7 @@ angular.module("Uv5kinbx")
         /* Obtener el estado del servidor... */
         $serv.stdgen_get().then(function (response) {
             ctrl.std = response.data;
+            $lserv.globalType(ctrl.std.type);
         }
         , function (response) {
             console.log(response);

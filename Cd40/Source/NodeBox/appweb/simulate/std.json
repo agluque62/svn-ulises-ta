@@ -1,9 +1,12 @@
 {
 	"cfg_activa":"16/11/2017 13:00:38",
-	"nbx_version":"2.5.6.0",
-	"cfg":2,
-	"rad":2,
-	"ifx":2,
-	"pbx":0,
-	"mn":"Running"
+	"sw_version":"2.5.6.0",
+	"type":  "Radio",
+	"level": "Master",
+	"rad":  {"std": "Disabled", "level": "Error"},
+	"mn":   {"std": "Disabled", "level": "Error"},
+	"cfg":  {"std": "Disabled", "level": "Error"},
+	"ifx":  {"std": "Running", "level": "Master"},
+	"pre":  {"std": "Stopped", "level": "Master"},
+	"pho":  {"std": "Running", "level": "Master"}
 }

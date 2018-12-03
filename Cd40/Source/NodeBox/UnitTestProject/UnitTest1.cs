@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Windows.Forms;
 
@@ -37,4 +38,30 @@ namespace UnitTestProject
             string stdf = sipuri.UlisesFormat;
         }
     }
+
+    [TestClass]
+    public class ServicesHelpersTest
+    {
+        [TestMethod]
+        public void VersionsFileAdjustTest_Radio()
+        {
+            ///** Test Radio */
+            ServicesHelpers.VersionsFileAdjust("RadioService", new List<string>() { "CfgService", "RdService", "RemoteControlService" });
+        }
+
+        [TestMethod]
+        public void VersionsFileAdjustTest_Phone()
+        {
+            ///** Test Phone */
+            ServicesHelpers.VersionsFileAdjust("PhoneService", new List<string>() { "TifxService", "PresenceService", "PhoneService" });
+        }
+
+        [TestMethod]
+        public void VersionsFileAdjustTest_Mixed()
+        {
+            ///** Test Mixed */
+            ServicesHelpers.VersionsFileAdjust("Nodebox", null);
+        }
+    }
+
 }

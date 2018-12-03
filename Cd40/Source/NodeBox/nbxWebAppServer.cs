@@ -29,16 +29,16 @@ namespace U5ki.NodeBox
     /// <summary>
     ///     { "cfg": 2, "rad": 2, "ifx": 2, "pbx": 0, "cfg_activa": "...", "nbx_version": "...." }
     /// </summary>
-    class stdGlobal
-    {
-        public string cfg_activa { get; set; }
-        public string nbx_version { get; set; }
-        public int cfg { get; set; }
-        public int rad { get; set; }
-        public int ifx { get; set; }
-        public int pbx { get; set; }
-        public string mn { get; set; }
-    }
+    //class stdGlobal
+    //{
+    //    public string cfg_activa { get; set; }
+    //    public string nbx_version { get; set; }
+    //    public int cfg { get; set; }
+    //    public int rad { get; set; }
+    //    public int ifx { get; set; }
+    //    public int pbx { get; set; }
+    //    public string mn { get; set; }
+    //}
 
     /// <summary>
     /// { "fecha": "10/01/2015 08:00", "nombre": "Configuracion 1" }
@@ -317,11 +317,19 @@ namespace U5ki.NodeBox
         public nbxLocalConfigExt(bool readFile = false) {
             if (readFile)
             {
-                fichero = File.ReadAllText(@"U5ki.NodeBox.exe.config", Encoding.UTF8);
+                fichero = File.ReadAllText(fileName, Encoding.UTF8);
             }
         }
         public void save(){
-            File.WriteAllText(@"U5ki.NodeBox.exe.config", fichero, Encoding.UTF8);
+            File.WriteAllText(fileName, fichero, Encoding.UTF8);
+        }
+        protected string fileName
+        {
+            get
+            {
+                return NodeBoxSrv.ServerType == ServicesServerTypes.Radio ? @"U5ki.RadioService.exe.config" :
+                    NodeBoxSrv.ServerType == ServicesServerTypes.Phone ? @"U5ki.PhoneService.exe.config" : @"U5ki.NodeBox.exe.config";
+            }
         }
     }
 
@@ -444,7 +452,7 @@ namespace U5ki.NodeBox
     /// </summary>
     class nbxPublicData
     {
-        public stdGlobal std = new stdGlobal();
+        //public stdGlobal std = new stdGlobal();
         public List<pcfData> pcf = new List<pcfData>();
         public nbxLocalConfig lcf = new nbxLocalConfig();
         public List<GlobalTypes.radioSessionData> ses = new List<GlobalTypes.radioSessionData>();
@@ -473,6 +481,7 @@ namespace U5ki.NodeBox
         const string rest_url_preconf = "preconf";
         /** Obsoleto */
         const string rest_url_local_config = "lconfig";
+
         const string rest_url_local_config_ext = "lconfig-ext";
         const string rest_url_radio_sessions = "rdsessions";
         const string rest_url_radio_gestormn = "gestormn";
@@ -934,10 +943,9 @@ namespace U5ki.NodeBox
         /// <param name="sb"></param>
         private void processEstadoGeneral(HttpListenerRequest request, HttpListenerResponse response, StringBuilder sb)
         {
-            GetEstadoGeneral();
+            object data = WebSrvCommand(CmdSupervision.cmdSrvStd, null);
             response.ContentType = "application/json";
-            string data = JsonConvert.SerializeObject(_rtData.std);
-            sb.Append(data);
+            sb.Append(JsonConvert.SerializeObject(data));
         }
 
         /// <summary>
@@ -1298,15 +1306,15 @@ namespace U5ki.NodeBox
         /// 
         /// </summary>
         /// <returns></returns>
-        private void GetEstadoGeneral()
-        {
-            if (WebSrvCommand != null)
-            {
-                _rtData.std = (stdGlobal)WebSrvCommand(CmdSupervision.cmdSrvStd, null);
-                _rtData.std.nbx_version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                // _rtData.std = JsonConvert.DeserializeObject<stdGlobal>(File.ReadAllText(@"./appweb/simulate/std.json"));
-            }
-        }
+        //private void GetEstadoGeneral()
+        //{
+        //    if (WebSrvCommand != null)
+        //    {
+        //        _rtData.std = (stdGlobal)WebSrvCommand(CmdSupervision.cmdSrvStd, null);
+        //        _rtData.std.nbx_version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        //        // _rtData.std = JsonConvert.DeserializeObject<stdGlobal>(File.ReadAllText(@"./appweb/simulate/std.json"));
+        //    }
+        //}
 
         /// <summary>
         /// 

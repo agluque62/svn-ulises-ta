@@ -8,6 +8,7 @@ angular.module("Uv5kinbx")
     ctrl.listainci = [];
     ctrl.HashCode = 0;
     ctrl.timer = 0;
+    ctrl.title = "";
 
     getInci();
 
@@ -17,6 +18,7 @@ angular.module("Uv5kinbx")
     ctrl.hora = (new Date()).toLocaleTimeString();
     $location.path("/");
 
+
     /** */
     ctrl.appver = app_version;
 
@@ -25,6 +27,16 @@ angular.module("Uv5kinbx")
         var txt = document.createElement("textarea");
         txt.innerHTML = html;
         return txt.value;
+    }
+
+    ctrl.RadioOptionsShow = function(){
+        var type = $lserv.globalType();
+        return type === srvtypes.Radio || type === srvtypes.Mixed;
+    }
+
+    ctrl.PhoneOptionsShow = function () {
+        var type = $lserv.globalType();
+        return ctrl.appver >= 1 && (type === srvtypes.Phone || type === srvtypes.Mixed);
     }
 
     /** Funciones o servicios */
@@ -58,6 +70,12 @@ angular.module("Uv5kinbx")
         });
     }
 
+    function getTitle() {
+        var type = $lserv.globalType();
+        return type === srvtypes.Radio ? "ULISES V 5000 I. Radio Server" :
+            type === srvtypes.Phone ? "ULISES V 5000 I. Phone Server" : "ULISES V 5000 I. Nodebox";
+    }
+
     /** Funcion Periodica del controlador */
     var timer = $interval(function () {
 
@@ -69,6 +87,8 @@ angular.module("Uv5kinbx")
 		if ((ctrl.timer % 5) == 0) {
 		    getInci();
 		}
+
+		ctrl.title = getTitle();
 
 	}, 1000);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -103,5 +104,79 @@ namespace Utilities
 
         public static string SerializeObject(object data) { return JsonConvert.SerializeObject(data, Formatting.Indented); }
         public static T DeserializeObject<T>(string data) { return JsonConvert.DeserializeObject<T>(data); }
+
+        /// <summary>
+        /// Establece si un string contiene algun elemento de una lista....
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static bool ListElementInString(string val, List<string> list)
+        {
+            var res = list.Where(e => val.ToLower().Contains(e.ToLower())).ToList().Count;
+            return res > 0;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        const string ficheroversiones = "versiones.json";
+        const string oldName = "nodebox";
+        public static void VersionsFileAdjust(string newModuleName, List<string> newServicesNamesList)
+        {
+            string ficheroversionesbackup = ficheroversiones + ".bkp";
+            if (File.Exists(ficheroversiones))
+            {
+                VersionDetails.VersionData actualVersion = new VersionDetails(ficheroversiones, false).version;
+
+                if (actualVersion.Version != "")
+                {
+                    VersionDetails.VersionData backupVersion = new VersionDetails(ficheroversionesbackup, false).version;
+
+                    if (actualVersion.Version != backupVersion.Version)
+                    {
+                        File.WriteAllText(ficheroversionesbackup, File.ReadAllText(ficheroversiones));
+                    }
+                }
+
+                if (newModuleName.ToLower() == oldName.ToLower())
+                {
+                    // Recupero el fichero original...
+                    File.WriteAllText(ficheroversiones, File.ReadAllText(ficheroversionesbackup));
+                }
+                else
+                {
+                    actualVersion.Components.ForEach(c =>
+                    {
+                        // Cambiar los titulos de los modulos.
+                        if (c.Name.ToLower().Contains(oldName.ToLower()) == true)
+                        {
+                            c.Name = c.Name.ToUpper().Replace(oldName.ToUpper(), newModuleName.ToUpper());
+                        }
+
+                        // Cambiar los path de ficheros que correspondan y
+                        c.Files.ForEach(file =>
+                        {
+                            if (file.Path.ToLower().Contains(oldName.ToLower()) == true)
+                            {
+                                file.Path = file.Path.ToLower().Replace(oldName.ToLower(), newModuleName.ToLower());
+                            }
+                        });
+
+                        // Eliminar los que correspondan.
+                        if (c.Name.ToUpper().Contains("SERVICES"))
+                        {
+                            c.Files = c.Files.Where(f => ServicesHelpers.ListElementInString(f.Path, newServicesNamesList)).ToList();
+                        }
+                    });
+
+                    // Escribir el real...                
+                    File.WriteAllText(ficheroversiones, actualVersion.ToString());
+                }
+            }
+            else
+            {
+                File.WriteAllText("Errores.out.txt", "No encuentro el fichero de versiones...");
+            }
+        }
     }
 }

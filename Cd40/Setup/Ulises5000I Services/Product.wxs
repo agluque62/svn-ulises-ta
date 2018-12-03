@@ -581,7 +581,7 @@
       <Component Id='ps_NodeBox_nlog_config' Guid='*' >
         <File Id='ps_NodeBox_nlog_config' Name='nlog.config'/>
       </Component>
-      <Component Id="ps_NodeBox_AutInstall" Guid="*">
+      <Component Id="ps_NodeBox_AutInstall" Guid="{F879C401-8C0B-483E-9BAF-6AFD0DD24B37}">
         <Condition><![CDATA[SERVICE_AUT = "True"]]></Condition>
         <File Id="ps_nbx_aut" Name="U5ki.PhoneService.exe" Source="..\..\bin\Release\U5ki.NodeBox.exe">
           <Shortcut Id='ps_desktopNodeBox_aut' Directory='DesktopFolder' Name='Ulises5000I-PhoneService' WorkingDirectory='U5ki.PhoneService.INSTALLFOLDER' Advertise='yes' Arguments='-console'></Shortcut>

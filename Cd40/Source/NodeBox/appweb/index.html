@@ -26,9 +26,7 @@
 						 style="width:100%; height: 100%; margin: 0;"/>
                 </div>
             </div>
-            <div id="_tit_ppal">
-                ULISES V 5000 I. Nodebox
-            </div>
+            <div id="_tit_ppal">{{ctrl.title}}</div>
             <div id="_contSupDrcha">
                 <!--                <div id="_usuario">
                     Usuario: <b>{{ctrl.user}}</b>
@@ -44,10 +42,10 @@
                 <li data-ng-class="{'active': ctrl.pagina==0}">
                     <a href="#/" data-ng-click="ctrl.pagina=0" translate>Generales</a>
                 </li>
-                <li data-ng-class="{'active': ctrl.pagina==1}">
+                <li data-ng-class="{'active': ctrl.pagina==1}" ng-show="ctrl.RadioOptionsShow()">
                     <a href="#/radio" data-ng-click="ctrl.pagina=1" translate>Radio</a>
                 </li>
-                <li data-ng-class="{'active': ctrl.pagina==2}" ng-show="ctrl.appver >= 1">
+                <li data-ng-class="{'active': ctrl.pagina==2}" ng-show="ctrl.PhoneOptionsShow()">
                     <a href="#/tlf" data-ng-click="ctrl.pagina=2" translate>Telefonia</a>
                 </li>
                 <li data-ng-class="{'active': ctrl.pagina==3}">

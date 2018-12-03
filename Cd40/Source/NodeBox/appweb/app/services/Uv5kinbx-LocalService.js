@@ -4,6 +4,7 @@ angular
     .factory('$lserv', function ($q, $http, $filter) {
         /** Para las Traducciones */
         var $translate = $filter('translate');
+        var globalType = undefined;
 
         return {
             translate: function (key) {
@@ -26,6 +27,11 @@ angular
                     default:
                         return true;
                 }
+            },
+            globalType: function (estado) {
+                if (estado != undefined)
+                    globalType = estado;
+                return globalType;
             }
         };
 

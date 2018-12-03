@@ -200,6 +200,12 @@ var roles = {
 	ALM2_PROLIFLE: 2,
 	VIS_PROFILE: 1
 };
+
+var srvtypes = { None: "None", Mixed: "Mixed", Phone: "Phone", Radio: "Radio" }
+var states = { Running: "Running", Stopped: "Stopped", Disabled: "Disabled" }
+var levels = { Master: "Master", Slave: "Slave", Error: "Error" }
+
+
 /** */
 var routeForUnauthorizedAccess = '/noaut';
 

@@ -15,10 +15,10 @@
         <table class="table table-bordered table-striped">
             <tr>
                 <td class="text-primary col-xs-3" translate>Version del Servicio</td>
-                <td class="text-success col-xs-6">{{ctrl.std.nbx_version}}</td>
+                <td class="text-success col-xs-6">{{ctrl.std.sw_version}}</td>
                 <td><button type="button" class="btn btn-default" ng-click="ctrl.VersionDetailShow()" translate>Detalle</button></td>
             </tr>
-            <tr>
+            <tr ng-hide="ctrl.DisableRadioServiceComponent()">
                 <td class="text-primary col-xs-3" translate>Configuracion Activa</td>
                 <td class="text-success col-xs-6">{{ctrl.std.cfg_activa}}</td>
                 <td></td>
@@ -34,30 +34,35 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-ng-class="ctrl.colorEstado(ctrl.std.cfg)">
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.cfg)" ng-hide="ctrl.DisableRadioServiceComponent()">
                     <td class="text-primary"><strong translate>Configuracion Puestos</strong></td>
                     <td>{{ctrl.txtModo(ctrl.std.cfg)}}</td>
 					<td>{{ctrl.txtEstado(ctrl.std.cfg)}}</td>
                 </tr>
-                <tr data-ng-class="ctrl.colorEstado(ctrl.std.rad)">
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.rad)" ng-hide="ctrl.DisableRadioServiceComponent()">
                     <td class="text-primary"><strong translate>Radio</strong></td>
                     <td>{{ctrl.txtModo(ctrl.std.rad)}}</td>
                     <td>{{ctrl.txtEstado(ctrl.std.rad)}}</td>
                 </tr>
-                <tr data-ng-class="ctrl.colorEstado(ctrl.std.rad)">
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.rad)" ng-hide="ctrl.DisableRadioServiceComponent()">
                     <td class="text-primary"><strong translate>Gestor MN</strong></td>
                     <td>{{ctrl.txtModo(ctrl.std.rad)}}</td>
                     <td>{{ctrl.txtEstadoMn(ctrl.std.mn)}}</td>
                 </tr>
-                <tr data-ng-class="ctrl.colorEstado(ctrl.std.ifx)">
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.pho)" ng-hide="ctrl.DisablePhoneServiceComponent()">
+                    <td class="text-primary"><strong translate>Telefonia (Focus)</strong></td>
+                    <td>{{ctrl.txtModo(ctrl.std.pho)}}</td>
+                    <td>{{ctrl.txtEstado(ctrl.std.pho)}}</td>
+                </tr>
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.ifx)" ng-hide="ctrl.DisablePhoneServiceComponent()">
                     <td class="text-primary"><strong translate>Interfaces Analogicas</strong></td>
                     <td>{{ctrl.txtModo(ctrl.std.ifx)}}</td>
                     <td>{{ctrl.txtEstado(ctrl.std.ifx)}}</td>
                 </tr>
-                <tr data-ng-class="ctrl.colorEstado(ctrl.std.pbx)">
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.pre)" ng-hide="ctrl.DisablePhoneServiceComponent()">
                     <td class="text-primary"><strong translate>Servicio de Presencia</strong></td>
-                    <td>{{ctrl.txtModo(ctrl.std.pbx)}}</td>
-                    <td>{{ctrl.txtEstado(ctrl.std.pbx)}}</td>
+                    <td>{{ctrl.txtModo(ctrl.std.pre)}}</td>
+                    <td>{{ctrl.txtEstado(ctrl.std.pre)}}</td>
                 </tr>
             </tbody>
         </table>

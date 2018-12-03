@@ -31,35 +31,52 @@ namespace Utilities
             public string Version { get; set; }
             public string Fecha { get; set; }
             public List<VersionDataComponent> Components = new List<VersionDataComponent>();
+            public override string ToString()
+            {
+                return JsonConvert.SerializeObject(this, Formatting.Indented);
+            }
         }
         /** 20180409. Para poder modificar RUNTIME los ficheros de versiones */
         public VersionData version;
-        public VersionDetails(string filepath)
+        public VersionDetails(string filepath, bool updateFields=true)
         {
-            version = JsonConvert.DeserializeObject<VersionData>(File.ReadAllText(@filepath));
-            version.Server = System.Environment.MachineName;
-            foreach (VersionDataComponent component in version.Components)
+            if (File.Exists(@filepath))
             {
-                foreach (VersionDataFileItem fileitem in component.Files)
+                version = JsonConvert.DeserializeObject<VersionData>(File.ReadAllText(@filepath));
+                
+                if (updateFields)
                 {
-                    if (File.Exists(fileitem.Path))
+                    version.Server = System.Environment.MachineName;
+                    foreach (VersionDataComponent component in version.Components)
                     {
-                        FileInfo fi = new FileInfo(fileitem.Path);
-                        fileitem.Date = fi.LastWriteTime.ToShortDateString();
-                        fileitem.Size = fi.Length.ToString();
-                        fileitem.MD5 = FileMd5Hash(fileitem.Path);
-                    }
-                    else
-                    {
-                        fileitem.Date = fileitem.Size = fileitem.MD5 = "File not found";
+                        foreach (VersionDataFileItem fileitem in component.Files)
+                        {
+                            if (File.Exists(fileitem.Path))
+                            {
+                                FileInfo fi = new FileInfo(fileitem.Path);
+                                fileitem.Date = fi.LastWriteTime.ToShortDateString();
+                                fileitem.Size = fi.Length.ToString();
+                                fileitem.MD5 = FileMd5Hash(fileitem.Path);
+                            }
+                            else
+                            {
+                                fileitem.Date = fileitem.Size = fileitem.MD5 = "File not found";
+                            }
+                        }
                     }
                 }
+            }
+            else
+            {
+                // No existe fichero de versiones...
+                version = new VersionData();
+                version.Version = "";
             }
         }
 
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(version);
+            return JsonConvert.SerializeObject(version, Formatting.Indented);
         }
         protected string FileMd5Hash(string filepath)
         {
