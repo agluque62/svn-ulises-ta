@@ -538,14 +538,15 @@ namespace U5ki.NodeBox
                         var data = new
                         {
                             Machine = Environment.MachineName,
-                            ServerType = ServerType,
-                            Master = GlobalMasterState,
-                            RadioService = RadioService == null ? -1 : (RadioService.Master ? 1 : 0),
-                            CfgService = CfgService == null ? -1 : (CfgService.Master ? 1 : 0),
-                            PhoneService = PhoneService == null ? -1 : (PhoneService.Master ? 1 : 0),
-                            TifxService = TifxService == null ? -1 : (TifxService.Master ? 1 : 0),
-                            PresenceService = PresenceService == null ? -1 : (PresenceService.Master ? 1 : 0),
-                            WebPort = settings.PuertoControlRemoto
+                            ServerType = ServerType.ToString(),
+                            GlobalMaster = GlobalMasterState.ToString(),
+                            RadioService = ServiceMasterStateByValue(RadioService).ToString(),
+                            CfgService = ServiceMasterStateByValue(CfgService).ToString(),
+                            PhoneService = ServiceMasterStateByValue(PhoneService).ToString(),
+                            TifxService = ServiceMasterStateByValue(TifxService).ToString(),
+                            PresenceService = ServiceMasterStateByValue(PresenceService).ToString(),
+                            WebPort = settings.PuertoControlRemoto,
+                            TimeStamp = DateTime.Now
                         };
 
                         sock.SendTo(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)), dst);

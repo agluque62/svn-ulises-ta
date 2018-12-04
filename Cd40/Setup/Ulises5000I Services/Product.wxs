@@ -293,7 +293,11 @@
         <util:XmlFile Id="PuertoControlRemoto" Action="setValue"
                         File = "[#U5ki.NodeBox.cfg]"
                         ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='PuertoControlRemoto'[\]]/value"
-                        Value="8100"/>
+                        Value="8101"/>
+        <util:XmlFile Id="PuertoPresencia" Action="setValue"
+                        File = "[#U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='PuertoPresencia'[\]]/value"
+                        Value="8103"/>
 <!-- 20180208. Se sustituye por el servicio de Presencia
         <util:XmlFile Id="Pabx" Action="setValue"
                         File = "[#U5ki.NodeBox.cfg]"
@@ -555,7 +559,11 @@
         <util:XmlFile Id="ps_PuertoControlRemoto" Action="setValue"
                         File = "[#ps_U5ki.NodeBox.cfg]"
                         ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='PuertoControlRemoto'[\]]/value"
-                        Value="8101"/>
+                        Value="8102"/>
+        <util:XmlFile Id="ps_PuertoPresencia" Action="setValue"
+                        File = "[#ps_U5ki.NodeBox.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.NodeBox.Properties.Settings/setting[\[]@name='PuertoPresencia'[\]]/value"
+                        Value="8103"/>
         <!-- 20180614. Por defecto a reinstalar debe valer 0 (deshabilitado) -->
         <util:XmlFile Id="ps_IgmpQueryPeriodSeconds" Action="setValue"
                         File = "[#ps_U5ki.NodeBox.cfg]"
