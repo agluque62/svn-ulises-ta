@@ -768,7 +768,7 @@
         <IniFile Id="ug5krec.config.05" Action="addLine" Directory="ED137B4SERVICE" Name="ug5krec-config.ini" Section="GENERAL" Key="DUAL_RECORDER" Value="[RECDUAL]"/>
       </Component>      
       <Component Id="HMI.GRABADOR.SERVICE.AUT" Guid="{40BF10CE-5E9B-45C2-8864-79A46BFC0C56}">
-        <Condition><![CDATA[ED137REC = "1"]]></Condition>
+        <Condition><![CDATA[ED137REC != "0"]]></Condition>
         <File Id="ed137_rec_aut" Name="ED137B4WindowsService.exe"></File>
         <ServiceInstall
             Id="GrbEd137InstallerAut"
