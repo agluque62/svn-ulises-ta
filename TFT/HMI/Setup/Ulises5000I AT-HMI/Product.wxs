@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="*" Name="Ulises5000I Audio Terminal HMI" Language="1033" Version="2.5.10" Manufacturer="DF Nucleo" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
+  <Product Id="*" Name="Ulises5000I Audio Terminal HMI" Language="1033" Version="2.5.10" Manufacturer="NucleoCC" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
 
     <PropertyRef Id="NETFRAMEWORK45"/>
@@ -40,7 +40,8 @@
     </Condition>
 
     <!-- Condicion para que este instalado MCAS/NODEBOX -->
-    <Upgrade Id ="c17a4cae-94cf-4435-ada9-69eaefc872eb">
+    <!--<Upgrade Id ="c17a4cae-94cf-4435-ada9-69eaefc872eb">-->
+    <Upgrade Id ="{9DE84BBF-F425-4262-AADA-F09A40603AB8}">
       <UpgradeVersion OnlyDetect="yes" Minimum="0.0.0.0"
                       Property="APPDETECTED" IncludeMinimum="yes" />
     </Upgrade>
@@ -187,7 +188,7 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="COMPANYFOLDER" Name="DF Nucleo">
+        <Directory Id="COMPANYFOLDER" Name="NucleoCC">
           <Directory Id="INSTALLFOLDER" Name="Ulises5000I-TA">
             <Directory Id="EN" Name="en-GB" />
             <Directory Id="FR" Name="fr-FR" />
