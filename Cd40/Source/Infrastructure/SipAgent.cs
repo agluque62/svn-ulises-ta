@@ -108,6 +108,10 @@ namespace U5ki.Infrastructure
      */
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public delegate void SubPresCb(string dst_uri, int subscription_status, int presence_status);
+
+    /*Callback para recibir notificaon de fin de reproduccion de un wav. Lo utiliza el ETM*/
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void FinWavCb(int Code);
 	
 #if _ED137_
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -178,8 +182,11 @@ namespace U5ki.Infrastructure
         [Description("Echo Canceller")]
 		CORESIP_CALL_EC = 0x10,
         [Description("Through external central IP")]
-        CORESIP_CALL_EXTERNAL_IP = 0x20
+        CORESIP_CALL_EXTERNAL_IP = 0x20,
 
+        CORESIP_CALL_NINGUNO = 0x0,			//Se refiere a transceptor 
+	    CORESIP_CALL_RD_IDLE = 0x12,		
+	    CORESIP_CALL_RD_TXRX = 0x14 		
 	}
     /// <summary>
     /// 
@@ -359,7 +366,11 @@ namespace U5ki.Infrastructure
 		public int AccountId;
 		public CORESIP_CallType Type;
 		public CORESIP_Priority Priority;
-		public CORESIP_CallFlags Flags;       
+		public CORESIP_CallFlags Flags;
+
+        public CORESIP_CallFlags Flags_type;			//UNIFETM: Este campo falta en ULISES. En el ETM lo utiliza para indicar el tipo de agente radio. Se pasa a la callback de onIncommingCall
+        //public int SourcePort;						//UNIFETM: Este campo falta en ULISES. En el ETM no se utiliza. Se le asigna valor, pero para nada. Yo lo quitaria en ETM
+        public int DestinationPort;						//UNIFETM: Este campo falta en ULISES. Se asigna el valor en onIncomingCall. es un valor que se retorna en la callback. No es de entrada.
 
 #if _VOTER_
         /** 20160608. VOTER */
@@ -381,9 +392,9 @@ namespace U5ki.Infrastructure
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_BSS_LENGTH + 1)]
         public string bss_method;
-
-        int RecursoPasarela;			//Si es distinto de cero significa que es un recurso de pasarela
+        public uint porcentajeRSSI;
 	}
+
     /// <summary>
     /// 
     /// </summary>
@@ -557,6 +568,7 @@ namespace U5ki.Infrastructure
 		public InfoReceivedCb OnInfoReceived;
         public IncomingSubscribeConfCb OnIncomingSubscribeConf;
         public SubPresCb OnSubPres;
+        public FinWavCb OnFinWavCb;
 
 #if _ED137_
 	// PlugTest FAA 05/2011
@@ -647,7 +659,7 @@ namespace U5ki.Infrastructure
 		public const int CORESIP_MAX_CODEC_LENGTH = 50;
 		public const int CORESIP_MAX_CONF_USERS = 25;
 		public const int CORESIP_MAX_CONF_STATE_LENGTH = 25;
-        public const int CORESIP_MAX_ZONA_LENGTH = 256;     //EDU 20170223
+        public const int CORESIP_MAX_ZONA_LENGTH = 128;     //EDU 20170223
         public const int CORESIP_MAX_BSS_LENGTH = 32;     //EDU 20170223
         public const int CORESIP_MAX_NAME_LENGTH = 20;    //B. Santamaria 20180206
         public const int CORESIP_MAX_CALLID_LENGTH = 256;    
@@ -698,6 +710,7 @@ namespace U5ki.Infrastructure
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_IP_LENGTH + 1)]
 			public string IpAddress;
 			public uint Port;
+            public uint RtpPorts;				//Valor por el que empiezan a crearse los puertos RTP
 
 			public CORESIP_Callbacks Cb;
 
@@ -735,6 +748,15 @@ namespace U5ki.Infrastructure
             /// Evita que el nodebox reciba falsos SQ de avion provocados por PTT propio
             /// </summary>
             public uint TimeToDiscardRdInfo;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        class CORESIP_Impairments   //Necesario para ETM
+        {
+	        public int Perdidos;
+	        public int Duplicados;
+	        public int LatMin;
+	        public int LatMax;
         }
        
         enum CORESIP_RecCmdType : int {CORESIP_REC_RESET = 0 // Ordena reiniciar el grabador
@@ -922,6 +944,26 @@ namespace U5ki.Infrastructure
          */
         [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
         static extern int CORESIP_EchoCancellerLCMic(bool on, out CORESIP_Error error);
+
+        /**
+         * CORESIP_SetTipoGRS.	...
+         * Funcion para activar en la Coresip un accId para que funcione como una radio 
+         * @param	accId           Account de la Coresip
+         * @param	Flags           Opciones de la radio
+         * @return	CORESIP_OK OK, CORESIP_ERROR  error.
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_SetTipoGRS(int accId, CORESIP_CallFlags Flag, CORESIP_Error error);
+
+        /**
+         * CORESIP_SetImpairments.	...
+         * Funcion para activar inperfecciones en la señal de audio que se envia por rtp 
+         * @param	call          Call id de la llamada
+         * @param	impairments   Define las inperfecciones que queremos que se ejecuten
+         * @return	CORESIP_OK OK, CORESIP_ERROR  error.
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+	    static extern int CORESIP_SetImpairments(int call, CORESIP_Impairments impairments, CORESIP_Error error);
 
 		#endregion
 		
@@ -1828,7 +1870,7 @@ namespace U5ki.Infrastructure
 		public static int MakeRdCall(string accId, string dst, string frecuency, CORESIP_CallFlags flags, string mcastIp, uint mcastPort,
             CORESIP_Priority prioridad, string Zona, CORESIP_FREQUENCY_TYPE FrequencyType,
             CORESIP_CLD_CALCULATE_METHOD CLDCalculateMethod, int BssWindows, bool AudioSync, bool AudioInBssWindow, bool NotUnassignable,
-            int cld_supervision_time, string bss_method)
+            int cld_supervision_time, string bss_method, uint porcentajeRSSI)
 		{
             int acc;
 #if _TRACEAGENT_
@@ -1862,6 +1904,7 @@ namespace U5ki.Infrastructure
             info.NotUnassignable = NotUnassignable;
             info.cld_supervision_time = cld_supervision_time;
             info.bss_method = bss_method;
+            info.porcentajeRSSI = porcentajeRSSI;
 
 			outInfo.DstUri = dst;
 			outInfo.RdFr = frecuency;
@@ -2574,6 +2617,7 @@ namespace U5ki.Infrastructure
                 if (OnSubPres != null)
                     OnSubPres(p1, p2, p3);
             });
+            _Cb.OnFinWavCb = null;
         }
 		#endregion
 	}
