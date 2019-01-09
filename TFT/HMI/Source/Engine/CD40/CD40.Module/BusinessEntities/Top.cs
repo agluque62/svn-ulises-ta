@@ -299,8 +299,7 @@ namespace HMI.CD40.Module.BusinessEntities
             Contador = 0;
             var InitList = new List<VoidDelegate> 
             { 
-                /** 20180409. Incluir en las versiones el componente CMEDIA */
-                delegate() {if (_HwManager!=null) {_HwManager.Init(); SetCurrentSwVersion(); } }, 
+                delegate() {if (_HwManager!=null) {_HwManager.Init();} }, 
                 delegate() {if (_Registry != null) _Registry.Init();}, 
                 delegate() {if (_CfgManager != null) _CfgManager.Init();}, 
                 delegate() {if (_SipManager != null) _SipManager.Init();},
@@ -386,7 +385,8 @@ namespace HMI.CD40.Module.BusinessEntities
                 delegate() { if (_MixerManager != null) _MixerManager.Start();}, 
                 delegate() { if (_CfgManager != null) _CfgManager.Start();},            
                 delegate() { if (_Registry != null) _Registry.Start();}, 
-                delegate() { if (_HwManager != null) _HwManager.Start();}
+                /** 20190107. Incluir en las versiones el componente CMEDIA */
+                delegate() { if (_HwManager != null) {_HwManager.Start(); SetCurrentSwVersion();} }
             };
 
             int n = 0;

@@ -208,7 +208,9 @@ namespace GenericHid
             finally
             {
             }
-            return success ? System.Text.Encoding.Unicode.GetString(data) : "No Serial Number";
+            /** 20190109. Limita a 8 caracters UNICODE la extension valida del string (en cmedia viene la fecha).
+             los sistemas de 64 bits, encadenan los caracteres '0' finales*/
+            return success ? System.Text.Encoding.Unicode.GetString(data, 0, 16) : "No Serial Number";
         }
     }   
 
