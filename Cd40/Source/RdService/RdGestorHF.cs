@@ -83,24 +83,38 @@ namespace U5ki.RdService
 
         public static class HFHelper
         {
-            static Logger nlog = LogManager.GetCurrentClassLogger();
-            public static string Log(LogLevel level, string message, string idEquipo, object Frecuencia = null, string usuario = null, U5kiIncidencias.U5kiIncidencia inci = (U5kiIncidencias.U5kiIncidencia)0)
+            class HFLogger : BaseCode
+            {
+                public void Trace(String msg, U5kiIncidencias.U5kiIncidencia type = U5kiIncidencias.U5kiIncidencia.IGNORE) { LogTrace<HFLogger>(msg); }
+                public void Debug(String msg, U5kiIncidencias.U5kiIncidencia type = U5kiIncidencias.U5kiIncidencia.IGNORE) { LogDebug<HFLogger>(msg); }
+                public void Info(String msg, U5kiIncidencias.U5kiIncidencia type, params Object[] issueMessages) { LogInfo<HFLogger>(msg, type, issueMessages); }
+                public void Error(String msg, U5kiIncidencias.U5kiIncidencia type, params Object[] issueMessages) { LogError<HFLogger>(msg, type, issueMessages); }
+            }
+            static HFLogger hflog = new HFLogger();
+            //static Logger nlog = LogManager.GetCurrentClassLogger();
+            public static string Log(LogLevel level, string message, string idEquipo, string Frecuencia = "---", string usuario = "---", U5kiIncidencias.U5kiIncidencia inci = U5kiIncidencias.U5kiIncidencia.IGNORE)
             {
                 StackFrame frame = new StackFrame(1);
                 String calling = frame.GetMethod().Name;
                 String msg = String.Format("({0}) => [{1,4}/{2,4}/{3,4}]: {4}", calling, idEquipo ?? "---" , Frecuencia ?? "---", usuario ?? "---", message);
-                nlog.Log(level, msg);
-                int ninci = (int)inci;
-                if (ninci != 0)
-                {
-                    U5kiIncidencias.GeneraIncidencia(inci, msg);
-                }
+
+                if (level == LogLevel.Debug)
+                    hflog.Debug(msg);
+                else if (level == LogLevel.Info)
+                    hflog.Info(msg, inci, "HFM", usuario, idEquipo, Frecuencia, msg);
+                else
+                    hflog.Error(msg, inci, "HFM", usuario, idEquipo, Frecuencia, msg);
+                
+#if DEBUG
+                TestHist();
+#endif
                 return msg;
             }
             public static void Trace([System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string caller = null)
             {
                 String msg = String.Format("TxHFGestor TRACE: {0} line {1}", caller, lineNumber);
-                nlog.Trace(msg);
+                // nlog.Trace(msg);
+                hflog.Trace(msg);
             }
             public static void RespondToFrHfTxChange(string ip, string frec, int code)
             {
@@ -118,6 +132,33 @@ namespace U5ki.RdService
                 AsignacionUsuariosTV asg = cfg.ConfiguracionGeneral.PlanAsignacionUsuarios.Where(a => a.IdUsuario == user).FirstOrDefault();
                 return asg == null ? "" : asg.IdHost;
             }
+
+#if DEBUG
+            static int TestingHis = 2;
+            static public void TestHist()
+            {
+                var lista = new List<U5kiIncidencias.U5kiIncidencia>()
+                {
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_EQUIPO_CONECTADO,
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_EQUIPO_ERROR,
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_EQUIPO_DESCONECTADO,
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_EQUIPO_ASIGNADO,
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_EQUIPO_LIBERADO,
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_GENERAL,
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_ASIGNACION,
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_DESASIGNACION,
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_INTENTO_ASIGNACION_MULTIPLE,
+                    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_PREPARACIONSELCAL,
+                };
+
+                if (TestingHis-- > 0)
+                {
+                    lista.ForEach(e =>{
+                        hflog.Info("Testing #01", e, "HFM", "##_user_##", "##_equipment_##", "##_frequency_##", "Testing #01");
+                    });                    
+                }
+            }
+#endif
         }
         /// <summary>
         /// 
@@ -409,7 +450,7 @@ namespace U5ki.RdService
                 {
                     // _log.Error("GestorHF.Sintoniza: ", x);
                     // 20171003. AGL. ¿Convendría aquí 'limpiar' el equipo o al menos marcar un estado 'erroneo', enviar un historico...
-                    HFHelper.Log(LogLevel.Error, x.Message, IdEquipo, frec);
+                    HFHelper.Log(LogLevel.Error, x.Message, IdEquipo, frec.ToString(), ToString());
                     throw x;
                 }
             }
@@ -614,7 +655,9 @@ namespace U5ki.RdService
                     {
                         if (ra.Type == RdRsType.Tx)
                         {
-                            string msg = HFHelper.Log(LogLevel.Error, CTranslate.translateResource("¡Asignando frecuencia con TX asignado!"), IdEquipo, fr.FrecuenciaSintonizada, usuario, U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_GENERAL);
+                            string msg = HFHelper.Log(LogLevel.Error, 
+                                CTranslate.translateResource("¡Asignando frecuencia con TX asignado!"), 
+                                IdEquipo, fr.FrecuenciaSintonizada.ToString(), usuario, U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_GENERAL);
                             throw new Exception(msg);
                         }
                     }
@@ -699,7 +742,9 @@ namespace U5ki.RdService
                         else
                         {
                             /** TODO. Algo Raro pasa... */
-                            HFHelper.Log(LogLevel.Error, CTranslate.translateResource("¡Desasignando frecuencia sin TX asignado!"), IdEquipo, fr.FrecuenciaSintonizada, null, U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_GENERAL);
+                            HFHelper.Log(LogLevel.Error, 
+                                CTranslate.translateResource("¡Desasignando frecuencia sin TX asignado!"), 
+                                IdEquipo, fr.FrecuenciaSintonizada.ToString(), null, U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_GENERAL);
                         }
                     }
                     else
@@ -936,7 +981,7 @@ namespace U5ki.RdService
             if (fr.TipoDeFrecuencia != "HF")
                 return (int)EquipoHFStd.stdAsignado;
             HFHelper.Trace();
-            HFHelper.Log(LogLevel.Debug, "Peticion de Asignacion de Equipo HF", from, fr.FrecuenciaSintonizada, usuario);
+            HFHelper.Log(LogLevel.Debug, "Peticion de Asignacion de Equipo HF", from, fr.FrecuenciaSintonizada.ToString(), usuario);
 
 #if __VERSION_0__
             lock (_equipos)
@@ -1051,7 +1096,7 @@ namespace U5ki.RdService
                 {
                     HFHelper.Log(LogLevel.Error,
                         CTranslate.translateResource("Intento de asignacion múltiple"),
-                        null, fr.FrecuenciaSintonizada, usuario, U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_INTENTO_ASIGNACION_MULTIPLE);
+                        null, fr.FrecuenciaSintonizada.ToString(), usuario, U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_INTENTO_ASIGNACION_MULTIPLE);
                     return (equipoEnUsuario != null) ? (int)EquipoHFStd.stdTxAlreadyAssigned : (int)EquipoHFStd.stdFrequencyAlreadyAssigned;
                 }
 
@@ -1078,7 +1123,7 @@ namespace U5ki.RdService
                 catch (Exception x)
                 {
                     /** Log e Historico. */
-                    HFHelper.Log(LogLevel.Error, x.Message, equipo.IdEquipo, fr.FrecuenciaSintonizada, usuario,
+                    HFHelper.Log(LogLevel.Error, x.Message, equipo.IdEquipo, fr.FrecuenciaSintonizada.ToString(), usuario,
                         U5kiIncidencias.U5kiIncidencia.U5KI_NBX_HF_ERROR_ASIGNACION);
                     // 20171003. esto parece un error. Si un equipo pre-seleccionado no puede ser asignado, debería marcarse como tal y continuar con un nuevo equipo si existen 
                     // otros disponibles.

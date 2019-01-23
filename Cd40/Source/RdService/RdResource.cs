@@ -364,7 +364,8 @@ namespace U5ki.RdService
                 _SipCallId = SipAgent.MakeRdCall(null, _LastUri, _Frecuency, flags, Settings.Default.McastIp, _McastPort,
                     _New_params_ClBss.Priority, new_params.zona, _New_params_ClBss.FrequencyType,
                     _New_params_ClBss.CLDCalculateMethod, _New_params_ClBss.BssWindows, _New_params_ClBss.AudioSync,
-                    _New_params_ClBss.AudioInBssWindow, _New_params_ClBss.NotUnassignable, new_params.cld_supervision_time, new_params.bss_method);
+                    _New_params_ClBss.AudioInBssWindow, _New_params_ClBss.NotUnassignable, new_params.cld_supervision_time, new_params.bss_method,
+                    0);
 
                 if (_SipCallId >= 0)
                     _SipCallSt = CORESIP_CallState.CORESIP_CALL_STATE_CONNECTING;
