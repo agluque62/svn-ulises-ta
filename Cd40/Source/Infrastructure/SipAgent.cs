@@ -812,12 +812,14 @@ namespace U5ki.Infrastructure
          *	@param	expire_seg  Tiempo en el que expira el registro en segundos.
          *	@param	username	Si no es necesario autenticación, este parametro será NULL
          *	@param  pass		Password. Si no es necesario autenticación, este parametro será NULL
+         *	@param  DisplayName	Display name que va antes de la sip URI, se utiliza para como nombre a mostrar
+         *	@param	isfocus		Si el valor es distinto de cero, indica que es Focus, para establecer llamadas multidestino
          *	@param	error		Puntero @ref CORESIP_Error a la Estructura de error
          *	@return				Codigo de Error
          */
         [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
         static extern int CORESIP_CreateAccountAndRegisterInProxy([In] string acc, int defaultAcc, out int accId, string proxy_ip,
-                                                                uint expire_seg, string username, string pass, string displayName, out CORESIP_Error error);
+                                                                uint expire_seg, string username, string pass, string displayName, int isfocus, out CORESIP_Error error);
 
 
         [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
@@ -1376,7 +1378,7 @@ namespace U5ki.Infrastructure
 #if _TRACEAGENT_
             _Logger.Debug("Entrando en SipAgent.CreateAccountAndRegisterInProxy");
 #endif
-            if (CORESIP_CreateAccountAndRegisterInProxy(accId, 0, out id, proxy_ip, expire_seg, username, pass, displayName, out err) != 0)
+            if (CORESIP_CreateAccountAndRegisterInProxy(accId, 0, out id, proxy_ip, expire_seg, username, pass, displayName, 0, out err) != 0)
             {
                 throw new Exception(err.Info);
             }
