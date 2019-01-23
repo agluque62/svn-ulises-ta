@@ -3,6 +3,8 @@ using System.Net;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
+using System.Net;
+using System.Net.Sockets;
 
 using NLog;
 using Lextm.SharpSnmpLib;
@@ -231,10 +233,32 @@ namespace HMI.CD40.Module.Snmp
 				{
 					List<Variable> vList = new List<Variable> { new Variable(oid, data) };
 
-					foreach (IPEndPoint ep in eps)
+#if !DEBUG
+                    /** 20190123 Para seleccionar la IP SOURCE del TRAP */
+                    using (var sender = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+                    {
+                        var endPointLocal = new IPEndPoint(IPAddress.Parse(Properties.Settings.Default.SipIp), 0);
+                        sender.Bind(endPointLocal);
+
+                        foreach (IPEndPoint ep in eps)
+                        {
+
+                            TrapV2Message message = new TrapV2Message(0,
+                                VersionCode.V2,
+                                new OctetString("public"),
+                                new ObjectIdentifier(Settings.Default.BaseOid),
+                                0, vList);
+
+                            message.Send(ep, sender);
+                        }
+                    }
+
+#else
+                    foreach (IPEndPoint ep in eps)
 					{
                         Messenger.SendTrapV2(0, VersionCode.V2, ep, new OctetString("public"), new ObjectIdentifier(Settings.Default.BaseOid), 0, vList);
 					}
+#endif
 				}
 				catch (Exception /*e*/)
 				{

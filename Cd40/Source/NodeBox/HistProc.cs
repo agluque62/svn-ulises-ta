@@ -101,7 +101,6 @@ namespace U5ki.NodeBox
         UdpClient _listener = null;
 #endif
         // private static Logger _Logger = LogManager.GetCurrentClassLogger();
-
 #if IPC_DEFINED
         /// <summary>
         /// 
@@ -175,8 +174,7 @@ namespace U5ki.NodeBox
         }
 #else
         private void ProcesoIncidencias()
-        {
-                      
+        {                      
             while (!_salir)
             {
                 try
@@ -191,7 +189,10 @@ namespace U5ki.NodeBox
 
                     /** Enviar al servidor. */
                     string oidh = string.Format("{0}.{1}", _oidbase, (int)hist.id);
-                    SnmpClient.TrapTo(_iptrapserver, _trapcomm, oidh, hist.descripcion);
+                    
+                    // SnmpClient.TrapTo(_iptrapserver, _trapcomm, oidh, hist.descripcion);
+
+                    SnmpClient.TrapFromTo(Properties.Settings.Default.IpPrincipal, _iptrapserver, _trapcomm, oidh, hist.descripcion);
 
                     /** LOG del Historico */
                     DateTime d = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) + new TimeSpan((long)hist.datetime);

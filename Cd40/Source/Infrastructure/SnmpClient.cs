@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
+using System.Net.Sockets;
 
 using NLog;
 using Lextm.SharpSnmpLib;
@@ -194,12 +195,12 @@ namespace U5ki.Infrastructure
             SetOne(ip, community, oid, timeout, port, snmpVersion, SnmpType.OctetString, valor);
         }
 
+        /** */
         public static void TrapTo(string ipTo, string community, string oid, string val, Int32 port = 162, VersionCode snmpVersion = VersionCode.V2)
         {
-            List<Variable> lst = new List<Variable>();
+            List<Variable> variables = new List<Variable>();
             Variable var = new Variable(new ObjectIdentifier(oid), new OctetString(val));
-            lst.Add(var);
-
+            variables.Add(var);
             Messenger.SendTrapV2(
                 0,
                 snmpVersion,                     
@@ -209,8 +210,34 @@ namespace U5ki.Infrastructure
                 new OctetString(community),                   
                 new ObjectIdentifier(oid),                    
                 0, 
-                lst);
+                variables);
         }
+        /** 20190123. Para poder seleccionar la fuente del TRAP... */
+        public static void TrapFromTo(string ipFrom, string ipTo, string community, string oid, string val, Int32 port = 162, VersionCode snmpVersion = VersionCode.V2)
+        {
+            //List<Variable> variables = new List<Variable>();
+            //Variable var = new Variable(new ObjectIdentifier(oid), new OctetString(val));
+            //variables.Add(var);
+
+            using (var sender = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            {
+                var variables = new List<Variable>() { new Variable(new ObjectIdentifier(oid), new OctetString(val)) };
+                var endPointLocal = new IPEndPoint(IPAddress.Parse(ipFrom), 0);
+                var receiver = new IPEndPoint(IPAddress.Parse(ipTo), port);
+
+                sender.Bind(endPointLocal);
+
+                TrapV2Message message = new TrapV2Message(0,
+                    VersionCode.V2,
+                    new OctetString(community),
+                    new ObjectIdentifier(oid),
+                    0,
+                    variables);
+
+                message.Send(receiver, sender);
+            }
+        }
+
         //20161124. JOI 
         public static Byte[] GetOctectString(string ip, string community, string oid, int timeout, Int32 port = 161, VersionCode snmpVersion = VersionCode.V1)
         {
