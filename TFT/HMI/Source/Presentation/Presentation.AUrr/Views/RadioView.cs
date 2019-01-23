@@ -533,7 +533,9 @@ namespace HMI.Presentation.AUrr.Views
                 Image audio = null;
                 int rtxGroup = 0;
                 bool allAsOneBt = false;
-                string alias = dst.Alias;
+                /** 20190121. AGL. ALIAS a mostrar en la tecla... */
+                // string alias = dst.Alias;
+                string alias = dst.KeyAlias;
                 bool isGreenIcons = false;
 
                 if (!dst.Unavailable)
@@ -724,7 +726,11 @@ namespace HMI.Presentation.AUrr.Views
                 }
                 else
                 {
-                    bt.Reset(dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? string.Empty : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    //bt.Reset(dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? string.Empty : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    /** 20190121. AGL. ALIAS a mostrar en la tecla... */
+                    // bt.Reset(dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? string.Empty : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+
                     dst.State == FrequencyState.Degraded);
                 }
                 bt.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative && !dst.Unavailable;
