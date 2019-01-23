@@ -392,7 +392,7 @@ namespace U5ki.Infrastructure
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_BSS_LENGTH + 1)]
         public string bss_method;
-        public uint porcentajeRSSI;
+        public uint porcentajeRSSI;                     //Peso del valor de Qidx del tipo RSSI en el calculo del Qidx final. 0 indica que el calculo es solo interno (centralizado). 10 que el calculo es solo el RSSI. 
 	}
 
     /// <summary>
@@ -1868,11 +1868,12 @@ namespace U5ki.Infrastructure
         /// <param name="flags"></param>
         /// <param name="mcastIp">Grupo Multicast de Recepcion para los HMI.</param>
         /// <param name="mcastPort">Puerto del grupo asociado al recurso radio.</param>
+        /// /// <param name="porcentajeRSSI">Peso del valor de Qidx del tipo RSSI en el calculo del Qidx final. 0 indica que el calculo es solo centralizado. 10 que el calculo es solo el RSSI.</param>
         /// <returns></returns>
 		public static int MakeRdCall(string accId, string dst, string frecuency, CORESIP_CallFlags flags, string mcastIp, uint mcastPort,
             CORESIP_Priority prioridad, string Zona, CORESIP_FREQUENCY_TYPE FrequencyType,
             CORESIP_CLD_CALCULATE_METHOD CLDCalculateMethod, int BssWindows, bool AudioSync, bool AudioInBssWindow, bool NotUnassignable,
-            int cld_supervision_time, string bss_method, uint porcentajeRSSI)
+            int cld_supervision_time, string bss_method, uint porcentajeRSSI = 0)
 		{
             int acc;
 #if _TRACEAGENT_
