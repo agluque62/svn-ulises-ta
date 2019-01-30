@@ -88,6 +88,9 @@ namespace HMI.Presentation.AUrr.Views
             this._TitleBT.TabIndex = 12;
             this._TitleBT.Text = "TFT";
             this._TitleBT.Click += new System.EventHandler(this._TitleBT_Click);
+            /** 20180130. EN AURR el LONGCLICK activa la posibilidad de salir de la aplicacion */
+            this._TitleBT.LongClick += new System.EventHandler(this._TitleBT_LongClick);
+            this._TitleBT.DblClick += new System.EventHandler(this._TitleBT_DblClick);
             // 
             // _UrrBrightnessUDB
             // 
@@ -164,7 +167,8 @@ namespace HMI.Presentation.AUrr.Views
         private UI.UrrUpDownButton _UrrBuzzerUDB;
         private UI.UrrUpDownButton _UrrBrightnessUDB;
         private System.Windows.Forms.TextBox _PosMsgLB;
-        private Model.Module.UI.HMIButton _TitleBT;
+        //private Model.Module.UI.HMIButton _TitleBT;
+        private HMI.Model.Module.UI.HMIButton _TitleBT;
     }
 }
 

@@ -17,7 +17,7 @@
 			<Dependency Name="Model" />
 		</Dependencies>
 		<Modules>
-			<ModuleInfo AssemblyFile="Presentation.Twr.dll" />
+			<ModuleInfo AssemblyFile="Presentation.Aurr.dll" />
 		</Modules>
 	</Section>
 </SolutionProfile>

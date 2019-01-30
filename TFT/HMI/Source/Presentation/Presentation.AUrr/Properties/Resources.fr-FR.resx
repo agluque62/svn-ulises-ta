@@ -223,4 +223,7 @@
   <data name="BadOperation" xml:space="preserve">
     <value>Mauvaise opération</value>
   </data>
+  <data name="ApplicationExit" xml:space="preserve">
+    <value>Quitter l'application</value>
+  </data>
 </root>

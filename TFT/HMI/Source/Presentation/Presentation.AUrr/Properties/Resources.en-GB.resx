@@ -298,4 +298,7 @@
   <data name="BadOperation" xml:space="preserve">
     <value>BadOperation</value>
   </data>
+  <data name="ApplicationExit" xml:space="preserve">
+    <value>Exit application</value>
+  </data>
 </root>

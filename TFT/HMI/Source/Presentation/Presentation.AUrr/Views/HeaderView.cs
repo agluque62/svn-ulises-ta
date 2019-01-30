@@ -399,6 +399,43 @@ namespace HMI.Presentation.AUrr.Views
             }
         }
 
+        /** 20180130. EN AURR el LONGCLICK activa la posibilidad de salir de la aplicacion */
+        private void _TitleBT_LongClick(object sender, EventArgs e)
+        {
+            try
+            {
+                ContextMenuStrip mnuContextMenu = new ContextMenuStrip();
+                ToolStripMenuItem menuItemSalir = new ToolStripMenuItem(Resources.ApplicationExit)
+                {
+                    Name = "Salir",
+                    Font = new Font(FontFamily.GenericSansSerif, (float)16)
+                };
+                menuItemSalir.Margin = new Padding(menuItemSalir.Margin.Left, menuItemSalir.Margin.Top + 5, menuItemSalir.Margin.Right, menuItemSalir.Margin.Bottom + 5);
+                menuItemSalir.Click += delegate (object sender1, EventArgs args)
+                {
+                    Application.Exit();
+                };
+                mnuContextMenu.Items.Add(menuItemSalir);
+                mnuContextMenu.Show(this._TitleBT, new Point(this._TitleBT.Width+5, this._TitleBT.Height+5));
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error("Error en Long Click en _TitleBT", ex);
+            }
+        }
+
+        private void _TitleBT_DblClick(object sender, EventArgs e)
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error("Error Doble Click en _TitleBT", ex);
+            }
+        }
+
         private void _SplitUC_SplitSelectionClick(object sender, EventArgs e)
         {
             try

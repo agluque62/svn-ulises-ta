@@ -21,6 +21,8 @@ namespace HMI.Model.Module.UI
 
         public new event EventHandler Click;
         public event EventHandler LongClick;
+        /** 20190130. AGL. */
+        public event EventHandler DblClick;
 
         [Browsable(false),
         DefaultValue(0)
@@ -564,6 +566,17 @@ namespace HMI.Model.Module.UI
         {
             base.OnForeColorChanged(e);
             _BtnInfo.SetForeColor(BtnState.Normal, ForeColor);
+        }
+
+        /** 20190130. AGL*/
+        protected override void OnDoubleClick(EventArgs e)
+        {
+            if (_BtnState != BtnState.Inactive)
+            {
+                Invalidate();
+                General.SafeLaunchEvent(DblClick, this);
+                base.OnDoubleClick(e);
+            }
         }
 
         protected virtual void OnLongClick(object sender, EventArgs e)
