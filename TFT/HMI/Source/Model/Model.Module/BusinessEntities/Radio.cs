@@ -93,6 +93,10 @@ namespace HMI.Model.Module.BusinessEntities
         private uint _qidxValue = 0;
         private string _qidxResource = string.Empty;
 
+        /** 20190205. RTX Information*/
+        private string _PttSrcId = string.Empty;
+        public string PttSrcId { get { return _PttSrcId; } }
+
 		public int Id
 		{
 			get { return _Id; }
@@ -222,6 +226,8 @@ namespace HMI.Model.Module.BusinessEntities
             _qidxValue = 0;
             _State = FrequencyState.NotAvailable;
             _RxOnly = false;
+            /** 20190205 */
+            _PttSrcId = string.Empty;
 		}
 
 		public void Reset()
@@ -319,6 +325,8 @@ namespace HMI.Model.Module.BusinessEntities
             _qidxValue = st.QidxValue;
 
             _State = st.State;
+
+            _PttSrcId = st.PttSrcId;
 		}
 
 		public void Reset(RdDestination dst)

@@ -56,8 +56,8 @@ namespace HMI.Presentation.Asecna.Views
             this._PttBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SquelchBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._RtxBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            this._CarrierDetectionTimer = new System.Windows.Forms.Timer(this.components);
-            this._TxConfirmationDetectionTimer = new System.Windows.Forms.Timer(this.components);
+            //this._TxConfirmationDetectionTimer = new System.Windows.Forms.Timer(this.components);
+            //this._CarrierDetectionTimer = new System.Windows.Forms.Timer(this.components);
             _RadioTLP = new System.Windows.Forms.TableLayoutPanel();
             _RadioHeadP = new System.Windows.Forms.Panel();
             _RadioTLP.SuspendLayout();
@@ -230,11 +230,11 @@ namespace HMI.Presentation.Asecna.Views
             // 
             // _TxConfirmationDetectionTimer
             // 
-            this._TxConfirmationDetectionTimer.Tick += new System.EventHandler(this._TxConfirmationDetectionTimer_Tick);
+            //this._TxConfirmationDetectionTimer.Tick += new System.EventHandler(this._TxConfirmationDetectionTimer_Tick);
             // 
             // _CarrierDetectionTimer
             // 
-            this._CarrierDetectionTimer.Tick += new System.EventHandler(this._CarrierDetectionTimer_Tick);
+            //this._CarrierDetectionTimer.Tick += new System.EventHandler(this._CarrierDetectionTimer_Tick);
             // 
             // RadioView
             // 
@@ -262,8 +262,8 @@ namespace HMI.Presentation.Asecna.Views
         private System.Windows.Forms.Timer _RtxBlinkTimer;
         private UI.UpDownButton _RdHfSpeakerUDB;
         private Microsoft.Practices.CompositeUI.WinForms.DeckWorkspace _SelCallWS;
-        private System.Windows.Forms.Timer _CarrierDetectionTimer;
-        private System.Windows.Forms.Timer _TxConfirmationDetectionTimer;
+        //private System.Windows.Forms.Timer _TxConfirmationDetectionTimer;
+        //private System.Windows.Forms.Timer _CarrierDetectionTimer;
 	}
 }
 

@@ -222,51 +222,51 @@ namespace HMI.Presentation.Asecna.Views
 		public void OnPttOnChanged(object sender, EventArgs e)
 		{
             //Control de errores para CarrierDetection y para TxConfirmation
-            if (_StateManager.Radio.PttOn)
-            {
-                if (Settings.Default.TxConfirmationDetectionTimeOut < 10)
-                    this._TxConfirmationDetectionTimer.Enabled = false;
-                else
-                {
-                    this._TxConfirmationDetectionTimer.Enabled = true;
-                    this._TxConfirmationDetectionTimer.Interval = Settings.Default.TxConfirmationDetectionTimeOut;
-                }
-                if (Settings.Default.CarrierDetectionTimeOut < 10)
-                    this._CarrierDetectionTimer.Enabled = false;
-                else
-                {
-                    this._CarrierDetectionTimer.Enabled = true;
-                    this._CarrierDetectionTimer.Interval = Settings.Default.CarrierDetectionTimeOut;
-                }
-            }
-            else
-            {//Liberar del estado de error los que tengan fallo al soltar el Ptt
-                _TxConfirmationDetectionTimer.Enabled = false;
-                _CarrierDetectionTimer.Enabled = false;
-                _CarrierDetectionEventFired = false;
-                _TxErrorEventFired = false;
+            //if (_StateManager.Radio.PttOn)
+            //{
+            //    if (Settings.Default.TxConfirmationDetectionTimeOut < 10)
+            //        this._TxConfirmationDetectionTimer.Enabled = false;
+            //    else
+            //    {
+            //        this._TxConfirmationDetectionTimer.Enabled = true;
+            //        this._TxConfirmationDetectionTimer.Interval = Settings.Default.TxConfirmationDetectionTimeOut;
+            //    }
+            //    if (Settings.Default.CarrierDetectionTimeOut < 10)
+            //        this._CarrierDetectionTimer.Enabled = false;
+            //    else
+            //    {
+            //        this._CarrierDetectionTimer.Enabled = true;
+            //        this._CarrierDetectionTimer.Interval = Settings.Default.CarrierDetectionTimeOut;
+            //    }
+            //}
+            //else
+            //{//Liberar del estado de error los que tengan fallo al soltar el Ptt
+            //    _TxConfirmationDetectionTimer.Enabled = false;
+            //    _CarrierDetectionTimer.Enabled = false;
+            //    _CarrierDetectionEventFired = false;
+            //    _TxErrorEventFired = false;
 
-                /* VMG 04/09/2018 */
-                //Con esto hacemos que una vez que se ha dado el error de transmision, 
-                // al dejar de recibir PTT o dejar de pulsar el boton, se genera un estado NoPtt
-                // que hace que el boton vuelva al estado normal seleccionado (color verde presumiblemente)
-                var rdButtonList = new Dictionary<RdButton, RdDst>(_PttPushedList);
-                foreach (KeyValuePair<RdButton, RdDst> p in rdButtonList)
-                {
-                    if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
-                        && p.Value.Ptt != PttState.ExternPtt)
-                    {
-                        try
-                        {
-                            General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.NoPtt));
-                        }
-                        catch (Exception ex)
-                        {
-                            _Logger.Error("ERROR generando evento PTT.NoPtt. " + ex);
-                        }
-                    }
-                }
-            }
+            //    /* VMG 04/09/2018 */
+            //    //Con esto hacemos que una vez que se ha dado el error de transmision, 
+            //    // al dejar de recibir PTT o dejar de pulsar el boton, se genera un estado NoPtt
+            //    // que hace que el boton vuelva al estado normal seleccionado (color verde presumiblemente)
+            //    var rdButtonList = new Dictionary<RdButton, RdDst>(_PttPushedList);
+            //    foreach (KeyValuePair<RdButton, RdDst> p in rdButtonList)
+            //    {
+            //        if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
+            //            && p.Value.Ptt != PttState.ExternPtt)
+            //        {
+            //            try
+            //            {
+            //                General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.NoPtt));
+            //            }
+            //            catch (Exception ex)
+            //            {
+            //                _Logger.Error("ERROR generando evento PTT.NoPtt. " + ex);
+            //            }
+            //        }
+            //    }
+            //}
 			_PttBT.ButtonColor = _StateManager.Radio.PttOn ? VisualStyle.Colors.Blue : VisualStyle.ButtonColor;
 			_RtxBT.Enabled = _RtxEnabled;
 			_RdPageBT.Enabled = _RdPageEnabled;
@@ -468,56 +468,56 @@ namespace HMI.Presentation.Asecna.Views
         ///<summary>
         /// Error al confirmar la Transmision. Tick del Timer.
         ///</summary>
-        private void _TxConfirmationDetectionTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_TxConfirmationDetectionTimer.Enabled)
-                {
-                    var rdButtonList = new Dictionary<RdButton, RdDst>(_PttPushedList);
-                    foreach (KeyValuePair<RdButton, RdDst> p in rdButtonList)
-                    {
-                        if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
-                            && p.Value.Ptt != PttState.ExternPtt)
-                        {
-                            General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.TxError));
-                            _TxErrorEventFired = true;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error("ERROR generando timer error recepcion Tx", ex);
-            }
-        }
+        //private void _TxConfirmationDetectionTimer_Tick(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (_TxConfirmationDetectionTimer.Enabled)
+        //        {
+        //            var rdButtonList = new Dictionary<RdButton, RdDst>(_PttPushedList);
+        //            foreach (KeyValuePair<RdButton, RdDst> p in rdButtonList)
+        //            {
+        //                if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
+        //                    && p.Value.Ptt != PttState.ExternPtt)
+        //                {
+        //                    General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.TxError));
+        //                    _TxErrorEventFired = true;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _Logger.Error("ERROR generando timer error recepcion Tx", ex);
+        //    }
+        //}
 
         /* VMG 05/09/2018 */
         ///<summary>
         /// Error de Rx al realizar Tx. Tick del Timer.
         ///</summary>
-        private void _CarrierDetectionTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_CarrierDetectionTimer.Enabled)
-                {
-                    var rdButtonList = new Dictionary<RdButton, RdDst>(_PttPushedList);
-                    foreach (KeyValuePair<RdButton, RdDst> p in rdButtonList)
-                    {
-                        if (p.Value.Ptt == PttState.PttOnlyPort && p.Value.Squelch == SquelchState.NoSquelch)
-                        {
-                            General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.CarrierError));
-                            _CarrierDetectionEventFired = true;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error("ERROR generando timer Ptt", ex);
-            }
-        }
+        //private void _CarrierDetectionTimer_Tick(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (_CarrierDetectionTimer.Enabled)
+        //        {
+        //            var rdButtonList = new Dictionary<RdButton, RdDst>(_PttPushedList);
+        //            foreach (KeyValuePair<RdButton, RdDst> p in rdButtonList)
+        //            {
+        //                if (p.Value.Ptt == PttState.PttOnlyPort && p.Value.Squelch == SquelchState.NoSquelch)
+        //                {
+        //                    General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.CarrierError));
+        //                    _CarrierDetectionEventFired = true;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _Logger.Error("ERROR generando timer Ptt", ex);
+        //    }
+        //}
 
 		private void RecuperaEstadoAsignacionFrecuencias()
 		{
@@ -1039,6 +1039,88 @@ namespace HMI.Presentation.Asecna.Views
 		{
 			Invalidate(true);
 		}
+
+        /** 20190205. Pintar los errores de confirmacion de transmision */
+        [EventSubscription(EventTopicNames.TxInProgressError, ThreadOption.Publisher)]
+        public void OnTxInProgressError(object sender, TxInProgressErrorCode e)
+        {
+            var InGroupButtons = new Dictionary<RdButton, RdDst>(_PttPushedList);
+            switch (e.IdEvent)
+            {
+                case 0:             // PTT OFF                       
+                                    /* VMG 04/09/2018 */
+                                    // Con esto hacemos que una vez que se ha dado el error de transmision,                                         
+                                    // al dejar de recibir PTT o dejar de pulsar el boton, se genera un estado NoPtt                                       
+                                    // que hace que el boton vuelva al estado normal seleccionado (color verde presumiblemente)
+                    foreach (KeyValuePair<RdButton, RdDst> p in InGroupButtons)
+                    {
+                        if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
+                            && p.Value.Ptt != PttState.ExternPtt && p.Value.Ptt != PttState.Blocked)
+                        {
+                            try
+                            {
+                                General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.NoPtt));
+                            }
+                            catch (Exception ex)
+                            {
+                                _Logger.Error("ERROR generando evento PTT.NoPtt. " + ex);
+                            }
+                        }
+                    }
+                    break;
+                case 1:             // Error en Confirmacion TX.
+                    {
+                        foreach (KeyValuePair<RdButton, RdDst> p in InGroupButtons)
+                        {
+                            if (p.Value.Ptt != PttState.PttOnlyPort &&
+                                p.Value.Ptt != PttState.PttPortAndMod &&
+                                p.Value.Ptt != PttState.ExternPtt &&
+                                /** 20190205. Cuando esta en BLOQUEO no hay que testear el fallo de confirmacion de TX */
+                                p.Value.Ptt != PttState.Blocked)
+                            {
+                                General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.TxError));//VMG Invented por ahora
+                            }
+                        }
+                        NotifMsg msg = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.TxConfirmationDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    }
+                    break;
+
+                case 2:             // Error en Confirmacion Portadora.
+                    {
+                        foreach (KeyValuePair<RdButton, RdDst> p in InGroupButtons)
+                        {
+                            if (p.Value.Ptt == PttState.PttOnlyPort && p.Value.Squelch == SquelchState.NoSquelch)
+                            {
+                                General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.CarrierError));
+                            }
+                        }
+                        NotifMsg msg = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.CarrierDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    }
+                    break;
+
+                case 3:             // Error en Grupo RTX
+                    //foreach (KeyValuePair<RdButton, RdDst> p in InGroupButtons)
+                    //{
+                    //    if (p.Value.RtxGroup > 0 && p.Value.Squelch == SquelchState.NoSquelch)
+                    //    {
+                    //        p.Key.setRtxErrorColor(true);
+                    //    }
+                    //}
+                    break;
+
+                case 4:             // RTX OFF
+                    //foreach (KeyValuePair<RdButton, RdDst> p in InGroupButtons)
+                    //{
+                    //    if (p.Value.RtxGroup > 0 && p.Value.Squelch == SquelchState.NoSquelch)
+                    //    {
+                    //        p.Key.setRtxErrorColor(false);
+                    //    }
+                    //}
+                    break;
+            }
+        }
 	}
 }
 

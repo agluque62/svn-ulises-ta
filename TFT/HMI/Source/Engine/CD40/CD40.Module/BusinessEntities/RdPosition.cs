@@ -185,6 +185,9 @@ namespace HMI.CD40.Module.BusinessEntities
             get { return _RxOnly; }
         }
 
+        /** 20190205. RTX Information */
+        public string PttSrcId { get { return _PttSrcId; } }
+
 		public RdPosition(int pos)
 		{
 			_Pos = pos;

@@ -185,6 +185,14 @@ namespace HMI.Model.Module.Services
                 RestoreOnInitialEventsFails();
             });
 
+            txInProgressControl = new TxInProgressControl((code) =>
+            {
+                if (code == 1 || code == 2)
+                    EngineCmdManager.GenerateRadioBadOperationTone(-1);
+
+                General.SafeLaunchEvent(TxInProgressError, this, new TxInProgressErrorCode(code) { });
+            });
+
             LogManager.GetLogger("RSFService").Trace("Starting RadioStatusRecoveryService");
         }
         /// <summary>
@@ -217,6 +225,9 @@ namespace HMI.Model.Module.Services
             msg.Info.ToList().ForEach(item =>
             {
                 EventOnPos(pos++, item);
+                /** 20190205 */
+                if (txInProgressControl != null)
+                    txInProgressControl.RtxGroupEvent(StateManager, item);
             });
         }
         /// <summary>
@@ -232,7 +243,6 @@ namespace HMI.Model.Module.Services
 
             if (StateManager.Radio.Rtx == 0)
                 RtxSave();
-        
         }
 
 #if _RDPAGESTIMING_
@@ -593,7 +603,7 @@ namespace HMI.Model.Module.Services
                 for (int pos = 0; pos < 32; pos++)
                 {
                     EventOnPos(pos,
-                        new RdState(false, false, PttState.NoPtt, SquelchState.NoSquelch, RdRxAudioVia.NoAudio, 0, FrequencyState.Available, "", 0, "")
+                        new RdState(false, false, string.Empty, PttState.NoPtt, SquelchState.NoSquelch, RdRxAudioVia.NoAudio, 0, FrequencyState.Available, "", 0, "")
                         );
                 }
             }
@@ -649,6 +659,245 @@ namespace HMI.Model.Module.Services
         }
 
         #endregion METODOS PRIVADOS
+
+        #region SUPERVISION ERRORES EN TX RADIO
+
+        /** 20180205. AGl. Control de los Grupos RTX */
+        [EventSubscription(EventTopicNames.PttOnChanged, ThreadOption.Publisher)]
+        public void OnPttOnChanged(object sender, EventArgs e)
+        {
+            if (txInProgressControl != null)
+            {
+                txInProgressControl.LocalPttEvent(StateManager);
+            }
+        }
+
+        [EventPublication(EventTopicNames.TxInProgressError, PublicationScope.Global)]
+        public event EventHandler<TxInProgressErrorCode> TxInProgressError;
+
+        internal class TxInProgressControl
+        {
+            enum eRtxGroupStates { Inactive, TxInProgress, RtxInProgress }
+            private eRtxGroupStates grpStatus = eRtxGroupStates.Inactive;
+            private eRtxGroupStates GrpStatus { get => grpStatus; set => grpStatus = value; }
+            private Action<int> EventError = null;
+            private Object Locker = new object();
+            private int TxConfirmationTime { get; set; }
+            private int SquelchConfirmationTime { get; set; }
+            public TxInProgressControl(Action<int> eventError)
+            {
+                TxConfirmationTime = Properties.Settings.Default.RdTxConfirmationTime;
+                SquelchConfirmationTime = Properties.Settings.Default.RdSquelchConfirmationTime;
+                EventError = eventError;
+            }
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="stateManager"></param>
+            /// <param name="dst"></param>
+            public void RtxGroupEvent(StateManagerService stateManager, RdState dst)
+            {
+                lock (Locker)
+                {
+                    var TxInProgressSupervisionEnable = TxConfirmationTime > 10 || SquelchConfirmationTime > 10;
+                    if (TxInProgressSupervisionEnable)
+                    {
+                        bool thereIsGroup = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0).ToList().Count > 0;
+                        if (thereIsGroup && dst.RtxGroup > 0)   // Si hay grupo y el evento es en el grupo.
+                        {
+                            bool eventRtxOn = dst.Ptt == PttState.NoPtt && dst.Squelch == SquelchState.SquelchOnlyPort;
+                            bool eventTxOn = dst.Ptt == PttState.PttOnlyPort;
+                            bool eventOff = dst.Ptt == PttState.NoPtt && dst.Squelch == SquelchState.NoSquelch;
+                            switch (GrpStatus)
+                            {
+                                case eRtxGroupStates.Inactive:
+                                    if (eventRtxOn)
+                                    {
+                                        GrpStatus = eRtxGroupStates.RtxInProgress;
+                                        StartRtxSupervisor(stateManager);
+                                    }
+                                    else if (eventTxOn)
+                                    {
+                                        GrpStatus = eRtxGroupStates.TxInProgress;
+                                    }
+                                    break;
+                                case eRtxGroupStates.TxInProgress:
+                                    if (eventRtxOn)
+                                    {
+                                        GrpStatus = eRtxGroupStates.RtxInProgress;
+                                        StartRtxSupervisor(stateManager);
+                                    }
+                                    else if (eventOff)
+                                    {
+                                        var squelchsInGroup = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0 && d.Squelch != SquelchState.NoSquelch).ToList().Count;
+                                        if (squelchsInGroup == 0)
+                                        {
+                                            GrpStatus = eRtxGroupStates.Inactive;
+                                            EventError(4);
+                                        }
+                                    }
+                                    break;
+
+                                case eRtxGroupStates.RtxInProgress:
+                                    if (eventTxOn)
+                                    {
+                                        GrpStatus = eRtxGroupStates.TxInProgress;
+                                        CancelRtxSupervisor();
+                                    }
+                                    else if (eventOff)
+                                    {
+                                        var squelchsInGroup = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0 && d.Squelch != SquelchState.NoSquelch).ToList().Count;
+                                        if (squelchsInGroup == 0)
+                                        {
+                                            GrpStatus = eRtxGroupStates.Inactive;
+                                            CancelRtxSupervisor();
+                                            EventError(4);
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        else if (!thereIsGroup)
+                        {
+                            GrpStatus = eRtxGroupStates.Inactive;
+                        }
+                    }
+                }
+            }
+            private Task RtxSpTask = null;
+            private System.Threading.ManualResetEvent RtxSpTaskAbort = null;
+            private void StartRtxSupervisor(StateManagerService stateManager)
+            {
+                if (RtxSpTask == null)
+                {
+                    RtxSpTaskAbort = new System.Threading.ManualResetEvent(false);
+                    RtxSpTask = Task.Factory.StartNew(() =>
+                    {
+                        var time = (TxConfirmationTime > SquelchConfirmationTime ? TxConfirmationTime : SquelchConfirmationTime) + 500;
+                        if (RtxSpTaskAbort.WaitOne(time) == false)
+                        {
+                            lock (Locker)
+                            {
+                                if (GrpStatus == eRtxGroupStates.RtxInProgress)
+                                {
+                                    var items = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0).ToList().Count;
+                                    var itemsInSquelch = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0 && d.Squelch != SquelchState.NoSquelch).ToList().Count;
+                                    var itemsInPtt = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0 && d.Ptt == PttState.ExternPtt).ToList().Count;
+                                    if (itemsInSquelch != items || itemsInPtt != (items - 1))
+                                    {
+                                        // Error en Grupo
+                                        if (EventError != null)
+                                            EventError(3);
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                        }
+                        lock (Locker)
+                        {
+                            RtxSpTaskAbort = null;
+                            RtxSpTask = null;
+                        }
+                    });
+                }
+            }
+            private void CancelRtxSupervisor()
+            {
+                if (RtxSpTask != null && RtxSpTaskAbort != null)
+                    RtxSpTaskAbort.Set();
+            }
+
+            private System.Threading.ManualResetEvent TxInProgressSpCancel = null;
+            public void LocalPttEvent(StateManagerService stateManager)
+            {
+                lock (Locker)
+                {
+                    var TxInProgressSupervisionEnable = TxConfirmationTime > 10 || SquelchConfirmationTime > 10;
+                    if (TxInProgressSupervisionEnable)
+                    {
+                        if (stateManager.Radio.PttOn)
+                        {
+                            // PTTON de Operador.
+                            TxInProgressSpCancel = new System.Threading.ManualResetEvent(false);
+                            Task.Factory.StartNew(() =>
+                            {
+                                var NewSqhConfirmationTime = SquelchConfirmationTime;
+                                // Espera la confirmacion de TX
+                                if (TxConfirmationTime > 10 && !TxInProgressSpCancel.WaitOne(TxConfirmationTime))
+                                {
+                                    // Chequea que todos los PTT estan confirmados...
+                                    lock (Locker)
+                                    {
+                                        var txSelItems = stateManager.Radio.Destinations.Where(d => d.Tx == true).ToList().Count;
+                                        var inPttItems = stateManager.Radio.Destinations.Where(d =>
+                                            d.Ptt == PttState.PttOnlyPort ||
+                                            d.Ptt == PttState.PttPortAndMod ||
+                                            d.Ptt == PttState.ExternPtt ||
+                                            d.Ptt == PttState.Blocked).ToList().Count;
+                                        bool confirmados = txSelItems == inPttItems;
+                                        if (!confirmados)
+                                        {
+                                            EventError(1);
+                                        }
+                                        NewSqhConfirmationTime -= TxConfirmationTime;
+                                    }
+                                }
+                                else
+                                {
+                                    NewSqhConfirmationTime = 0;
+                                }
+                                // Espera la confirmacion de portadoras.
+                                if (NewSqhConfirmationTime > 10 && !TxInProgressSpCancel.WaitOne(NewSqhConfirmationTime))
+                                {
+                                    // Chequea que todos los SQH estan confirmados...
+                                    lock (Locker)
+                                    {
+                                        var inCarrierErrorItems = stateManager.Radio.Destinations.Where(d => d.Ptt == PttState.CarrierError).ToList().Count;
+                                        var inPttItems = stateManager.Radio.Destinations.Where(d =>
+                                        d.Ptt == PttState.PttOnlyPort ||
+                                        d.Ptt == PttState.PttPortAndMod ||
+                                        d.Ptt == PttState.ExternPtt ||
+                                        d.Ptt == PttState.Blocked).ToList().Count;
+                                        var inSqhItems = stateManager.Radio.Destinations.Where(d => d.Squelch == SquelchState.SquelchOnlyPort ||
+                                            d.Squelch == SquelchState.SquelchPortAndMod).ToList().Count;
+                                        bool confirmados = inCarrierErrorItems==0 && inPttItems == inSqhItems;
+                                        if (!confirmados)
+                                        {
+                                            EventError(2);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+
+                                }
+                                lock (Locker)
+                                {
+                                    TxInProgressSpCancel = null;
+                                }
+                            });
+                        }
+                        else
+                        {
+                            // PTTOFF de Operador.
+                            if (TxInProgressSpCancel != null)
+                            {
+                                TxInProgressSpCancel.Set();
+                            }
+                            EventError(0);
+                        }
+                    }
+                }
+            }
+        }
+
+        protected TxInProgressControl txInProgressControl = null;
+        #endregion
 
     }
 }

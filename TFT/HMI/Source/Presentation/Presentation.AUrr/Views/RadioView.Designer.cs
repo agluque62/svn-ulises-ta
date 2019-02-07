@@ -306,8 +306,8 @@ namespace HMI.Presentation.AUrr.Views
             // 
             // _RtxErrorTimer
             // 
-            this._RtxErrorTimer.Interval = 2000;
-            this._RtxErrorTimer.Tick += new System.EventHandler(this._RtxErrorTimer_Tick);
+            //this._RtxErrorTimer.Interval = 2000;
+            //this._RtxErrorTimer.Tick += new System.EventHandler(this._RtxErrorTimer_Tick);
             // 
             // RadioView
             // 

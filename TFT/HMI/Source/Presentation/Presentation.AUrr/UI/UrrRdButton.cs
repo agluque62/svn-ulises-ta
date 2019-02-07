@@ -199,10 +199,18 @@ namespace HMI.Model.Module.UI
         {
             _TxBtnInfo.Text = text;
         }
-        public void setRtxErrorColor()
+        public void setRtxErrorColor(bool error)
+        {
+            if (error)
         {
             _TxBtnInfo.SetBackColor(BtnState.Normal, VisualStyle.Colors.Red);
             _TxBtnInfo.SetForeColor(BtnState.Normal, HMI.Presentation.AUrr.UI.VisualStyle.Colors.DarkRed);
+            }
+            else
+            {
+                _TxBtnInfo.SetBackColor(BtnState.Normal, HMI.Presentation.AUrr.UI.VisualStyle.Colors.HeaderBlueA1);
+                _TxBtnInfo.SetForeColor(BtnState.Normal, HMI.Presentation.AUrr.UI.VisualStyle.Colors.Black);
+            }
             Invalidate();
         }
 

@@ -478,6 +478,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 
         /** 20180716. Acceso a un tono de falsa maniobra radio...*/
+        /** 20190206. Un valor -1 Activa el tono hasta que desaparezca la Pulsacion PTT */
         Task generatingToneTask = null;
         public void GenerateBadOperationTone(int durationInMsec)
         {
@@ -486,7 +487,15 @@ namespace HMI.CD40.Module.BusinessEntities
                 generatingToneTask = Task.Run(() =>
                 {
                     BadOperation(true);
+                    if (durationInMsec > 0)
                     Task.Delay(durationInMsec).Wait();
+                    else
+                    {
+                        while (PttSource != PttSource.NoPtt)
+                        {
+                            Task.Delay(50).Wait();
+                        }
+                    }
                     BadOperation(false);
                     generatingToneTask = null;
                 });
@@ -862,7 +871,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			if (!_ChangingCfg)
 			{
-				RdState st = new RdState(rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, 
+				RdState st = new RdState(rd.Tx, rd.Rx, rd.PttSrcId, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, 
                                             (FrequencyState)rd.Estado, rd.QidxMethod, rd.QidxValue, rd.QidxResource);
 				RangeMsg<RdState> state = new RangeMsg<RdState>(rd.Pos, st);
 				General.SafeLaunchEvent(PositionsChanged, this, state);

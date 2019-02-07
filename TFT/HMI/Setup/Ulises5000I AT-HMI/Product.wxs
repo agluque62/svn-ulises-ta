@@ -163,6 +163,21 @@
                      Name='NICTEAM_Property' Type='raw' />
     </Property>
 
+<!---->
+    <!-- Tiempo para Supervisar la Confirmacion TX  -->
+    <Property Id="TIMESPTX" Value="0">
+      <RegistrySearch Id='UV5KI_HMI_TIMESPTX' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_HMI'
+                     Name='TIMESPTX_Property' Type='raw' />
+    </Property>
+    <!-- Tiempo para supervision de SQUELCH tras TX   -->
+    <Property Id="TIMESPRX" Value="0">
+      <RegistrySearch Id='UV5KI_HMI_TIMESPRX' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_HMI'
+                     Name='TIMESPRX_Property' Type='raw' />
+    </Property>
+
+    <!---->
 
     <Feature Id="ProductFeature" Title="Ulises5000I_TA" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
@@ -313,6 +328,16 @@
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='RdRtxStatusRetrieveEnable'[\]]/value"
                         Value="[RDRTXREC]"/>
+        <!--  -->
+        <util:XmlFile Id="RadioTxSpTimeProperty" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='RdTxConfirmationTime'[\]]/value"
+                        Value="[TIMESPTX]"/>
+        <!--  -->
+        <util:XmlFile Id="RadioRxSpTimeProperty" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='RdSquelchConfirmationTime'[\]]/value"
+                        Value="[TIMESPRX]"/>
         <!-- Idioma -->
         <util:XmlFile Id="Lang" Action="setValue"
                         File = "[#HMI.config]"
@@ -466,7 +491,7 @@
                   ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='ECHandsFreeLC'[\]]/value"
                   Value="[ECLC]"/>
 
-        <!-- Cancelador Manos Libres para Linea Caliente -->
+        <!-- Tipo de TEAM de LAN -->
         <util:XmlFile Id="LanTypeSet" Action="setValue"
                   File = "[#HMI.config]"
                   ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='LanTeamType'[\]]/value"
@@ -650,6 +675,8 @@
           <RegistryValue Name='DOUBLERDSPEAKER_Property' Value='[DOUBLERDSPEAKER]' Type='string' />          
           <RegistryValue Name='RDSTATUSREC_Property' Value='[RDSTATUSREC]' Type='string' />
           <RegistryValue Name='RDRTXREC_Property' Value='[RDRTXREC]' Type='string' />
+          <RegistryValue Name='TIMESPTX_Property' Value='[TIMESPTX]' Type='string' />
+          <RegistryValue Name='TIMESPRX_Property' Value='[TIMESPRX]' Type='string' />
           <!--<RegistryValue Name='ECTLF_Property' Value='[ECTLF]' Type='string' />-->
           <RegistryValue Name='ECLC_Property' Value='[ECLC]' Type='string' />
           <RegistryValue Name='NICTEAM_Property' Value='[NICTEAM]' Type='string' />
@@ -1161,8 +1188,29 @@
             <ListItem Value="False" Text="No" />
           </ComboBox>
         </Control>
+<!---->
+        <Control Id="TxConfirmTime_label" Type="Text"       X="10" Y="192" Width="105" Height="18" TabSkip="no" Text="Tiempo Confirmacion TX" />
+        <Control Id="TxConfirmTime_value" Type="ComboBox"   X="125" Y="190" Width="50" Height="18" Property="TIMESPTX" ComboList="yes" >
+          <ComboBox Property="TIMESPTX">
+            <ListItem Value="0"  Text="No" />
+            <ListItem Value="200" Text="200 ms" />
+            <ListItem Value="300" Text="300 ms" />
+            <ListItem Value="400" Text="400 seg." />
+          </ComboBox>
+        </Control>
 
+        <Control Id="SqConfirmTime_label"  Type="Text"     X="190" Y="192" Width="100" Height="18" TabSkip="no" Text="Tiempo Confirmacion RX" />
+        <Control Id="SqConfirmTime_value"  Type="ComboBox" X="300" Y="190" Width="50"  Height="18" Property="TIMESPRX" ComboList="yes" >
+          <ComboBox  Property="TIMESPRX">
+            <ListItem Value="0"  Text="No" />
+            <ListItem Value="500"  Text="500 ms" />
+            <ListItem Value="1000" Text="1   seg." />
+            <ListItem Value="1500" Text="1.5 seg." />
+            <ListItem Value="2000" Text="2   seg." />
+          </ComboBox>
+        </Control>
 
+        <!---->
         <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
         <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
         <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)" />

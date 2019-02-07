@@ -63,6 +63,8 @@ namespace HMI.Model.Module.Constants
         public const string SiteManagerChanged = "SiteManagerChanged";
         public const string SiteChanged = "SiteChanged";
         public const string ChangeTlfSpeaker = "ChangeTlfSpeaker";
+        /** 20190205 */
+        public const string TxInProgressError = "RtxInProgressError";
         #endregion
 
 		#region Presentation Events

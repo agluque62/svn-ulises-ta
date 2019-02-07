@@ -209,8 +209,10 @@ namespace HMI.Model.Module.Messages
         public readonly string QidxMethod;
         public readonly uint QidxValue;
         public readonly string QidxResource;
+        /** 20190205 RTX Information */
+        public readonly string PttSrcId;
 
-		public RdState(bool tx, bool rx, PttState ptt, SquelchState squelch, RdRxAudioVia audioVia, int rtxGroup, FrequencyState state,
+		public RdState(bool tx, bool rx, string pttSrcId, PttState ptt, SquelchState squelch, RdRxAudioVia audioVia, int rtxGroup, FrequencyState state,
             string qidxMethod, uint qidxValue, string qidxResource)
 		{
 			Tx = tx;
@@ -224,6 +226,8 @@ namespace HMI.Model.Module.Messages
             QidxMethod = qidxMethod;
             QidxValue = qidxValue;
             QidxResource = qidxResource;
+
+            PttSrcId = pttSrcId;
         }
 
 		public override string ToString()
