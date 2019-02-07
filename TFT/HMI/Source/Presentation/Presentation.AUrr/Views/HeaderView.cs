@@ -133,6 +133,11 @@ namespace HMI.Presentation.AUrr.Views
             _UrrBrightnessUDB.Enabled = _BrightnessEnabled;
 
             _InfoBT.Text = _Info;   // Miguel
+
+            if (_StateManager.Brightness.Open == false)
+            {
+                _UrrBrightnessUDB.Hide();
+            }
         }
 
         [EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]

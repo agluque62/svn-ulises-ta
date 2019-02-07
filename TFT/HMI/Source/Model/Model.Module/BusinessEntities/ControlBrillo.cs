@@ -18,6 +18,10 @@ namespace HMI.Model.Module.BusinessEntities
             mclass = new ManagementClass("WmiMonitorBrightnessMethods");
             mclass.Scope = new ManagementScope(@"\\.\root\wmi");
             instances = mclass.GetInstances();
+            if (instances == null || instances.Count==0)
+            {
+                throw new ApplicationException("Control de Brillo 2 incompatible con la maquina");
+            }
         }
 
         /// <summary>

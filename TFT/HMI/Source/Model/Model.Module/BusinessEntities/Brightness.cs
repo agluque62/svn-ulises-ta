@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Microsoft.Practices.CompositeUI.EventBroker;
@@ -152,6 +153,8 @@ namespace HMI.Model.Module.BusinessEntities
 				int min = Settings.Default.BrightnessMin;
 				int level = Settings.Default.BrightnessLevel;
 
+                if (level > 0)
+                {
 				if (max < min)
 				{
 					int tmp = max;
@@ -199,17 +202,18 @@ namespace HMI.Model.Module.BusinessEntities
                 {
                     _Open = true;
                 }
-
+                    else
+                    {
+                        throw new ApplicationException("Ocultar Control Brillo");
+                    }
+                }
 				Level = level;
 			}
 			catch (Exception ex)
 			{
 				_Logger.Error(Resources.BrightnessError + ": " + ex.Message);
-                if (ex.Message == "Incompatible ")
-                {
-                    Level = -1;
+                _Open = false;
                     General.SafeLaunchEvent(BrightnessLevelChanged, this);
-                }
 			}
 		}
 
