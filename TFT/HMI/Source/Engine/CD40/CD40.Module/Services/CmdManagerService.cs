@@ -151,7 +151,7 @@ namespace HMI.CD40.Module.Services
 		public event EventHandler<RangeMsg<LcState>> LcPosStateEngine;
 
 		[EventPublication(EventTopicNames.TransferStateEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<TransferState>> TransferStateEngine;
+		public event EventHandler<StateMsg<FunctionState>> TransferStateEngine;
 
 		//[EventPublication(EventTopicNames.IntrudedByEngine, PublicationScope.Global)]
 		//public event EventHandler<StateMsg<string>> IntrudedByEngine;
@@ -160,7 +160,7 @@ namespace HMI.CD40.Module.Services
 		//public event EventHandler<StateMsg<string>> InterruptedByEngine;
 
 		[EventPublication(EventTopicNames.ListenStateEngine, PublicationScope.Global)]
-		public event EventHandler<ListenMsg> ListenStateEngine;
+		public event EventHandler<ListenPickUpMsg> ListenStateEngine;
 
 		[EventPublication(EventTopicNames.HangToneStateEngine, PublicationScope.Global)]
 		public event EventHandler<StateMsg<bool>> HangToneStateEngine;
@@ -175,7 +175,7 @@ namespace HMI.CD40.Module.Services
 		//public event EventHandler<EventArgs<string>> HideNotifMsgEngine;
 
 		[EventPublication(EventTopicNames.RemoteListenStateEngine, PublicationScope.Global)]
-		public event EventHandler<ListenMsg> RemoteListenStateEngine;
+		public event EventHandler<ListenPickUpMsg> RemoteListenStateEngine;
 
 		[EventPublication(EventTopicNames.ConfListEngine, PublicationScope.Global)]
 		public event EventHandler<RangeMsg<string>> ConfListEngine;
@@ -206,9 +206,21 @@ namespace HMI.CD40.Module.Services
         [EventPublication(EventTopicNames.SiteChangedResultEngine, PublicationScope.Global)]
         public event EventHandler<StateMsg<string>> SiteChangedResultEngine;
 
+        [EventPublication(EventTopicNames.PickUpStateEngine, PublicationScope.Global)]
+        public event EventHandler<ListenPickUpMsg> PickUpStateEngine;
+
+        [EventPublication(EventTopicNames.ForwardStateEngine, PublicationScope.Global)]
+        public event EventHandler<ListenPickUpMsg> ForwardStateEngine;
+
+        [EventPublication(EventTopicNames.RemoteForwardStateEngine, PublicationScope.Global)]
+        public event EventHandler<ListenPickUpMsg> RemoteForwardStateEngine;
+
+        [EventPublication(EventTopicNames.RedirectedCallEngine, PublicationScope.Global)]
+        public event EventHandler<PositionIdMsg> RedirectedCallEngine;
+
         #endregion
 
-		public void Run()
+        public void Run()
 		{
 			try
 			{
@@ -243,6 +255,10 @@ namespace HMI.CD40.Module.Services
                     Top.Tlf.Listen.ListenChanged += OnListenChanged;
                     Top.Tlf.Listen.RemoteListenChanged += OnRemoteListenChanged;
                     Top.Tlf.Listen.SetSnmpString += OnSetSnmpString;
+                    Top.Tlf.PickUp.PickUpChanged += OnPickUpChanged;
+                    Top.Tlf.PickUp.SipMessageReceived += OnSipMessageReceived;
+                    Top.Tlf.PickUp.PickUpError += OnFunctionError;
+                    Top.Tlf.PickUp.SetSnmpString += OnSetSnmpString;
                     Top.Tlf.CompletedIntrusion += OnCompletedIntrusion;
                     Top.Tlf.IntrudeToStateEngine += OnIntrudeToStateEngine;
                     Top.Tlf.BegeningIntrudeTo += OnBeginingIntrudeTo;
@@ -250,6 +266,11 @@ namespace HMI.CD40.Module.Services
                     Top.Tlf.SetSnmpString += OnSetSnmpString;
                     Top.Tlf.SendSnmpTrapString += OnSendSnmpTrapString;
                     Top.Tlf.HistoricalOfLocalCallsEngine += OnLoadHistoricalOfLocalCalls;
+                    Top.Tlf.RedirectedCall += OnRedirectedCall;
+                    Top.Tlf.Forward.ForwardChanged += OnForwardChanged;
+                    Top.Tlf.Forward.RemoteForwardChanged += OnRemoteForwardChanged;
+                    Top.Tlf.Forward.ForwardError += OnFunctionError;
+                    Top.Tlf.Forward.SetSnmpString += OnSetSnmpString;
                 }
                 if (Top.Lc != null)
                 {
@@ -778,7 +799,13 @@ namespace HMI.CD40.Module.Services
 				}
 			});
 		}
-
+        /// <summary>
+        /// Llamada desde teclado o AI
+        /// La prioridad sólo se gestiona para prefijos 0 y 3 (destinos ATS)
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="prio"></param>
+        /// <param name="literal"></param>
         public void BeginTlfCall(string number, bool prio, string literal)
 		{
 			Top.WorkingThread.Enqueue("BeginTlfCall", delegate()
@@ -795,6 +822,8 @@ namespace HMI.CD40.Module.Services
 
                     if (TryParseNumber(number, out prefix, out dst, ref literal))
 					{
+                        if ((prefix != Cd40Cfg.ATS_DST) && (prefix != Cd40Cfg.INT_DST))
+                            prio = false;
                         Top.Tlf.Call(prefix, dst, number, prio, literal);
 					}
 				}
@@ -818,12 +847,12 @@ namespace HMI.CD40.Module.Services
                     uint prefix;
                     string dst;
 
-                    if (TryParseNumber(number, out prefix, out dst, ref literal))
+                    if (TryParseNumber(number, out prefix, out dst, ref literal, false))
                     {
-                        //Reutilizo los datos de la tecla
-                        Top.Tlf.Call(id, prio);
-                        
+                         Top.Tlf.Call(prefix, dst, number, prio, literal);
                     }
+                    else
+                        Top.Tlf.Call(id, prio);
                 }
             });
         }
@@ -948,7 +977,7 @@ namespace HMI.CD40.Module.Services
                     if (!Top.Recorder.Briefing && !Top.Replay.Replaying)
                     {
 					    Top.Tlf.Listen.To(id);
-					    if (Top.Tlf.Listen.State == ListenState.Error && _ListenOperationTone == 0)
+					    if (Top.Tlf.Listen.State == FunctionState.Error && _ListenOperationTone == 0)
 					    {
                             ListenToError();
 					    }
@@ -989,7 +1018,7 @@ namespace HMI.CD40.Module.Services
                         if (TryParseNumber(number, out prefix, out dst, ref lit))
                         {
                             Top.Tlf.Listen.To(prefix, dst, number);
-                            if (Top.Tlf.Listen.State == ListenState.Error && _ListenOperationTone == 0)
+                            if (Top.Tlf.Listen.State == FunctionState.Error && _ListenOperationTone == 0)
                             {
                                 ListenToError();
                             }
@@ -1008,7 +1037,7 @@ namespace HMI.CD40.Module.Services
 		{
 			Top.WorkingThread.Enqueue("CancelListen", delegate()
 			{
-				if (Top.Tlf.Listen.State == ListenState.Executing)
+				if (Top.Tlf.Listen.State == FunctionState.Executing)
 				{
 					Top.Tlf.Listen.Cancel(-1);
 				}
@@ -1019,7 +1048,7 @@ namespace HMI.CD40.Module.Services
 		{
 			Top.WorkingThread.Enqueue("RecognizeListenState", delegate()
 			{
-				if (Top.Tlf.Listen.State == ListenState.Error)
+				if (Top.Tlf.Listen.State == FunctionState.Error)
 				{
 					Top.Tlf.Listen.Cancel(-1);
 				}
@@ -1040,6 +1069,116 @@ namespace HMI.CD40.Module.Services
 				}
 			});
 		}
+
+        public void PreparePickUp(int id)
+        {
+            Top.WorkingThread.Enqueue("PreparePickUp", delegate()
+            {
+                if (AllowTlf())
+                    if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite iniciar el pickUp
+                    {
+                        Top.Tlf.PickUp.Prepare(id);
+                    }
+                    else
+                    {
+                        NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    }
+            });
+        }
+
+        public void PreparePickUp(string number)
+        {
+             Top.WorkingThread.Enqueue("PreparePickUp", delegate()
+            {
+                if (AllowTlf())
+                    if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite iniciar el pickUp
+                    {
+                        uint prefix;
+                        string dst,lit= null;
+
+                        if (TryParseNumber(number, out prefix, out dst, ref lit))
+                        {
+                            Top.Tlf.PickUp.Prepare(prefix, dst, number, lit);
+                        }
+                    }
+                    else
+                    {
+                        NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    }
+            });
+        }
+        public void PickUp(int id)
+        {
+             Top.WorkingThread.Enqueue("PickUp", delegate()
+            {
+                if (AllowTlf())
+                    if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite iniciar el pickUp
+                    {
+                        Top.Tlf.PickUp.Capture(id);
+                    }
+                    else
+                    {
+                        NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    }
+            });
+        }
+
+        public void CancelPickUp()
+        {
+            Top.WorkingThread.Enqueue("PickUp", delegate()
+            {
+                Top.Tlf.PickUp.Cancel();
+            });
+        }
+        public void PrepareForward(int id)
+        {
+            Top.WorkingThread.Enqueue("Forward", delegate ()
+            {
+                if (AllowTlf())
+                    if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite iniciar el pickUp
+                    {
+                        Top.Tlf.Forward.Prepare(id);
+                    }
+                    else
+                    {
+                        NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    }
+            });
+        }
+
+        public void PrepareForward(string number)
+        {
+            Top.WorkingThread.Enqueue("Forward", delegate ()
+            {
+                if (AllowTlf())
+                    if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite iniciar el pickUp
+                    {
+                        uint prefix;
+                        string dst, lit = null;
+
+                        if (TryParseNumber(number, out prefix, out dst, ref lit))
+                        {
+                            Top.Tlf.Forward.Prepare(prefix, dst, number, lit);
+                        }
+                    }
+                    else
+                    {
+                        NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    }
+            });
+        }
+        public void CancelForward()
+        {
+            Top.WorkingThread.Enqueue("Forward", delegate ()
+            {
+                Top.Tlf.Forward.Cancel(false);
+            });
+        }
 
         /// <summary>
         /// Funcion pra gestionar el aparcado por colisión con PTT o LC
@@ -1126,7 +1265,7 @@ namespace HMI.CD40.Module.Services
 		{
 			Top.WorkingThread.Enqueue("CancelTransfer", delegate()
 			{
-				if (Top.Tlf.Transfer.State == TransferState.Executing)
+				if (Top.Tlf.Transfer.State == FunctionState.Executing)
 				{
 					Top.Tlf.Transfer.Cancel();
 				}
@@ -1137,7 +1276,7 @@ namespace HMI.CD40.Module.Services
 		{
 			Top.WorkingThread.Enqueue("RecognizeTransferState", delegate()
 			{
-				if (Top.Tlf.Transfer.State == TransferState.Error)
+				if (Top.Tlf.Transfer.State == FunctionState.Error)
 				{
 					Top.Tlf.Transfer.Cancel();
 				}
@@ -1343,15 +1482,15 @@ namespace HMI.CD40.Module.Services
 
 		private void OnTransferChanged(object sender)
 		{
-			TransferState st = Top.Tlf.Transfer.State;
+			FunctionState st = Top.Tlf.Transfer.State;
 
 			Top.PublisherThread.Enqueue(EventTopicNames.TransferStateEngine, delegate()
 			{
-				General.SafeLaunchEvent(TransferStateEngine, this, new StateMsg<TransferState>(st));
+				General.SafeLaunchEvent(TransferStateEngine, this, new StateMsg<FunctionState>(st));
 			});
 		}
 
-		private void OnListenChanged(object sender, ListenMsg msg)
+		private void OnListenChanged(object sender, ListenPickUpMsg msg)
 		{
 			Top.PublisherThread.Enqueue(EventTopicNames.ListenStateEngine, delegate()
 			{
@@ -1359,7 +1498,7 @@ namespace HMI.CD40.Module.Services
 			});
 		}
 
-		private void OnRemoteListenChanged(object sender, ListenMsg msg)
+		private void OnRemoteListenChanged(object sender, ListenPickUpMsg msg)
 		{
 			Top.PublisherThread.Enqueue(EventTopicNames.RemoteListenStateEngine, delegate()
 			{
@@ -1367,12 +1506,64 @@ namespace HMI.CD40.Module.Services
 			});
 		}
 
-		private void OnNewTlfPositions(object sender, RangeMsg<TlfInfo> tlfPositions)
+        private void OnPickUpChanged(object sender, ListenPickUpMsg msg)
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.PickUpStateEngine, delegate()
+            {
+                General.SafeLaunchEvent(PickUpStateEngine, this, msg);
+            });
+        }
+
+        private void OnSipMessageReceived(object sender, string textMsg)
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+            {
+                NotifMsg msg = new NotifMsg("SipMessage", Resources.Info, textMsg, 20000, MessageType.Information, MessageButtons.Ok);
+                General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+            });
+        }
+        private void OnFunctionError(object sender, string textMsg)
+        {
+            int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
+            Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+            Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+            {
+                NotifMsg msg = new NotifMsg("PickUpError", Resources.Info, textMsg, 20000, MessageType.Error, MessageButtons.Ok);
+                General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+            });
+            Wait(500);
+            Top.Mixer.Unlink(_BadOperationTone);
+            SipAgent.DestroyWavPlayer(_BadOperationTone);
+        }
+
+        private void OnRedirectedCall(object sender, PositionIdMsg position)
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.ForwardStateEngine, delegate ()
+            {
+                General.SafeLaunchEvent(RedirectedCallEngine, this, position);
+            });
+        }
+        private void OnForwardChanged(object sender, ListenPickUpMsg msg)
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.ForwardStateEngine, delegate()
+            {
+                General.SafeLaunchEvent(ForwardStateEngine, this, msg);
+            });
+        }
+        private void OnRemoteForwardChanged(object sender, ListenPickUpMsg remoteName)
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.RemoteForwardStateEngine, delegate ()
+            {
+                General.SafeLaunchEvent(RemoteForwardStateEngine, this, remoteName);
+            });
+        }
+
+        private void OnNewTlfPositions(object sender, RangeMsg<TlfInfo> tlfPositions)
 		{
 			Top.PublisherThread.Enqueue(EventTopicNames.TlfInfoEngine, delegate()
-			{
+            {
 				General.SafeLaunchEvent(TlfInfoEngine, this, tlfPositions);
-			});
+            });
 		}
 
 		private void OnTlfPositionsChanged(object sender, RangeMsg<TlfState> tlfStates)
@@ -1916,7 +2107,6 @@ namespace HMI.CD40.Module.Services
 		{
 			prefix = uint.MaxValue;
 			dst = null;
-            string givenLit = lit;
 
 			if (number.Length > 2)
 			{
@@ -1932,13 +2122,8 @@ namespace HMI.CD40.Module.Services
 						case Cd40Cfg.INT_DST:
 						case Cd40Cfg.PP_DST:
 						case Cd40Cfg.IP_DST:
-                            return true;
                         case Cd40Cfg.UNKNOWN_DST:
-                            //Este prefijo procede una tecla si viene con literal y se admite.
-                            //Si viene del keypad, no se admite, debe dar número erróneo.
-                            if (givenLit != null)
-                               return true;
-                            break;
+							return true;
 						default:
 							if (Top.Cfg.ExistNet(prefix, dst))
 							{

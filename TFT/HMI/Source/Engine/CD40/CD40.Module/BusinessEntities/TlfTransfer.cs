@@ -13,12 +13,16 @@ using NLog;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
+#if DEBUG
+    public class TlfTransfer
+#else
 	class TlfTransfer
-	{
+#endif
+    {
 		public event GenericEventHandler StateChanged;
 		public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
 
-		public TransferState State
+		public FunctionState State
 		{
 			get { return _State; }
 			private set
@@ -38,27 +42,27 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				if (_AssociateCall != null)
 				{
-					_AssociateCall.StateChanged -= OnAssociateCallStateChanged;
+					_AssociateCall.TlfPosStateChanged -= OnAssociateCallStateChanged;
 					_AssociateCall = null;
 				}
 
 				if (value != null)
 				{
 					_AssociateCall = value;
-					_AssociateCall.StateChanged += OnAssociateCallStateChanged;
+					_AssociateCall.TlfPosStateChanged += OnAssociateCallStateChanged;
 				}
 			}
 		}
 
 		public void Cancel()
 		{
-			if (_State == TransferState.Executing)
+			if (_State == FunctionState.Executing)
 			{
 				AssociateCall = null;
 				Top.Sip.TlfTransferStatus -= OnTransferStatus;
 			}
 
-			State = TransferState.Idle;
+			State = FunctionState.Idle;
 		}
 
 		public void To(int id)
@@ -66,10 +70,10 @@ namespace HMI.CD40.Module.BusinessEntities
             _FirstTransferTryKO = false;
             _ToTransfer = null;
             _FromTransferDisplayName = "";
-            if (_State == TransferState.Idle)
+            if (_State == FunctionState.Idle)
 			{
 				List<TlfPosition> activeCalls = Top.Tlf.ActiveCalls;
-				TransferState st = TransferState.Error;
+				FunctionState st = FunctionState.Error;
 
 				if (activeCalls.Count == 1)
 				{
@@ -107,7 +111,7 @@ namespace HMI.CD40.Module.BusinessEntities
                             Top.Sip.TlfTransferStatus += OnTransferStatus;
                             AssociateCall = tlf;
 
-                            st = TransferState.Executing;
+                            st = FunctionState.Executing;
 
                             Top.WorkingThread.Enqueue("SetSnmp", delegate()
                             {
@@ -127,10 +131,10 @@ namespace HMI.CD40.Module.BusinessEntities
             _FirstTransferTryKO = false;
             _ToTransfer = null;
             _FromTransferDisplayName = "";
-            if (_State == TransferState.Idle)
+            if (_State == FunctionState.Idle)
 			{
 				List<TlfPosition> activeCalls = Top.Tlf.ActiveCalls;
-				TransferState st = TransferState.Error;
+				FunctionState st = FunctionState.Error;
 
 				if (activeCalls.Count == 1)
 				{
@@ -151,7 +155,7 @@ namespace HMI.CD40.Module.BusinessEntities
 							Top.Sip.TlfTransferStatus += OnTransferStatus;
 
 							AssociateCall = tlf;
-							st = TransferState.Executing;
+							st = FunctionState.Executing;
 
 							Top.WorkingThread.Enqueue("SetSnmp", delegate()
 							{
@@ -170,7 +174,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		private static Logger _Logger = LogManager.GetCurrentClassLogger();
 
-		private TransferState _State = TransferState.Idle;
+		private FunctionState _State = FunctionState.Idle;
 		private TlfPosition _AssociateCall = null;
 
         //Cuando falla una transferencia atendida en un sentido, se intenta en el sentido contrario
@@ -183,7 +187,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		private void OnAssociateCallStateChanged(object sender)
 		{
-			Debug.Assert(_State == TransferState.Executing);
+			Debug.Assert(_State == FunctionState.Executing);
 			Debug.Assert(sender == _AssociateCall);
 
 			switch (_AssociateCall.State)
@@ -211,7 +215,7 @@ namespace HMI.CD40.Module.BusinessEntities
 					_AssociateCall.HangUp(0);
 				}
 				Top.Sip.TlfTransferStatus -= OnTransferStatus;
-				State = TransferState.Idle;
+				State = FunctionState.Idle;
                 _ToTransfer = null;
                 _FromTransferDisplayName = "";
 			}
@@ -228,7 +232,7 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 AssociateCall = null;
                 Top.Sip.TlfTransferStatus -= OnTransferStatus;
-                State = TransferState.Error;
+                State = FunctionState.Error;
                 _ToTransfer = null;
                 _FromTransferDisplayName = "";
             }

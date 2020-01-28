@@ -98,7 +98,7 @@ namespace HMI.Presentation.AUrr.Views
                     (_StateManager.Radio.GetNumFrAvalilablesForRtx(_urrRdPageButton.Page * _NumPositionsByPage, _NumPositionsByPage) > 1);
             }
         }
-        
+
         private bool _RdPageEnabled
         {
             get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative && !_StateManager.Radio.PttOn; }
@@ -168,16 +168,10 @@ namespace HMI.Presentation.AUrr.Views
             _UrrRdHeadPhonesUDB.Enabled = _RdHeadPhonesEnabled;
             _PttBT.Enabled = _PttEnabled;
             _RtxBT.Enabled = _RtxEnabled;
-            //_RdPageBT.Enabled = _RdPageEnabled;
             _urrRdPageButton.Enabled = false; //_RdPageEnabled;
             _UrrUpPageBT.Enabled = _RdPageEnabled;
             _UrrDownPageBT.Enabled = _RdPageEnabled;
 
-            //_RtxBT.Text = _Rtx; // Miguel
-
-            // Para Enaire no hay recuperación de estados de asignación
-            // 26/01/2017
-            //RecuperaEstadoAsignacionFrecuencias();
         }
 
         [EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
@@ -188,7 +182,6 @@ namespace HMI.Presentation.AUrr.Views
             _UrrRdHeadPhonesUDB.Enabled = _RdHeadPhonesEnabled;
             _PttBT.Enabled = _PttEnabled;
             _RtxBT.Enabled = _RtxEnabled;
-            //_RdPageBT.Enabled = _RdPageEnabled;
             _urrRdPageButton.Enabled = false;//_RdPageEnabled;
             _UrrUpPageBT.Enabled = _RdPageEnabled;
             _UrrDownPageBT.Enabled = _RdPageEnabled;
@@ -231,7 +224,6 @@ namespace HMI.Presentation.AUrr.Views
         {
             _PttBT.ButtonColor = _StateManager.Radio.PttOn ? HMI.Presentation.AUrr.UI.VisualStyle.Colors.StrongGreen : HMI.Presentation.AUrr.UI.VisualStyle.ButtonColor;
             _RtxBT.Enabled = _RtxEnabled;
-            //_RdPageBT.Enabled = _RdPageEnabled;
             _urrRdPageButton.Enabled = false;//_RdPageEnabled;
             _UrrUpPageBT.Enabled = _RdPageEnabled;
             _UrrDownPageBT.Enabled = _RdPageEnabled;
@@ -249,7 +241,6 @@ namespace HMI.Presentation.AUrr.Views
             //_urrRdPageButton.Enabled = _RdPageEnabled;
             //_UrrUpPageBT.Enabled = _RdPageEnabled;
             //_UrrDownPageBT.Enabled = _RdPageEnabled;
-
         }
 
         [EventSubscription(EventTopicNames.SiteChanged, ThreadOption.Publisher)]
@@ -265,7 +256,6 @@ namespace HMI.Presentation.AUrr.Views
                 Reset(bt, dst);
             }
         }
-
 
         [EventSubscription(EventTopicNames.RtxChanged, ThreadOption.Publisher)]
         public void OnRtxChanged(object sender, EventArgs e)
@@ -327,9 +317,6 @@ namespace HMI.Presentation.AUrr.Views
                 Reset(bt, dst, ref estado);
             }
 
-            //Settings.Default.Save();
-            // Fin modificación 26/01/2017
-
             _RtxBT.Enabled = _RtxEnabled;
         }
 
@@ -354,38 +341,39 @@ namespace HMI.Presentation.AUrr.Views
             }
         }
 
-        private void RecuperaEstadoAsignacionFrecuencias()
-        {
-            int absPageBegin = _urrRdPageButton.Page * _NumPositionsByPage;
+        /** Esta funcion se ha trasladado al Model Module */
+        //private void RecuperaEstadoAsignacionFrecuencias()
+        //{
+        //    int absPageBegin = _urrRdPageButton.Page * _NumPositionsByPage;
 
-            for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
-            {
-                if (i < Settings.Default.AssignatedStates.Count)
-                {
-                    string[] estado = Settings.Default.AssignatedStates[i].Split(',');
+        //    for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
+        //    {
+        //        if (i < Settings.Default.AssignatedStates.Count)
+        //        {
+        //            string[] estado = Settings.Default.AssignatedStates[i].Split(',');
 
-                    EstadoAsignacion eAsignacion = new EstadoAsignacion();
+        //            EstadoAsignacion eAsignacion = new EstadoAsignacion();
 
-                    eAsignacion._Rx = estado[1] == "True";
-                    eAsignacion._Tx = estado[2] == "True";
-                    switch (estado[3])
-                    {
-                        case "HeadPhones":
-                            eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
-                            break;
-                        case "Speaker":
-                            eAsignacion._AudioVia = RdRxAudioVia.Speaker;
-                            break;
-                        case "NoAudio":
-                            eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
-                            break;
-                    }
+        //            eAsignacion._Rx = estado[1] == "True";
+        //            eAsignacion._Tx = estado[2] == "True";
+        //            switch (estado[3])
+        //            {
+        //                case "HeadPhones":
+        //                    eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
+        //                    break;
+        //                case "Speaker":
+        //                    eAsignacion._AudioVia = RdRxAudioVia.Speaker;
+        //                    break;
+        //                case "NoAudio":
+        //                    eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
+        //                    break;
+        //            }
 
-                    _EstadosAsignacion[i - absPageBegin] = eAsignacion;
+        //            _EstadosAsignacion[i - absPageBegin] = eAsignacion;
 
-                }
-            }
-        }
+        //        }
+        //    }
+        //}
 
         private void Reset(UrrRdButton bt, RdDst dst, ref EstadoAsignacion estado)
         {
@@ -487,7 +475,6 @@ namespace HMI.Presentation.AUrr.Views
                         allAsOneBt = true;
                         title = _RtxBlinkOn ? HMI.Presentation.AUrr.UI.VisualStyle.Colors.Yellow : HMI.Presentation.AUrr.UI.VisualStyle.ButtonColor;
                         _RtxBlinkList[bt] = HMI.Presentation.AUrr.UI.VisualStyle.Colors.Yellow;
-                        //alias = (dst.TempAlias != string.Empty && dst.TempAlias != dst.Alias) ? dst.TempAlias : alias;
                     }
                     else if (dst.Rx)
                     {
@@ -855,7 +842,6 @@ namespace HMI.Presentation.AUrr.Views
             try
             {
                 _CmdManager.RdSiteManagerClick();
-                //_SiteManagerBT.ButtonColor = _StateManager.ManagingSite ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
 
                 int absPageBegin = _urrRdPageButton.Page * _NumPositionsByPage;
                 for (int i = 0; i < _NumPositionsByPage; i++)
@@ -1032,7 +1018,7 @@ namespace HMI.Presentation.AUrr.Views
                     //}
                     InGroupButtons.Where(p => p.Value.RtxGroup > 0 && p.Value.Squelch == SquelchState.NoSquelch).
                         ToList().ForEach(p1 =>
-                {
+                        {
                             p1.Key.setRtxErrorColor(false);
                         });
                     break;
@@ -1044,21 +1030,6 @@ namespace HMI.Presentation.AUrr.Views
             Invalidate(true);
         }
 
-        /*private void _UrrDownPageBT_DownClick(object sender)
-        {
-            int actualPage = _urrRdPageButton.Page;
-
-            try
-            {
-                _CmdManager.RdLoadPrevPage(actualPage, _NumPositionsByPage);
-            }
-            catch (Exception ex)
-            {
-                string msg = string.Format("ERROR solicitando pagina RD previa [Actual={0}]", actualPage);
-                _Logger.Error(msg, ex);
-            }
-        }
-        */
         private void _UrrUpPageBT_Click(object sender, EventArgs e)
         {
             int actualPage = _urrRdPageButton.Page;
@@ -1085,6 +1056,7 @@ namespace HMI.Presentation.AUrr.Views
                 _Logger.Error(msg, ex);
             }
         }
+
     }
 }
 

@@ -92,7 +92,7 @@ namespace HMI.Presentation.Urr.Views
             // _UrrBrightnessUDB
             // 
             this._UrrBrightnessUDB.BackColor = System.Drawing.Color.Transparent;
-            this._UrrBrightnessUDB.DownImage = global::HMI.Presentation.Urr.Properties.Resources.UrrBrigthness1;
+            this._UrrBrightnessUDB.DownImage = global::HMI.Presentation.Urr.Properties.Resources.UrrBrigthness;
             this._UrrBrightnessUDB.Level = 1;
             this._UrrBrightnessUDB.Location = new System.Drawing.Point(627, 0);
             this._UrrBrightnessUDB.Name = "_UrrBrightnessUDB";
@@ -104,19 +104,19 @@ namespace HMI.Presentation.Urr.Views
             // _UrrBuzzerUDB
             // 
             this._UrrBuzzerUDB.BackColor = System.Drawing.Color.Transparent;
+            this._UrrBuzzerUDB.DownImage = global::HMI.Presentation.Urr.Properties.Resources.UrrBuzzer;
             this._UrrBuzzerUDB.Level = 1;
             this._UrrBuzzerUDB.Location = new System.Drawing.Point(518, 0);
             this._UrrBuzzerUDB.Name = "_UrrBuzzerUDB";
             this._UrrBuzzerUDB.Size = new System.Drawing.Size(114, 70);
             this._UrrBuzzerUDB.TabIndex = 9;
-            this._UrrBuzzerUDB.Visible = false;
             this._UrrBuzzerUDB.LevelDown += new System.EventHandler(this._BuzzerUDB_LevelDown);
             this._UrrBuzzerUDB.LevelUp += new System.EventHandler(this._BuzzerUDB_LevelUp);
             // 
             // _SplitUC
             // 
-            this._SplitUC.JackOff = global::HMI.Presentation.Urr.Properties.Resources.UrrJackOff1;
-            this._SplitUC.JackOn = global::HMI.Presentation.Urr.Properties.Resources.UrrJackOn1;
+            this._SplitUC.JackOff = global::HMI.Presentation.Urr.Properties.Resources.UrrJackOff;
+            this._SplitUC.JackOn = global::HMI.Presentation.Urr.Properties.Resources.UrrJackOn;
             this._SplitUC.Location = new System.Drawing.Point(215, 5);
             this._SplitUC.Margin = new System.Windows.Forms.Padding(0);
             this._SplitUC.Name = "_SplitUC";
@@ -136,7 +136,6 @@ namespace HMI.Presentation.Urr.Views
             this._InfoBT.Size = new System.Drawing.Size(54, 53);
             this._InfoBT.TabIndex = 2;
             this._InfoBT.Text = "INFO";
-            this._InfoBT.Visible = false;
             // 
             // HeaderView
             // 

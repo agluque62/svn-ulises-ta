@@ -114,7 +114,7 @@ namespace Utilities
         Queue<DataGram> _Datagrams;
         int _MaxReceiveThreads = 10;
         int _NumRecevieThreads;
-        bool _Disposed = false;
+        bool _Disposed;
 
         void Dispose(bool bDispose)
         {
@@ -125,12 +125,12 @@ namespace Utilities
                 if (bDispose)
                 {
                     _Udp.Close();
-                    //_Udp = null;
+                    _Udp = null;
 
                     lock (_Datagrams)
                     {
                         _Datagrams.Clear();
-                        //_Datagrams = null;
+                        _Datagrams = null;
                     }
                 }
             }
@@ -143,9 +143,7 @@ namespace Utilities
                 DataGram dg = new DataGram();
                 IPEndPoint client = new IPEndPoint(IPAddress.Any, 0);
                 bool processData = false;
- 
-                if (!_Disposed)
-                {
+
                 dg.Data = _Udp.EndReceive(ar, ref client);
                 dg.Client = client;
 
@@ -208,7 +206,6 @@ namespace Utilities
                         }
                     }
                 }
-            }
             }
             catch (Exception ex)
             {

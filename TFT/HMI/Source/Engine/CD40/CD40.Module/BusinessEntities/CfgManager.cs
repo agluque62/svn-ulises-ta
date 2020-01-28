@@ -12,7 +12,11 @@ using Utilities;
 using NLog;
 namespace HMI.CD40.Module.BusinessEntities
 {
+#if DEBUG
+    public class RsIdxType
+#else
     class RsIdxType
+#endif
     {
         public int indexToLine;
         public int ruta;
@@ -26,16 +30,49 @@ namespace HMI.CD40.Module.BusinessEntities
         }
     }
 
+#if DEBUG
+    public class TlfNet
+#else
 	class TlfNet
-	{
+#endif
+    {
 		public string Id;
 		public List<SipLine> Lines = new List<SipLine>();
 		public List<RsIdxType> RsTypes = new List<RsIdxType>();
 		public List<int> Routes = new List<int>();
 	}
 
+#if DEBUG
+    public class OperatorData
+#else
+	class OperatorData
+#endif
+    {
+        /// <summary>
+        /// PICT host name
+        /// </summary>
+        public string idHost;   
+        /// <summary>
+        /// sector name having in account if it's a group of sectors
+        /// </summary>
+        public string idGroupName;
+        /// <summary>
+        /// data of each sector
+        /// </summary>
+        public List <SectorData> sectorData = new List<SectorData> ();
+    }
+
+    public class SectorData
+    {
+        public string idUser;
+        public List<CfgRecursoEnlaceInterno> numberData = new List<CfgRecursoEnlaceInterno>();
+    }
+#if DEBUG
+    public class CfgManager
+#else
 	class CfgManager
-	{
+#endif
+    {
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
         private string STR_SECTOR_FS = "**FS**";
         private string STR_PUESTO_FS = "__FS__";
@@ -99,9 +136,13 @@ namespace HMI.CD40.Module.BusinessEntities
                     {
                         p |= Permissions.Replay;
                     }
+                    if (_UserCfg.User.TeclasDelSector.Captura)
+                        p |= Permissions.Capture;
+                    if (_UserCfg.User.TeclasDelSector.Redireccion)
+                        p |= Permissions.Forward;
                 }
 
-				return p;
+                return p;
 			}
 		}
 
@@ -131,8 +172,39 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 			}
 		}
-
-		public IEnumerable<CfgEnlaceInterno> AgLinks
+        public IEnumerable<CfgEnlaceInterno> MdTlfLinksPropios
+        {
+            get
+            {
+                if (_UserCfg != null)
+                {
+                    foreach (CfgEnlaceInterno link in _UserCfg.TlfLinks)
+                    {
+                        if (link.TipoEnlaceInterno == "MD" && link.Dominio == "PROPIO")
+                        {
+                            yield return link;
+                        }
+                    }
+                }
+            }
+        }
+        public IEnumerable<CfgEnlaceInterno> MdTlfLinksAjeno
+        {
+            get
+            {
+                if (_UserCfg != null)
+                {
+                    foreach (CfgEnlaceInterno link in _UserCfg.TlfLinks)
+                    {
+                        if (link.TipoEnlaceInterno == "MD" && link.Dominio == "AJENO")
+                        {
+                            yield return link;
+                        }
+                    }
+                }
+            }
+        }
+        public IEnumerable<CfgEnlaceInterno> AgLinks
 		{
 			get
 			{
@@ -241,53 +313,20 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public string GetHostIp(string hostId)
 		{
-			foreach (DireccionamientoIP host in _SystemCfg.PlanDireccionamientoIP)
-			{
-				if (string.Compare(host.IdHost, hostId, true) == 0)
-				{					
-                    return host.IpRed1;
+            return _SystemCfg.GetHostIp(hostId);
 				}
-			}
 
-			return null;
-		}
-
-		public string GetHostMainUser(string host)
+        public string GetMainUser(string host)
 		{
-			foreach (AsignacionUsuariosDominantesTV tv in _SystemCfg.PlanAsignacionUsuariosDominantes)
-			{
-				if (string.Compare(tv.IdHost, host, true) == 0)
-				{
-                    return tv.IdUsuario;
+            return _SystemCfg.GetMainUser(host);
 				}
-			}
-
-			return null;
-		}
 
         public string GetGwRsIp(string resourceId, out string gw)
 		{
-			gw = GetGwRsHost(resourceId);
-			if (gw != null)
-			{
-				return GetHostIp(gw);
-			}
-
-			return null;
-		}
-
-        // Devuelve la dirección del Proxy que está activa
-        public string GetProxyIpAddress(out string idEquipo)
-        {
-            idEquipo = string.Empty;
-
-            if (_MiScv != null)
-                return _MiScv.GetProxyIpAddress(out idEquipo);
-
-            return null;
+            return _SystemCfg.GetGwRsIp(resourceId, out gw);
         }
 
-        // Devuelve en end point del Proxy que está activa
+        // Devuelve la dirección del Proxy que está activa
         public string GetProxyIp(out string idEquipo)
         {
             idEquipo = string.Empty;
@@ -385,7 +424,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     else if ((recurso == null) &&
                         (host.TipoHost == Tipo_Elemento_HW.TEH_EXTERNO_TELEFONIA))
                     {
-                        recurso = lookForResourceExternal(id, ip, host);
+                            recurso = lookForResourceExternal(id, ip, host);
                     }
                     else if ((recurso == null) && (host.TipoHost == Tipo_Elemento_HW.TEH_TIFX))
                     {
@@ -398,18 +437,21 @@ namespace HMI.CD40.Module.BusinessEntities
 			return recurso;
 		}
 
-		public string GetUserHost(string userId)
-		{
-			foreach (AsignacionUsuariosTV tv in _SystemCfg.PlanAsignacionUsuarios)
-			{
-				if (string.Compare(tv.IdUsuario, userId, true) == 0)
-				{
-					return tv.IdHost;
-				}
-			}
+        public string GetUserHost(string name)
+        {
+            foreach (OperatorData oper in _Operators)
+            {
+                if (string.Compare(oper.idGroupName, name, true) == 0)
+                     return oper.idHost;
+                foreach (SectorData sector in oper.sectorData)
+                {
+                    if (string.Compare (sector.idUser, name, true) == 0)
+                        return oper.idHost;
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
         public AsignacionUsuariosTV GetUserTv(string userId)
         {
@@ -426,30 +468,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public List<StrNumeroAbonado> GetHostAddresses(string host)
 		{
-			List<StrNumeroAbonado> addresses = new List<StrNumeroAbonado>();
-
-			foreach (AsignacionUsuariosTV tv in _SystemCfg.PlanAsignacionUsuarios)
-			{
-				if (string.Compare(tv.IdHost, host, true) == 0)
-				{
-                    /* 
-                     * JCAM 06/10/2015
-                     * Se elimina de la lista los identificadores de usuario
-                     * para evitar que se registren en el proxy con el 
-                     * identificador y con el número de abonado
-					StrNumeroAbonado num = new StrNumeroAbonado();
-
-					num.Prefijo = 2;
-					num.NumeroAbonado = tv.IdUsuario;
-
-					addresses.Add(num);
-                     */
-					addresses.AddRange(GetNumerosAbonado(tv.IdUsuario));
+            return _SystemCfg.GetHostAddresses(host);
 				}
-			}
-
-			return addresses;
-		}
 
 		public string GetNumeroAbonado(string userId, uint prefix)
 		{
@@ -546,7 +566,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
                                 foreach (string trunk in ruta.ListaTroncales)
                                 {
-                                    foreach (PlanRecursos recurso in GetTrunkResources(trunk))
+                                    foreach (PlanRecursos recurso in _SystemCfg.GetTrunkResources(trunk))
                                     {
                                         Rs<GwTlfRs> rs = Top.Registry.GetRs<GwTlfRs>(recurso.IdRecurso);
                                         string rsIp = GetGwRsIp(recurso.IdRecurso, out idEquipo);
@@ -692,6 +712,10 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			return null;
 		}
+        public List<PlanRecursos> GetNetResources(uint prefix, string numero)
+        {
+            return _SystemCfg.GetNetResources(prefix, numero);
+        }
 
         public TlfNet GetIPNet(uint prefix, string number)
         {
@@ -700,33 +724,51 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 ulong num;
                 if (ulong.TryParse(number, out num))
+                {
                     // Se comprueba si existe un equipo externo con capacidad
                     // para dar servicio a números ATS, un encaminamiento tipo central IP
                     foreach (Scv scv in _OtrosScv.Values)
-                    if (scv.EsCentralIp && scv.IsInRangeScv(num))
-                    {
-                        net = new TlfNet();
-                        net.Id = "Net_ATS_IP_"+scv.Id;
-
-                        Rs<GwTlfRs> rs = Top.Registry.GetRs<GwTlfRs>(number);
-                        string ScvIp;
-                        if (rs.Content == null)
+                        if (scv.EsCentralIp && scv.IsInRangeScv(num))
                         {
-                            //Si el recurso no tiene contenido actualizado, lo creo con los datos de configuración (principal)
-                            GwTlfRs proxyRs = new GwTlfRs();
-                            string id;
-                            proxyRs.GwIp = ScvIp = scv.GetProxyIp(out id);
-                            rs.Reset(null, proxyRs);
+                            net = CreateIpNet(number, scv);
                         }
-                        else
-                            //Utilizo los datos del recurso (actualizado con el activo)
-                            ScvIp = ((GwTlfRs)rs.Content).GwIp;
-                        SipLine line = new SipLine(rs, ScvIp, true);
-                        net.Lines.Add(line);
-                        net.RsTypes.Add(new RsIdxType(net.Lines.Count - 1, 0, TipoInterface.TI_IP_PROXY));
-                        net.Routes.Add(0);
+                    //Puede ser el caso de una numeración que pertenece a mi SCV (y no sea un puesto de operación)
+                    if ((net == null) && _MiScv.EsCentralIp && _MiScv.IsInRangeScv(num))
+                    {
+                        net = CreateIpNet(number, _MiScv);
                     }
+                }
             }
+            return net;
+        }
+
+        private static TlfNet CreateIpNet(string number, Scv scv)
+        {
+            TlfNet net = new TlfNet();
+            net.Id = "Net_ATS_IP_" + scv.Id;
+
+            Rs<GwTlfRs> rs = Top.Registry.GetRs<GwTlfRs>(number);
+            string ScvIp;
+            if (rs.Content == null)
+            {
+                //Si el recurso no tiene contenido actualizado, la IP es de los datos de configuración (principal)                            
+                string id;
+                ScvIp = scv.GetProxyIp(out id);
+                if (rs.IsUnreferenced)
+                {
+                    //Para que recién creado por defecto aparezca sin aspa, le añado un recurso 
+                    GwTlfRs proxyRs = new GwTlfRs();
+                    proxyRs.GwIp = ScvIp;
+                    rs.Reset(null, proxyRs);
+                }
+            }
+            else
+                //Utilizo los datos del recurso (actualizado con el activo)
+                ScvIp = ((GwTlfRs)rs.Content).GwIp;
+            SipLine line = new SipLine(rs, ScvIp, true);
+            net.Lines.Add(line);
+            net.RsTypes.Add(new RsIdxType(net.Lines.Count - 1, 0, TipoInterface.TI_IP_PROXY));
+            net.Routes.Add(0);
             return net;
         }
 		public bool ExistNet(uint prefix, string number)
@@ -800,8 +842,10 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
 		#region Private Members
-
-		private bool _ResetUsuario;
+        /// <summary>
+        /// Flag que indica si el puesto de operador ha cambiado de usuario por configuración
+        /// </summary>
+		private bool _ResetUsuario = false;
 		private ConfiguracionSistema _SystemCfg;
 		private ConfiguracionUsuario _UserCfg;
         private List<PoolHfElement> _PoolHf;
@@ -809,12 +853,23 @@ namespace HMI.CD40.Module.BusinessEntities
         private Scv _MiScv;
         // La key es el id del Scv, para facilitar las búsquedas
         private Dictionary<string, Scv> _OtrosScv = new Dictionary<string,Scv>();
+        /// <summary>
+        /// Compact structure to optimize searchs of sectors o internal users.
+        /// Unifies data from queries DireccionamientoSIP and AsignacionUsuarios
+        /// Suitable for searches of groups of users                                                                                                                                                                                                                                                                                                                                                            º37t689
+        /// </summary>
+        private List<OperatorData> _Operators = new List<OperatorData>();
+
         private void OnProxyStateChangeCfg(object sender, bool state)
         {
             General.SafeLaunchEvent(ProxyStateChangeCfg, this, state);
         }
 
-		private void OnNewConfig(object sender, Cd40Cfg cfg)
+#if DEBUG
+    public void OnNewConfig(object sender, Cd40Cfg cfg)
+#else
+	private void OnNewConfig(object sender, Cd40Cfg cfg)
+#endif
 		{
 			string _idIdenticador = MainId;
 
@@ -837,15 +892,64 @@ namespace HMI.CD40.Module.BusinessEntities
              la configuracion de BDT, aunque si de la configuracion de SPREAD. */
             if (_UserCfg == null)
             {
-                _HostAddresses = GetHostAddresses(Top.HostId);
+                _HostAddresses = _SystemCfg.GetHostAddresses(Top.HostId);
                 ClearChildrenObjects();
             }
             else
             {
-                _HostAddresses = GetHostAddresses(Top.HostId);
+                _HostAddresses = _SystemCfg.GetHostAddresses(Top.HostId);
                 CreateChildrenObjects();                
             }
+            CreateOperatorsData();
             General.SafeLaunchEvent(ConfigChanged, this);
+        }
+        /// <summary>
+        /// Fills _Operators struct with  config received
+        /// </summary>
+        private void CreateOperatorsData()
+        {
+            OperatorData operatorTA = null;
+            List<OperatorData> operatorsCopy = new List<OperatorData>();
+
+            foreach (DireccionamientoSIP dirSip in _SystemCfg.PlanDireccionamientoSIP)
+            {
+                SectorData sector = new SectorData();
+                operatorTA = null;
+                foreach (StrNumeroAbonado num in dirSip.NumerosAbonadoQueAtiende)
+                {
+                    if (operatorTA == null)
+                    {
+                        operatorTA = operatorsCopy.Find(x => x.idGroupName.Equals(num.IdAgrupacion));
+                        if (operatorTA == null)
+                        {
+                            operatorTA = new OperatorData();
+                            operatorTA.idGroupName = num.IdAgrupacion;
+                            foreach (AsignacionUsuariosTV tv in _SystemCfg.PlanAsignacionUsuarios)
+                            {
+                                if ((tv.IdUsuario != STR_SECTOR_FS) && (tv.IdUsuario != STR_PUESTO_FS))
+                                {
+                                    if (tv.IdUsuario.Equals(dirSip.IdUsuario))
+                                    {
+                                        operatorTA.idHost = tv.IdHost;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    CfgRecursoEnlaceInterno cfg = new CfgRecursoEnlaceInterno();
+                    cfg.NombreRecurso = dirSip.IdUsuario;
+                    cfg.NumeroAbonado = num.NumeroAbonado;
+                    cfg.Prefijo = num.Prefijo;
+                    sector.numberData.Add(cfg);
+                    sector.idUser = dirSip.IdUsuario;
+                }
+                operatorTA.sectorData.Add(sector);
+                if (operatorsCopy.Contains(operatorTA) == false)
+                    operatorsCopy.Add(operatorTA);
+            }
+
+            _Operators = operatorsCopy;
         }
 
         /// <summary>
@@ -910,7 +1014,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		
         private ConfiguracionUsuario GetUserCfg(Cd40Cfg cfg)
 		{
-			string idUser = GetHostMainUser(Top.HostId);
+            string idUser = cfg.ConfiguracionGeneral.GetMainUser(Top.HostId);
 
 			if (!string.IsNullOrEmpty(idUser))
 			{
@@ -949,31 +1053,6 @@ namespace HMI.CD40.Module.BusinessEntities
 			return new List<StrNumeroAbonado>();
 		}
 
-		private string GetGwRsHost(string resourceId)
-		{
-			foreach (AsignacionRecursosGW gw in _SystemCfg.PlanAsignacionRecursos)
-			{
-				if (string.Compare(gw.IdRecurso, resourceId, true) == 0)
-				{
-					return gw.IdHost;
-				}
-			}
-
-			return null;
-		}
-
-		private List<PlanRecursos> GetTrunkResources(string trunkId)
-		{
-			foreach (ListaTroncales trunk in _SystemCfg.PlanTroncales)
-			{
-				if (string.Compare(trunk.IdTroncal, trunkId, true) == 0)
-				{
-					return trunk.ListaRecursos;
-				}
-			}
-
-			return new List<PlanRecursos>();
-		}
 
         /// <summary>
         /// Dado un user name y la ip (procedentes de una URI por ejemplo)
@@ -1022,7 +1101,7 @@ namespace HMI.CD40.Module.BusinessEntities
             CfgRecursoEnlaceInterno recurso = null;
             ulong resultNumber = 0;
 
-            if (SipUtilities.SipEndPoint.EqualSipEndPoint(_MiScv.GetProxyIp(out idEquipo),ip))
+            if (_MiScv.GetProxyIp(out idEquipo) == ip)
             //Pertenece a mi SCV
             {
                 //Es un TOP o un recurso de telefonía IP interno
@@ -1036,7 +1115,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 foreach (Scv scv in _OtrosScv.Values)
                 {
                     string ipAddScv = scv.GetProxyIp(out idEquipo);
-                    if ((scv.EsCentralIp) && (SipUtilities.SipEndPoint.EqualSipEndPoint(ipAddScv, ip)))
+                    if ((scv.EsCentralIp) && (ipAddScv == ip))
                     //Pertenece a otro SCV IP
                     {
                         try
@@ -1074,7 +1153,7 @@ namespace HMI.CD40.Module.BusinessEntities
             CfgRecursoEnlaceInterno recurso = null;
             if (host.Interno)
             {
-                if (SipUtilities.SipEndPoint.EqualSipEndPoint(ip, host.IpRed1))
+                if (ip == host.IpRed1)
                 //Pertenece a la centralita interna
                 {
                     recurso = new CfgRecursoEnlaceInterno();
@@ -1103,7 +1182,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         return null;
                     }
                 }
-                else if (SipUtilities.SipEndPoint.EqualSipEndPoint(ip, host.IpRed1))
+                else if (ip == host.IpRed1)
                 {
                     //Este es el caso de la telefonía de equipos externos a una PABX externa 
                     string nombreRecurso = null;
@@ -1177,13 +1256,14 @@ namespace HMI.CD40.Module.BusinessEntities
                     {
                         foreach (string trunk in ruta.ListaTroncales)
                         {
-                            foreach (PlanRecursos recInPlan in GetTrunkResources(trunk))
+                            foreach (PlanRecursos recInPlan in _SystemCfg.GetTrunkResources(trunk))
                             {
                                 if (string.Compare(recInPlan.IdRecurso, foundRsId, true) == 0)
                                 {
                                     recurso = new CfgRecursoEnlaceInterno();
                                     recurso.Prefijo = Cd40Cfg.ATS_DST;
                                     recurso.NumeroAbonado = id;
+                                    recurso.NombreRecurso = foundRsId;
                                     break;
                                 }
                             }
@@ -1200,6 +1280,17 @@ namespace HMI.CD40.Module.BusinessEntities
                 recurso.Interface = TipoInterface.TI_AB;
             }
             return recurso;
+        }
+
+        /// <summary>
+        /// Devuelve el nombre del host que contiene ese recurso
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        private string GetGwRsHost(string resourceId)
+        {
+            string[] hostId = _SystemCfg.GetGwRsHost(resourceId).Split(':');  // idHost:SipPort
+            return hostId[0];
         }
 
 		#endregion

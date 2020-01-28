@@ -50,6 +50,14 @@
     <Content Include="License.rtf" />
     <Content Include="PlanNumeracionEUROCONTROL.xls" />
     <Content Include="sfk.exe" />
+    <Content Include="TEAMVIEWER-START.xml" />
+    <Content Include="UV5K-HMI-START.xml" />
+    <Content Include="UV5K-WAUDIO-START.xml" />
+    <Content Include="uv5ki-scripts-del.cmd" />
+    <Content Include="uv5ki-scripts.cmd">
+      <Link>
+      </Link>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UtilExtension_en-US.wxl" />

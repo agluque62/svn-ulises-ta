@@ -43,8 +43,8 @@ namespace HMI.Presentation.Asecna.Views
 		private void InitializeComponent()
 		{
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TableLayoutPanel _RadioTLP;
             System.Windows.Forms.Panel _RadioHeadP;
+            this._RadioTLP = new System.Windows.Forms.TableLayoutPanel();
             this._RdHfSpeakerUDB = new HMI.Presentation.Asecna.UI.UpDownButton();
             this._RdPageBT = new HMI.Presentation.Asecna.UI.RdPageButton();
             this._RtxBT = new HMI.Model.Module.UI.HMIButton();
@@ -56,30 +56,27 @@ namespace HMI.Presentation.Asecna.Views
             this._PttBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SquelchBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._RtxBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            //this._TxConfirmationDetectionTimer = new System.Windows.Forms.Timer(this.components);
-            //this._CarrierDetectionTimer = new System.Windows.Forms.Timer(this.components);
-            _RadioTLP = new System.Windows.Forms.TableLayoutPanel();
             _RadioHeadP = new System.Windows.Forms.Panel();
-            _RadioTLP.SuspendLayout();
+            this._RadioTLP.SuspendLayout();
             _RadioHeadP.SuspendLayout();
             this.SuspendLayout();
             // 
             // _RadioTLP
             // 
-            _RadioTLP.ColumnCount = 1;
-            _RadioTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            _RadioTLP.Controls.Add(_RadioHeadP, 0, 0);
-            _RadioTLP.Controls.Add(this._RdButtonsTLP, 0, 1);
-            _RadioTLP.Controls.Add(this._SelCallWS, 0, 2);
-            _RadioTLP.Dock = System.Windows.Forms.DockStyle.Fill;
-            _RadioTLP.Location = new System.Drawing.Point(0, 0);
-            _RadioTLP.Name = "_RadioTLP";
-            _RadioTLP.RowCount = 3;
-            _RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 18F));
-            _RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 60F));
-            _RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 22F));
-            _RadioTLP.Size = new System.Drawing.Size(600, 470);
-            _RadioTLP.TabIndex = 0;
+            this._RadioTLP.ColumnCount = 1;
+            this._RadioTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._RadioTLP.Controls.Add(_RadioHeadP, 0, 0);
+            this._RadioTLP.Controls.Add(this._RdButtonsTLP, 0, 1);
+            this._RadioTLP.Controls.Add(this._SelCallWS, 0, 2);
+            this._RadioTLP.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._RadioTLP.Location = new System.Drawing.Point(0, 0);
+            this._RadioTLP.Name = "_RadioTLP";
+            this._RadioTLP.RowCount = 3;
+            this._RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 18F));
+            this._RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 60F));
+            this._RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 22F));
+            this._RadioTLP.Size = new System.Drawing.Size(600, 470);
+            this._RadioTLP.TabIndex = 0;
             // 
             // _RadioHeadP
             // 
@@ -228,22 +225,14 @@ namespace HMI.Presentation.Asecna.Views
             this._RtxBlinkTimer.Interval = 500;
             this._RtxBlinkTimer.Tick += new System.EventHandler(this._RtxBlinkTimer_Tick);
             // 
-            // _TxConfirmationDetectionTimer
-            // 
-            //this._TxConfirmationDetectionTimer.Tick += new System.EventHandler(this._TxConfirmationDetectionTimer_Tick);
-            // 
-            // _CarrierDetectionTimer
-            // 
-            //this._CarrierDetectionTimer.Tick += new System.EventHandler(this._CarrierDetectionTimer_Tick);
-            // 
             // RadioView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-            this.Controls.Add(_RadioTLP);
+            this.Controls.Add(this._RadioTLP);
             this.Name = "RadioView";
             this.Size = new System.Drawing.Size(600, 470);
             this.BackColorChanged += new System.EventHandler(this.RadioView_BackColorChanged);
-            _RadioTLP.ResumeLayout(false);
+            this._RadioTLP.ResumeLayout(false);
             _RadioHeadP.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -262,6 +251,7 @@ namespace HMI.Presentation.Asecna.Views
         private System.Windows.Forms.Timer _RtxBlinkTimer;
         private UI.UpDownButton _RdHfSpeakerUDB;
         private Microsoft.Practices.CompositeUI.WinForms.DeckWorkspace _SelCallWS;
+        private System.Windows.Forms.TableLayoutPanel _RadioTLP;
         //private System.Windows.Forms.Timer _TxConfirmationDetectionTimer;
         //private System.Windows.Forms.Timer _CarrierDetectionTimer;
 	}

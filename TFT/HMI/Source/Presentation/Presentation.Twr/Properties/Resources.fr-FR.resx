@@ -230,12 +230,21 @@
     <value>Mauvaise opération</value>
   </data>
   <data name="CarrierDetectionError" xml:space="preserve">
-    <value>Transporteur non trouvé</value>
+    <value>Transporteur non trouvé.</value>
   </data>
   <data name="TxConfirmationDetectionError" xml:space="preserve">
     <value>Transmission non confirmée</value>
   </data>
   <data name="TxFailure" xml:space="preserve">
     <value>Panne en transmission</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>Plus</value>
+  </data>
+  <data name="PickUp" xml:space="preserve">
+    <value>Capturer</value>
+  </data>
+  <data name="Forward" xml:space="preserve">
+    <value>Renvoi</value>
   </data>
 </root>

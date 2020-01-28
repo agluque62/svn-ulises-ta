@@ -6,7 +6,11 @@ using Utilities;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
-	abstract class Resource
+#if DEBUG
+    public abstract class Resource
+#else
+	public abstract class Resource
+#endif
 	{
 		public event GenericEventHandler Changed;
 		public event GenericEventHandler<short> NewMsg;
@@ -28,6 +32,9 @@ namespace HMI.CD40.Module.BusinessEntities
 			get { return (_Content != null); }
 		}
 
+        /// <summary>
+        /// Recurso creado, no actualizado aún por el Tifx
+        /// </summary>
 		public bool IsUnreferenced
 		{
 			get { return ((_ContainerId == null) && (Changed == null) && (NewMsg == null)); }
@@ -92,7 +99,11 @@ namespace HMI.CD40.Module.BusinessEntities
 		#endregion
 	}
 
+#if DEBUG
+    public class Rs<T> : Resource where T : class
+#else
 	class Rs<T> : Resource where T : class
+#endif
 	{
 		public T Info
 		{

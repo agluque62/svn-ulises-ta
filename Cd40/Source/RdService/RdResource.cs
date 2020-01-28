@@ -41,10 +41,8 @@ namespace U5ki.RdService
             /** 20170807 */
             public string site { get; set; }
 
-            public int cld_supervision_time { get; set; }
             public bool enable_event_pttsq { get; set; }
             public int offset_frequency { get; set; }
-            public string bss_method { get; set; }
 
             // Parametros de estado
             public int rx_rtp_port { get; set; }
@@ -60,8 +58,6 @@ namespace U5ki.RdService
                 zona = "##ZONA##";
                 site = "##SITE##";
 
-                cld_supervision_time = 1000;
-                bss_method = "RSSI";
                 rx_selected = false;
 
                 rx_rtp_port = 5062;
@@ -75,7 +71,7 @@ namespace U5ki.RdService
         /************************************************************************/
 
         public enum BssMethods {
-            Ninguno,RSSI,RSSI_NUCLEO
+            Ninguno,RSSI,RSSI_NUCLEO,CENTRAL
         };
 
         public Boolean IsForbidden { get; set; }
@@ -87,6 +83,13 @@ namespace U5ki.RdService
 		{
 			get { return (_SipCallSt == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED); }
 		}
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool Connecting
+        {
+            get { return (_SipCallSt == CORESIP_CallState.CORESIP_CALL_STATE_CONNECTING); }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -174,7 +177,7 @@ namespace U5ki.RdService
         ///  En los receptores este atributo no debe usarse (siempre tendrá el valor por defecto false)
         ///  Este parámetro de estado se hereda en M+N
         /// </summary>
-        public bool _TxMute = false;
+        private bool _TxMute = false;
         public bool TxMute
         {
             get { return _TxMute; }
@@ -216,7 +219,7 @@ namespace U5ki.RdService
             //JOI 201709 NEWRDRP FIN
 			
             if (new_params != null)
-                _New_params_ClBss = confParams;
+               _FreqParams = confParams;
 
 			for (_McastPort = Settings.Default.McastPortBegin; _Ports.ContainsKey(_McastPort); _McastPort++) ;
 			_Ports[_McastPort] = this;
@@ -262,7 +265,7 @@ namespace U5ki.RdService
         /// <param name="uri2"></param>
         /// <param name="type"></param>
         /// <param name="frecuency"></param>
-        public RdResource(string id, string uri1, string uri2, RdRsType type, string frecuency, string site, bool selected, RdFrecuency.NewRdFrequencyParams new_params, CfgRecursoEnlaceExterno rs)
+        public RdResource(string id, string uri1, string uri2, RdRsType type, string frecuency, string site, bool selected, RdFrecuency.NewRdFrequencyParams newFreqParams, CfgRecursoEnlaceExterno rs)
         {
             _Id = id;
             _Uri1 = seturi(uri1);
@@ -272,15 +275,14 @@ namespace U5ki.RdService
             _Site = site;
             _Selected = selected;
 
-            _New_params_ClBss = new_params;
+            _FreqParams = newFreqParams;
 
             for (_McastPort = Settings.Default.McastPortBegin; _Ports.ContainsKey(_McastPort); _McastPort++) ;
             _Ports[_McastPort] = this;
 
             _LastUri = _Uri1;
             _ToCheck = false;
-
-            SetNewRdResourceParams(rs);
+             SetNewRdResourceParams(rs);
                             
             Connect();
         }
@@ -343,16 +345,16 @@ namespace U5ki.RdService
         /// <summary>
         /// 
         /// </summary>
-		public void Connect()
+		public bool Connect()
 		{
             //20180509 JOI
             //if (MNManager.NodeInPoolForbidden(_Id) == true) //20180323 CONTROL M+N FORBIDDEN
               //  return;
             if ((_Uri1.Contains(_Id) == true) && (MNManager.NodeInPoolForbidden(_Id) == true))
-                return;
+                return false;
 
             if (IsForbidden)
-                return;
+                return false;
 
 			if (_SipCallId < 0 && SipAgent.IP != null)
 			{
@@ -362,10 +364,11 @@ namespace U5ki.RdService
 				
                 //EDU 20170223
                 _SipCallId = SipAgent.MakeRdCall(null, _LastUri, _Frecuency, flags, Settings.Default.McastIp, _McastPort,
-                    _New_params_ClBss.Priority, new_params.zona, _New_params_ClBss.FrequencyType,
-                    _New_params_ClBss.CLDCalculateMethod, _New_params_ClBss.BssWindows, _New_params_ClBss.AudioSync,
-                    _New_params_ClBss.AudioInBssWindow, _New_params_ClBss.NotUnassignable, new_params.cld_supervision_time, new_params.bss_method,
-                    0);
+                    _FreqParams.Priority, new_params.zona, _FreqParams.FrequencyType,
+                    _FreqParams.CLDCalculateMethod, _FreqParams.BssWindows, _FreqParams.AudioSync,
+                    _FreqParams.AudioInBssWindow, _FreqParams.NotUnassignable, _FreqParams.cld_supervision_time, 
+                    ((BssMethods)_FreqParams.MetodosBssOfrecidos).ToString(),
+                    _FreqParams.PorcentajeRSSI);
 
                 if (_SipCallId >= 0)
                     _SipCallSt = CORESIP_CallState.CORESIP_CALL_STATE_CONNECTING;
@@ -373,6 +376,7 @@ namespace U5ki.RdService
                 //WG67Subscribe(_Uri, true);
                 // LogManager.GetCurrentClassLogger().Debug("MakeRdCall para {0}", _Frecuency);
 			}
+            return true;
 		}
 
         /// <summary>
@@ -397,7 +401,7 @@ namespace U5ki.RdService
 		{
 			bool connected = Connected;
 
-			Reset();
+            Reset();
             /** 20180717. Para los codigos BYE de las sesiones RADIO */
             SipAgent.HangupCall(callId, SipAgent.WG67Reason_KATimeout);
 
@@ -553,10 +557,8 @@ namespace U5ki.RdService
             /** 20170807 */
             new_params.site = enlace.IdEmplazamiento;
 
-            new_params.cld_supervision_time = this._New_params_ClBss.cld_supervision_time;  // Se obtinene a partir del CLD de la frecuencia. enlace.CldSupervision;
             new_params.enable_event_pttsq = enlace.EnableEventPttSq;
             new_params.offset_frequency = enlace.OffSetFrequency;
-            new_params.bss_method = ((BssMethods)this._New_params_ClBss.MetodosBssOfrecidos).ToString();
         }
 		
         // JOI 201709 NEWRDRP INI
@@ -564,10 +566,8 @@ namespace U5ki.RdService
         {
             new_params.zona = newrRDRP.zona;
             new_params.site = newrRDRP.site;
-            new_params.cld_supervision_time = newrRDRP.cld_supervision_time;
             new_params.enable_event_pttsq = newrRDRP.enable_event_pttsq;
             new_params.offset_frequency = newrRDRP.offset_frequency;
-            new_params.bss_method = newrRDRP.bss_method;
         }
         // JOI 201709 NEWRDRP FIN
 		
@@ -703,7 +703,8 @@ namespace U5ki.RdService
             set { _Selected = value; }
         }
 
-        private RdFrecuency.NewRdFrequencyParams _New_params_ClBss = new RdFrecuency.NewRdFrequencyParams();    //EDU 20170223
+        //Parametros de la frecuencia
+        private RdFrecuency.NewRdFrequencyParams _FreqParams;// = new RdFrecuency.NewRdFrequencyParams();    //EDU 20170223
 
         /// <summary>
         /// 

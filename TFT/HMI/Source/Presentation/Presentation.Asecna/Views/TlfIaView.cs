@@ -61,14 +61,14 @@ namespace HMI.Presentation.Asecna.Views
 			get
 			{
 				if (!_StateManager.Tft.Enabled || /*!_StateManager.Engine.Operative ||*/
-					(_StateManager.Tlf.Priority.State == PriorityState.Error) ||
-					(_StateManager.Tlf.Listen.State == ListenState.Executing) || (_StateManager.Tlf.Listen.State == ListenState.Error) ||
-					(_StateManager.Tlf.Transfer.State == TransferState.Executing) || (_StateManager.Tlf.Transfer.State == TransferState.Error))
+					(_StateManager.Tlf.Priority.State == FunctionState.Error) ||
+					(_StateManager.Tlf.Listen.State == FunctionState.Executing) || (_StateManager.Tlf.Listen.State == FunctionState.Error) ||
+					(_StateManager.Tlf.Transfer.State == FunctionState.Executing) || (_StateManager.Tlf.Transfer.State == FunctionState.Error))
 				{
 					return false;
 				}
-				if ((_StateManager.Tlf.Listen.State == ListenState.Ready) ||
-					(_StateManager.Tlf.Transfer.State == TransferState.Ready) ||
+				if ((_StateManager.Tlf.Listen.State == FunctionState.Ready) ||
+					(_StateManager.Tlf.Transfer.State == FunctionState.Ready) ||
 					(_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] == 1))
 				{
 					return true;
@@ -89,14 +89,14 @@ namespace HMI.Presentation.Asecna.Views
 			get 
 			{ 
 				if (!_StateManager.Tft.Enabled || !_StateManager.Engine.Operative ||
-					(_StateManager.Tlf.Priority.State == PriorityState.Error) ||
-					(_StateManager.Tlf.Listen.State == ListenState.Executing) || (_StateManager.Tlf.Listen.State == ListenState.Error) ||
-					(_StateManager.Tlf.Transfer.State == TransferState.Executing) || (_StateManager.Tlf.Transfer.State == TransferState.Error))
+					(_StateManager.Tlf.Priority.State == FunctionState.Error) ||
+					(_StateManager.Tlf.Listen.State == FunctionState.Executing) || (_StateManager.Tlf.Listen.State == FunctionState.Error) ||
+					(_StateManager.Tlf.Transfer.State == FunctionState.Executing) || (_StateManager.Tlf.Transfer.State == FunctionState.Error))
 				{
 					return false;
 				}
-				if ((_StateManager.Tlf.Listen.State == ListenState.Ready) ||
-					(_StateManager.Tlf.Transfer.State == TransferState.Ready))
+				if ((_StateManager.Tlf.Listen.State == FunctionState.Ready) ||
+					(_StateManager.Tlf.Transfer.State == FunctionState.Ready))
 				{
 					return Tlf.ValidateNumber(_Keypad.Digits);
 				}
@@ -124,11 +124,11 @@ namespace HMI.Presentation.Asecna.Views
 			get
 			{
 				return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
-					(_StateManager.Tlf.Priority.State != PriorityState.Error) &&
-					(_StateManager.Tlf.Listen.State != ListenState.Executing) &&
-					(_StateManager.Tlf.Listen.State != ListenState.Error) &&
-					(_StateManager.Tlf.Transfer.State != TransferState.Error) &&
-					(_StateManager.Tlf.Transfer.State != TransferState.Executing) &&
+					(_StateManager.Tlf.Priority.State != FunctionState.Error) &&
+					(_StateManager.Tlf.Listen.State != FunctionState.Executing) &&
+					(_StateManager.Tlf.Listen.State != FunctionState.Error) &&
+					(_StateManager.Tlf.Transfer.State != FunctionState.Error) &&
+					(_StateManager.Tlf.Transfer.State != FunctionState.Executing) &&
 					(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.In) &&
 					(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.InPrio) &&
 					(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.RemoteIn);
@@ -220,7 +220,7 @@ namespace HMI.Presentation.Asecna.Views
 			{
 				_IsCurrentView = true;
 
-				if ((_StateManager.Tlf.Transfer.State == TransferState.Idle) &&
+				if ((_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
 					(_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] == 1))
 				{
 					int id = _StateManager.Tlf.GetFirstInState(TlfState.Set, TlfState.Conf);
@@ -315,7 +315,7 @@ namespace HMI.Presentation.Asecna.Views
 			{
 				Debug.Assert(_SetCall == null);
 
-				if (_StateManager.Tlf.Listen.State == ListenState.Idle)
+				if (_StateManager.Tlf.Listen.State == FunctionState.Idle)
 				{
 					_Keypad.Digits = "";
 					_Keypad.Dst = "";
@@ -330,7 +330,7 @@ namespace HMI.Presentation.Asecna.Views
 		{
 			if (_IsCurrentView)
 			{
-				if (_StateManager.Tlf.Transfer.State == TransferState.Idle)
+				if (_StateManager.Tlf.Transfer.State == FunctionState.Idle)
 				{
 					if ((_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf]) == 1)
 					{
@@ -346,7 +346,7 @@ namespace HMI.Presentation.Asecna.Views
 						_Keypad.Dst = "";
 					}
 				}
-				else if (_StateManager.Tlf.Transfer.State == TransferState.Ready)
+				else if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
 				{
 					_SetCall = null;
 					_Keypad.Digits = "";
@@ -394,8 +394,8 @@ namespace HMI.Presentation.Asecna.Views
 					}
 				}
 
-				if ((_StateManager.Tlf.Listen.State == ListenState.Idle) &&
-					(_StateManager.Tlf.Transfer.State == TransferState.Idle))
+				if ((_StateManager.Tlf.Listen.State == FunctionState.Idle) &&
+					(_StateManager.Tlf.Transfer.State == FunctionState.Idle))
 				{
 					int numSet = _StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf];
 

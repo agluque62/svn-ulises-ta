@@ -76,13 +76,12 @@ namespace HMI.Presentation.Urr.UI
         public void ChangeColor(Color c)
         {
             _UrrMidBT.ButtonColorDisabled = c;
-
+            
             //No hace disabled --> _UrrUpBT.ButtonColorDisabled = c;
             /*_UrrDownBT.StartColor = c;
             _UrrDownBT.EndColor = c;
             _UrrUpBT.StartColor = c;
-            _UrrUpBT.EndColor = c;*/
-            //-->Esto no chuta
+            _UrrUpBT.EndColor = c;*///-->Esto no chuta
         }
 
         /*[Browsable(false),
@@ -136,11 +135,11 @@ namespace HMI.Presentation.Urr.UI
         private void _UpButton_Click(object sender, EventArgs e)
         {
             General.SafeLaunchEvent(LevelUp, this);
-
+            
             if (this._UrrLevelBar.actualValue < 7)
             {
                 this._UrrLevelBar.actualValue += 1;
-                _UrrLevelBar.Refresh();
+                _UrrLevelBar.Refresh();   
             }
 
             if (this._UrrLevelBar.actualValue == 7)
@@ -150,13 +149,13 @@ namespace HMI.Presentation.Urr.UI
         private void _DownButton_Click(object sender, EventArgs e)
         {
             General.SafeLaunchEvent(LevelDown, this);
-
+            
             if (this._UrrLevelBar.actualValue > 1)
             {
                 this._UrrLevelBar.actualValue -= 1;
                 _UrrLevelBar.Refresh();
             }
-
+            
             if (this._UrrLevelBar.actualValue == 1)
                 this._UrrDownBT.Enabled = false;
             this._UrrUpBT.Enabled = true;

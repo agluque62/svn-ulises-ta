@@ -53,13 +53,12 @@ namespace HMI.Presentation.Asecna.Views
             this._TlfPage4BT = new HMI.Model.Module.UI.HMIButton();
             this._TlfPage3BT = new HMI.Model.Module.UI.HMIButton();
             this._TlfPage2BT = new HMI.Model.Module.UI.HMIButton();
-            this._TlfHeadPhonesUDB = new HMI.Presentation.Asecna.UI.UpDownButton();
-            this._LcSpeakerUDB = new HMI.Presentation.Asecna.UI.UpDownButton();
             this._TlfDaTLP = new System.Windows.Forms.TableLayoutPanel();
             this._TlfButtonsTLP = new System.Windows.Forms.TableLayoutPanel();
             this._FastBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SlowBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            this._CallRingerTimer = new System.Windows.Forms.Timer(this.components);
+            this._TlfHeadPhonesUDB = new HMI.Presentation.Asecna.UI.UpDownButton();
+            this._LcSpeakerUDB = new HMI.Presentation.Asecna.UI.UpDownButton();
             _TlfHeadP = new System.Windows.Forms.Panel();
             _TlfHeadP.SuspendLayout();
             this._TlfDaTLP.SuspendLayout();
@@ -89,13 +88,12 @@ namespace HMI.Presentation.Asecna.Views
             // 
             this._TlfPage1BT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPage1BT.DrawX = false;
             this._TlfPage1BT.Enabled = false;
             this._TlfPage1BT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPage1BT.Location = new System.Drawing.Point(193, 3);
             this._TlfPage1BT.Name = "_TlfPage1BT";
             this._TlfPage1BT.Size = new System.Drawing.Size(46, 35);
-            this._TlfPage1BT.TabIndex = 10;
+            this._TlfPage1BT.TabIndex = 1;
             this._TlfPage1BT.Text = "1";
             this._TlfPage1BT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this._TlfPage1BT.Click += new System.EventHandler(this._TlfPageBT_Click);
@@ -104,7 +102,7 @@ namespace HMI.Presentation.Asecna.Views
             // 
             this._TlfPage9BT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPage9BT.DrawX = false;
+            this._TlfPage9BT.Enabled = false;
             this._TlfPage9BT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPage9BT.Location = new System.Drawing.Point(385, 40);
             this._TlfPage9BT.Name = "_TlfPage9BT";
@@ -112,13 +110,14 @@ namespace HMI.Presentation.Asecna.Views
             this._TlfPage9BT.TabIndex = 9;
             this._TlfPage9BT.Text = "9";
             this._TlfPage9BT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPage9BT.Visible = false;
             this._TlfPage9BT.Click += new System.EventHandler(this._TlfPageBT_Click);
             // 
             // _TlfPage8BT
             // 
             this._TlfPage8BT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPage8BT.DrawX = false;
+            this._TlfPage8BT.Enabled = false;
             this._TlfPage8BT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPage8BT.Location = new System.Drawing.Point(385, 3);
             this._TlfPage8BT.Name = "_TlfPage8BT";
@@ -126,13 +125,14 @@ namespace HMI.Presentation.Asecna.Views
             this._TlfPage8BT.TabIndex = 8;
             this._TlfPage8BT.Text = "8";
             this._TlfPage8BT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPage8BT.Visible = false;
             this._TlfPage8BT.Click += new System.EventHandler(this._TlfPageBT_Click);
             // 
             // _TlfPage7BT
             // 
             this._TlfPage7BT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPage7BT.DrawX = false;
+            this._TlfPage7BT.Enabled = false;
             this._TlfPage7BT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPage7BT.Location = new System.Drawing.Point(337, 40);
             this._TlfPage7BT.Name = "_TlfPage7BT";
@@ -140,13 +140,14 @@ namespace HMI.Presentation.Asecna.Views
             this._TlfPage7BT.TabIndex = 7;
             this._TlfPage7BT.Text = "7";
             this._TlfPage7BT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPage7BT.Visible = false;
             this._TlfPage7BT.Click += new System.EventHandler(this._TlfPageBT_Click);
             // 
             // _TlfPage6BT
             // 
             this._TlfPage6BT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPage6BT.DrawX = false;
+            this._TlfPage6BT.Enabled = false;
             this._TlfPage6BT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPage6BT.Location = new System.Drawing.Point(337, 3);
             this._TlfPage6BT.Name = "_TlfPage6BT";
@@ -154,13 +155,14 @@ namespace HMI.Presentation.Asecna.Views
             this._TlfPage6BT.TabIndex = 6;
             this._TlfPage6BT.Text = "6";
             this._TlfPage6BT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPage6BT.Visible = false;
             this._TlfPage6BT.Click += new System.EventHandler(this._TlfPageBT_Click);
             // 
             // _TlfPage5BT
             // 
             this._TlfPage5BT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPage5BT.DrawX = false;
+            this._TlfPage5BT.Enabled = false;
             this._TlfPage5BT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPage5BT.Location = new System.Drawing.Point(289, 40);
             this._TlfPage5BT.Name = "_TlfPage5BT";
@@ -168,13 +170,14 @@ namespace HMI.Presentation.Asecna.Views
             this._TlfPage5BT.TabIndex = 5;
             this._TlfPage5BT.Text = "5";
             this._TlfPage5BT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPage5BT.Visible = false;
             this._TlfPage5BT.Click += new System.EventHandler(this._TlfPageBT_Click);
             // 
             // _TlfPage4BT
             // 
             this._TlfPage4BT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPage4BT.DrawX = false;
+            this._TlfPage4BT.Enabled = false;
             this._TlfPage4BT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPage4BT.Location = new System.Drawing.Point(289, 3);
             this._TlfPage4BT.Name = "_TlfPage4BT";
@@ -182,13 +185,14 @@ namespace HMI.Presentation.Asecna.Views
             this._TlfPage4BT.TabIndex = 4;
             this._TlfPage4BT.Text = "4";
             this._TlfPage4BT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPage4BT.Visible = false;
             this._TlfPage4BT.Click += new System.EventHandler(this._TlfPageBT_Click);
             // 
             // _TlfPage3BT
             // 
             this._TlfPage3BT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPage3BT.DrawX = false;
+            this._TlfPage3BT.Enabled = false;
             this._TlfPage3BT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPage3BT.Location = new System.Drawing.Point(241, 40);
             this._TlfPage3BT.Name = "_TlfPage3BT";
@@ -196,13 +200,14 @@ namespace HMI.Presentation.Asecna.Views
             this._TlfPage3BT.TabIndex = 3;
             this._TlfPage3BT.Text = "3";
             this._TlfPage3BT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPage3BT.Visible = false;
             this._TlfPage3BT.Click += new System.EventHandler(this._TlfPageBT_Click);
             // 
             // _TlfPage2BT
             // 
             this._TlfPage2BT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPage2BT.DrawX = false;
+            this._TlfPage2BT.Enabled = false;
             this._TlfPage2BT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPage2BT.Location = new System.Drawing.Point(241, 3);
             this._TlfPage2BT.Name = "_TlfPage2BT";
@@ -210,37 +215,8 @@ namespace HMI.Presentation.Asecna.Views
             this._TlfPage2BT.TabIndex = 2;
             this._TlfPage2BT.Text = "2";
             this._TlfPage2BT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPage2BT.Visible = false;
             this._TlfPage2BT.Click += new System.EventHandler(this._TlfPageBT_Click);
-            // 
-            // _TlfHeadPhonesUDB
-            // 
-            this._TlfHeadPhonesUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._TlfHeadPhonesUDB.BackColor = System.Drawing.Color.Transparent;
-            this._TlfHeadPhonesUDB.DownImage = global::HMI.Presentation.Asecna.Properties.Resources.HeadPhonesDown;
-            this._TlfHeadPhonesUDB.Enabled = false;
-            this._TlfHeadPhonesUDB.Location = new System.Drawing.Point(57, 3);
-            this._TlfHeadPhonesUDB.Name = "_TlfHeadPhonesUDB";
-            this._TlfHeadPhonesUDB.Size = new System.Drawing.Size(52, 70);
-            this._TlfHeadPhonesUDB.TabIndex = 1;
-            this._TlfHeadPhonesUDB.UpImage = global::HMI.Presentation.Asecna.Properties.Resources.HeadPhonesUp;
-            this._TlfHeadPhonesUDB.LevelDown += new System.EventHandler(this._TlfHeadPhonesUDB_LevelDown);
-            this._TlfHeadPhonesUDB.LevelUp += new System.EventHandler(this._TlfHeadPhonesUDB_LevelUp);
-            // 
-            // _LcSpeakerUDB
-            // 
-            this._LcSpeakerUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._LcSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
-            this._LcSpeakerUDB.DownImage = global::HMI.Presentation.Asecna.Properties.Resources.SpeakerDown;
-            this._LcSpeakerUDB.Enabled = false;
-            this._LcSpeakerUDB.Location = new System.Drawing.Point(1, 3);
-            this._LcSpeakerUDB.Name = "_LcSpeakerUDB";
-            this._LcSpeakerUDB.Size = new System.Drawing.Size(52, 70);
-            this._LcSpeakerUDB.TabIndex = 0;
-            this._LcSpeakerUDB.UpImage = global::HMI.Presentation.Asecna.Properties.Resources.SpeakerUp;
-            this._LcSpeakerUDB.LevelDown += new System.EventHandler(this._LcSpeakerUDB_LevelDown);
-            this._LcSpeakerUDB.LevelUp += new System.EventHandler(this._LcSpeakerUDB_LevelUp);
             // 
             // _TlfDaTLP
             // 
@@ -287,9 +263,36 @@ namespace HMI.Presentation.Asecna.Views
             // 
             this._SlowBlinkTimer.Interval = 500;
             this._SlowBlinkTimer.Tick += new System.EventHandler(this._SlowBlinkTimer_Tick);
-            // _CallRingerTimer
             // 
-            this._CallRingerTimer.Tick += new System.EventHandler(this._CallRingerTimer_Tick);
+            // _TlfHeadPhonesUDB
+            // 
+            this._TlfHeadPhonesUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this._TlfHeadPhonesUDB.BackColor = System.Drawing.Color.Transparent;
+            this._TlfHeadPhonesUDB.DownImage = global::HMI.Presentation.Asecna.Properties.Resources.HeadPhonesDown;
+            this._TlfHeadPhonesUDB.Enabled = false;
+            this._TlfHeadPhonesUDB.Location = new System.Drawing.Point(57, 3);
+            this._TlfHeadPhonesUDB.Name = "_TlfHeadPhonesUDB";
+            this._TlfHeadPhonesUDB.Size = new System.Drawing.Size(52, 70);
+            this._TlfHeadPhonesUDB.TabIndex = 1;
+            this._TlfHeadPhonesUDB.UpImage = global::HMI.Presentation.Asecna.Properties.Resources.HeadPhonesUp;
+            this._TlfHeadPhonesUDB.LevelDown += new System.EventHandler(this._TlfHeadPhonesUDB_LevelDown);
+            this._TlfHeadPhonesUDB.LevelUp += new System.EventHandler(this._TlfHeadPhonesUDB_LevelUp);
+            // 
+            // _LcSpeakerUDB
+            // 
+            this._LcSpeakerUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this._LcSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
+            this._LcSpeakerUDB.DownImage = global::HMI.Presentation.Asecna.Properties.Resources.SpeakerDown;
+            this._LcSpeakerUDB.Enabled = false;
+            this._LcSpeakerUDB.Location = new System.Drawing.Point(1, 3);
+            this._LcSpeakerUDB.Name = "_LcSpeakerUDB";
+            this._LcSpeakerUDB.Size = new System.Drawing.Size(52, 70);
+            this._LcSpeakerUDB.TabIndex = 0;
+            this._LcSpeakerUDB.UpImage = global::HMI.Presentation.Asecna.Properties.Resources.SpeakerUp;
+            this._LcSpeakerUDB.LevelDown += new System.EventHandler(this._LcSpeakerUDB_LevelDown);
+            this._LcSpeakerUDB.LevelUp += new System.EventHandler(this._LcSpeakerUDB_LevelUp);
             // 
             // TlfDaView
             // 
@@ -321,7 +324,6 @@ namespace HMI.Presentation.Asecna.Views
         private Model.Module.UI.HMIButton _TlfPage9BT;
         private Model.Module.UI.HMIButton _TlfPage8BT;
         private Model.Module.UI.HMIButton _TlfPage1BT;
-        private System.Windows.Forms.Timer _CallRingerTimer;
 
 
 	}

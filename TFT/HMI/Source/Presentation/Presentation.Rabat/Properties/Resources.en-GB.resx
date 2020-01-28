@@ -247,12 +247,12 @@
     <value>Reproduction</value>
   </data>
   <data name="BadOperation" xml:space="preserve">
-    <value>Bad operation</value>
+    <value>Bad Operation</value>
   </data>
   <data name="CarrierDetectionError" xml:space="preserve">
-    <value>Carrier not found</value>
+    <value>Carrier not found.</value>
   </data>
   <data name="TxConfirmationDetectionError" xml:space="preserve">
-    <value>Transmission not confirmed</value>
+    <value>Transmission not confirmed.</value>
   </data>
 </root>

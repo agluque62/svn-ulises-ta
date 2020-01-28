@@ -45,13 +45,13 @@ namespace HMI.Presentation.Twr.Views
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TableLayoutPanel _RadioTLP;
             System.Windows.Forms.Panel _RadioHeadP;
-            this._RtxBT = new HMI.Model.Module.UI.HMIButton();
-            this._PttBT = new HMI.Model.Module.UI.HMIButton();
-            this._RdHfSpeakerUDB = new HMI.Presentation.Twr.UI.UpDownButton();
             this._SiteManagerBT = new HMI.Model.Module.UI.HMIButton();
             this._RdPageBT = new HMI.Presentation.Twr.UI.RdPageButton();
+            this._RtxBT = new HMI.Model.Module.UI.HMIButton();
+            this._PttBT = new HMI.Model.Module.UI.HMIButton();
             this._RdHeadPhonesUDB = new HMI.Presentation.Twr.UI.UpDownButton();
             this._RdSpeakerUDB = new HMI.Presentation.Twr.UI.UpDownButton();
+            this._RdHfSpeakerUDB = new HMI.Presentation.Twr.UI.UpDownButton();
             this._RdButtonsTLP = new System.Windows.Forms.TableLayoutPanel();
             this._PttBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SquelchBlinkTimer = new System.Windows.Forms.Timer(this.components);
@@ -95,52 +95,6 @@ namespace HMI.Presentation.Twr.Views
             _RadioHeadP.Size = new System.Drawing.Size(594, 78);
             _RadioHeadP.TabIndex = 0;
             // 
-            // _RtxBT
-            // 
-            this._RtxBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._RtxBT.DrawX = false;
-            this._RtxBT.Enabled = false;
-            this._RtxBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._RtxBT.Location = new System.Drawing.Point(271, 3);
-            this._RtxBT.Name = "_RtxBT";
-            this._RtxBT.Size = new System.Drawing.Size(50, 72);
-            this._RtxBT.TabIndex = 4;
-            this._RtxBT.Text = "Rtx";
-            this._RtxBT.Click += new System.EventHandler(this._RtxBT_Click);
-            // 
-            // _PttBT
-            // 
-            this._PttBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._PttBT.DrawX = false;
-            this._PttBT.Enabled = false;
-            this._PttBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._PttBT.Location = new System.Drawing.Point(215, 3);
-            this._PttBT.Name = "_PttBT";
-            this._PttBT.Size = new System.Drawing.Size(50, 72);
-            this._PttBT.TabIndex = 3;
-            this._PttBT.Text = "PTT";
-            this._PttBT.MouseDown += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseDown);
-            this._PttBT.MouseUp += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseUp);
-            // 
-            // _RdHfSpeakerUDB
-            // 
-            this._RdHfSpeakerUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._RdHfSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
-            this._RdHfSpeakerUDB.DownImage = global::HMI.Presentation.Twr.Properties.Resources.HFSpeakerDown;
-            this._RdHfSpeakerUDB.DrawX = false;
-            this._RdHfSpeakerUDB.Enabled = false;
-            this._RdHfSpeakerUDB.Location = new System.Drawing.Point(185, 3);
-            this._RdHfSpeakerUDB.Name = "_RdHfSpeakerUDB";
-            this._RdHfSpeakerUDB.Size = new System.Drawing.Size(85, 72);
-            this._RdHfSpeakerUDB.TabIndex = 2;
-            this._RdHfSpeakerUDB.UpImage = global::HMI.Presentation.Twr.Properties.Resources.HFSpeakerUp;
-            this._RdHfSpeakerUDB.Visible = false;
-            this._RdHfSpeakerUDB.LevelDown += new System.EventHandler(this._HfSpeakerUDB_LevelDown);
-            this._RdHfSpeakerUDB.LevelUp += new System.EventHandler(this._HfSpeakerUDB_LevelUp);
-            // 
             // _SiteManagerBT
             // 
             this._SiteManagerBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -171,6 +125,35 @@ namespace HMI.Presentation.Twr.Views
             this._RdPageBT.UpEnabledImage = global::HMI.Presentation.Twr.Properties.Resources.RdPageUp;
             this._RdPageBT.UpClick += new Utilities.GenericEventHandler(this._RdPageBT_UpClick);
             this._RdPageBT.DownClick += new Utilities.GenericEventHandler(this._RdPageBT_DownClick);
+            // 
+            // _RtxBT
+            // 
+            this._RtxBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this._RtxBT.DrawX = false;
+            this._RtxBT.Enabled = false;
+            this._RtxBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._RtxBT.Location = new System.Drawing.Point(271, 3);
+            this._RtxBT.Name = "_RtxBT";
+            this._RtxBT.Size = new System.Drawing.Size(50, 72);
+            this._RtxBT.TabIndex = 4;
+            this._RtxBT.Text = "Rtx";
+            this._RtxBT.Click += new System.EventHandler(this._RtxBT_Click);
+            // 
+            // _PttBT
+            // 
+            this._PttBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this._PttBT.DrawX = false;
+            this._PttBT.Enabled = false;
+            this._PttBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._PttBT.Location = new System.Drawing.Point(215, 3);
+            this._PttBT.Name = "_PttBT";
+            this._PttBT.Size = new System.Drawing.Size(50, 72);
+            this._PttBT.TabIndex = 3;
+            this._PttBT.Text = "PTT";
+            this._PttBT.MouseDown += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseDown);
+            this._PttBT.MouseUp += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseUp);
             // 
             // _RdHeadPhonesUDB
             // 
@@ -203,6 +186,20 @@ namespace HMI.Presentation.Twr.Views
             this._RdSpeakerUDB.UpImage = global::HMI.Presentation.Twr.Properties.Resources.SpeakerUp;
             this._RdSpeakerUDB.LevelDown += new System.EventHandler(this._RdSpeakerUDB_LevelDown);
             this._RdSpeakerUDB.LevelUp += new System.EventHandler(this._RdSpeakerUDB_LevelUp);
+            // 
+            // _RdHfSpeakerUDB
+            // 
+            this._RdHfSpeakerUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this._RdHfSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
+            this._RdHfSpeakerUDB.DownImage = global::HMI.Presentation.Twr.Properties.Resources.HFSpeakerDown;
+            this._RdHfSpeakerUDB.Location = new System.Drawing.Point(70, 3);
+            this._RdHfSpeakerUDB.Name = "_RdHfSpeakerUDB";
+            this._RdHfSpeakerUDB.Size = new System.Drawing.Size(61, 72);
+            this._RdHfSpeakerUDB.TabIndex = 5;
+            this._RdHfSpeakerUDB.UpImage = global::HMI.Presentation.Twr.Properties.Resources.HFSpeakerUp;
+            this._RdHfSpeakerUDB.LevelDown += new System.EventHandler(this._HfSpeakerUDB_LevelDown);
+            this._RdHfSpeakerUDB.LevelUp += new System.EventHandler(this._HfSpeakerUDB_LevelUp);
             // 
             // _RdButtonsTLP
             // 
@@ -245,6 +242,21 @@ namespace HMI.Presentation.Twr.Views
             // _CarrierDetectionTimer
             // 
             //this._CarrierDetectionTimer.Tick += new System.EventHandler(this._CarrierDetectionTimer_Tick);
+            // 
+            // _RdHfSpeakerUDB
+            // 
+            this._RdHfSpeakerUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this._RdHfSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
+            this._RdHfSpeakerUDB.DownImage = global::HMI.Presentation.Twr.Properties.Resources.HFSpeakerDown;
+            this._RdHfSpeakerUDB.DrawX = false;
+            this._RdHfSpeakerUDB.Enabled = false;
+            this._RdHfSpeakerUDB.Location = new System.Drawing.Point(185, 3);
+            this._RdHfSpeakerUDB.Name = "_RdHfSpeakerUDB";
+            this._RdHfSpeakerUDB.Size = new System.Drawing.Size(85, 72);
+            this._RdHfSpeakerUDB.TabIndex = 2;
+            this._RdHfSpeakerUDB.UpImage = global::HMI.Presentation.Twr.Properties.Resources.HFSpeakerUp;
+            this._RdHfSpeakerUDB.Visible = false;
             // 
             // RadioView
             // 

@@ -72,14 +72,109 @@ namespace U5ki.Infrastructure
     /// </summary>
     /// <param name="call"></param>
     /// <param name="confInfo"></param>
+    /// <param name="from"> Uri del origen del Notify </param>
+    /// <param name="lenfrom"> Longitud de from </param>
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-	public delegate void ConfInfoCb(int call, [In] CORESIP_ConfInfo confInfo);
+    public delegate void ConfInfoCb(int call, [In] CORESIP_ConfInfo confInfo, string from, uint lenfrom);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="call"></param>
+    /// <param name="confInfo"></param>
+    /// <param name="from"> Uri del origen del Notify </param>
+    /// <param name="lenfrom"> Longitud de from </param>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void ConfInfoAccCb(string accountId, [In] CORESIP_ConfInfo confInfo, string from, uint lenfrom);
+    /// <summary>
+    /// Callback que se llama cuando se recibe un notify al evento de dialogo
+    /// </summary>
+    /// <param name="xml_body">body del notify</param>
+    /// <param name="length">longitud del body</param>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void DialogNotifyCb(string xml_body, uint length);
+
+    /// <summary>
+    /// Callback que se llama cuando se recibe un mensaje de texto
+    /// </summary>
+    /// <param name="from">URI of the sender</param>
+    /// <param name="to">URI of the destination message</param>
+    /// <param name="contact">The Contact URI of the sender, if present.</param>
+    /// <param name="mime_type">MIME type of the message.</param>
+    /// <param name="body">The message content</param>
+    /// 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void PagerCb(string from_uri, uint from_uri_len,
+             string to_uri, uint to_uri_len, string contact_uri, uint contact_uri_len,
+             string mime_type, uint mime_type_len, string body, uint body_len);
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="fromUri"></param>
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
 	public delegate void OptionsReceiveCb(string fromUri, string callid, int statusCodem, string supported, string allow);
+
+    /// <summary>
+    /// Esta funcion se llama cuando se recibe un options del tipo utilizado para la negociacion Call Forward
+    /// </summary>
+    /// <param name="accId">Account obtenido de la uri To</param>
+    /// <param name="from_uri">Uri de la cabecera From</param>
+    /// <param name="cfwr_options_type">Tipo de OPTIONS para la negociacion. Es del tipo CORESIP_CFWR_OPT_TYPE</param>
+    /// <param name="body">Es el cuerpo del mensaje, terminado con el caracter '\0'</param>
+    /// <param name="hresp">Manejador necesario para enviar la respuesta
+    ///
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void CfwrOptReceivedCb(int accId, string from_uri, CORESIP_CFWR_OPT_TYPE cfwr_options_type, string body, uint hresp);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="accId">Account obtenido de la uri To</param>
+    /// <param name="from_uri">Uri de la cabecera From</param>
+    /// <param name="cfwr_options_type">Tipo de OPTIONS para la negociacion. Es del tipo CORESIP_CFWR_OPT_TYPE</param>
+    /// <param name="body">Es el cuerpo del mensaje, terminado con el caracter '\0'</param>
+    /// <param name="hresp">Manejador necesario para enviar la respuesta
+    ///
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void CfwrOptReceivedAccCb(string accId, string from_uri, CORESIP_CFWR_OPT_TYPE cfwr_options_type, string body, uint hresp);
+
+
+    /// <summary>
+    /// Esta funcion se llama cuando se recibe la respuesta a un options del tipo utilizado para la negociacion Call Forward
+    /// </summary>
+    /// <param name="accId">Account obtenido de la uri From</param>
+    /// <param name="dstUri">Uri de la cabecera To. Es decir, es la uri del agente que nos envia la respuesta. Finalizado con '\0'</param>
+    /// <param name="callid">Call Id recibido. Finalizado con '\0'</param>
+    /// <param name="st_code">Code de la respuesta</param>
+    /// <param name="cfwr_options_type">Tipo de OPTIONS para la negociacion. Es del tipo CORESIP_CFWR_OPT_TYPE</param>
+    /// <param name="body">Es el cuerpo del mensaje, terminado con el caracter '\0'.</param>
+    ///
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void CfwrOptResponseCb(int accId, string dstUri, string callid, int st_code, CORESIP_CFWR_OPT_TYPE cfwr_options_type, string body);
+
+    /// <summary>
+    /// Esta funcion se llama cuando se recibe la respuesta a un options del tipo utilizado para la negociacion Call Forward
+    /// </summary>
+    /// <param name="accId">Account obtenido de la uri From</param>
+    /// <param name="dstUri">Uri de la cabecera To. Es decir, es la uri del agente que nos envia la respuesta. Finalizado con '\0'</param>
+    /// <param name="callid">Call Id recibido. Finalizado con '\0'</param>
+    /// <param name="st_code">Code de la respuesta</param>
+    /// <param name="cfwr_options_type">Tipo de OPTIONS para la negociacion. Es del tipo CORESIP_CFWR_OPT_TYPE</param>
+    /// <param name="body">Es el cuerpo del mensaje, terminado con el caracter '\0'.</param>
+    ///
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void CfwrOptResponseAccCb(string accId, string dstUri, string callid, int st_code, CORESIP_CFWR_OPT_TYPE cfwr_options_type, string body);
+
+    /// <summary>
+    /// Esta funcion se llama cuando se recibe un 302 (Moved Temporally) avisando que hay una redireccion pendiente de la llamada
+    /// Para aceptar o rechazar la redireccion, la aplicacion debe llamar a la funcion #CallProccessRedirect
+    /// </summary>
+    /// <param name="call">Identificador de la llamada</param>
+    /// <param name="dstUri">Uri a la que se quiere redirigir la llamada. String terminado en cero.</param>
+    ///
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void MovedTemporallyCb(int call, string dstUri);
+
     /// <summary>
     /// 
     /// </summary>
@@ -100,6 +195,14 @@ namespace U5ki.Infrastructure
     /// <param name="lenInfo"></param>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public delegate void IncomingSubscribeConfCb(int call, string from, uint lenInfo);
+    /// <summary>
+    ///  Received when subscription to conference arrives
+    /// </summary>
+    /// <param name="call"></param>
+    /// <param name="info"></param>
+    /// <param name="lenInfo"></param>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void IncomingSubscribeConfAccCb(string accountId, string from, uint lenInfo);
 
     /*Callback para recibir notificaciones por la subscripcion de presencia*/
     /*	dst_uri: uri del destino cuyo estado de presencia ha cambiado.
@@ -280,7 +383,20 @@ namespace U5ki.Infrastructure
         DESACTIVADO = 0,
         ACTIVADO = 1
     }
-	public class WG67Info
+    public enum CORESIP_CFWR_OPT_TYPE
+    {
+        CORESIP_CFWR_OPT_REQUEST,
+        CORESIP_CFWR_OPT_RELEASE,
+        CORESIP_CFWR_OPT_UPDATE
+    }
+
+    public enum CORESIP_REDIRECT_OP
+    {
+        CORESIP_REDIRECT_REJECT,
+        CORESIP_REDIRECT_ACCEPT
+    }
+
+    public class WG67Info
 	{
 		public struct SubscriberInfo
 		{
@@ -412,6 +528,16 @@ namespace U5ki.Infrastructure
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_IP_LENGTH + 1)]
 		public string RdMcastAddr;
 		public uint RdMcastPort;
+
+        //Referente al replaces. Esto no se necesita cuando el DstUri se obtiene de un REFER y ya tiene la info de replaces
+	    public bool RequireReplaces;		//Vale true si requiere replaces
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_CALLID_LENGTH + 1)]
+	    public string CallIdToReplace;	    //Call id de la llamada a reemplazar
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_TAG_LENGTH + 1)]
+	    public string ToTag;				//Tag del To de la llamada a reemplazar
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_TAG_LENGTH + 1)]
+	    public string FromTag;				//Tag del From de la llamada a reemplazar
+	    public bool EarlyOnly;				//Vale true si se requiere el parametro early-only en el replaces
 	}
     /// <summary>
     /// 
@@ -569,13 +695,19 @@ namespace U5ki.Infrastructure
         public IncomingSubscribeConfCb OnIncomingSubscribeConf;
         public SubPresCb OnSubPres;
         public FinWavCb OnFinWavCb;
-
+        public DialogNotifyCb OnDialogNotify;
+        public PagerCb OnPager;
+#if CALLFORWARD
+        public CfwrOptReceivedCb OnCfwrOptReceived;
+        public CfwrOptResponseCb OnCfwrOptResponse;
+        public MovedTemporallyCb OnMovedTemporally;
+#endif
 #if _ED137_
 	// PlugTest FAA 05/2011
 		public UpdateOvrCallMembersCb OnUpdateOvrCallMembers; //(CORESIP_EstablishedOvrCallMembers info);
 		public InfoCRDCb OnInfoCrd;								//(CORESIP_CRD InfoCrd);
 #endif
-	}
+    }
     /// <summary>
     /// 
     /// </summary>
@@ -627,11 +759,14 @@ namespace U5ki.Infrastructure
 		public const int SIP_INTERRUPTION_END = 185;
 		public const int SIP_OK = 200;
 		public const int SIP_ACCEPTED = 202;
+        public const int SIP_MOVED_TEMPORARILY = 302;
 		public const int SIP_BAD_REQUEST = 400;
 		public const int SIP_NOT_FOUND = 404;
+        public const int SIP_NOT_ACCEPTABLE = 406;
 		public const int SIP_REQUEST_TIMEOUT = 408;
 		public const int SIP_GONE = 410;
 		public const int SIP_TEMPORARILY_UNAVAILABLE = 480;
+        public const int SIP_LOOP_DETECTED = 482;
 		public const int SIP_BUSY = 486;
 		public const int SIP_NOT_ACCEPTABLE_HERE = 488;
 		public const int SIP_ERROR = 500;
@@ -652,6 +787,7 @@ namespace U5ki.Infrastructure
         public const int CORESIP_MAX_HOSTID_LENGTH = 32;
 		public const int CORESIP_MAX_IP_LENGTH = 25;
 		public const int CORESIP_MAX_URI_LENGTH = 256;
+        public const int CORESIP_MAX_TAG_LENGTH = 256;
 		public const int CORESIP_MAX_SOUND_DEVICES = 10;
 		public const int CORESIP_MAX_RS_LENGTH = 128;
 		public const int CORESIP_MAX_REASON_LENGTH = 128;
@@ -762,6 +898,16 @@ namespace U5ki.Infrastructure
         enum CORESIP_RecCmdType : int {CORESIP_REC_RESET = 0 // Ordena reiniciar el grabador
         };
 
+        const uint CORESIP_CALL_ID = 0x40000000;
+        const uint CORESIP_SNDDEV_ID=0x20000000;
+        const uint CORESIP_WAVPLAYER_ID=0x10000000;
+        const uint CORESIP_RDRXPORT_ID=0x08000000;
+        const uint CORESIP_SNDRXPORT_ID=0x04000000;
+        const uint CORESIP_ACC_ID=0x02000000;
+        const uint CORESIP_WAVRECORDER_ID=0x01000000;
+
+        const uint CORESIP_ID_TYPE_MASK=0xFF800000;
+        const uint CORESIP_ID_MASK = 0x007FFFFF;
 
 #if _VOTER_
         const string coresip = "coresip-voter";
@@ -854,8 +1000,31 @@ namespace U5ki.Infrastructure
 		static extern int CORESIP_CallHangup(int call, int code, out CORESIP_Error error);
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int CORESIP_CallAnswer(int call, int code, int addToConference, out CORESIP_Error error);
-		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-		static extern int CORESIP_CallHold(int call, int hold, out CORESIP_Error error);
+        /**
+         *	CORESIP_CallMovedTemporallyAnswer
+         *	@param	call		Identificador de Llamada
+         *	@param	dst			Uri del usuario al que la llamada es desviada
+         *	@param	reason		Es la razon del desvio. Posibles valores "unconditional", "user-busy", etc.
+         *	@param	error		Puntero a la Estructura de error
+         *	@return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_CallMovedTemporallyAnswer(int call, [In] string dst, [In] string reason, out CORESIP_Error error);
+
+        /**
+         *	CORESIP_CallProccessRedirect
+         *	Esta funcion debe llamarse despues de recibirse la callback MovedTemporallyCb para 
+         *	aceptar o rechazar la redireccion de la llamada.
+         *	@param	call		Identificador de Llamada
+         *	@param  dstUri		Nueva request uri hacia donde se desvia la llamada. Terminado en '\0', Si se rechaza entonces este parametro se ignora.
+         *	@param	op			Opcion (aceptar o rechazar)
+         *	@param	error		Puntero a la Estructura de error
+         *	@return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_CallProccessRedirect(int call, string dstUri, CORESIP_REDIRECT_OP op, out CORESIP_Error error);
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_CallHold(int call, int hold, out CORESIP_Error error);
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
         static extern int CORESIP_CallTransfer(int call, int dstCall, [In] string dst, [In] string displayName, out CORESIP_Error error);
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
@@ -864,6 +1033,10 @@ namespace U5ki.Infrastructure
 		static extern int CORESIP_CallConference(int call, int conf, out CORESIP_Error error);
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int CORESIP_CallSendConfInfo(int call, [In] CORESIP_ConfInfo info, out CORESIP_Error error);
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_SendConfInfoFromAcc(int accId, [In] CORESIP_ConfInfo info, out CORESIP_Error error);
+		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_SendConfInfoToUri(string uri, [In] CORESIP_ConfInfo info, out CORESIP_Error error);
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int CORESIP_CallSendInfo(int call, [In] string info, out CORESIP_Error error);
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
@@ -882,8 +1055,34 @@ namespace U5ki.Infrastructure
          *	@return				Codigo de Error
          */
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        static extern int CORESIP_SendOptionsMsg([In] string dst, StringBuilder callid, int isRadio, out CORESIP_Error error);  
-                //Envía OPTIONS directamente sin pasar por el proxy
+        static extern int CORESIP_SendOptionsMsg([In] string dst, StringBuilder callid, int isRadio, out CORESIP_Error error);
+        //Envía OPTIONS directamente sin pasar por el proxy
+        /**
+         * SendOptionsCFWD.	...
+         * Envia mensaje OPTIONS necesario para la negociacion Call Forward
+         * @param	accId				Account de la Coresip que utilizamos.
+         * @param	dst					Uri a la que se envia OPTIONS
+         * @param	cfwr_options_type	Tipo de OPTIONS para la negociacion. Es del tipo CORESIP_CFWR_OPT_TYPE
+         * @param	body				Contenido del body (XML). Acabado en '\0'
+         * @param	callid				callid que se retorna, acabado en '\0'.
+         * @param	by_proxy			TRUE si queremos que se envie a través del proxy. Agregara cabecera route
+         * @param	error		Puntero a la Estructura de error
+         * @return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_SendOptionsCFWD(int accId, [In] string dst, CORESIP_CFWR_OPT_TYPE cfwr_options_type, [In] string body, StringBuilder callid, bool by_proxy, out CORESIP_Error error);
+
+        /**
+         * CORESIP_SendResponseCFWD.	...
+         * Envia la respuesta al options utilizado para la negociacion de call forward
+         * @param	st_code				Code de la respuesta. Si no es 200 entonces se ignora el parametro del body
+         * @param	body				Contenido del body (XML). Acabado en '\0'
+         * @param	hresp				Manejador necesario para enviar la respuesta
+         * @param	error		Puntero a la Estructura de error
+         * @return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_SendResponseCFWD(int st_code, [In] string body, uint hresp, out CORESIP_Error error);
 
         /**
          *	SendOptionsMsg
@@ -936,6 +1135,61 @@ namespace U5ki.Infrastructure
 
         [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
         static extern int CORESIP_DestroyPresenceSubscription(string dest_uri, out CORESIP_Error error);
+
+        /*Funciones para gestion de subscripcion al evento de conferencia*/
+        /**
+         *	CORESIP_CreateConferenceSubscription. Crea una subscripcion por evento de conferencia
+         *	@param	accId		Identificador del account.
+         *  @param  dest_uri.	Uri del destino a monitorizar
+         *  @param	by_proxy.   Si true entonces el subscribe se envia a traves del proxy
+         *	@param	error		Puntero a la Estructura de error
+         *	@return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_CreateConferenceSubscription(int accId, string dest_uri, bool byProxy, out CORESIP_Error error);
+
+        /**
+         *	CORESIP_DestroyConferenceSubscription. Destruye una subscripcion por evento de presencia
+         *  @param  dest_uri.	Uri del destino a monitorizar
+         *	@param	error		Puntero a la Estructura de error
+         *	@return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_DestroyConferenceSubscription(string dest_uri, out CORESIP_Error error);
+
+        /*Funciones para gestion de subscripcion al evento de dialogo*/
+        /**
+         *	CORESIP_CreateDialogSubscription. Crea una subscripcion por evento de dialogo
+         *	@param	accId		Identificador del account.
+         *  @param  dest_uri.	Uri del destino a monitorizar
+         *  @param	by_proxy.   Si true entonces el subscribe se envia a traves del proxy
+         *	@param	error		Puntero a la Estructura de error
+         *	@return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_CreateDialogSubscription(int accId, string dest_uri, bool byProxy, out CORESIP_Error error);
+
+        /**
+         *	CORESIP_DestroyDialogSubscription. Destruye una subscripcion por evento de dialogo
+         *  @param  dest_uri.	Uri del destino a monitorizar
+         *	@param	error		Puntero a la Estructura de error
+         *	@return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_DestroyDialogSubscription(string dest_uri, out CORESIP_Error error);
+
+        /**
+         * CORESIP_SendInstantMessage. Envia un mensaje instantaneo
+         *
+         * @param	acc_id		Account ID to be used to send the request.
+         * @param	dest_uri	Uri del destino del mensaje. Acabado en 0.
+         * @param	text		Texto plano a enviar. Acabado en 0
+         * @param	by_proxy	Si es true el mensaje se envia por el proxy
+         * @return	Codigo de Error
+         *
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_SendInstantMessage(int acc_id, string dest_uri, string text, bool by_proxy, out CORESIP_Error error);
 
         /**
          * CORESIP_EchoCancellerLCMic.	...
@@ -1019,6 +1273,13 @@ namespace U5ki.Infrastructure
             remove {/*_Cb.*/OnIncomingSubscribeConf -= value; }
         }
 
+        static IncomingSubscribeConfAccCb OnIncomingSubscribeConfAcc;
+        public static event IncomingSubscribeConfAccCb IncomingSubscribeConfAcc
+        {
+            add {/*_Cb.*/OnIncomingSubscribeConfAcc += value; }
+            remove {/*_Cb.*/OnIncomingSubscribeConfAcc -= value; }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1074,6 +1335,33 @@ namespace U5ki.Infrastructure
 			remove {/*_Cb.*/OnConfInfo -= value; }
 		}
 
+        static ConfInfoAccCb OnConfInfoAcc;
+        public static event ConfInfoAccCb ConfInfoAcc
+        {
+            add {/*_Cb.*/OnConfInfoAcc += value; }
+            remove {/*_Cb.*/OnConfInfoAcc -= value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        static DialogNotifyCb OnDialogNotify;
+        public static event DialogNotifyCb DialogNotify
+        {
+            add {/*_Cb.*/OnDialogNotify += value; }
+            remove {/*_Cb.*/OnDialogNotify -= value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        static PagerCb OnPager;
+        public static event PagerCb Pager
+        {
+            add {/*_Cb.*/OnPager += value; }
+            remove {/*_Cb.*/OnPager -= value; }
+        }
+
         static WG67NotifyCb OnWG67Notify;
 		public static event WG67NotifyCb WG67Notify
 		{
@@ -1081,12 +1369,6 @@ namespace U5ki.Infrastructure
 			remove {/*_Cb.*/OnWG67Notify -= value; }
 		}
 
-        ///
-		//public static event ReplaceRequestCb ReplaceRequest
-		//{
-		//   add { _Cb.OnReplaceRequest += value; }
-		//   remove { _Cb.OnReplaceRequest -= value; }
-		//}
         /// <summary>
         /// 
         /// </summary>
@@ -1096,6 +1378,45 @@ namespace U5ki.Infrastructure
 			add { /*_Cb.*/OnOptionsReceive += value; }
 			remove { /*_Cb.*/OnOptionsReceive -= value; }
 		}
+        /// <summary>
+        /// 
+        /// </summary>
+        public static CfwrOptReceivedAccCb OnCfwrOptReceived;
+        public static event CfwrOptReceivedAccCb CfwrOptReceived
+        {
+            add { /*_Cb.*/OnCfwrOptReceived += value; }
+            remove { /*_Cb.*/OnCfwrOptReceived -= value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        //public static CfwrOptResponseCb OnCfwrOptResponse;
+        //public static event CfwrOptResponseCb CfwrOptresponse
+        //{
+        //    add { /*_Cb.*/OnCfwrOptResponse += value; }
+        //    remove { /*_Cb.*/OnCfwrOptResponse -= value; }
+        //}
+        /// <summary>
+        /// 
+        /// </summary>
+        public static CfwrOptResponseAccCb OnCfwrOptResponse;
+        public static event CfwrOptResponseAccCb CfwrOptResponse
+        {
+            add { /*_Cb.*/OnCfwrOptResponse += value; }
+            remove { /*_Cb.*/OnCfwrOptResponse -= value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static MovedTemporallyCb OnMovedTemporally;
+        public static event MovedTemporallyCb MovedTemporally
+        {
+            add { /*_Cb.*/OnMovedTemporally += value; }
+            remove { /*_Cb.*/OnMovedTemporally -= value; }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1344,7 +1665,8 @@ namespace U5ki.Infrastructure
 #if _TRACEAGENT_
             _Logger.Debug("Entrando en SipAgent.CreateAccount");
 #endif
-            if (CORESIP_CreateAccountProxyRouting(sipAcc, 0, out id, proxyIP, out err) != 0)
+            //Cuenta por defecto
+            if (CORESIP_CreateAccountProxyRouting(sipAcc, 1, out id, proxyIP, out err) != 0)
             {
                 throw new Exception(err.Info);
             }
@@ -1363,6 +1685,8 @@ namespace U5ki.Infrastructure
          *	@param	expire_seg  Tiempo en el que expira el registro en segundos.
          *	@param	username	Si no es necesario autenticación, este parametro será NULL
          *	@param  pass		Password. Si no es necesario autenticación, este parametro será NULL
+         *	@param  DisplayName	Display name que va antes de la sip URI, se utiliza para como nombre a mostrar
+         *	@param	isfocus		Si el valor es true, indica que es Focus, para establecer llamadas multidestino. por defecto es falso.
          *	@param	error		Puntero @ref CORESIP_Error a la Estructura de error
          *	@return				Codigo de Error
          */
@@ -1370,15 +1694,17 @@ namespace U5ki.Infrastructure
         /// 
         /// </summary>
         /// <param name="accId"></param>
-        public static void CreateAccountAndRegisterInProxy(string accId, string proxy_ip, uint expire_seg, string username, string pass, string displayName)
+        public static void CreateAccountAndRegisterInProxy(string accId, string proxy_ip, uint expire_seg, string username, string pass, string displayName, bool isFocus = false)
         {
             int id;
             CORESIP_Error err;
+            int isFocusArg = 0;
 
+            if (isFocus) isFocusArg = 1;
 #if _TRACEAGENT_
             _Logger.Debug("Entrando en SipAgent.CreateAccountAndRegisterInProxy");
 #endif
-            if (CORESIP_CreateAccountAndRegisterInProxy(accId, 0, out id, proxy_ip, expire_seg, username, pass, displayName, 0, out err) != 0)
+            if (CORESIP_CreateAccountAndRegisterInProxy(accId, 0, out id, proxy_ip, expire_seg, username, pass, displayName, isFocusArg, out err) != 0)
             {
                 throw new Exception(err.Info);
             }
@@ -1387,7 +1713,26 @@ namespace U5ki.Infrastructure
             _Logger.Debug("Saliendo de SipAgent.CreateAccountAndRegisterInProxy");
 #endif
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void DestroyAccount(string accId)
+        {
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.DestroyAccount");
+#endif
+            CORESIP_Error err;
 
+            if (CORESIP_DestroyAccount(_Accounts[accId], out err) != 0)
+            {
+                _Logger.Error("SipAgent.DestroyAccount: " + err.Info);
+            }
+
+            _Accounts.Remove(accId);
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.DestroyAccount");
+#endif
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -1792,7 +2137,7 @@ namespace U5ki.Infrastructure
             int acc;
 			if (string.IsNullOrEmpty(accId) || !_Accounts.TryGetValue(accId, out acc))
 			{
-                _Logger.Warn("Llamada con account Id desconocida -1");
+                _Logger.Warn("Llamada con account Id desconocida -1" + accId);
 				acc = -1;
 			}
 
@@ -1806,6 +2151,7 @@ namespace U5ki.Infrastructure
 
 			outInfo.DstUri = dst;
 			outInfo.ReferBy = referBy;
+            outInfo.RequireReplaces = false;
 
 			int callId;
 			CORESIP_Error err;
@@ -1821,6 +2167,54 @@ namespace U5ki.Infrastructure
             return callId;
 		}
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="accId"></param>
+        /// <param name="dst"></param>
+        /// <param name="referBy"></param>
+        /// <param name="priority"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
+        public static int MakeTlfCallReplaces(string accId, string dst, CORESIP_Priority priority, CORESIP_CallFlags flags, string callIdReplace,
+            string toTag, string fromTag)
+        {
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.MakTlfCall {0}, {1}, {2}, {3}, {4}", accId, dst, referBy, priority, flags);
+#endif
+            int acc;
+            if (string.IsNullOrEmpty(accId) || !_Accounts.TryGetValue(accId, out acc))
+            {
+                _Logger.Warn("Llamada con account Id desconocida -1" + accId);
+                acc = -1;
+            }
+
+            CORESIP_CallInfo info = new CORESIP_CallInfo();
+            CORESIP_CallOutInfo outInfo = new CORESIP_CallOutInfo();
+
+            info.AccountId = acc;
+            info.Type = CORESIP_CallType.CORESIP_CALL_DIA;
+            info.Priority = priority;
+            info.Flags = flags;
+
+            outInfo.DstUri = dst;
+            outInfo.RequireReplaces = true;
+            outInfo.ToTag = fromTag;
+            outInfo.FromTag = toTag;
+            outInfo.CallIdToReplace = callIdReplace;
+            outInfo.EarlyOnly = true;
+             int callId;
+            CORESIP_Error err;
+
+            if (CORESIP_CallMake(info, outInfo, out callId, out err) != 0)
+            {
+                throw new Exception(err.Info);
+            }
+
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.MakeTlfCall");
+#endif
+            return callId;
+        }        /// <summary>
         /// 
         /// </summary>
         /// <param name="accId"></param>
@@ -2043,19 +2437,70 @@ namespace U5ki.Infrastructure
 #if _TRACEAGENT_
             _Logger.Debug("Entrando en SipAgent.AnswerCall {0}, {1}, {2}", callId, response, addToConference);
 #endif
+#if !UNIT_TEST
             if (CORESIP_CallAnswer(callId, response, addToConference ? 1 : 0, out err) != 0)
 			{
 				throw new Exception(err.Info);
 			}
+#endif
 #if _TRACEAGENT_
             _Logger.Debug("Saliendo de SipAgent.AnswerCall");
+#endif
+        }
+        /// <summary>
+        /// Envia una respuesta 302 (Moved Temporally) al INVITE
+        /// </summary>
+        /// <param name="callId"></param>
+        /// <param name="dst"> Uri del destino al que se desvia la llamada </param>
+        /// <param name="reason"> Razon del desvio: "unconditional", "user-busy", etc.</param>
+		public static void MovedTemporallyAnswerCall(int callId, string dst, string reason)
+        {
+            CORESIP_Error err;
+
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.CORESIP_CallMovedTemporallyAnswer {0}, {1}, {2}", callId, dst, reason);
+#endif
+#if !UNIT_TEST
+            if (CORESIP_CallMovedTemporallyAnswer(callId, dst, reason, out err) != 0)
+            {
+                throw new Exception(err.Info);
+            }
+#endif
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.CORESIP_CallMovedTemporallyAnswer");
+#endif
+        }
+
+        /// <summary>
+        /// Esta funcion debe llamarse despues de recibirse la callback MovedTemporallyCb para aceptar o rechazar la redireccion de la llamada.
+        /// </summary>
+        /// <param name="callId">Identificador de Llamada</param>
+        /// <param name="dstUri">Nueva request uri hacia donde se desvia la llamada. Si se rechaza entonces este parametro se ignora</param>
+        /// <param name="op"> Opcion (aceptar o rechazar) </param>
+        public static void CallProccessRedirect(int callId, string dstUri, CORESIP_REDIRECT_OP op)
+        {
+#if CALLFORWARD
+            CORESIP_Error err;
+
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.CORESIP_CallProccessRedirect {0}, {1}, {2}", callId, dstUri, op);
+#endif
+#if !UNIT_TEST
+            if (CORESIP_CallProccessRedirect(callId, dstUri, op, out err) != 0)
+            {
+                throw new Exception(err.Info);
+            }
+#endif
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.CORESIP_CallProccessRedirect");
+#endif
 #endif
         }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="callId"></param>
-		public static void HoldCall(int callId)
+        public static void HoldCall(int callId)
 		{
 			CORESIP_Error err;
 
@@ -2156,7 +2601,8 @@ namespace U5ki.Infrastructure
 
 			if (CORESIP_CallPtt(callId, info, out err) != 0)
 			{
-				throw new Exception(err.Info);
+                _Logger.Warn("Error SipAgent.PttOff " + err.Info);
+				//throw new Exception(err.Info);
 			}
 #if _TRACEAGENT_
             _Logger.Debug("Saliendo de SipAgent.PttOff");
@@ -2219,6 +2665,52 @@ namespace U5ki.Infrastructure
             _Logger.Debug("Saliendo de SipAgent.SendConfInfo");
 #endif
         }
+        /**
+         * SendConfInfoFromAcc: Envia Notify con la info de la conferencia a todas las subscripciones al evento
+         *						de conferencia que tiene un account
+         * @param	accid	Account id
+         * @param	conf	Info de de conferencia
+         * @return	0 si no hay error
+         */
+        public static void SendConfInfoFromAcc(string accId, CORESIP_ConfInfo info)
+        {
+            CORESIP_Error err;
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.SendConfInfo {0}, {1}", callId, info.Version);
+#endif
+
+            if (CORESIP_SendConfInfoFromAcc(_Accounts[accId], info, out err) != 0)
+            {
+                _Logger.Error("SipAgent.SendConfInfoFromAcc: " + err.Info);
+            }
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.SendConfInfo");
+#endif
+        }
+
+
+        /**
+         * SendConfInfoToUri: Envia Notify con la info de la conferencia a un destino
+         * @param	uri	    Uri destino del Notify
+         * @param	conf	Info de de conferencia
+         * @return	0 si no hay error
+         */
+        public static void SendConfInfoToUri(string uri, CORESIP_ConfInfo info)
+        {
+            CORESIP_Error err;
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.SendConfInfo {0}, {1}", callId, info.Version);
+#endif
+            if (CORESIP_SendConfInfoToUri(uri, info, out err) != 0)
+            {             
+                _Logger.Error("SipAgent.SendConfInfoToUri: " + err.Info);
+            }
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.SendConfInfo");
+#endif
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -2275,6 +2767,71 @@ namespace U5ki.Infrastructure
         /// <summary>
         /// 
         /// </summary>
+        /// 
+        /**
+         * SendOptionsCFWD.	...
+         * Envia mensaje OPTIONS necesario para la negociacion Call Forward
+         * @param	accId				Account de la Coresip que utilizamos.
+         * @param	dst					Uri a la que se envia OPTIONS
+         * @param	cfwr_options_type	Tipo de OPTIONS para la negociacion. Es del tipo CORESIP_CFWR_OPT_TYPE
+         * @param	body				Contenido del body (XML). Acabado en '\0'
+         * @param	callid				callid que se retorna, acabado en '\0'.
+         * @param	by_proxy			TRUE si queremos que se envie a través del proxy. Agregara cabecera route
+         */
+        public static void SendOptionsCFWD(string accId, string dst, CORESIP_CFWR_OPT_TYPE cfwr_options_type, string body, out string callid, bool by_proxy)
+        {
+
+            CORESIP_Error err;
+            StringBuilder callid_ = new StringBuilder(CORESIP_MAX_CALLID_LENGTH + 1);
+#if CALLFORWARD
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.SendOptionsCFWD {0}", dst);
+#endif
+            if (CORESIP_SendOptionsCFWD(_Accounts[accId], dst, cfwr_options_type, body, callid_, by_proxy, out err) != 0)
+            {
+                //throw new Exception(err.Info);
+                _Logger.Error("Error SipAgent.SendOptionsCFWD" + err.Info);
+            }
+#endif
+            callid = callid_.ToString();
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.SendOptionsCFWD");
+#endif
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// 
+        /**
+         * CORESIP_SendResponseCFWD.	...
+         * Envia la respuesta al options utilizado para la negociacion de call forward
+         * @param	st_code				Code de la respuesta. Si no es 200 entonces se ignora el parametro del body
+         * @param	body				Contenido del body (XML). Acabado en '\0'
+         * @param	hresp				Manejador necesario para enviar la respuesta
+         */
+        public static void SendResponseCFWD(int st_code, string body, uint hresp)
+        {
+#if CALLFORWARD
+            CORESIP_Error err;
+
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.SendResponseCFWD {0}", dst);
+#endif
+            if (CORESIP_SendResponseCFWD(st_code, body, hresp, out err) != 0)
+            {
+                throw new Exception(err.Info);
+            }
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.SendResponseCFWD");
+#endif
+#endif
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="tsxKey"></param>
         /// <param name="txData"></param>
         /// <param name="evSub"></param>
@@ -2305,14 +2862,20 @@ namespace U5ki.Infrastructure
 #if _TRACEAGENT_
             _Logger.Debug("Entrando en SipAgent.Transfer {0}, {1}", evSub, code);
 #endif
-
-			if (CORESIP_TransferNotify(evSub, code, out err) != 0)
-			{
-                _Logger.Error("SipAgent.TransferNotify: " + err.Info);
-			}
+            try
+            {
+                if (CORESIP_TransferNotify(evSub, code, out err) != 0)
+                {
+                    _Logger.Error("SipAgent.TransferNotify: " + err.Info);
+                }
 #if _TRACEAGENT_
             _Logger.Debug("Saliendo de SipAgent.TransferNotify");
 #endif
+            }
+            catch (Exception exc)
+            {
+                _Logger.Error("SipAgent.TransferNotify: " + exc.Message);
+            }
         }
 
 		/// <summary>
@@ -2359,6 +2922,116 @@ namespace U5ki.Infrastructure
 #endif
         }
 
+        /**
+         *	CreateConferenceSubscription. Crea una subscripcion por evento de conferencia
+         *	@param	accId		Identificador del account.
+         *  @param  dst.	    Uri del destino al que nos subscribimos
+         *  @param	by_proxy.   Si true entonces el subscribe se envia a traves del proxy
+         *	@return				Codigo de Error
+         */
+        public static void CreateConferenceSubscription(string accId, string dst, bool byProxy = true)
+        {
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.CreateConferenceSubscription {0}", dst);
+#endif
+            CORESIP_Error err = new CORESIP_Error();
+
+            if (CORESIP_CreateConferenceSubscription(_Accounts[accId], dst, byProxy, out err) != 0)
+            {
+                _Logger.Error("Error creating Conference Subscription" + err.Info);
+            }
+
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.CreateConferenceSubscription");
+#endif
+            return;
+        }
+
+        /**
+         *	DestroyConferenceSubscription. Destruye una subscripcion por evento de presencia
+         *  @param  dest.	Uri del destino del que nos desubscribimos
+         *	@param	error		Puntero a la Estructura de error
+         *	@return				Codigo de Error
+         */
+        public static void DestroyConferenceSubscription(string dst)
+        {
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.DestroyConferenceSubscription {0}", wg67);
+#endif
+            CORESIP_Error err = new CORESIP_Error();
+
+            if (CORESIP_DestroyConferenceSubscription(dst, out err) != 0)
+            {
+                _Logger.Error("Error destroying Conference Subscription" + err.Info);
+            }
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.DestroyConferenceSubscription");
+#endif
+        }
+
+        /**
+         *	CreateDialogSubscription. Crea una subscripcion por evento de dialogo
+         *	@param	accId		Identificador del account.
+         *  @param  dst.	    Uri del destino al que nos subscribimos
+         *  @param	by_proxy.   Si true entonces el subscribe se envia a traves del proxy
+         *	@return				error
+         */
+        public static bool CreateDialogSubscription(string accId, string dst, bool byProxy = false)
+        {
+            bool error = false;
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.CreateDialogSubscription {0}", dst);
+#endif
+            CORESIP_Error err = new CORESIP_Error();
+            if (CORESIP_CreateDialogSubscription(_Accounts[accId], dst, byProxy, out err) != 0)
+            {
+                _Logger.Error("Error creating Dialog Subscription" + err.Info);
+                error = true;
+            }
+
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.CreateDialogSubscription");
+#endif
+            return error;
+        }
+
+        /**
+         *	DestroyDestroySubscription. Destruye una subscripcion por evento de dialogo
+         *  @param  dest.	Uri del destino del que nos desubscribimos
+         *	@return				Codigo de Error
+         */
+        public static void DestroyDialogSubscription(string dst)
+        {
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.DestroyDialogSubscription {0}", wg67);
+#endif
+            CORESIP_Error err = new CORESIP_Error();
+
+            if (CORESIP_DestroyDialogSubscription(dst, out err) != 0)
+            {
+                _Logger.Error("Error destroying Dialog Subscription" + err.Info);
+            }
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.DestroyDialogSubscription");
+#endif
+        }
+
+        /**
+          *	SendInstantMessage. Destruye una subscripcion por evento de dialogo
+          *  @param  dest.	Uri del destino del que nos desubscribimos
+          *	@return				Codigo de Error
+          */
+        public static void SendInstantMessage(string accId, string dest_uri, string text, bool by_proxy)
+        {
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.SendInstantMessage {0}", dest_uri);
+#endif
+            CORESIP_Error error = new CORESIP_Error();
+            CORESIP_SendInstantMessage(_Accounts[accId], dest_uri, text, by_proxy, out error);
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.SendInstantMessage");
+#endif
+        }
         /** AGL */
         public static void Wav2Remote(string file, string id, string ip, int port)
         {
@@ -2507,7 +3180,7 @@ namespace U5ki.Infrastructure
             }
         }
 
-		#region Private Members
+#region Private Members
         /// <summary>
         /// 
         /// </summary>
@@ -2590,16 +3263,67 @@ namespace U5ki.Infrastructure
                 if (OnTransferStatus != null)
                     OnTransferStatus(p1, p2);
             });
-            _Cb.OnConfInfo = new ConfInfoCb((p1, p2) =>
+            _Cb.OnConfInfo = new ConfInfoCb((p1, p2, p3, p4) =>
             {
+                //p1 puede ser un callId o el identificador de la cuenta de SIP
+                if ((p1 & SipAgent.CORESIP_ID_TYPE_MASK) == SipAgent.CORESIP_ACC_ID)
+                {
+                    foreach (string accountName in _Accounts.Keys)
+                        if (_Accounts[accountName] == p1)
+                        {
+                            if (OnConfInfoAcc != null)
+                                OnConfInfoAcc(accountName, p2, p3, p4);
+                            break;
+                        }
+                }
+                else
                 if (OnConfInfo != null)
-                    OnConfInfo(p1, p2);
+                    OnConfInfo(p1, p2, p3, p4);
+            });
+            _Cb.OnDialogNotify = new DialogNotifyCb((p1, p2) =>
+            {
+                if (OnDialogNotify != null)
+                    OnDialogNotify(p1, p2);
+            });
+            _Cb.OnPager = new PagerCb((p1, p2, p3, p4, p5, p6, p7, p8, p9, p10) =>
+            {
+                if (OnPager != null)
+                    OnPager(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
             });
             _Cb.OnOptionsReceive = new OptionsReceiveCb((p1, p2, p3, p4, p5) =>
             {
                 if (OnOptionsReceive != null)
                     OnOptionsReceive(p1, p2, p3, p4, p5);
             });
+#if CALLFORWARD
+            _Cb.OnCfwrOptReceived = new CfwrOptReceivedCb((p1, p2, p3, p4, p5) =>
+            {
+                foreach (string accountName in _Accounts.Keys)
+                    if (_Accounts[accountName] == p1)
+                    {
+                        if (OnCfwrOptReceived != null)
+                            OnCfwrOptReceived(accountName, p2, p3, p4, p5);
+                        break;
+                    }
+            });
+
+            _Cb.OnCfwrOptResponse = new CfwrOptResponseCb((p1, p2, p3, p4, p5, p6) =>
+            {
+                foreach (string accountName in _Accounts.Keys)
+                    if (_Accounts[accountName] == p1)
+                    {
+                        if (OnCfwrOptResponse != null)
+                            OnCfwrOptResponse(accountName,p2, p3, p4, p5, p6);
+                        break;
+                    }
+            });
+
+            _Cb.OnMovedTemporally = new MovedTemporallyCb((p1, p2) =>
+            {
+                if (OnMovedTemporally != null)
+                    OnMovedTemporally(p1, p2);
+            });
+#endif
             _Cb.OnWG67Notify = new WG67NotifyCb((p1, p2, p3) =>
             {
                 if (OnWG67Notify != null)
@@ -2612,6 +3336,18 @@ namespace U5ki.Infrastructure
             });
             _Cb.OnIncomingSubscribeConf = new IncomingSubscribeConfCb((p1, p2, p3) =>
             {
+                //p1 puede ser un callId o el identificador de la cuenta de SIP
+                if ((p1 & SipAgent.CORESIP_ID_TYPE_MASK) == SipAgent.CORESIP_ACC_ID)
+                {                        
+                    foreach (string accountName in _Accounts.Keys)
+                        if (_Accounts[accountName] == p1)
+                        {
+                            if (OnIncomingSubscribeConfAcc != null)
+                                OnIncomingSubscribeConfAcc(accountName, p2, p3);
+                            break;
+                        }                        
+                }
+                else
                 if (OnIncomingSubscribeConf != null)
                     OnIncomingSubscribeConf(p1, p2, p3);
             });
@@ -2622,6 +3358,6 @@ namespace U5ki.Infrastructure
             });
             _Cb.OnFinWavCb = null;
         }
-		#endregion
+#endregion
 	}
 }

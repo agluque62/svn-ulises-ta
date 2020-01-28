@@ -42,182 +42,180 @@ namespace HMI.Presentation.Rabat.Views
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TableLayoutPanel _RadioTLP;
-            System.Windows.Forms.Panel _RadioHeadP;
-            this._RdPageBT = new HMI.Presentation.Rabat.UI.RdPageButton();
-            this._RtxBT = new HMI.Model.Module.UI.HMIButton();
-            this._PttBT = new HMI.Model.Module.UI.HMIButton();
-            this._RdHeadPhonesUDB = new HMI.Presentation.Rabat.UI.UpDownButton();
-            this._RdSpeakerUDB = new HMI.Presentation.Rabat.UI.UpDownButton();
-            this._RdButtonsTLP = new System.Windows.Forms.TableLayoutPanel();
-            this._PttBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            this._SquelchBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            this._RtxBlinkTimer = new System.Windows.Forms.Timer(this.components);
+			this.components = new System.ComponentModel.Container();
+			System.Windows.Forms.TableLayoutPanel _RadioTLP;
+			System.Windows.Forms.Panel _RadioHeadP;
+			this._RdPageBT = new HMI.Presentation.Rabat.UI.RdPageButton();
+			this._RtxBT = new HMI.Model.Module.UI.HMIButton();
+			this._PttBT = new HMI.Model.Module.UI.HMIButton();
+			this._RdHeadPhonesUDB = new HMI.Presentation.Rabat.UI.UpDownButton();
+			this._RdSpeakerUDB = new HMI.Presentation.Rabat.UI.UpDownButton();
+			this._RdButtonsTLP = new System.Windows.Forms.TableLayoutPanel();
+			this._PttBlinkTimer = new System.Windows.Forms.Timer(this.components);
+			this._SquelchBlinkTimer = new System.Windows.Forms.Timer(this.components);
+			this._RtxBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._TxConfirmationDetectionTimer = new System.Windows.Forms.Timer(this.components);
             this._CarrierDetectionTimer = new System.Windows.Forms.Timer(this.components);
-            _RadioTLP = new System.Windows.Forms.TableLayoutPanel();
-            _RadioHeadP = new System.Windows.Forms.Panel();
-            _RadioTLP.SuspendLayout();
-            _RadioHeadP.SuspendLayout();
-            this.SuspendLayout();
-            // 
-            // _RadioTLP
-            // 
-            _RadioTLP.ColumnCount = 1;
-            _RadioTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            _RadioTLP.Controls.Add(_RadioHeadP, 0, 0);
-            _RadioTLP.Controls.Add(this._RdButtonsTLP, 0, 1);
-            _RadioTLP.Dock = System.Windows.Forms.DockStyle.Fill;
-            _RadioTLP.Location = new System.Drawing.Point(0, 0);
-            _RadioTLP.Name = "_RadioTLP";
-            _RadioTLP.RowCount = 2;
-            _RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 18F));
-            _RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 82F));
-            _RadioTLP.Size = new System.Drawing.Size(600, 470);
-            _RadioTLP.TabIndex = 0;
-            // 
-            // _RadioHeadP
-            // 
-            _RadioHeadP.Controls.Add(this._RdPageBT);
-            _RadioHeadP.Controls.Add(this._RtxBT);
-            _RadioHeadP.Controls.Add(this._PttBT);
-            _RadioHeadP.Controls.Add(this._RdHeadPhonesUDB);
-            _RadioHeadP.Controls.Add(this._RdSpeakerUDB);
-            _RadioHeadP.Dock = System.Windows.Forms.DockStyle.Fill;
-            _RadioHeadP.Location = new System.Drawing.Point(3, 3);
-            _RadioHeadP.Name = "_RadioHeadP";
-            _RadioHeadP.Size = new System.Drawing.Size(594, 78);
-            _RadioHeadP.TabIndex = 0;
-            // 
-            // _RdPageBT
-            // 
-            this._RdPageBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._RdPageBT.CornerRadius = 4;
-            this._RdPageBT.DownDisabledImage = global::HMI.Presentation.Rabat.Properties.Resources.RdPageDownDisabled;
-            this._RdPageBT.DownEnabledImage = global::HMI.Presentation.Rabat.Properties.Resources.RdPageDown;
-            this._RdPageBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._RdPageBT.Location = new System.Drawing.Point(488, 3);
-            this._RdPageBT.Name = "_RdPageBT";
-            this._RdPageBT.Size = new System.Drawing.Size(103, 72);
-            this._RdPageBT.TabIndex = 4;
-            this._RdPageBT.UpDisabledImage = global::HMI.Presentation.Rabat.Properties.Resources.RdPageUpDisabled;
-            this._RdPageBT.UpEnabledImage = global::HMI.Presentation.Rabat.Properties.Resources.RdPageUp;
-            this._RdPageBT.UpClick += new Utilities.GenericEventHandler(this._RdPageBT_UpClick);
-            this._RdPageBT.DownClick += new Utilities.GenericEventHandler(this._RdPageBT_DownClick);
-            // 
-            // _RtxBT
-            // 
-            this._RtxBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._RtxBT.DrawX = false;
-            this._RtxBT.Enabled = false;
-            this._RtxBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._RtxBT.Location = new System.Drawing.Point(267, 3);
-            this._RtxBT.Name = "_RtxBT";
-            this._RtxBT.Size = new System.Drawing.Size(65, 72);
-            this._RtxBT.TabIndex = 3;
-            this._RtxBT.Text = "Rtx";
-            this._RtxBT.Click += new System.EventHandler(this._RtxBT_Click);
-            // 
-            // _PttBT
-            // 
-            this._PttBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._PttBT.DrawX = false;
-            this._PttBT.Enabled = false;
-            this._PttBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._PttBT.Location = new System.Drawing.Point(196, 3);
-            this._PttBT.Name = "_PttBT";
-            this._PttBT.Size = new System.Drawing.Size(65, 72);
-            this._PttBT.TabIndex = 2;
-            this._PttBT.Text = "PTT";
-            this._PttBT.MouseDown += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseDown);
-            this._PttBT.MouseUp += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseUp);
-            // 
-            // _RdHeadPhonesUDB
-            // 
-            this._RdHeadPhonesUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._RdHeadPhonesUDB.BackColor = System.Drawing.Color.Transparent;
-            this._RdHeadPhonesUDB.DownImage = global::HMI.Presentation.Rabat.Properties.Resources.HeadPhonesDown;
-            this._RdHeadPhonesUDB.Enabled = false;
-            this._RdHeadPhonesUDB.Location = new System.Drawing.Point(94, 3);
-            this._RdHeadPhonesUDB.Name = "_RdHeadPhonesUDB";
-            this._RdHeadPhonesUDB.Size = new System.Drawing.Size(85, 72);
-            this._RdHeadPhonesUDB.TabIndex = 1;
-            this._RdHeadPhonesUDB.UpImage = global::HMI.Presentation.Rabat.Properties.Resources.HeadPhonesUp;
-            this._RdHeadPhonesUDB.LevelDown += new System.EventHandler(this._RdHeadPhonesUDB_LevelDown);
-            this._RdHeadPhonesUDB.LevelUp += new System.EventHandler(this._RdHeadPhonesUDB_LevelUp);
-            // 
-            // _RdSpeakerUDB
-            // 
-            this._RdSpeakerUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._RdSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
-            this._RdSpeakerUDB.DownImage = global::HMI.Presentation.Rabat.Properties.Resources.SpeakerDown;
-            this._RdSpeakerUDB.Enabled = false;
-            this._RdSpeakerUDB.Location = new System.Drawing.Point(3, 3);
-            this._RdSpeakerUDB.Name = "_RdSpeakerUDB";
-            this._RdSpeakerUDB.Size = new System.Drawing.Size(85, 72);
-            this._RdSpeakerUDB.TabIndex = 0;
-            this._RdSpeakerUDB.UpImage = global::HMI.Presentation.Rabat.Properties.Resources.SpeakerUp;
-            this._RdSpeakerUDB.LevelDown += new System.EventHandler(this._RdSpeakerUDB_LevelDown);
-            this._RdSpeakerUDB.LevelUp += new System.EventHandler(this._RdSpeakerUDB_LevelUp);
-            // 
-            // _RdButtonsTLP
-            // 
-            this._RdButtonsTLP.ColumnCount = 5;
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._RdButtonsTLP.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
-            this._RdButtonsTLP.Location = new System.Drawing.Point(3, 87);
-            this._RdButtonsTLP.Name = "_RdButtonsTLP";
-            this._RdButtonsTLP.RowCount = 3;
-            this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this._RdButtonsTLP.Size = new System.Drawing.Size(594, 380);
-            this._RdButtonsTLP.TabIndex = 1;
-            // 
-            // _PttBlinkTimer
-            // 
-            this._PttBlinkTimer.Interval = 500;
-            this._PttBlinkTimer.Tick += new System.EventHandler(this._PttBlinkTimer_Tick);
-            // 
-            // _SquelchBlinkTimer
-            // 
-            this._SquelchBlinkTimer.Interval = 500;
-            this._SquelchBlinkTimer.Tick += new System.EventHandler(this._SquelchBlinkTimer_Tick);
-            // 
-            // _RtxBlinkTimer
-            // 
-            this._RtxBlinkTimer.Interval = 500;
-            this._RtxBlinkTimer.Tick += new System.EventHandler(this._RtxBlinkTimer_Tick);
-            // 
-            // _TxConfirmationDetectionTimer
-            // 
-            this._TxConfirmationDetectionTimer.Tick += new System.EventHandler(this._TxConfirmationDetectionTimer_Tick);
-            // 
-            // _CarrierDetectionTimer
-            // 
-            this._CarrierDetectionTimer.Tick += new System.EventHandler(this._CarrierDetectionTimer_Tick);
-            // 
-            // RadioView
-            // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-            this.Controls.Add(_RadioTLP);
-            this.Name = "RadioView";
-            this.Size = new System.Drawing.Size(600, 470);
-            this.BackColorChanged += new System.EventHandler(this.RadioView_BackColorChanged);
-            _RadioTLP.ResumeLayout(false);
-            _RadioHeadP.ResumeLayout(false);
-            this.ResumeLayout(false);
+			_RadioTLP = new System.Windows.Forms.TableLayoutPanel();
+			_RadioHeadP = new System.Windows.Forms.Panel();
+			_RadioTLP.SuspendLayout();
+			_RadioHeadP.SuspendLayout();
+			this.SuspendLayout();
+			// 
+			// _RadioTLP
+			// 
+			_RadioTLP.ColumnCount = 1;
+			_RadioTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			_RadioTLP.Controls.Add(_RadioHeadP, 0, 0);
+			_RadioTLP.Controls.Add(this._RdButtonsTLP, 0, 1);
+			_RadioTLP.Dock = System.Windows.Forms.DockStyle.Fill;
+			_RadioTLP.Location = new System.Drawing.Point(0, 0);
+			_RadioTLP.Name = "_RadioTLP";
+			_RadioTLP.RowCount = 2;
+			_RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 18F));
+			_RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 82F));
+			_RadioTLP.Size = new System.Drawing.Size(600, 470);
+			_RadioTLP.TabIndex = 0;
+			// 
+			// _RadioHeadP
+			// 
+			_RadioHeadP.Controls.Add(this._RdPageBT);
+			_RadioHeadP.Controls.Add(this._RtxBT);
+			_RadioHeadP.Controls.Add(this._PttBT);
+			_RadioHeadP.Controls.Add(this._RdHeadPhonesUDB);
+			_RadioHeadP.Controls.Add(this._RdSpeakerUDB);
+			_RadioHeadP.Dock = System.Windows.Forms.DockStyle.Fill;
+			_RadioHeadP.Location = new System.Drawing.Point(3, 3);
+			_RadioHeadP.Name = "_RadioHeadP";
+			_RadioHeadP.Size = new System.Drawing.Size(594, 78);
+			_RadioHeadP.TabIndex = 0;
+			// 
+			// _RdPageBT
+			// 
+			this._RdPageBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+							| System.Windows.Forms.AnchorStyles.Right)));
+			this._RdPageBT.BackColor = System.Drawing.Color.Transparent;
+			this._RdPageBT.DownDisabledImage = global::HMI.Presentation.Rabat.Properties.Resources.RdPageDownDisabled;
+			this._RdPageBT.DownEnabledImage = global::HMI.Presentation.Rabat.Properties.Resources.RdPageDown;
+			this._RdPageBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this._RdPageBT.Location = new System.Drawing.Point(488, 3);
+			this._RdPageBT.Name = "_RdPageBT";
+			this._RdPageBT.Size = new System.Drawing.Size(103, 72);
+			this._RdPageBT.TabIndex = 4;
+			this._RdPageBT.UpDisabledImage = global::HMI.Presentation.Rabat.Properties.Resources.RdPageUpDisabled;
+			this._RdPageBT.UpEnabledImage = global::HMI.Presentation.Rabat.Properties.Resources.RdPageUp;
+			this._RdPageBT.UpClick += new Utilities.GenericEventHandler(this._RdPageBT_UpClick);
+			this._RdPageBT.DownClick += new Utilities.GenericEventHandler(this._RdPageBT_DownClick);
+			// 
+			// _RtxBT
+			// 
+			this._RtxBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+							| System.Windows.Forms.AnchorStyles.Left)));
+			this._RtxBT.Enabled = false;
+			this._RtxBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this._RtxBT.Location = new System.Drawing.Point(267, 3);
+			this._RtxBT.Name = "_RtxBT";
+			this._RtxBT.Size = new System.Drawing.Size(65, 72);
+			this._RtxBT.TabIndex = 3;
+			this._RtxBT.Text = "Rtx";
+			this._RtxBT.Click += new System.EventHandler(this._RtxBT_Click);
+			// 
+			// _PttBT
+			// 
+			this._PttBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+							| System.Windows.Forms.AnchorStyles.Left)));
+			this._PttBT.Enabled = false;
+			this._PttBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this._PttBT.Location = new System.Drawing.Point(196, 3);
+			this._PttBT.Name = "_PttBT";
+			this._PttBT.Size = new System.Drawing.Size(65, 72);
+			this._PttBT.TabIndex = 2;
+			this._PttBT.Text = "PTT";
+			this._PttBT.MouseDown += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseDown);
+			this._PttBT.MouseUp += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseUp);
+			// 
+			// _RdHeadPhonesUDB
+			// 
+			this._RdHeadPhonesUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+							| System.Windows.Forms.AnchorStyles.Left)));
+			this._RdHeadPhonesUDB.BackColor = System.Drawing.Color.Transparent;
+			this._RdHeadPhonesUDB.DownImage = global::HMI.Presentation.Rabat.Properties.Resources.HeadPhonesDown;
+			this._RdHeadPhonesUDB.Enabled = false;
+			this._RdHeadPhonesUDB.Location = new System.Drawing.Point(94, 3);
+			this._RdHeadPhonesUDB.Name = "_RdHeadPhonesUDB";
+			this._RdHeadPhonesUDB.Size = new System.Drawing.Size(85, 72);
+			this._RdHeadPhonesUDB.TabIndex = 1;
+			this._RdHeadPhonesUDB.UpImage = global::HMI.Presentation.Rabat.Properties.Resources.HeadPhonesUp;
+			this._RdHeadPhonesUDB.LevelUp += new System.EventHandler(this._RdHeadPhonesUDB_LevelUp);
+			this._RdHeadPhonesUDB.LevelDown += new System.EventHandler(this._RdHeadPhonesUDB_LevelDown);
+			// 
+			// _RdSpeakerUDB
+			// 
+			this._RdSpeakerUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+							| System.Windows.Forms.AnchorStyles.Left)));
+			this._RdSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
+			this._RdSpeakerUDB.DownImage = global::HMI.Presentation.Rabat.Properties.Resources.SpeakerDown;
+			this._RdSpeakerUDB.Enabled = false;
+			this._RdSpeakerUDB.Location = new System.Drawing.Point(3, 3);
+			this._RdSpeakerUDB.Name = "_RdSpeakerUDB";
+			this._RdSpeakerUDB.Size = new System.Drawing.Size(85, 72);
+			this._RdSpeakerUDB.TabIndex = 0;
+			this._RdSpeakerUDB.UpImage = global::HMI.Presentation.Rabat.Properties.Resources.SpeakerUp;
+			this._RdSpeakerUDB.LevelUp += new System.EventHandler(this._RdSpeakerUDB_LevelUp);
+			this._RdSpeakerUDB.LevelDown += new System.EventHandler(this._RdSpeakerUDB_LevelDown);
+			// 
+			// _RdButtonsTLP
+			// 
+			this._RdButtonsTLP.ColumnCount = 5;
+			this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this._RdButtonsTLP.Dock = System.Windows.Forms.DockStyle.Fill;
+			this._RdButtonsTLP.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
+			this._RdButtonsTLP.Location = new System.Drawing.Point(3, 87);
+			this._RdButtonsTLP.Name = "_RdButtonsTLP";
+			this._RdButtonsTLP.RowCount = 3;
+			this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+			this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+			this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+			this._RdButtonsTLP.Size = new System.Drawing.Size(594, 380);
+			this._RdButtonsTLP.TabIndex = 1;
+			// 
+			// _PttBlinkTimer
+			// 
+			this._PttBlinkTimer.Interval = 500;
+			this._PttBlinkTimer.Tick += new System.EventHandler(this._PttBlinkTimer_Tick);
+			// 
+			// _SquelchBlinkTimer
+			// 
+			this._SquelchBlinkTimer.Interval = 500;
+			this._SquelchBlinkTimer.Tick += new System.EventHandler(this._SquelchBlinkTimer_Tick);
+			// 
+			// _RtxBlinkTimer
+			// 
+			this._RtxBlinkTimer.Interval = 500;
+			this._RtxBlinkTimer.Tick += new System.EventHandler(this._RtxBlinkTimer_Tick);
+            //// 
+            //// _TxConfirmationDetectionTimer
+            //// 
+            //this._TxConfirmationDetectionTimer.Tick += new System.EventHandler(this._TxConfirmationDetectionTimer_Tick);
+            //// 
+            //// _CarrierDetectionTimer
+            //// 
+            //this._CarrierDetectionTimer.Tick += new System.EventHandler(this._CarrierDetectionTimer_Tick);
+			// 
+			// RadioView
+			// 
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
+			this.Controls.Add(_RadioTLP);
+			this.Name = "RadioView";
+			this.Size = new System.Drawing.Size(600, 470);
+			this.BackColorChanged += new System.EventHandler(this.RadioView_BackColorChanged);
+			_RadioTLP.ResumeLayout(false);
+			_RadioHeadP.ResumeLayout(false);
+			this.ResumeLayout(false);
 
 		}
 

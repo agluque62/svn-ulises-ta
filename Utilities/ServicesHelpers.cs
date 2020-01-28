@@ -82,7 +82,7 @@ namespace Utilities
             public Int64 TraceIn([System.Runtime.CompilerServices.CallerMemberName] string caller = null)
             {
                 String msg = String.Format("{0}: {1} Invoked", Counter, caller);
-#if DEBUG
+#if DEBUG_1
                 Debug.WriteLine(msg);
 #else
                 _logger.Trace(msg);
@@ -92,7 +92,7 @@ namespace Utilities
             public void TraceOut(Int64 Val, [System.Runtime.CompilerServices.CallerMemberName] string caller = null)
             {
                 String msg = String.Format("{0}: {1} Executed", Counter, caller);
-#if DEBUG
+#if DEBUG_1
                 Debug.WriteLine(msg);
 #else
                 _logger.Trace(msg);

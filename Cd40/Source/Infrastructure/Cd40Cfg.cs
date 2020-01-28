@@ -85,7 +85,7 @@ namespace U5ki.Infrastructure
         /// </summary>
         /// <param name="host"></param>
         /// <returns></returns>
-		public List<StrNumeroAbonado> GetHostAlias(string host)
+        public List<StrNumeroAbonado> GetHostAddresses(string host)
 		{
 			List<StrNumeroAbonado> alias = new List<StrNumeroAbonado>();
 
@@ -93,12 +93,19 @@ namespace U5ki.Infrastructure
 			{
 				if (string.Compare(tv.IdHost, host, true) == 0)
 				{
+                    /* 
+                     * JCAM 06/10/2015
+                     * Se elimina de la lista los identificadores de usuario
+                     * para evitar que se registren en el proxy con el 
+                     * identificador y con el número de abonado
 					StrNumeroAbonado num = new StrNumeroAbonado();
 
 					num.Prefijo = 2;
 					num.NumeroAbonado = tv.IdUsuario;
 
-					alias.Add(num);
+					addresses.Add(num);
+                     */
+
 					alias.AddRange(GetUserAlias(tv.IdUsuario));
 				}
 			}
@@ -211,15 +218,20 @@ namespace U5ki.Infrastructure
         /// </summary>
         /// <param name="resourceId"></param>
         /// <returns></returns>
-		public string GetGwRsIp(string resourceId)
+		public string GetGwRsIp(string resourceId, out string gw)
 		{
-			string gw = GetGwRsHost(resourceId);
+			gw = GetGwRsHost(resourceId);
 			if (gw != null)
 			{
                 string[] host = gw.Split(':');  // idHost:SipPort
                 string hostIp = GetHostIp(host[0]);
                 if (hostIp != null)
-                    return hostIp + ":" + host[1];  // IPHost:SipPort
+                {
+                    if (hostIp.Contains(":"))
+                        return hostIp;
+                    else
+                        return hostIp + ":" + host[1];  // IPHost:SipPort
+                }
             }
 
 			return null;
@@ -343,6 +355,7 @@ namespace U5ki.Infrastructure
 		public const uint ATS_DST = 3; //ATS analógica y digital
 		public const uint RTB_DST = 4;
 		public const uint EyM_DEST = 50;
+        public const uint MD_DST = 90;
         public const uint UNKNOWN_DST = 99;  // Destinos entrantes desconocidos
 
 		public const uint RD_RX = 0;

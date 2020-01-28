@@ -90,5 +90,11 @@
     <Setting Name="DirectorioGLP" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Recording\</Value>
     </Setting>
+    <Setting Name="EmergencyModeWarn" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="HFView" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

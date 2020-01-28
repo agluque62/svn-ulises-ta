@@ -9,6 +9,7 @@ using NAudio;
 using NAudio.CoreAudioApi;
 using IniParser;
 using IniParser.Model;
+using System.Diagnostics;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
@@ -29,6 +30,12 @@ namespace HMI.CD40.Module.BusinessEntities
         public virtual void Init()
         {
             DevCol = MMDE.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active);
+        }
+ 
+        public void Dispose()
+        {
+            foreach (var dev in DevCol)
+                dev.Dispose();
         }
 
         /// <summary>
@@ -130,12 +137,15 @@ namespace HMI.CD40.Module.BusinessEntities
                 MMDevice dev = DeviceGet(device_id, isDeviceOut ? DataFlow.Render : DataFlow.Capture);
                 if (dev != null)
                 {
-                    if (dev.AudioEndpointVolume.Channels.Count > channel)
+                    using (var enpv = dev.AudioEndpointVolume)
                     {
-                        dev.AudioEndpointVolume.Channels[channel].VolumeLevel = volume;
-                        System.Threading.Thread.Sleep(100);
-                        dev.AudioEndpointVolume.Channels[channel].VolumeLevel = volume;
-                        return true;
+                        if (enpv.Channels.Count > channel)
+                        {
+                            enpv.Channels[channel].VolumeLevel = volume;
+                            System.Threading.Thread.Sleep(100);
+                            enpv.Channels[channel].VolumeLevel = volume;
+                            return true;
+                        }
                     }
                 }
             }
@@ -179,6 +189,7 @@ namespace HMI.CD40.Module.BusinessEntities
     /// </summary>
     class CMedia_MMAudioDeviceManager : MMAudioDeviceManager
     {
+        long MemoryOnInit = 0;
         /// <summary>
         /// 
         /// </summary>
@@ -195,8 +206,9 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         public override void Init()
         {
-            readINI();
-            setDevs();
+            ReadINI();
+            SetDevs();
+            MemoryOnInit = Process.GetCurrentProcess().PrivateMemorySize64;
         }
 
         /// <summary>
@@ -208,7 +220,7 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 if (--current_sup <= 0)
                 {
-                    setDevs();
+                    SetDevs();
                     current_sup = val_tsup;
                 }
             }
@@ -217,13 +229,14 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <summary>
         /// 
         /// </summary>
-        void setDevs()
+        void SetDevs()
         {
             base.Init();
             foreach (CMediaDevsTableItem dev in devTable.Values)
             {
                 VolumeSet(dev.idDev, dev.channel, dev.def_val, dev.isDevOut);
             }
+            base.Dispose();
         }
         
         /// <summary>
@@ -232,7 +245,7 @@ namespace HMI.CD40.Module.BusinessEntities
         int current_sup = 0;
         int val_tsup = 0;
         Dictionary<string, CMediaDevsTableItem> devTable = new Dictionary<string, CMediaDevsTableItem>();
-        void readINI()
+        void ReadINI()
         {
             try
             {

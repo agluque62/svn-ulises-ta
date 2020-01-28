@@ -56,7 +56,6 @@ namespace U5ki.RdService.Gears
         // Datos avanzados del nodo
 
         public bool IsReceptor { get; set; }
-        public bool IsEmitter { get; set; }
         public RdRsType ResourceType
         {
             get
@@ -101,7 +100,7 @@ namespace U5ki.RdService.Gears
         public Int32? Priority { get; set; }
 
         public Tipo_Formato_Trabajo WorkingFormat { get; set; }
-        public Boolean IsMaster
+        public new Boolean IsMaster
         {
             get
             {
@@ -440,7 +439,7 @@ namespace U5ki.RdService.Gears
             this.FrecuenciesAllowed = input.Frecs;
 
             this.IsReceptor = input.EsReceptor;
-            this.IsEmitter = input.EsTransmisor;
+            //this.IsEmitter = input.EsTransmisor;
 
             this.FrecuencyKey = input.FrecuenciaClave;
 
@@ -512,8 +511,8 @@ namespace U5ki.RdService.Gears
                 LogInfo<BaseGear>("[GEAR INIT] Error de configuración en el Puerto de escucha del SNMP. Se asigna el valor por defecto. " + this.ToString(),
                     U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_CONFIGURATION_ERROR,
                     Id, CTranslate.translateResource("Puerto de escucha del SNMP. Se asigna el valor por defecto."));
-                if (this.IsEmitter)
-                    this.Port = 161;
+                if (IsEmitter)
+                    Port = 161;
                 else
                     if (this.RemoteControlType == RCTypes.RCJotron7000)
                         this.Port = 161;

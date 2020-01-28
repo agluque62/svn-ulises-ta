@@ -43,7 +43,11 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// 
     /// </summary>
+#if DEBUG
+    public class RecorderManager
+#else
 	class RecorderManager
+#endif
 	{
 		const int NUM_DEVICE = 20;              // AGL. 20. Para la grabacion HF... Habia 10...
 #if _AUDIOGENERIC_
@@ -331,6 +335,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
             lock (_Sync)
             {
+                try
+                {
                 if (iniciar && !_GlpSessionsStarted[(int)fuente])
                 {
                     _GlpSessionsStarted[(int)fuente] = !_GlpSessionsStarted[(int)fuente];
@@ -400,6 +406,11 @@ namespace HMI.CD40.Module.BusinessEntities
                     //_GlpCallId[(int)fuente] = 0;
                 }
             }
+                catch (Exception exc)
+                {
+                    _Logger.Error("GLP.SesionGlp Excepcion "+ exc.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -414,6 +425,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
             lock (_Sync)
             {
+                try { 
                 if (iniciar != _GlpSessionsStarted[(int)fuente])
                 {
                     _GlpSessionsStarted[(int)fuente] = !_GlpSessionsStarted[(int)fuente];
@@ -520,6 +532,11 @@ namespace HMI.CD40.Module.BusinessEntities
                             });
                         }
                     }
+                }
+            }
+                catch (Exception exc)
+                {
+                    _Logger.Error("GLP.SesionGlp Excepcion " + exc.Message);
                 }
             }
         }
@@ -733,7 +750,11 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// 
     /// </summary>
-    class ReplayManager
+#if DEBUG
+    public class ReplayManager
+#else
+   class ReplayManager
+#endif
     {
         public event GenericEventHandler<StateMsg<bool>> PlayingChanged;
         public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;

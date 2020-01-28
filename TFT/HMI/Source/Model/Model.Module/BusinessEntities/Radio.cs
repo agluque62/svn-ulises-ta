@@ -21,8 +21,8 @@ namespace HMI.Model.Module.BusinessEntities
 		Blocked,
         CarrierError,       // No detectada la portadora, ...
         TxError,
-		Error,				
-		Unavailable
+        Error,
+        Unavailable
 	}
 
 	public enum SquelchState
@@ -287,6 +287,8 @@ namespace HMI.Model.Module.BusinessEntities
 				{
 					_Ptt = PttState.PttOnlyPort;
 				}
+
+                //_PttSrcId = dst.PttSrcId;
 			}
 		}
 

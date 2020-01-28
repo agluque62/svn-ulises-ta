@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using HMI.Model.Module.Properties;
 
 using Utilities;
+using HMI.Model.Module.BusinessEntities;
 
 namespace HMI.Model.Module.UI
 {
@@ -168,15 +169,16 @@ namespace HMI.Model.Module.UI
 		}
 
         public void Reset(string frecuency, string alias, bool drawX, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor, Color rxForeColor, Color titleForeColor, 
-            string qidxResource, uint qidxValue, bool degradedState = false)
+            string qidxResource, uint qidxValue, FrequencyState state)
         {
             //_Alias = qidxResource;
             _QidxValue = (int)qidxValue;
 
-            Reset(frecuency, alias, drawX, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor, degradedState);
+            Reset(frecuency, alias, drawX, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor, state);
         }
 
-        public void Reset(string frecuency, string alias, bool drawX, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor, Color rxForeColor, Color titleForeColor, bool degradedState = false)
+        public void Reset(string frecuency, string alias, bool drawX, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor, 
+            Color rxForeColor, Color titleForeColor, FrequencyState state = FrequencyState.Available)
 		{
 			_Frecuency = frecuency;
 			_Alias = alias.Length > 11 ? (alias.Substring(0,8)+"...") : alias ;
@@ -186,10 +188,24 @@ namespace HMI.Model.Module.UI
 
             ForeColor = titleForeColor;
 //            BackColor = titleForeColor;
-            _CurrentBackColor = degradedState ? Color.OrangeRed : VisualStyle.ButtonColor;
-            // El amarillo (formacion de retransmision) tiene preferencia sobre el color de fondo.
-            _BtnInfo.SetBackColor(BtnState.Normal, (title==VisualStyle.Colors.Yellow)? title : _CurrentBackColor);
-			_TxBtnInfo.SetBackColor(BtnState.Normal, tx);
+            if (drawX)
+                _CurrentBackColor = VisualStyle.ButtonColor;
+            else
+            {
+                if ((title == VisualStyle.Colors.Yellow) || (title == VisualStyle.Colors.Red))
+                    _CurrentBackColor = title; //error cases and rtx formation with priority over other colors
+                else if (state == FrequencyState.Degraded)
+                    _CurrentBackColor = Color.OrangeRed;
+                else if (state == FrequencyState.Available)
+                    _CurrentBackColor = VisualStyle.ButtonColor;
+                else //FrequencyState.NotAvailable
+                {
+                     _CurrentBackColor = title;              
+                }
+            }
+
+            _BtnInfo.SetBackColor(BtnState.Normal, _CurrentBackColor);
+            _TxBtnInfo.SetBackColor(BtnState.Normal, tx);
 			_TxBtnInfo.SetForeColor(BtnState.Normal, txForeColor);
 			_RxBtnInfo.SetBackColor(BtnState.Normal, rx);
 			_RxBtnInfo.SetForeColor(BtnState.Normal, rxForeColor);

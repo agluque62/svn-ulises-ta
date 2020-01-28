@@ -54,7 +54,7 @@ namespace HMI.Presentation.Twr.Views
 		}
 		private bool _InfoEnabled
 		{
-			get { return _StateManager.Tft.Enabled && (_StateManager.Tlf.Listen.State == ListenState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
+			get { return _StateManager.Tft.Enabled && (_StateManager.Tlf.Listen.State == FunctionState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
 		}
 		private bool _BrightnessEnabled
 		{
@@ -137,7 +137,8 @@ namespace HMI.Presentation.Twr.Views
         [EventSubscription(EventTopicNames.ProxyPresent, ThreadOption.Publisher)]
         public void OnProxyPresent(object sender, EventArgs e)
         {
-            BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : BackColor = System.Drawing.Color.Khaki;
+            if (Settings.Default.EmergencyModeWarn)
+                BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : BackColor = System.Drawing.Color.Khaki;
         }
 
         [EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
@@ -167,14 +168,14 @@ namespace HMI.Presentation.Twr.Views
 
 			if (!string.IsNullOrEmpty(jacks.PreviusStateDescription))
 			{
-				_MsgLB.Items.Remove(jacks.PreviusStateDescription);
+				_MsgLB.Text.Replace(jacks.PreviusStateDescription, "");
 			}
 
 			if (_StateManager.Engine.Operative)
 			{
 				if (!string.IsNullOrEmpty(jacks.StateDescription))
 				{
-					_MsgLB.Items.Add(jacks.StateDescription);
+					_MsgLB.Text += jacks.StateDescription;
 				}
 			}
 		}
@@ -222,133 +223,89 @@ namespace HMI.Presentation.Twr.Views
 			{
 				TlfDst dst = _StateManager.Tlf[i];
 
-				if (!string.IsNullOrEmpty(dst.PreviusStateDescription))
-				{
-					if (_MsgLB.Items.Contains(dst.PreviusStateDescription))
-					{
-						_MsgLB.Items.Remove(dst.PreviusStateDescription);
-					}
-					else
-					{
-						_ConfUnused.Remove(dst.PreviusStateDescription);
-					}
-				}
-				if (!string.IsNullOrEmpty(dst.StateDescription))
-				{
-					if (_MsgLB.Items.Contains(dst.StateDescription))
-					{
-						_ConfUnused.Add(dst.StateDescription);
-					}
-					else
-					{
-						_MsgLB.Items.Add(dst.StateDescription);
-					}
-				}
+                if (!string.IsNullOrEmpty(dst.PreviusStateDescription))
+                {
+                    if (_MsgLB.Text.Contains(dst.PreviusStateDescription))
+                    {
+                        _MsgLB.Text = _MsgLB.Text.Replace(dst.PreviusStateDescription, "");
+                    }
+                    else
+                    {
+                        _ConfUnused.Remove(dst.PreviusStateDescription);
+                    }
+                }
+                if (!string.IsNullOrEmpty(dst.StateDescription))
+                {
+                    if (_MsgLB.Text.Contains(dst.StateDescription))
+                    {
+                        _ConfUnused.Add(dst.StateDescription);
+                    }
+                    else
+                    {
+                        _MsgLB.Text += dst.StateDescription;
+                    }
+                }
 			}
 		}
 
-		[EventSubscription(EventTopicNames.TlfIntrudedByChanged, ThreadOption.Publisher)]
-		public void OnTlfIntrudedByChanged(object sender, EventArgs e)
-		{
-			IntrudedBy intrudedBy = _StateManager.Tlf.IntrudedBy;
+        [EventSubscription(EventTopicNames.TlfForwardChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TlfPickUpChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TlfIntrudeToChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TlfInterruptedByChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TlfIntrudedByChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TlfListenChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TlfListenByChanged, ThreadOption.Publisher)]
+        public void OnEntityDescriptionChanged(object sender, EventArgs e)
+        {
+            Description entity = (Description) sender;
 
-			if (!string.IsNullOrEmpty(intrudedBy.PreviusStateDescription))
-			{
-				_MsgLB.Items.Remove(intrudedBy.PreviusStateDescription);
-			}
-			if (!string.IsNullOrEmpty(intrudedBy.StateDescription))
-			{
-				_MsgLB.Items.Add(intrudedBy.StateDescription);
-			}
-		}
-
-		[EventSubscription(EventTopicNames.TlfInterruptedByChanged, ThreadOption.Publisher)]
-		public void OnTlfInterruptedByChanged(object sender, EventArgs e)
-		{
-			InterruptedBy interruptedBy = _StateManager.Tlf.InterruptedBy;
-
-			if (!string.IsNullOrEmpty(interruptedBy.PreviusStateDescription))
-			{
-				_MsgLB.Items.Remove(interruptedBy.PreviusStateDescription);
-			}
-			if (!string.IsNullOrEmpty(interruptedBy.StateDescription))
-			{
-				_MsgLB.Items.Add(interruptedBy.StateDescription);
-			}
-		}
-
-		[EventSubscription(EventTopicNames.TlfIntrudeToChanged, ThreadOption.Publisher)]
-		public void OnTlfIntrudeToChanged(object sender, EventArgs e)
-		{
-			IntrudeTo intrudeTo = _StateManager.Tlf.IntrudeTo;
-
-			if (!string.IsNullOrEmpty(intrudeTo.PreviusStateDescription))
-			{
-				_MsgLB.Items.Remove(intrudeTo.PreviusStateDescription);
-			}
-			if (!string.IsNullOrEmpty(intrudeTo.StateDescription))
-			{
-				_MsgLB.Items.Add(intrudeTo.StateDescription);
-			}
-		}
+            if (!string.IsNullOrEmpty(entity.PreviusStateDescription))
+            {
+                _MsgLB.Text=_MsgLB.Text.Replace(entity.PreviusStateDescription, "");
+            }
+            if (!string.IsNullOrEmpty(entity.StateDescription))
+            {
+                if (!_MsgLB.Text.Contains(entity.StateDescription))
+                    _MsgLB.Text += entity.StateDescription;                    
+            }
+        }
 
 		[EventSubscription(EventTopicNames.TlfListenChanged, ThreadOption.Publisher)]
 		public void OnTlfListenChanged(object sender, EventArgs e)
 		{
             _InfoBT.Enabled = _InfoEnabled;
-
-			Listen listen = _StateManager.Tlf.Listen;
-
-			if (!string.IsNullOrEmpty(listen.PreviusStateDescription))
-			{
-				_MsgLB.Items.Remove(listen.PreviusStateDescription);
-			}
-			if (!string.IsNullOrEmpty(listen.StateDescription))
-			{
-				_MsgLB.Items.Add(listen.StateDescription);
-			}
 		}
 
 		[EventSubscription(EventTopicNames.TlfListenByChanged, ThreadOption.Publisher)]
 		public void OnTlfListenByChanged(object sender, EventArgs e)
 		{
-			ListenBy listenBy = _StateManager.Tlf.ListenBy;
-
-			if (!string.IsNullOrEmpty(listenBy.PreviusStateDescription))
-			{
-				_MsgLB.Items.Remove(listenBy.PreviusStateDescription);
-			}
-			if (!string.IsNullOrEmpty(listenBy.StateDescription))
-			{
-				_MsgLB.Items.Add(listenBy.StateDescription);
-			}
-
+            ListenBy listenBy = (ListenBy) sender;
 			_MsgLB.BackColor = listenBy.IsListen ? VisualStyle.Colors.Orange : VisualStyle.Colors.White;
 		}
 
 		[EventSubscription(EventTopicNames.TlfConfListChanged, ThreadOption.Publisher)]
 		public void OnTlfConfListChanged(object sender, EventArgs e)
 		{
-			ConfList confList = _StateManager.Tlf.ConfList;
+            ConfList confList = _StateManager.Tlf.ConfList;
 
-			if (!string.IsNullOrEmpty(confList.PreviusStateDescription))
-			{
-				if (!_ConfUnused.Remove(confList.PreviusStateDescription))
-				{
-					_MsgLB.Items.Remove(confList.PreviusStateDescription);
-				}
-			}
-			if (!string.IsNullOrEmpty(confList.StateDescription))
-			{
-				if (_MsgLB.Items.Contains(confList.StateDescription))
-				{
-					_ConfUnused.Add(confList.StateDescription);
-				}
-				else
-				{
-					_MsgLB.Items.Add(confList.StateDescription);
-				}
-			}
+            if (!string.IsNullOrEmpty(confList.PreviusStateDescription))
+            {
+                if (!_ConfUnused.Remove(confList.PreviusStateDescription))
+                {
+                    _MsgLB.Text=_MsgLB.Text.Replace(confList.PreviusStateDescription, "");
+                }
+            }
+            if (!string.IsNullOrEmpty(confList.StateDescription))
+            {
+                if (_MsgLB.Text.Contains(confList.StateDescription))
+                {
+                    _ConfUnused.Add(confList.StateDescription);
+                }
+                else
+                {
+                    _MsgLB.Text +=confList.StateDescription;
+                }
+            }
 		}
 
         /// <summary>
@@ -369,33 +326,33 @@ namespace HMI.Presentation.Twr.Views
             {
                 if (_StateManager.RdSpeaker.Presencia)
                 {
-                    _MsgLB.Items.Remove(Resources.SpeakerMissing + Resources.Radio);
+                    _MsgLB.Text = _MsgLB.Text.Replace(Resources.SpeakerMissing + Resources.Radio + Environment.NewLine,"");
                 }
                 else if (_StateManager.Engine.Operative)
                 {
-                    _MsgLB.Items.Add(Resources.SpeakerMissing + Resources.Radio);
+                    _MsgLB.Text += Resources.SpeakerMissing + Resources.Radio + Environment.NewLine;
                 }
             }
             else if (tipo == typeof(LcSpeaker))
             {
                 if (_StateManager.LcSpeaker.Presencia)
                 {
-                    _MsgLB.Items.Remove(Resources.SpeakerMissing + Resources.TelephonyLC);
+                    _MsgLB.Text = _MsgLB.Text.Replace(Resources.SpeakerMissing + Resources.TelephonyLC + Environment.NewLine,"");
                 }
                 else if (_StateManager.Engine.Operative)
                 {
-                    _MsgLB.Items.Add(Resources.SpeakerMissing + Resources.TelephonyLC);
+                    _MsgLB.Text += Resources.SpeakerMissing + Resources.TelephonyLC + Environment.NewLine;
                 }
             }
             else if (tipo == typeof(HfSpeaker))
             {
                 if (_StateManager.HfSpeaker.Presencia)
                 {
-                    _MsgLB.Items.Remove(Resources.SpeakerMissing + Resources.RadioAux);
+                    _MsgLB.Text = _MsgLB.Text.Replace(Resources.SpeakerMissing + Resources.RadioAux + Environment.NewLine,"");
                 }
-                else if (_StateManager.Engine.Operative)
+                else if ((_StateManager.Engine.Operative) && (_StateManager.Radio.DoubleRadioSpeaker))
                 {
-                    _MsgLB.Items.Add(Resources.SpeakerMissing + Resources.RadioAux);
+                    _MsgLB.Text += Resources.SpeakerMissing + Resources.RadioAux + Environment.NewLine;
                 }
             }
         }

@@ -37,7 +37,6 @@ using Utilities;
 using NLog;
 
 
-
 namespace HMI.Presentation.Urr.Views
 {
     [SmartPart]
@@ -45,7 +44,7 @@ namespace HMI.Presentation.Urr.Views
     {
         [EventPublication(EventTopicNames.RdPosPttStateEngine, PublicationScope.Global)]
         public event EventHandler<RangeMsg<PttState>> RdPosPttStateEngine;
-
+        
         [EventPublication(EventTopicNames.RdPosSquelchStateEngine, PublicationScope.Global)]
         public event EventHandler<RangeMsg<SquelchState>> RdPosSquelchStateEngine;
 
@@ -99,7 +98,7 @@ namespace HMI.Presentation.Urr.Views
                     (_StateManager.Radio.GetNumFrAvalilablesForRtx(_urrRdPageButton.Page * _NumPositionsByPage, _NumPositionsByPage) > 1);
             }
         }
-
+        
         private bool _RdPageEnabled
         {
             get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative && !_StateManager.Radio.PttOn; }
@@ -228,58 +227,58 @@ namespace HMI.Presentation.Urr.Views
         public void OnPttOnChanged(object sender, EventArgs e)
         {
             //Control de errores para CarrierDetection y para TxConfirmation
-            if (_StateManager.Radio.PttOn)
-            {
-                if (Settings.Default.TxConfirmationDetectionTimeOut < 10)
-                    this._TxConfirmationDetectionTimer.Enabled = false;
-                else
-                {
-                    this._TxConfirmationDetectionTimer.Enabled = true;
-                    this._TxConfirmationDetectionTimer.Interval = Settings.Default.TxConfirmationDetectionTimeOut;
-                }
-                if (Settings.Default.CarrierDetectionTimeOut < 10)
-                    this._CarrierDetectionTimer.Enabled = false;
-                else
-                {
-                    this._CarrierDetectionTimer.Enabled = true;
-                    this._CarrierDetectionTimer.Interval = Settings.Default.CarrierDetectionTimeOut;
-                }
-            }
-            else
-            {//Liberar del estado de error los que tengan fallo al soltar el Ptt
-                _TxConfirmationDetectionTimer.Enabled = false;
-                _CarrierDetectionTimer.Enabled = false;
-                _CarrierDetectionEventFired = false;
-                _TxErrorEventFired = false;
+            //if (_StateManager.Radio.PttOn)
+            //{
+            //    if (Settings.Default.TxConfirmationDetectionTimeOut < 10)
+            //        this._TxConfirmationDetectionTimer.Enabled = false;
+            //    else
+            //    {
+            //        this._TxConfirmationDetectionTimer.Enabled = true;
+            //        this._TxConfirmationDetectionTimer.Interval = Settings.Default.TxConfirmationDetectionTimeOut;
+            //    }
+            //    if (Settings.Default.CarrierDetectionTimeOut < 10)
+            //        this._CarrierDetectionTimer.Enabled = false;
+            //    else
+            //    {
+            //        this._CarrierDetectionTimer.Enabled = true;
+            //        this._CarrierDetectionTimer.Interval = Settings.Default.CarrierDetectionTimeOut;
+            //    }
+            //}
+            //else
+            //{//Liberar del estado de error los que tengan fallo al soltar el Ptt
+            //    _TxConfirmationDetectionTimer.Enabled = false;
+            //    _CarrierDetectionTimer.Enabled = false;
+            //    _CarrierDetectionEventFired = false;
+            //    _TxErrorEventFired = false;
 
-                /* VMG 04/09/2018 */
-                //Con esto hacemos que una vez que se ha dado el error de transmision, 
-                // al dejar de recibir PTT o dejar de pulsar el boton, se genera un estado NoPtt
-                // que hace que el boton vuelva al estado normal seleccionado (color verde presumiblemente)
-                var rdButtonList = new Dictionary<UrrRdButton, RdDst>(_PttPushedList);
-                foreach (KeyValuePair<UrrRdButton, RdDst> p in rdButtonList)
-                {
-                    if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
-                        && p.Value.Ptt != PttState.ExternPtt)
-                    {
-                        try
-                        {
-                            General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.NoPtt));
-                        }
-                        catch (Exception ex)
-                        {
-                            _Logger.Error("ERROR generando evento PTT.NoPtt. " + ex);
-                        }
-                    }
-                }
-            }
+            //    /* VMG 04/09/2018 */
+            //    //Con esto hacemos que una vez que se ha dado el error de transmision, 
+            //    // al dejar de recibir PTT o dejar de pulsar el boton, se genera un estado NoPtt
+            //    // que hace que el boton vuelva al estado normal seleccionado (color verde presumiblemente)
+            //    var rdButtonList = new Dictionary<UrrRdButton, RdDst>(_PttPushedList);
+            //    foreach (KeyValuePair<UrrRdButton, RdDst> p in rdButtonList)
+            //    {
+            //        if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
+            //            && p.Value.Ptt != PttState.ExternPtt)
+            //        {
+            //            try
+            //            {
+            //                General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.NoPtt));
+            //            }
+            //            catch (Exception ex)
+            //            {
+            //                _Logger.Error("ERROR generando evento PTT.NoPtt. " + ex);
+            //            }
+            //        }
+            //    }
+            //}
             _PttBT.ButtonColor = _StateManager.Radio.PttOn ? HMI.Presentation.Urr.UI.VisualStyle.Colors.StrongGreen : HMI.Presentation.Urr.UI.VisualStyle.ButtonColor;
             _RtxBT.Enabled = _RtxEnabled;
             //_RdPageBT.Enabled = _RdPageEnabled;
             _urrRdPageButton.Enabled = false;//_RdPageEnabled;
             _UrrUpPageBT.Enabled = _RdPageEnabled;
             _UrrDownPageBT.Enabled = _RdPageEnabled;
-
+	
         }
 
         [EventSubscription(EventTopicNames.SiteManagerChanged, ThreadOption.Publisher)]
@@ -293,7 +292,7 @@ namespace HMI.Presentation.Urr.Views
             //_urrRdPageButton.Enabled = _RdPageEnabled;
             //_UrrUpPageBT.Enabled = _RdPageEnabled;
             //_UrrDownPageBT.Enabled = _RdPageEnabled;
-
+	
         }
 
         [EventSubscription(EventTopicNames.SiteChanged, ThreadOption.Publisher)]
@@ -369,6 +368,7 @@ namespace HMI.Presentation.Urr.Views
                 RdDst dst = _StateManager.Radio[i];
                 EstadoAsignacion estado = _EstadosAsignacion[i - absPageBegin];
                 Reset(bt, dst, ref estado);
+                /** Esta funcion se ha trasladado al Model Module */
                 // Para versión Enaire no hay recuperación de estados de asignación
                 // 26/01/2017
                 //_EstadosAsignacion[i - absPageBegin] = estado;
@@ -415,38 +415,39 @@ namespace HMI.Presentation.Urr.Views
             }
         }
 
-        private void RecuperaEstadoAsignacionFrecuencias()
-        {
-            int absPageBegin = _urrRdPageButton.Page * _NumPositionsByPage;
+        /** Esta funcion se ha trasladado al Model Module */
+        //private void RecuperaEstadoAsignacionFrecuencias()
+        //{
+        //    int absPageBegin = _urrRdPageButton.Page * _NumPositionsByPage;
 
-            for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
-            {
-                if (i < Settings.Default.AssignatedStates.Count)
-                {
-                    string[] estado = Settings.Default.AssignatedStates[i].Split(',');
+        //    for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
+        //    {
+        //        if (i < Settings.Default.AssignatedStates.Count)
+        //        {
+        //            string[] estado = Settings.Default.AssignatedStates[i].Split(',');
 
-                    EstadoAsignacion eAsignacion = new EstadoAsignacion();
+        //            EstadoAsignacion eAsignacion = new EstadoAsignacion();
 
-                    eAsignacion._Rx = estado[1] == "True";
-                    eAsignacion._Tx = estado[2] == "True";
-                    switch (estado[3])
-                    {
-                        case "HeadPhones":
-                            eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
-                            break;
-                        case "Speaker":
-                            eAsignacion._AudioVia = RdRxAudioVia.Speaker;
-                            break;
-                        case "NoAudio":
-                            eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
-                            break;
-                    }
+        //            eAsignacion._Rx = estado[1] == "True";
+        //            eAsignacion._Tx = estado[2] == "True";
+        //            switch (estado[3])
+        //            {
+        //                case "HeadPhones":
+        //                    eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
+        //                    break;
+        //                case "Speaker":
+        //                    eAsignacion._AudioVia = RdRxAudioVia.Speaker;
+        //                    break;
+        //                case "NoAudio":
+        //                    eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
+        //                    break;
+        //            }
 
-                    _EstadosAsignacion[i - absPageBegin] = eAsignacion;
+        //            _EstadosAsignacion[i - absPageBegin] = eAsignacion;
 
-                }
-            }
-        }
+        //        }
+        //    }
+        //}
 
         private void Reset(UrrRdButton bt, RdDst dst, ref EstadoAsignacion estado)
         {
@@ -525,8 +526,8 @@ namespace HMI.Presentation.Urr.Views
                 Color title = HMI.Presentation.Urr.UI.VisualStyle.ButtonColor;
                 Color tx = HMI.Presentation.Urr.UI.VisualStyle.ButtonColor;
                 Color rx = HMI.Presentation.Urr.UI.VisualStyle.ButtonColor;
-                Color txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Black;
-                Color rxForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Black;
+                Color txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.White;
+                Color rxForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.White;
                 Color titleForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Black;
                 Image ptt = null;
                 Image squelch = null;
@@ -536,7 +537,7 @@ namespace HMI.Presentation.Urr.Views
                 /** 20190121. AGL. ALIAS a mostrar en la tecla... */
                 // string alias = dst.Alias;
                 string alias = dst.KeyAlias;
-                bool isGreenIcons = false;
+                bool isGreenIcons = false;               
 
                 if (!dst.Unavailable)
                 {
@@ -558,9 +559,8 @@ namespace HMI.Presentation.Urr.Views
 
                         if (dst.Tx)
                         {
-                            tx = HMI.Presentation.Urr.UI.VisualStyle.Colors.HeaderBlueA1;
-                            bt.changeTxText("Tx");
-                            txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Black;//Seleccionado en reposo
+                            tx = HMI.Presentation.Urr.UI.VisualStyle.Colors.White;
+                            txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.DarkGray;//Seleccionado en reposo
                             _PttPushedList[bt] = dst;
 
                             if (_StateManager.Radio.Rtx > 0)
@@ -580,54 +580,30 @@ namespace HMI.Presentation.Urr.Views
                                 }
                             }
                         }
-                        else
-                            bt.changeTxText("");
                     }
 
                     NotifMsg msg = null;
                     switch (dst.Ptt)
                     {
                         case PttState.NoPtt:
-                            if (dst.Tx)
-                                tx = HMI.Presentation.Urr.UI.VisualStyle.Colors.HeaderBlueA1;
-                            else
-                                tx = HMI.Presentation.Urr.UI.VisualStyle.ButtonColor;
-                            //<VMG 24/07------------------
-                            //if (dst.Squelch == SquelchState.SquelchOnlyPort && dst.RtxGroup == 1)
-                            //    titleForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
-                            //VMG 24/07------------------>
                             break;
                         case PttState.ExternPtt:
-                            titleForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
-                            break;
                         case PttState.PttOnlyPort:
                             //ptt = Resources.Ptt;
-                            //txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.StrongGreen;
-                            
-                            //<VMG 24/07------------------
-                            //if (dst.RtxGroup == 1)
-                            //{
-                            //    titleForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
-                            //    txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
-                            //}
-                            //else
-                            //VMG 24/07------------------>
-                            title = HMI.Presentation.Urr.UI.VisualStyle.Colors.DarkGreen;
+                            txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.StrongGreen;
                             break;
                         case PttState.PttPortAndMod:
                             //ptt = _PttBlinkOn ? Resources.Ptt : null;
-                            //txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.StrongGreen;
-                            title = HMI.Presentation.Urr.UI.VisualStyle.Colors.DarkGreen;
+                            txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.StrongGreen;
                             _PttBlinkList[bt] = Resources.Ptt;
                             _PttBlinkTimer.Enabled = true;
                             break;
                         case PttState.Blocked:
                             title = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
-                            titleForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.DarkRed;
                             //ptt = Resources.PttBlocked;
-                            //txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.HeaderBlue;
+                            txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.HeaderBlue;
                             break;
-                        //VMG 05/09/2018 Cambios en los estados
+                            /** halfduplex */
                         case PttState.CarrierError://Error en portadora
                             title = HMI.Model.Module.UI.VisualStyle.Colors.Red;
                             if (!_CarrierDetectionEventFired && !_TxErrorEventFired)
@@ -646,17 +622,17 @@ namespace HMI.Presentation.Urr.Views
                             }
                             break;
                         /*case PttState.Error://Error en portadora
-                            title = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
-                            //txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
-                            NotifMsg msg = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.CarrierDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
-                            General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                                title = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
+                                txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
+                                NotifMsg msg = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.CarrierDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
+                                General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
                             break;
                         default://Error en Tx
-                            // PttState.PttNotConfirmed
-                            title = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
-                            //txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
-                            NotifMsg msg2 = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.TxConfirmationDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
-                            General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg2);
+                                // PttState.PttNotConfirmed
+                                title = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
+                                txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
+                                NotifMsg msg2 = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.TxConfirmationDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
+                                General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg2);
                             break;
                             */
                     }
@@ -664,24 +640,19 @@ namespace HMI.Presentation.Urr.Views
                     switch (dst.Squelch)
                     {
                         case SquelchState.SquelchOnlyPort:
-                            if(dst.Ptt==PttState.ExternPtt)
-                                txForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.Red;
                             //squelch = Resources.Squelch;
                             switch (dst.AudioVia)
                             {
                                 case RdRxAudioVia.Speaker:
-                                    rx = HMI.Presentation.Urr.UI.VisualStyle.Colors.DarkGreen;
-                                    audio = Resources.RxSpeakerBlack;//Iconos negros
+                                    audio = Resources.RxSpeaker;//Iconos verdes
                                     isGreenIcons = true;
                                     break;
                                 case RdRxAudioVia.HeadPhones:
-                                    rx = HMI.Presentation.Urr.UI.VisualStyle.Colors.DarkGreen;
-                                    audio = Resources.RxHeadPhonesBlack;
+                                    audio = Resources.RxHeadPhones;
                                     isGreenIcons = true;
                                     break;
                                 case RdRxAudioVia.NoAudio:
                                     rxForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.StrongGreen;
-                                    rx = HMI.Presentation.Urr.UI.VisualStyle.Colors.DarkGreen;
                                     break;
                             }
 
@@ -701,7 +672,7 @@ namespace HMI.Presentation.Urr.Views
                                     break;
                                 case RdRxAudioVia.NoAudio:
                                     rxForeColor = HMI.Presentation.Urr.UI.VisualStyle.Colors.StrongGreen;
-                                    break;
+                                   break;
                             }
                             _SquelchBlinkList[bt] = Resources.Squelch;
                             _SquelchBlinkTimer.Enabled = true;
@@ -709,10 +680,11 @@ namespace HMI.Presentation.Urr.Views
                         case SquelchState.NoSquelch:
                             //isNoSquelch = true;
                             break;
+
                     }
 
                     if (!isGreenIcons)
-                    {
+                    {  
                         switch (dst.AudioVia)
                         {
                             case RdRxAudioVia.Speaker:
@@ -724,13 +696,7 @@ namespace HMI.Presentation.Urr.Views
                         }
                     }
                 }
-                else
-                {
-                    bt.changeTxText("");
-                    title = HMI.Presentation.Urr.UI.VisualStyle.Colors.HeaderBlueA1;
-                    tx = HMI.Presentation.Urr.UI.VisualStyle.ButtonColor;
-                    rx = HMI.Presentation.Urr.UI.VisualStyle.ButtonColor;
-                }
+
                 // Mostrar información Qidx sólo si en HMI.exe.config está habilitado
                 if (Settings.Default.ShowBssProperties)
                 {
@@ -1041,58 +1007,58 @@ namespace HMI.Presentation.Urr.Views
         ///<summary>
         /// Error al confirmar la Transmision. Tick del Timer.
         ///</summary>
-        private void _TxConfirmationDetectionTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_TxConfirmationDetectionTimer.Enabled)
-                {
-                    var rdButtonList = new Dictionary<UrrRdButton, RdDst>(_PttPushedList);
-                    foreach (KeyValuePair<UrrRdButton, RdDst> p in rdButtonList)
-                    {
-                        if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
-                            && p.Value.Ptt != PttState.ExternPtt)
-                        {
-                            General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.TxError));//VMG Invented por ahora
-                            _TxErrorEventFired = true;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error("ERROR generando timer error recepcion Tx", ex);
-            }
-        }
+        //private void _TxConfirmationDetectionTimer_Tick(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (_TxConfirmationDetectionTimer.Enabled)
+        //        {
+        //            var rdButtonList = new Dictionary<UrrRdButton, RdDst>(_PttPushedList);
+        //            foreach (KeyValuePair<UrrRdButton, RdDst> p in rdButtonList)
+        //            {
+        //                if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
+        //                    && p.Value.Ptt != PttState.ExternPtt)
+        //                {
+        //                    General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.TxError));//VMG Invented por ahora
+        //                    _TxErrorEventFired = true;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _Logger.Error("ERROR generando timer error recepcion Tx", ex);
+        //    }
+        //}
 
         /* VMG 05/09/2018 */
         ///<summary>
         /// Error de Rx al realizar Tx. Tick del Timer.
         ///</summary>
-        private void _CarrierDetectionTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_CarrierDetectionTimer.Enabled)
-                {
-                    var rdButtonList = new Dictionary<UrrRdButton, RdDst>(_PttPushedList);
-                    foreach (KeyValuePair<UrrRdButton, RdDst> p in rdButtonList)
-                    {
-                        if (p.Value.Ptt == PttState.PttOnlyPort && p.Value.Squelch == SquelchState.NoSquelch)
-                        {
-                            General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.CarrierError));
-                            _CarrierDetectionEventFired = true;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error("ERROR generando timer Ptt", ex);
-            }
-        }
+        //private void _CarrierDetectionTimer_Tick(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (_CarrierDetectionTimer.Enabled)
+        //        {
+        //            var rdButtonList = new Dictionary<UrrRdButton, RdDst>(_PttPushedList);
+        //            foreach (KeyValuePair<UrrRdButton, RdDst> p in rdButtonList)
+        //            {
+        //                if (p.Value.Ptt == PttState.PttOnlyPort && p.Value.Squelch == SquelchState.NoSquelch)
+        //                {
+        //                    General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.CarrierError));
+        //                    _CarrierDetectionEventFired = true;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _Logger.Error("ERROR generando timer Ptt", ex);
+        //    }
+        //}
 
-        //Error retransmisión RTX
+        /*/Error retransmisión RTX
         private void _RtxErrorTimer_Tick(object sender, EventArgs e)
         {
             bool thereIsGroup = false;
@@ -1131,12 +1097,12 @@ namespace HMI.Presentation.Urr.Views
                 _Logger.Error("ERROR generando timer error Rtx", ex);
             }
         }
-
+        */
         private void RadioView_BackColorChanged(object sender, EventArgs e)
         {
             Invalidate(true);
         }
-
+        
         /*private void _UrrDownPageBT_DownClick(object sender)
         {
             int actualPage = _urrRdPageButton.Page;
@@ -1176,6 +1142,88 @@ namespace HMI.Presentation.Urr.Views
             {
                 string msg = string.Format("ERROR solicitando pagina RD anterior [Actual={0}]", actualPage);
                 _Logger.Error(msg, ex);
+            }
+        }
+
+        /** 20190205. Pintar los errores de confirmacion de transmision */
+        [EventSubscription(EventTopicNames.TxInProgressError, ThreadOption.Publisher)]
+        public void OnTxInProgressError(object sender, TxInProgressErrorCode e)
+        {
+            var InGroupButtons = new Dictionary<UrrRdButton, RdDst>(_PttPushedList);
+            switch (e.IdEvent)
+            {
+                case 0:             // PTT OFF
+                                    /* VMG 04/09/2018 */
+                                    // Con esto hacemos que una vez que se ha dado el error de transmision,                     
+                                    // al dejar de recibir PTT o dejar de pulsar el boton, se genera un estado NoPtt                    
+                                    // que hace que el boton vuelva al estado normal seleccionado (color verde presumiblemente)
+                    foreach (KeyValuePair<UrrRdButton, RdDst> p in InGroupButtons)
+                    {
+                        if (p.Value.Ptt != PttState.PttOnlyPort && p.Value.Ptt != PttState.PttPortAndMod
+                            && p.Value.Ptt != PttState.ExternPtt && p.Value.Ptt != PttState.Blocked)
+                        {
+                            try
+                            {
+                                General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.NoPtt));
+                            }
+                            catch (Exception ex)
+                            {
+                                _Logger.Error("ERROR generando evento PTT.NoPtt. " + ex);
+                            }
+                        }
+                    }
+                    break;
+                case 1:             // Error en Confirmacion TX.
+                    {
+                        foreach (KeyValuePair<UrrRdButton, RdDst> p in InGroupButtons)
+                        {
+                            if (p.Value.Ptt != PttState.PttOnlyPort &&
+                                p.Value.Ptt != PttState.PttPortAndMod &&
+                                p.Value.Ptt != PttState.ExternPtt &&
+                                /** 20190205. Cuando esta en BLOQUEO no hay que testear el fallo de confirmacion de TX */
+                                p.Value.Ptt != PttState.Blocked)
+                            {
+                                General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.TxError));//VMG Invented por ahora
+                            }
+                        }
+                        NotifMsg msg = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.TxConfirmationDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    }
+                    break;
+
+                case 2:             // Error en Confirmacion Portadora.
+                    {
+                        foreach (KeyValuePair<UrrRdButton, RdDst> p in InGroupButtons)
+                        {
+                            if (p.Value.Ptt == PttState.PttOnlyPort && p.Value.Squelch == SquelchState.NoSquelch)
+                            {
+                                General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.CarrierError));
+                            }
+                        }
+                        NotifMsg msg = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.CarrierDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    }
+                    break;
+
+                case 3:             // Error en Grupo RTX
+                    //foreach (KeyValuePair<UrrRdButton, RdDst> p in InGroupButtons)
+                    //{
+                    //    if (p.Value.RtxGroup > 0 && p.Value.Squelch == SquelchState.NoSquelch)
+                    //    {
+                    //        p.Key.setRtxErrorColor(true);
+                    //    }
+                    //}
+                    break;
+
+                case 4:             // RTX OFF
+                    //foreach (KeyValuePair<UrrRdButton, RdDst> p in InGroupButtons)
+                    //{
+                    //    if (p.Value.RtxGroup > 0 && p.Value.Squelch == SquelchState.NoSquelch)
+                    //    {
+                    //        p.Key.setRtxErrorColor(false);
+                    //    }
+                    //}
+                    break;
             }
         }
     }

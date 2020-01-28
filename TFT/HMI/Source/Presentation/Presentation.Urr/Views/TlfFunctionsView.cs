@@ -55,11 +55,11 @@ namespace HMI.Presentation.Urr.Views
             get
             {
                 return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
-                    ((_StateManager.Tlf.Priority.State != PriorityState.Idle) ||
+                    ((_StateManager.Tlf.Priority.State != FunctionState.Idle) ||
                     (((_StateManager.Permissions & Permissions.Priority) == Permissions.Priority) &&
                      _StateManager.Jacks.SomeJack &&
-                    (_StateManager.Tlf.Listen.State == ListenState.Idle) &&
-                    (_StateManager.Tlf.Transfer.State == TransferState.Idle) &&
+                    (_StateManager.Tlf.Listen.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
                     (_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] +
                     _StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteHold] == 0)));
             }
@@ -69,11 +69,11 @@ namespace HMI.Presentation.Urr.Views
             get
             {
                 return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
-                    ((_StateManager.Tlf.Listen.State != ListenState.Idle) ||
+                    ((_StateManager.Tlf.Listen.State != FunctionState.Idle) ||
                     (((_StateManager.Permissions & Permissions.Listen) == Permissions.Listen) &&
                      _StateManager.Jacks.SomeJack &&
-                    (_StateManager.Tlf.Priority.State == PriorityState.Idle) &&
-                    (_StateManager.Tlf.Transfer.State == TransferState.Idle) &&
+                    (_StateManager.Tlf.Priority.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
                     (_StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.Busy] +
                     _StateManager.Tlf[TlfState.Hold] + _StateManager.Tlf[TlfState.RemoteHold] +
                     _StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] +
@@ -88,9 +88,9 @@ namespace HMI.Presentation.Urr.Views
                 return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
                     ((_StateManager.Permissions & Permissions.Hold) == Permissions.Hold) &&
                      _StateManager.Jacks.SomeJack &&
-                    (_StateManager.Tlf.Priority.State == PriorityState.Idle) &&
-                    (_StateManager.Tlf.Listen.State == ListenState.Idle) &&
-                    (_StateManager.Tlf.Transfer.State == TransferState.Idle) &&
+                    (_StateManager.Tlf.Priority.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Listen.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
                     (_StateManager.Tlf[TlfState.Set] + /* _StateManager.Tlf[TlfState.Conf] */ +_StateManager.Tlf[TlfState.RemoteHold] > 0) &&
                     (_StateManager.Tlf[TlfState.Conf] == 0);
             }
@@ -100,11 +100,11 @@ namespace HMI.Presentation.Urr.Views
             get
             {
                 return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
-                    ((_StateManager.Tlf.Transfer.State != TransferState.Idle) ||
+                    ((_StateManager.Tlf.Transfer.State != FunctionState.Idle) ||
                     (((_StateManager.Permissions & Permissions.Transfer) == Permissions.Transfer) &&
                      _StateManager.Jacks.SomeJack &&
-                    (_StateManager.Tlf.Priority.State == PriorityState.Idle) &&
-                    (_StateManager.Tlf.Listen.State == ListenState.Idle) &&
+                    (_StateManager.Tlf.Priority.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Listen.State == FunctionState.Idle) &&
                     (_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] == 1)));
             }
         }
@@ -117,7 +117,7 @@ namespace HMI.Presentation.Urr.Views
         }
         private bool _CancelEnabled
         {
-            get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative && (_StateManager.Tlf.Listen.State == ListenState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
+            get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative && (_StateManager.Tlf.Listen.State == FunctionState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
         }
 
         private string _Prioridad   // Miguel
@@ -215,7 +215,7 @@ namespace HMI.Presentation.Urr.Views
 
             switch (_StateManager.Tlf.Priority.State)
             {
-                case PriorityState.Idle:
+                case FunctionState.Idle:
                     if (_SlowBlinkList.Remove(_PriorityBT) && (_SlowBlinkList.Count == 0))
                     {
                         _SlowBlinkTimer.Enabled = false;
@@ -223,12 +223,12 @@ namespace HMI.Presentation.Urr.Views
                     }
                     _PriorityBT.ButtonColor = VisualStyle.ButtonColor;
                     break;
-                case PriorityState.Ready:
+                case FunctionState.Ready:
                     _PriorityBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
                     _SlowBlinkList[_PriorityBT] = VisualStyle.Colors.Yellow;
                     _SlowBlinkTimer.Enabled = true;
                     break;
-                case PriorityState.Error:
+                case FunctionState.Error:
                     if (_SlowBlinkList.Remove(_PriorityBT) && (_SlowBlinkList.Count == 0))
                     {
                         _SlowBlinkTimer.Enabled = false;
@@ -250,43 +250,34 @@ namespace HMI.Presentation.Urr.Views
 
             switch (_StateManager.Tlf.Listen.State)
             {
-                case ListenState.Idle:
+                case FunctionState.Idle:
                     if (_SlowBlinkList.Remove(_ListenBT) && (_SlowBlinkList.Count == 0))
                     {
                         _SlowBlinkTimer.Enabled = false;
                         _SlowBlinkOn = true;
                     }
                     _ListenBT.ButtonColor = VisualStyle.ButtonColor;
-                    //VMG 12/09/2018
-                    //Generar evento para poner los botones como estuvieran
-                    _CmdManager.RdSwitchRxToHeadphone();
                     break;
-                case ListenState.Ready:
+                case FunctionState.Ready:
                     _ListenBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
                     _SlowBlinkList[_ListenBT] = VisualStyle.Colors.Yellow;
                     _SlowBlinkTimer.Enabled = true;
                     break;
-                case ListenState.Executing:
+                case FunctionState.Executing:
                     if (_SlowBlinkList.Remove(_ListenBT) && (_SlowBlinkList.Count == 0))
                     {
                         _SlowBlinkTimer.Enabled = false;
                         _SlowBlinkOn = true;
                     }
                     _ListenBT.ButtonColor = VisualStyle.Colors.Yellow;
-                    //VMG 12/09/2018
-                    //Generar evento para poner los botones en cascos
-                    _CmdManager.RdSwitchRxToSpeaker();
                     break;
-                case ListenState.Error:
+                case FunctionState.Error:
                     if (_SlowBlinkList.Remove(_ListenBT) && (_SlowBlinkList.Count == 0))
                     {
                         _SlowBlinkTimer.Enabled = false;
                         _SlowBlinkOn = true;
                     }
                     _ListenBT.ButtonColor = VisualStyle.Colors.Red;
-                    //VMG 12/09/2018
-                    //Generar evento para poner los botones como estuvieran
-                    _CmdManager.RdSwitchRxToHeadphone();
                     break;
             }
         }
@@ -301,7 +292,7 @@ namespace HMI.Presentation.Urr.Views
 
             switch (_StateManager.Tlf.Transfer.State)
             {
-                case TransferState.Idle:
+                case FunctionState.Idle:
                     if (_SlowBlinkList.Remove(_TransferBT) && (_SlowBlinkList.Count == 0))
                     {
                         _SlowBlinkTimer.Enabled = false;
@@ -309,13 +300,13 @@ namespace HMI.Presentation.Urr.Views
                     }
                     _TransferBT.ButtonColor = VisualStyle.ButtonColor;
                     break;
-                case TransferState.Ready:
-                case TransferState.Executing:
+                case FunctionState.Ready:
+                case FunctionState.Executing:
                     _TransferBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
                     _SlowBlinkList[_TransferBT] = VisualStyle.Colors.Yellow;
                     _SlowBlinkTimer.Enabled = true;
                     break;
-                case TransferState.Error:
+                case FunctionState.Error:
                     if (_SlowBlinkList.Remove(_TransferBT) && (_SlowBlinkList.Count == 0))
                     {
                         _SlowBlinkTimer.Enabled = false;

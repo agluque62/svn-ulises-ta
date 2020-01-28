@@ -310,7 +310,7 @@
     <value>Mauvaise opération</value>
   </data>
   <data name="CarrierDetectionError" xml:space="preserve">
-    <value>Transporteur non trouvé</value>
+    <value>Transporteur non trouvé.</value>
   </data>
   <data name="TxConfirmationDetectionError" xml:space="preserve">
     <value>Transmission non confirmée</value>

@@ -9,7 +9,6 @@
     <title>UV5KI. Nodebox</title>
     <!-- Estilos  -->
     <link rel="stylesheet" href="./styles/bootstrap/bootstrap.min.css" />
-    <!--    <link rel="stylesheet" href="./styles/ng-table.css" />-->
     <link rel="stylesheet" href="./styles/uv5ki-styles.css" />
     <link rel="stylesheet" type="text/css" href="./styles/alertify/alertify.min.css" />
     <link rel="stylesheet" type="text/css" href="./styles/alertify/themes/bootstrap.css" />
@@ -22,7 +21,7 @@
             <div id="_contSupIzq">
                 <div id="_logo" style="width:90%;">
                     <!-- <img src="./images/nucleo-df-new.jpg" /> -->
-                    <img src="./images/corporativo.png" 
+                    <img src="./images/corporativo-a.png" 
 						 style="width:100%; height: 100%; margin: 0;"/>
                 </div>
             </div>
@@ -72,7 +71,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="inci in ctrl.listainci">
+                    <tr data-ng-repeat="inci in ctrl.inciPage">
                         <td>
                             <div>{{inci.fh}}</div>
                         </td>
@@ -91,15 +90,23 @@
                     <tr style="padding: 0;">
                         <td></td>
                         <td></td>
-                        <td style="text-align: right;">
-                            <div id="pag" st-pagination="" st-items-by-page="4" st-displayed-pages="4"></div>
+                        <td></td>
+                        <td >
+                            <div class="row">
+                                <div class="col-md-2" style="float: right; margin-top: 17px; text-align:right">
+                                    <p>Pag. {{ctrl.inciCurrentPage}}-{{ctrl.inciPages}}</p>
+                                </div>
+                                <div class="col-md-3" style="float: right">
+                                    <uib-pager style="margin-top: 10px; margin-bottom: 10px;" total-items="ctrl.listainci.length"
+                                               ng-model="ctrl.inciCurrentPage" items-per-page="ctrl.inciPageSize" next-text=">>" previous-text="<<"></uib-pager>
+                                </div>
+                            </div>
                         </td>
                     </tr>
-
                 </tfoot>
             </table>
         </div>
-        <footer id="_pie" translate>Nucleo Copyright @ 2015-2018. Todos los Derechos Reservados.</footer>
+        <footer id="_pie" translate>Nucleo Copyright @ 2015-2020. Todos los Derechos Reservados.</footer>
     </div>
 
     <!-- inject-vendor:js -->

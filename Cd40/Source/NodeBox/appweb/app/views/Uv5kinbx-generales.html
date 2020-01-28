@@ -49,7 +49,7 @@
                     <td>{{ctrl.txtModo(ctrl.std.rad)}}</td>
                     <td>{{ctrl.txtEstadoMn(ctrl.std.mn)}}</td>
                 </tr>
-                <tr data-ng-class="ctrl.colorEstado(ctrl.std.pho)" ng-hide="ctrl.DisablePhoneServiceComponent()">
+                <tr data-ng-class="ctrl.colorEstado(ctrl.std.pho)" ng-hide="ctrl.DisablePhoneServiceComponent(true)">
                     <td class="text-primary"><strong translate>Telefonia (Focus)</strong></td>
                     <td>{{ctrl.txtModo(ctrl.std.pho)}}</td>
                     <td>{{ctrl.txtEstado(ctrl.std.pho)}}</td>

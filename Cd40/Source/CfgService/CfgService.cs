@@ -15,6 +15,7 @@ using ProtoBuf;
 using NLog;
 
 using Translate;
+using Newtonsoft.Json;
 
 namespace U5ki.CfgService
 {
@@ -214,7 +215,7 @@ namespace U5ki.CfgService
                 _WorkingThread.Start();
 
                 _CheckCfg.AutoReset = false;
-                _CheckCfg.Elapsed += OnTimeElapsed;
+                _CheckCfg.Elapsed += OnCheckCfg;
 
                 InitRegistry();
 
@@ -318,9 +319,9 @@ namespace U5ki.CfgService
         /// </summary>
         private bool _StopCfgThread = false;
         /// <summary>
-        /// 
+        /// Flag that is true during the recovery of data of a new confguration
         /// </summary>
-        private Thread _GetSoapCfgThread = null;
+        private bool _CfgOnGoing = false;
         /// <summary>
         /// 
         /// </summary>
@@ -329,6 +330,7 @@ namespace U5ki.CfgService
         /// 
         /// </summary>
         private string _LastCfgFile = "u5ki.LastCfg.bin";
+        private string _LastCfgFileJson = "u5ki.LastCfg.json";
 #if _LOCKING_
         private object _lock = new object();
 #endif
@@ -345,17 +347,7 @@ namespace U5ki.CfgService
              * Fin de la Modificacion */
 
             _CheckCfg.Enabled = false;
-
-            if (_GetSoapCfgThread != null)
-            {
                 _StopCfgThread = true;
-                if (!_GetSoapCfgThread.Join(2000))
-                {
-                    _GetSoapCfgThread.Abort();
-                }
-                _GetSoapCfgThread = null;
-            }
-
             if (_Registry != null)
             {
                 _Registry.Dispose();
@@ -402,7 +394,6 @@ namespace U5ki.CfgService
         /// <param name="master"></param>
         private void OnMasterStatusChanged(object sender, bool master)
         {
-            Debug.Assert(_Master != master);
             _Master = master;
 
             _WorkingThread.Enqueue("OnMasterStatusChanged", delegate()
@@ -412,12 +403,14 @@ namespace U5ki.CfgService
                 {
 #endif
                 if (_Master)
+                //Para que el servicio de configuración entre el último master
+                System.Threading.Thread.Sleep(3000);
+
+                if (_Master)
                 {
                     try
                     {
-                        Debug.Assert(_CfgChangesListener == null);
-                        _Registry.PublishMaster(ServiceSite, Identifiers.CfgMasterTopic);
-
+                        //Debug.Assert(_CfgChangesListener == null);
                         if (_LastCfg != null)
                         {
                             _Registry.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, _LastCfg);
@@ -427,7 +420,7 @@ namespace U5ki.CfgService
                             _Registry.Publish(_LastCfg.Version, false);
                              * */
                             /**
-                             * Cambio */
+                             * Cambio */                            
                             _Registry.Publish(_LastCfg.Version);
                             /**
                              * Fin del cambio */
@@ -447,6 +440,21 @@ namespace U5ki.CfgService
                                 // _Logger.Info(_LastCfg.ConfiguracionGeneral.ParametrosGenerales.ToString());
                             }
                         }
+                        else if (File.Exists(_LastCfgFileJson))
+                        {
+                            using (StreamReader r = new StreamReader(_LastCfgFileJson))
+                            {
+                                string json = r.ReadToEnd();
+                                _LastCfg = JsonConvert.DeserializeObject <Cd40Cfg>(json);
+
+                                _Registry.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, _LastCfg);
+                                _Registry.Publish(_LastCfg.Version);
+
+                                // _Logger.Info(_LastCfg.ConfiguracionGeneral.ParametrosGenerales.ToString());
+                            }
+                        }
+                        else
+                            LogInfo<CfgService>("No cfg file found", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "CfgService", "MASTER");
                         /**
                          * Fin del cambio.*/
                     }
@@ -458,7 +466,7 @@ namespace U5ki.CfgService
                     finally
                     {
                         LogInfo<CfgService>("MASTER", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "CfgService", "MASTER");
-                        OnTimeElapsed(null, null);
+                        OnCheckCfg(null, null);
                     }
                 }
                 else
@@ -476,26 +484,8 @@ namespace U5ki.CfgService
                             _CfgChangesListener = null;
                         }
 
-                        if (_GetSoapCfgThread != null)
-                        {
                             _StopCfgThread = true;
-                            if (!_GetSoapCfgThread.Join(2000))
-                            {
-                                _GetSoapCfgThread.Abort();
                             }
-                            _GetSoapCfgThread = null;
-                        }
-
-                        //Para Gestion Master/slave. 
-                        //Si paso de master a slave reinicio el Registry
-                        if (_Registry != null)
-                        {
-                            _Registry.Dispose();
-                            _Registry = null;
-                        }
-                        InitRegistry();
-
-                    }
                     catch (Exception x)
                     {
                         //LogException<CfgService>("CONFIG Cambiando a SLAVE...", x);
@@ -505,7 +495,6 @@ namespace U5ki.CfgService
                     {
                         _CheckCfg.Enabled = false;
                         _CfgChangesListener = null;
-                        _GetSoapCfgThread = null;
 
                         LogInfo<CfgService>("SLAVE");
                     }
@@ -533,7 +522,9 @@ namespace U5ki.CfgService
 #endif
                     if (!_Master)
                     {
-                        MemoryStream ms = new MemoryStream(e.Content);
+                        try
+                        {
+                            MemoryStream ms = new MemoryStream(Tools.Decompress(e.Content));
                         _LastCfg = Serializer.Deserialize<Cd40Cfg>(ms);
                         /**
                          * AGL 20120704. Salvo la configuracion en disco...
@@ -544,6 +535,13 @@ namespace U5ki.CfgService
                         }
                         /**
                          * Fin Cambio */
+                            string json = JsonConvert.SerializeObject(_LastCfg);
+                            File.WriteAllText(_LastCfgFileJson, json);
+                    }
+                        catch (Exception exc)
+                        {
+                            ExceptionManage<CfgService>("OnResourceChanged", exc, "Slave save cfg to file " + _LastCfg.Version + " Excepción: " + exc.Message);
+                        }
                     }
 #if _LOCKING_
                     }
@@ -556,7 +554,7 @@ namespace U5ki.CfgService
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnTimeElapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void OnCheckCfg(object sender, System.Timers.ElapsedEventArgs e)
         {
             _WorkingThread.Enqueue("OnTimeElapsed", delegate()
             {
@@ -569,18 +567,8 @@ namespace U5ki.CfgService
                 {
                     try
                     {
+                        _CheckCfg.Interval = 30000;
                         _CheckCfg.Enabled = false;
-
-                        if (_GetSoapCfgThread != null)
-                        {
-                            _StopCfgThread = true;
-                            if (!_GetSoapCfgThread.Join(2000))
-                            {
-                                _GetSoapCfgThread.Abort();
-                                LogWarn<CfgService>("OnTimeElapsed: " + "El hilo de obtencion de configuracion SOAP fue abortado");
-                            }
-                            _GetSoapCfgThread = null;
-                        }
 
                         if (_CfgChangesListener == null)
                         {
@@ -597,19 +585,18 @@ namespace U5ki.CfgService
                         }
 
                         _StopCfgThread = false;
-                        _GetSoapCfgThread = new Thread(TryGetSoapCfg);
-                        _GetSoapCfgThread.IsBackground = true;
-                        _GetSoapCfgThread.Start();
+                        _CfgOnGoing = true;
+                        TryGetSoapCfg();
+                        _CfgOnGoing = false;
                     }
                     catch (Exception ex)
                     {
                         //LogException<CfgService>("Conexion a SOAP", ex);
+                        _CheckCfg.Enabled = true;
                         ExceptionManage<CfgService>("OnTimeElapsed", ex, "En conexion SOAP. Exception: " + ex.Message);
                     }
                     finally
                     {
-                        _CheckCfg.Interval = 30000;
-                        _CheckCfg.Enabled = true;
                         LogTrace<CfgService>("OnTimeElapsed-OUT");
                     }
                 }
@@ -651,7 +638,12 @@ namespace U5ki.CfgService
                             catch (Exception) { }
 
                             LogInfo<CfgService>("OnSoapCfgChanged: " + "Recibida notificacion de cambio de configuracion SOAP");
+                            if (_CfgOnGoing == true)
+                                _StopCfgThread = true;
+                            _CheckCfg.Stop();
                             _CheckCfg.Interval = 1;
+                            _CheckCfg.Start();
+
                         }
                     }
                 }
@@ -702,29 +694,28 @@ namespace U5ki.CfgService
                             hosts.Add(asign.IdHost);
                         }
                     }
-
+                    SoapCfg.LoginTerminalVoz soapLoginCfg;
+                    SoapCfg.CfgUsuario soapCfgUser;
                     /** De la lista de Hosts, determina los usuarios y de enlaces a usuarios internos y externos ??? y de 'usarios dominantes' ??? */
                     foreach (string host in hosts)
                     {
-                        SoapCfg.LoginTerminalVoz soapLoginCfg = soapSrv.LoginTop(systemId, host);
+                        soapLoginCfg = soapSrv.LoginTop(systemId, host);
                         if (_StopCfgThread) return;
 
                         if (!string.IsNullOrEmpty(soapLoginCfg.IdUsuario))
                         {
-                            SoapCfg.CfgUsuario soapCfgUser = soapSrv.GetCfgUsuario(systemId, soapLoginCfg.IdUsuario);
-                            if (_StopCfgThread) return;
-
-                            SoapCfg.CfgEnlaceExterno[] soapExLinks = soapSrv.GetListaEnlacesExternos(systemId, soapLoginCfg.IdUsuario);
-                            if (_StopCfgThread) return;
-
-                            SoapCfg.CfgEnlaceInterno[] soapInLinks = soapSrv.GetListaEnlacesInternos(systemId, soapLoginCfg.IdUsuario);
-                            if (_StopCfgThread) return;
-
+                            soapCfgUser = soapSrv.GetCfgUsuario(systemId, soapLoginCfg.IdUsuario);
                             soapUsers.Add(soapCfgUser);
-                            soapUsersExLinks.Add(soapExLinks);
-                            soapUsersInLinks.Add(soapInLinks);
-
                             dominantUsers[host] = soapCfgUser.IdIdentificador;
+                            if (_StopCfgThread) return;
+
+                            soapUsersExLinks.Add(soapSrv.GetListaEnlacesExternos(systemId, soapLoginCfg.IdUsuario));
+                            if (_StopCfgThread) 
+                                return;
+
+                            soapUsersInLinks.Add(soapSrv.GetListaEnlacesInternos(systemId, soapLoginCfg.IdUsuario));
+                            if (_StopCfgThread) return;
+
                         }
                     }
 
@@ -776,31 +767,40 @@ namespace U5ki.CfgService
                             CfgTranslators.Translate(cfg, nmelement);
                         }
                     }
-
-
-                    /** Salva y distribuye la configuracion */
-                    _WorkingThread.Enqueue("PublishNewCfg", delegate()
-                    {
-                        if (_Master)
-                        {
                             try
                             {
-                                _LastCfg = cfg;
                                 /**
                                  * AGL 20120705. Salvar la configuracion en disco
                                  * */
                                 using (FileStream file = File.Create(_LastCfgFile))
                                 {
-                                    Serializer.Serialize(file, _LastCfg);
+                                    Serializer.Serialize(file, cfg);
                                 }
+
+                        string json = JsonConvert.SerializeObject(cfg);
+                        File.WriteAllText(_LastCfgFileJson, json);
+                    }
+                    catch (Exception exc)
+                    {
+                        ExceptionManage<CfgService>("TryGetSoapCfg", exc, "En TryGetSoapCfg save to file "+ cfg.Version+" Excepción: " + exc.Message);
+                    }
                                 /**
                                  * Fin de Modificacion */
 
+                    /** Salva y distribuye la configuracion */
+                    _WorkingThread.Enqueue("PublishNewCfg", delegate()
+                    {
+                            try
+                            {
+                                if (_Master && !_StopCfgThread)
+                                {
+                                    _LastCfg = cfg;
                                 LogInfo<CfgService>("Publicando nueva configuración: "+cfg.Version , U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
                                     "CfgService", CTranslate.translateResource("Publicando nueva configuración: " + cfg.Version));
 
                                 _Registry.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, cfg);
                                 _Registry.Publish(cfg.Version);
+                            }
                             }
                             catch (Exception ex)
                             {
@@ -811,21 +811,23 @@ namespace U5ki.CfgService
                                 Dispose();
                                 _Status = ServiceStatus.Stopped;
                             }
-
-                        }
                     });
                 }
             }
-            catch (ThreadAbortException)
+            catch (ThreadAbortException ex)
             {
                 Thread.ResetAbort();
+                ExceptionManage<CfgService>("TryGetSoapCfg", ex, "En TryGetSoapCfg Excepcion: " + ex.Message);
             }
             catch (Exception ex)
             {
                 //LogException<CfgService>("TryGetSoapCfg: Intento fallido de obtener la configuracion SOAP.", ex);
                 ExceptionManage<CfgService>("TryGetSoapCfg", ex, "En TryGetSoapCfg Excepcion: " + ex.Message);
             }
-
+            finally
+            {
+                _CheckCfg.Enabled = true;
+            }
             return;
         }
 

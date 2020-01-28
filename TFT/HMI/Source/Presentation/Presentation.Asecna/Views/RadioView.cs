@@ -110,8 +110,17 @@ namespace HMI.Presentation.Asecna.Views
 
         public RadioView([ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
 		{
-			InitializeComponent();
-            _SelCallWS.Name = WorkspaceNames.SelCallWorkspace;
+            InitializeComponent();
+            if (!Settings.Default.HFView)
+            {
+                _RadioTLP.Controls.Remove(_SelCallWS);
+                _RadioTLP.RowStyles.Clear();
+                _RadioTLP.RowCount = 2;
+                this._RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 18F));
+                this._RadioTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 82F));
+            }
+            else 
+                _SelCallWS.Name = WorkspaceNames.SelCallWorkspace;
 
 			_CmdManager = cmdManager;
 			_StateManager = stateManager;
@@ -166,8 +175,10 @@ namespace HMI.Presentation.Asecna.Views
 
 			_RdSpeakerUDB.Level = _StateManager.RdSpeaker.Level;
             _RdHfSpeakerUDB.Level = _StateManager.HfSpeaker.Level;
-            //En Asecna el doble altavoz está siempre para frecuencias HF o para todas
-            _RdHfSpeakerUDB.Enabled = _RdSpeakerUDB.Enabled = _RdSpeakerEnabled;
+            //En Asecna el doble altavoz es configurable (para Kenia)
+            _RdHfSpeakerUDB.Visible = _StateManager.Radio.DoubleRadioSpeaker;
+            _RdHfSpeakerUDB.Enabled = _RdSpeakerEnabled;
+            _RdSpeakerUDB.Enabled = _RdSpeakerEnabled;
             _RdHfSpeakerUDB.DrawX = _RdSpeakerUDB.DrawX = true;
             _RdHeadPhonesUDB.Visible = !_StateManager.Tlf.SoloAltavoces;
             _RdHeadPhonesUDB.Level = _StateManager.RdHeadPhones.Level;
@@ -177,14 +188,16 @@ namespace HMI.Presentation.Asecna.Views
 			_RdPageBT.Enabled = _RdPageEnabled;
             _RtxBT.Text = _Rtx; // Miguel
 
-            RecuperaEstadoAsignacionFrecuencias();            
+            /** Esta funcion se ha trasladado al MODEL MODULE */
+            //RecuperaEstadoAsignacionFrecuencias();            
 		}
 
 		[EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
 		[EventSubscription(EventTopicNames.EngineStateChanged, ThreadOption.Publisher)]
 		public void OnTftEngineChanged(object sender, EventArgs e)
 		{
-            _RdHfSpeakerUDB.Enabled = _RdSpeakerUDB.Enabled = _RdSpeakerEnabled;
+            _RdHfSpeakerUDB.Enabled = _RdSpeakerEnabled;
+            _RdSpeakerUDB.Enabled = _RdSpeakerEnabled;
 			_RdHeadPhonesUDB.Enabled = _RdHeadPhonesEnabled;
 			_PttBT.Enabled = _PttEnabled;
 			_RtxBT.Enabled = _RtxEnabled;
@@ -332,24 +345,26 @@ namespace HMI.Presentation.Asecna.Views
 				//Reset(bt, dst);
 				_EstadosAsignacion[i - absPageBegin] = estado;
 
-                if (i < Settings.Default.AssignatedStates.Count)
-                {
-                    Settings.Default.AssignatedStates.RemoveAt(i - absPageBegin);
-                    Settings.Default.AssignatedStates.Insert(i - absPageBegin, dst.Frecuency + "," + _EstadosAsignacion[i - absPageBegin]._Rx.ToString() + "," +
-                                                        ((dst.TipoFrecuencia == TipoFrecuencia_t.HF) ? false : _EstadosAsignacion[i - absPageBegin]._Tx) +
-                                                            "," + _EstadosAsignacion[i - absPageBegin]._AudioVia + "," + _EstadosAsignacion[i - absPageBegin].Unavailable);
-                }
-                else
-                {
-                    Settings.Default.AssignatedStates.Add(dst.Frecuency + "," + _EstadosAsignacion[i - absPageBegin]._Rx.ToString() + "," +
-                                                        ((dst.TipoFrecuencia == TipoFrecuencia_t.HF) ? false : _EstadosAsignacion[i - absPageBegin]._Tx) +
-                                                            "," + _EstadosAsignacion[i - absPageBegin]._AudioVia + "," + _EstadosAsignacion[i - absPageBegin].Unavailable);
-                }
+                /** Esta funcion se ha trasladado al MODEL MODULE */
+                //if (i < Settings.Default.AssignatedStates.Count)
+                //{
+                //    Settings.Default.AssignatedStates.RemoveAt(i - absPageBegin);
+                //    Settings.Default.AssignatedStates.Insert(i - absPageBegin, dst.Frecuency + "," + _EstadosAsignacion[i - absPageBegin]._Rx.ToString() + "," +
+                //                                        ((dst.TipoFrecuencia == TipoFrecuencia_t.HF) ? false : _EstadosAsignacion[i - absPageBegin]._Tx) +
+                //                                            "," + _EstadosAsignacion[i - absPageBegin]._AudioVia + "," + _EstadosAsignacion[i - absPageBegin].Unavailable);
+                //}
+                //else
+                //{
+                //    Settings.Default.AssignatedStates.Add(dst.Frecuency + "," + _EstadosAsignacion[i - absPageBegin]._Rx.ToString() + "," +
+                //                                        ((dst.TipoFrecuencia == TipoFrecuencia_t.HF) ? false : _EstadosAsignacion[i - absPageBegin]._Tx) +
+                //                                            "," + _EstadosAsignacion[i - absPageBegin]._AudioVia + "," + _EstadosAsignacion[i - absPageBegin].Unavailable);
+                //}
 			}
 
-			Settings.Default.Save();
+            /** Esta funcion se ha trasladado al MODEL MODULE */
+            //Settings.Default.Save();
 
-			_RtxBT.Enabled = _RtxEnabled;
+            _RtxBT.Enabled = _RtxEnabled;
 		}
 
 		[EventSubscription(EventTopicNames.TitleIdChanged, ThreadOption.Publisher)]
@@ -519,40 +534,41 @@ namespace HMI.Presentation.Asecna.Views
         //    }
         //}
 
-		private void RecuperaEstadoAsignacionFrecuencias()
-		{
-			int absPageBegin = _RdPageBT.Page * _NumPositionsByPage;
+        /** Esta funcion se ha trasladado al MODEL MODULE */
+		//private void RecuperaEstadoAsignacionFrecuencias()
+		//{
+		//	int absPageBegin = _RdPageBT.Page * _NumPositionsByPage;
 
-			for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
-			{
-				if (i < Settings.Default.AssignatedStates.Count)
-				{
-					string[] estado = Settings.Default.AssignatedStates[i].Split(',');
+		//	for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
+		//	{
+		//		if (i < Settings.Default.AssignatedStates.Count)
+		//		{
+		//			string[] estado = Settings.Default.AssignatedStates[i].Split(',');
 
-					EstadoAsignacion eAsignacion = new EstadoAsignacion();
+		//			EstadoAsignacion eAsignacion = new EstadoAsignacion();
 
-					eAsignacion._Rx = estado[1] == "True";
-					eAsignacion._Tx = estado[2] == "True";
-					switch (estado[3])
-					{
-                        case "HfSpeaker":
-                            eAsignacion._AudioVia = RdRxAudioVia.HfSpeaker;
-                            break;
-                        case "HeadPhones":
-                            eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
-                            break;
-                        case "Speaker":
-							eAsignacion._AudioVia = RdRxAudioVia.Speaker;
-							break;
-						case "NoAudio":
-							eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
-							break;
-					}
+		//			eAsignacion._Rx = estado[1] == "True";
+		//			eAsignacion._Tx = estado[2] == "True";
+		//			switch (estado[3])
+		//			{
+  //                      case "HfSpeaker":
+  //                          eAsignacion._AudioVia = RdRxAudioVia.HfSpeaker;
+  //                          break;
+  //                      case "HeadPhones":
+  //                          eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
+  //                          break;
+  //                      case "Speaker":
+		//					eAsignacion._AudioVia = RdRxAudioVia.Speaker;
+		//					break;
+		//				case "NoAudio":
+		//					eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
+		//					break;
+		//			}
 
-					_EstadosAsignacion[i - absPageBegin] = eAsignacion;
-				}
-			}
-		}
+		//			_EstadosAsignacion[i - absPageBegin] = eAsignacion;
+		//		}
+		//	}
+		//}
 
 		private void Reset(RdButton bt, RdDst dst, ref EstadoAsignacion estado)
 		{
@@ -1121,6 +1137,6 @@ namespace HMI.Presentation.Asecna.Views
                     break;
             }
         }
-	}
+    }
 }
 

@@ -34,8 +34,33 @@ namespace UnitTestProject
         [TestMethod]
         public void TestSipUriParser()
         {
-            SipUtilities.SipUriParser sipuri = new SipUtilities.SipUriParser("<sip:192.168.0.129:7060>");
+            SipUtilities.SipUriParser sipuri = new SipUtilities.SipUriParser("<sip:\"pp\"192.168.0.129:7060>");
             string stdf = sipuri.UlisesFormat;
+            
+            sipuri = new SipUtilities.SipUriParser("<sip:\"pp\"bb@192.168.0.129:7060>");
+            Assert.AreEqual(sipuri.User, "bb");
+            Assert.AreEqual(sipuri.Port, 7060);
+            Assert.AreEqual(sipuri.Host, "192.168.0.129");
+            Assert.AreEqual(sipuri.DisplayName, "pp");
+
+            sipuri = new SipUtilities.SipUriParser("<sip:bb@192.168.0.129:7060>");
+            Assert.AreEqual(sipuri.User, "bb");
+            Assert.AreEqual(sipuri.Port, 7060);
+            Assert.AreEqual(sipuri.Host, "192.168.0.129");
+            Assert.AreEqual(sipuri.DisplayName, "");
+
+            sipuri = new SipUtilities.SipUriParser("<sip:\"pp\"bb@192.168.0.129>");
+            Assert.AreEqual(sipuri.User, "bb");
+            Assert.AreEqual(sipuri.Port, 5060);
+            Assert.AreEqual(sipuri.Host, "192.168.0.129");
+            Assert.AreEqual(sipuri.DisplayName, "pp");
+
+            sipuri = new SipUtilities.SipUriParser("sip:0682696141@192.168.2.18;cd40rs=RTB-REC");
+            Assert.AreEqual(sipuri.User, "0682696141");
+            Assert.AreEqual(sipuri.Port, 5060);
+            Assert.AreEqual(sipuri.Host, "192.168.2.18");
+            Assert.AreEqual(sipuri.DisplayName, "");
+            Assert.AreEqual(sipuri.Resource, "RTB-REC");
         }
     }
 

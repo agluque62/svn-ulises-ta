@@ -78,8 +78,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Lib\Microsoft.Practices.ObjectBuilder.dll</HintPath>
     </Reference>
-    <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
+    <Reference Include="NAudio, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\NAudio.1.9.0\lib\net35\NAudio.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=3.1.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
@@ -100,6 +100,7 @@
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Management" />
     <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
@@ -109,6 +110,8 @@
     </Compile>
     <Compile Include="BusinessEntities\AsioChannels.cs" />
     <Compile Include="BusinessEntities\CfgManager.cs" />
+    <Compile Include="BusinessEntities\TlfForward.cs" />
+    <Compile Include="BusinessEntities\TlfPickUp.cs" />
     <Compile Include="BusinessEntities\Scv.cs" />
     <Compile Include="BusinessEntities\CMediaHwManager.cs" />
     <Compile Include="BusinessEntities\GenericHwManager.cs" />
@@ -132,6 +135,7 @@
     <Compile Include="BusinessEntities\TlfIntrusion.cs" />
     <Compile Include="BusinessEntities\TlfListen.cs" />
     <Compile Include="BusinessEntities\TlfManager.cs" />
+    <Compile Include="BusinessEntities\TlfPositionMd.cs" />
     <Compile Include="BusinessEntities\TlfTransfer.cs" />
     <Compile Include="BusinessEntities\Top.cs" />
     <Compile Include="BusinessEntities\MixerManager.cs" />

@@ -61,9 +61,9 @@ namespace HMI.Presentation.AUrr.Views
             this._PttBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SquelchBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._RtxBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            this._RtxErrorTimer = new System.Windows.Forms.Timer(this.components);
-            this._TxConfirmationDetectionTimer = new System.Windows.Forms.Timer(this.components);
-            this._CarrierDetectionTimer = new System.Windows.Forms.Timer(this.components);
+            //this._RtxErrorTimer = new System.Windows.Forms.Timer(this.components);
+            //this._TxConfirmationDetectionTimer = new System.Windows.Forms.Timer(this.components);
+            //this._CarrierDetectionTimer = new System.Windows.Forms.Timer(this.components);
             _RadioTLP = new System.Windows.Forms.TableLayoutPanel();
             _RadioTLP.SuspendLayout();
             this._RadioHeadP.SuspendLayout();
@@ -304,11 +304,6 @@ namespace HMI.Presentation.AUrr.Views
             this._RtxBlinkTimer.Interval = 500;
             this._RtxBlinkTimer.Tick += new System.EventHandler(this._RtxBlinkTimer_Tick);
             // 
-            // _RtxErrorTimer
-            // 
-            //this._RtxErrorTimer.Interval = 2000;
-            //this._RtxErrorTimer.Tick += new System.EventHandler(this._RtxErrorTimer_Tick);
-            // 
             // RadioView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -329,7 +324,6 @@ namespace HMI.Presentation.AUrr.Views
         private System.Windows.Forms.Timer _PttBlinkTimer;
         private System.Windows.Forms.Timer _SquelchBlinkTimer;
         private System.Windows.Forms.Timer _RtxBlinkTimer;
-        private System.Windows.Forms.Timer _RtxErrorTimer;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.TableLayoutPanel _RdButtonsTLP;
@@ -342,8 +336,6 @@ namespace HMI.Presentation.AUrr.Views
         private Model.Module.UI.UrrRdPageButton _urrRdPageButton;
         private Model.Module.UI.HMIButton _PttBT;
         private System.Windows.Forms.Label DivisorLine;
-        private System.Windows.Forms.Timer _TxConfirmationDetectionTimer;
-        private System.Windows.Forms.Timer _CarrierDetectionTimer;
     }
 }
 

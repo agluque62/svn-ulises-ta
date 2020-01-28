@@ -101,8 +101,13 @@ namespace HMI.Model.Module.BusinessEntities
                         case 2:
                             try
                             {
-                                _controlBrillo.SetBrilloPerCent((ushort)(value * 14));
+                                //_controlBrillo.SetBrilloPerCent((ushort)(value * 14));
+                                _controlBrillo.SetBrilloPerCent(LevelToPercent(value));
                                 result = value;
+
+                                _Logger.Info(String.Format("Set brightness. Max {0}, Min{1}, Val {2}, Percent {3}",
+                                    Properties.Settings.Default.BrightnessMin,
+                                    Properties.Settings.Default.BrightnessMax, value, LevelToPercent(value)));
                             }
                             catch (System.Management.ManagementException x1)
                             {
@@ -110,10 +115,19 @@ namespace HMI.Model.Module.BusinessEntities
                                 {
                                     _Open = false;
                                     General.SafeLaunchEvent(BrightnessLevelChanged, this);
+
+                                    _Logger.Error(String.Format("Set brightness ManagementException.NotSupported Error. Max {0}, Min{1}, Val {2}, Percent {3}. ERROR: {4}",
+                                        Properties.Settings.Default.BrightnessMin,
+                                        Properties.Settings.Default.BrightnessMax, value, LevelToPercent(value), x1.Message));
+
                                     return;
                                 }
+
+                                _Logger.Error(String.Format("Set brightness ManagementException Error. Max {0}, Min{1}, Val {2}, Percent {3}. ERROR: {4}",
+                                    Properties.Settings.Default.BrightnessMin,
+                                    Properties.Settings.Default.BrightnessMax, value, LevelToPercent(value), x1.Message));
                             }
-                            catch (Exception )
+                            catch (Exception x)
                             {
                                 //if (ex.Message == "Incompatible ")
                                 //{
@@ -121,10 +135,16 @@ namespace HMI.Model.Module.BusinessEntities
                                 //    General.SafeLaunchEvent(BrightnessLevelChanged, this);
                                 //    return;
                                 //}
+                                _Logger.Error(String.Format("Set brightness Exception Error. Max {0}, Min{1}, Val {2}, Percent {3}. ERROR: {4}",
+                                    Properties.Settings.Default.BrightnessMin,
+                                    Properties.Settings.Default.BrightnessMax, value, LevelToPercent(value), x.Message));
                             }
                             break;
 
                         case 1000:      // Simulador de Control de Brillo
+                            _Logger.Info(String.Format("Set brightness. Max {0}, Min{1}, Val {2}, Percent {3}", 
+                                Properties.Settings.Default.BrightnessMin,
+                                Properties.Settings.Default.BrightnessMax, value, LevelToPercent(value)));
                             result = value;
                             break;
 
@@ -140,8 +160,12 @@ namespace HMI.Model.Module.BusinessEntities
 						Settings.Default.Save();
 
 						General.SafeLaunchEvent(BrightnessLevelChanged, this);
-					}
-				}
+
+                        _Logger.Info(String.Format("Last brightness Saved. Max {0}, Min{1}, Val {2}, Percent {3}",
+                            Properties.Settings.Default.BrightnessMin,
+                            Properties.Settings.Default.BrightnessMax, value, LevelToPercent(value)));
+                    }
+                }
 			}
 		}
 
@@ -153,67 +177,69 @@ namespace HMI.Model.Module.BusinessEntities
 				int min = Settings.Default.BrightnessMin;
 				int level = Settings.Default.BrightnessLevel;
 
-                if (level > 0)
+                if (level >= 0)
                 {
-				if (max < min)
-				{
-					int tmp = max;
-					max = min;
-					min = tmp;
+                    level = level < 0 ? 0 : level > 7 ? 7 : level;
 
-					_Invert = true;
-				}
+                    if (max < min)
+                    {
+                        int tmp = max;
+                        max = min;
+                        min = tmp;
 
-				_Min = min;
-				_Step = ((double)max - _Min) / 7;
+                        _Invert = true;
+                    }
 
-				if (Settings.Default.BrightnessVersion == 0)
-				{
-					if (OpenSerialCommunicationVer0(Settings.Default.BrightnessComPort, 19200) > 0)
-					{
-						_Open = true;
+                    _Min = min;
+                    _Step = ((double)max - _Min) / 7;
 
-						_MinBrightness = ReadAdjusterMinVer0(Adj_Backlight);
-						_FactorBrightness = (ReadAdjusterMaxVer0(Adj_Backlight) - _MinBrightness) / 100;
-					}
-				}
-				else if (Settings.Default.BrightnessVersion == 1)
-				{
-					if (OpenSerialCommunicationVer1(Settings.Default.BrightnessComPort, 57600) > 0)
-					{
-						_Open = true;
+                    if (Settings.Default.BrightnessVersion == 0)
+                    {
+                        if (OpenSerialCommunicationVer0(Settings.Default.BrightnessComPort, 19200) > 0)
+                        {
+                            _Open = true;
 
-						BrightnessValues vs = new BrightnessValues(0, 0xFF, 0x90);
-						ReadAdjusterVer1(ADJUSTER_CMD, BRIGHT_ID, ref vs);
-						_MinBrightness = vs.Min;
-						_FactorBrightness = (double)(vs.Max - vs.Min) / 100;
+                            _MinBrightness = ReadAdjusterMinVer0(Adj_Backlight);
+                            _FactorBrightness = (ReadAdjusterMaxVer0(Adj_Backlight) - _MinBrightness) / 100;
+                        }
+                    }
+                    else if (Settings.Default.BrightnessVersion == 1)
+                    {
+                        if (OpenSerialCommunicationVer1(Settings.Default.BrightnessComPort, 57600) > 0)
+                        {
+                            _Open = true;
 
-						ReadAdjusterVer1(ADJUSTER_CMD, CONTRAST_ID, ref vs);
-						_MinContrast = vs.Min;
-						_FactorContrast = (double)(vs.Max - vs.Min) / 100;
-					}
-                }
-                else if (Settings.Default.BrightnessVersion == 2)
-                {
-                    _controlBrillo = new ControlBrillo();
-                    _Open = true;
-                }
-                else if (Settings.Default.BrightnessVersion == 1000)
-                {
-                    _Open = true;
-                }
+                            BrightnessValues vs = new BrightnessValues(0, 0xFF, 0x90);
+                            ReadAdjusterVer1(ADJUSTER_CMD, BRIGHT_ID, ref vs);
+                            _MinBrightness = vs.Min;
+                            _FactorBrightness = (double)(vs.Max - vs.Min) / 100;
+
+                            ReadAdjusterVer1(ADJUSTER_CMD, CONTRAST_ID, ref vs);
+                            _MinContrast = vs.Min;
+                            _FactorContrast = (double)(vs.Max - vs.Min) / 100;
+                        }
+                    }
+                    else if (Settings.Default.BrightnessVersion == 2)
+                    {
+                        _controlBrillo = new ControlBrillo();
+                        _Open = true;
+                    }
+                    else if (Settings.Default.BrightnessVersion == 1000)
+                    {
+                        _Open = true;
+                    }
                     else
                     {
                         throw new ApplicationException("Ocultar Control Brillo");
                     }
                 }
-				Level = level;
-			}
-			catch (Exception ex)
+                Level = level;
+            }
+            catch (Exception ex)
 			{
 				_Logger.Error(Resources.BrightnessError + ": " + ex.Message);
                 _Open = false;
-                    General.SafeLaunchEvent(BrightnessLevelChanged, this);
+                General.SafeLaunchEvent(BrightnessLevelChanged, this);
 			}
 		}
 
@@ -250,5 +276,13 @@ namespace HMI.Model.Module.BusinessEntities
 
 			return -1;
 		}
-	}
+
+        private ushort LevelToPercent(int level)
+        {
+            double bMin = Properties.Settings.Default.BrightnessMin;
+            double bMax = Properties.Settings.Default.BrightnessMax;
+            var percent = bMin + ((bMax - bMin) / 7) * level;
+            return (ushort)percent;
+        }
+    }
 }

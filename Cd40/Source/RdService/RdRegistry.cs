@@ -19,7 +19,7 @@ namespace U5ki.RdService
     /// </summary>
     static class RdRegistry 
 	{
-
+        public static bool _Master = false;
         /// <summary>
         /// 
         /// </summary>
@@ -51,6 +51,7 @@ namespace U5ki.RdService
 				_Registry.Dispose();
 				_Registry = null;
 			}
+            _DisabledFr.Clear();
 		}
         /// <summary>
         /// 
@@ -80,6 +81,8 @@ namespace U5ki.RdService
 			RdSrvFrRs rs;
 			string frId = fr.ToUpper();
 
+            if (!_Master)
+                return;
 			if (_DisabledFr.TryGetValue(frId, out rs))
 			{
 				_DisabledFr.Remove(frId);
@@ -107,6 +110,8 @@ namespace U5ki.RdService
 		public static void Publish(string fr, RdSrvFrRs rs)
 		{
 			string frId = fr.ToUpper();
+            if (!_Master)
+                return;
 
 			if (_DisabledFr.ContainsKey(frId))
 			{
@@ -155,6 +160,9 @@ namespace U5ki.RdService
         /// <param name="_FrRs"></param>
         public static void PublishStatusFr(string fr, RdSrvFrRs rs)
         {
+            if (!_Master)
+                return;
+
             if (_Registry != null)
             {
                 string frId = fr.ToUpper();
@@ -180,6 +188,9 @@ namespace U5ki.RdService
         /// <param name="txRs"></param>
 		public static void PublishTxRs(string rsId, RdSrvTxRs txRs)
 		{
+            if (!_Master)
+                return;
+
             if (_Registry != null)
             {
                 _Registry.SetValue<RdSrvTxRs>(Identifiers.RdTopic, rsId, txRs);
@@ -215,6 +226,9 @@ namespace U5ki.RdService
         /// <param name="rxRs"></param>
 		public static void PublishRxRs(string rsId, RdSrvRxRs rxRs)
 		{
+            if (!_Master)
+                return;
+
             if (_Registry != null)
             {
                 _Registry.SetValue<RdSrvRxRs>(Identifiers.RdTopic, rsId, rxRs);
@@ -236,6 +250,9 @@ namespace U5ki.RdService
         /// <param name="tx"></param>
 		public static void RespondToFrTxChange(string to, string fr, bool tx)
 		{
+            if (!_Master)
+                return;
+
             if (_Registry != null)
             {
                 FrChangeResponse response = new FrChangeResponse();
@@ -256,6 +273,9 @@ namespace U5ki.RdService
         /// <param name="rx"></param>
 		public static void RespondToFrRxChange(string to, string fr, bool rx)
 		{
+            if (!_Master)
+                return;
+
             if (_Registry != null)
             {
                 FrChangeResponse response = new FrChangeResponse();
@@ -278,6 +298,9 @@ namespace U5ki.RdService
         /// <param name="men"></param>
         public static void RespondToPrepareSelcal(string to, string fr, bool res, string men)
         {
+            if (!_Master)
+                return;
+
             if (_Registry != null)
             {
                 SelcalPrepareRsp resp = new SelcalPrepareRsp();
@@ -295,6 +318,9 @@ namespace U5ki.RdService
 
         public static void RespondToFrHfTxChange(string to, string fr, int tx)
         {
+            if (!_Master)
+                return;
+
             if (_Registry != null)
             {
                 FrChangeResponse response = new FrChangeResponse();
@@ -312,6 +338,9 @@ namespace U5ki.RdService
 
         public static void RespondToChangingSite(string to, string fr, string alias, int num)
         {
+            if (!_Master)
+                return;
+
             if (_Registry != null)
             {
                 ChangeSiteRsp response = new ChangeSiteRsp();
@@ -331,6 +360,9 @@ namespace U5ki.RdService
 #if _HF_GLOBAL_STATUS_
         public static void SendHFStatus(HFStatus std)
         {
+            if (!_Master)
+                return;
+
             if (_Registry != null)
                 _Registry.Send<HFStatus>(Identifiers.RdTopic, Identifiers.HF_STATUS, std);
         }
@@ -338,6 +370,9 @@ namespace U5ki.RdService
         /** 20180316. MNDISABEDNODES */
         public static void PublishMNDisabledNodes(MNDisabledNodes nodes)
         {
+            if (!_Master)
+                return;
+
 #if _PUBLISH_MNDIS_
             if (_Registry != null)
             {
@@ -400,7 +435,8 @@ namespace U5ki.RdService
 #if _PUBLISH_MNDIS_
             _Registry.SubscribeToTopic<MNDisabledNodes>(Identifiers.RdTopic);
 #endif
-            _Registry.Join(Identifiers.RdMasterTopic, Identifiers.RdTopic);
+            //_Registry.Join(Identifiers.RdMasterTopic, Identifiers.RdTopic);
+            _Registry.Join(Identifiers.RdTopic, Identifiers.CfgTopic, Identifiers.TopTopic, Identifiers.RdMasterTopic);
 		}
 
 		#endregion

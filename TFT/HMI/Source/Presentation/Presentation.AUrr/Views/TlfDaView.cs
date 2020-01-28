@@ -266,10 +266,10 @@ namespace HMI.Presentation.AUrr.Views
         {
             return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
                     !dst.Unavailable &&
-                    (_StateManager.Tlf.Priority.State != PriorityState.Executing) &&
-                    ((_StateManager.Tlf.Listen.State == ListenState.Idle) || (_StateManager.Tlf.Listen.State == ListenState.Ready)) &&
-                    ((_StateManager.Tlf.Transfer.State == TransferState.Idle) ||
-                    ((_StateManager.Tlf.Transfer.State == TransferState.Ready) &&
+                    (_StateManager.Tlf.Priority.State != FunctionState.Executing) &&
+                    ((_StateManager.Tlf.Listen.State == FunctionState.Idle) || (_StateManager.Tlf.Listen.State == FunctionState.Ready)) &&
+                    ((_StateManager.Tlf.Transfer.State == FunctionState.Idle) ||
+                    ((_StateManager.Tlf.Transfer.State == FunctionState.Ready) &&
                     ((dst.State == TlfState.Idle) || (dst.State == TlfState.Hold) || (dst.State == TlfState.NotAllowed) ||
                     (dst.State == TlfState.Mem) || (dst.State == TlfState.RemoteMem))));
         }

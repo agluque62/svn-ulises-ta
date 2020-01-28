@@ -44,15 +44,14 @@ namespace HMI.Presentation.Urr.Views
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.Panel _TlfHeadP;
-            this._TlfPageSecondBT = new HMI.Model.Module.UI.HMIButton();
-            this._TlfPageFirstBT = new HMI.Model.Module.UI.HMIButton();
-            this._TlfHeadPhonesUDB = new HMI.Presentation.Urr.UI.UpDownButton();
-            this._LcSpeakerUDB = new HMI.Presentation.Urr.UI.UpDownButton();
             this._TlfDaTLP = new System.Windows.Forms.TableLayoutPanel();
             this._TlfButtonsTLP = new System.Windows.Forms.TableLayoutPanel();
             this._FastBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SlowBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            this._CallRingerTimer = new System.Windows.Forms.Timer(this.components);
+            this._TlfPageSecondBT = new HMI.Model.Module.UI.HMIButton();
+            this._TlfPageFirstBT = new HMI.Model.Module.UI.HMIButton();
+            this._TlfHeadPhonesUDB = new HMI.Presentation.Urr.UI.UpDownButton();
+            this._LcSpeakerUDB = new HMI.Presentation.Urr.UI.UpDownButton();
             _TlfHeadP = new System.Windows.Forms.Panel();
             _TlfHeadP.SuspendLayout();
             this._TlfDaTLP.SuspendLayout();
@@ -70,68 +69,6 @@ namespace HMI.Presentation.Urr.Views
             _TlfHeadP.Name = "_TlfHeadP";
             _TlfHeadP.Size = new System.Drawing.Size(432, 76);
             _TlfHeadP.TabIndex = 0;
-            // 
-            // _TlfPageSecondBT
-            // 
-            this._TlfPageSecondBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPageSecondBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._TlfPageSecondBT.ImageNormal = global::HMI.Presentation.Urr.Properties.Resources.TlfPage;
-            this._TlfPageSecondBT.Location = new System.Drawing.Point(374, 3);
-            this._TlfPageSecondBT.Name = "_TlfPageSecondBT";
-            this._TlfPageSecondBT.Size = new System.Drawing.Size(55, 73);
-            this._TlfPageSecondBT.TabIndex = 3;
-            this._TlfPageSecondBT.Text = "3";
-            this._TlfPageSecondBT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this._TlfPageSecondBT.Visible = false;
-            this._TlfPageSecondBT.Click += new System.EventHandler(this._TlfPageSecondBT_Click);
-            // 
-            // _TlfPageFirstBT
-            // 
-            this._TlfPageFirstBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPageFirstBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._TlfPageFirstBT.ImageNormal = global::HMI.Presentation.Urr.Properties.Resources.TlfPage;
-            this._TlfPageFirstBT.Location = new System.Drawing.Point(313, 3);
-            this._TlfPageFirstBT.Name = "_TlfPageFirstBT";
-            this._TlfPageFirstBT.Size = new System.Drawing.Size(55, 73);
-            this._TlfPageFirstBT.TabIndex = 2;
-            this._TlfPageFirstBT.Text = "2";
-            this._TlfPageFirstBT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this._TlfPageFirstBT.Visible = false;
-            this._TlfPageFirstBT.Click += new System.EventHandler(this._TlfPageFirstBT_Click);
-            // 
-            // _TlfHeadPhonesUDB
-            // 
-            this._TlfHeadPhonesUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._TlfHeadPhonesUDB.BackColor = System.Drawing.Color.Transparent;
-            this._TlfHeadPhonesUDB.DownImage = global::HMI.Presentation.Urr.Properties.Resources.HeadPhonesDown;
-            this._TlfHeadPhonesUDB.Enabled = false;
-            this._TlfHeadPhonesUDB.Location = new System.Drawing.Point(94, 3);
-            this._TlfHeadPhonesUDB.Name = "_TlfHeadPhonesUDB";
-            this._TlfHeadPhonesUDB.Size = new System.Drawing.Size(85, 70);
-            this._TlfHeadPhonesUDB.TabIndex = 1;
-            this._TlfHeadPhonesUDB.UpImage = global::HMI.Presentation.Urr.Properties.Resources.HeadPhonesUp;
-            this._TlfHeadPhonesUDB.Visible = false;
-            this._TlfHeadPhonesUDB.LevelDown += new System.EventHandler(this._TlfHeadPhonesUDB_LevelDown);
-            this._TlfHeadPhonesUDB.LevelUp += new System.EventHandler(this._TlfHeadPhonesUDB_LevelUp);
-            // 
-            // _LcSpeakerUDB
-            // 
-            this._LcSpeakerUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._LcSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
-            this._LcSpeakerUDB.DownImage = global::HMI.Presentation.Urr.Properties.Resources.SpeakerDown;
-            this._LcSpeakerUDB.Enabled = false;
-            this._LcSpeakerUDB.Location = new System.Drawing.Point(3, 3);
-            this._LcSpeakerUDB.Name = "_LcSpeakerUDB";
-            this._LcSpeakerUDB.Size = new System.Drawing.Size(85, 70);
-            this._LcSpeakerUDB.TabIndex = 0;
-            this._LcSpeakerUDB.UpImage = global::HMI.Presentation.Urr.Properties.Resources.SpeakerUp;
-            this._LcSpeakerUDB.Visible = false;
-            this._LcSpeakerUDB.LevelDown += new System.EventHandler(this._LcSpeakerUDB_LevelDown);
-            this._LcSpeakerUDB.LevelUp += new System.EventHandler(this._LcSpeakerUDB_LevelUp);
             // 
             // _TlfDaTLP
             // 
@@ -179,9 +116,67 @@ namespace HMI.Presentation.Urr.Views
             this._SlowBlinkTimer.Interval = 500;
             this._SlowBlinkTimer.Tick += new System.EventHandler(this._SlowBlinkTimer_Tick);
             // 
-            // _CallRingerTimer
+            // _TlfPageSecondBT
             // 
-            this._CallRingerTimer.Tick += new System.EventHandler(this._CallRingerTimer_Tick);
+            this._TlfPageSecondBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._TlfPageSecondBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._TlfPageSecondBT.ImageNormal = global::HMI.Presentation.Urr.Properties.Resources.TlfPage;
+            this._TlfPageSecondBT.Location = new System.Drawing.Point(374, 3);
+            this._TlfPageSecondBT.Name = "_TlfPageSecondBT";
+            this._TlfPageSecondBT.Size = new System.Drawing.Size(55, 73);
+            this._TlfPageSecondBT.TabIndex = 3;
+            this._TlfPageSecondBT.Text = "3";
+            this._TlfPageSecondBT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPageSecondBT.Visible = false;
+            this._TlfPageSecondBT.Click += new System.EventHandler(this._TlfPageSecondBT_Click);
+            // 
+            // _TlfPageFirstBT
+            // 
+            this._TlfPageFirstBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._TlfPageFirstBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._TlfPageFirstBT.ImageNormal = global::HMI.Presentation.Urr.Properties.Resources.TlfPage;
+            this._TlfPageFirstBT.Location = new System.Drawing.Point(313, 3);
+            this._TlfPageFirstBT.Name = "_TlfPageFirstBT";
+            this._TlfPageFirstBT.Size = new System.Drawing.Size(55, 73);
+            this._TlfPageFirstBT.TabIndex = 2;
+            this._TlfPageFirstBT.Text = "2";
+            this._TlfPageFirstBT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this._TlfPageFirstBT.Visible = false;
+            this._TlfPageFirstBT.Click += new System.EventHandler(this._TlfPageFirstBT_Click);
+            // 
+            // _TlfHeadPhonesUDB
+            // 
+            this._TlfHeadPhonesUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this._TlfHeadPhonesUDB.BackColor = System.Drawing.Color.Transparent;
+            this._TlfHeadPhonesUDB.DownImage = global::HMI.Presentation.Urr.Properties.Resources.HeadPhonesDown;
+            this._TlfHeadPhonesUDB.Enabled = false;
+            this._TlfHeadPhonesUDB.Location = new System.Drawing.Point(94, 3);
+            this._TlfHeadPhonesUDB.Name = "_TlfHeadPhonesUDB";
+            this._TlfHeadPhonesUDB.Size = new System.Drawing.Size(85, 70);
+            this._TlfHeadPhonesUDB.TabIndex = 1;
+            this._TlfHeadPhonesUDB.UpImage = global::HMI.Presentation.Urr.Properties.Resources.HeadPhonesUp;
+            this._TlfHeadPhonesUDB.Visible = false;
+            this._TlfHeadPhonesUDB.LevelDown += new System.EventHandler(this._TlfHeadPhonesUDB_LevelDown);
+            this._TlfHeadPhonesUDB.LevelUp += new System.EventHandler(this._TlfHeadPhonesUDB_LevelUp);
+            // 
+            // _LcSpeakerUDB
+            // 
+            this._LcSpeakerUDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this._LcSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
+            this._LcSpeakerUDB.DownImage = global::HMI.Presentation.Urr.Properties.Resources.SpeakerDown;
+            this._LcSpeakerUDB.Enabled = false;
+            this._LcSpeakerUDB.Location = new System.Drawing.Point(3, 3);
+            this._LcSpeakerUDB.Name = "_LcSpeakerUDB";
+            this._LcSpeakerUDB.Size = new System.Drawing.Size(85, 70);
+            this._LcSpeakerUDB.TabIndex = 0;
+            this._LcSpeakerUDB.UpImage = global::HMI.Presentation.Urr.Properties.Resources.SpeakerUp;
+            this._LcSpeakerUDB.Visible = false;
+            this._LcSpeakerUDB.LevelDown += new System.EventHandler(this._LcSpeakerUDB_LevelDown);
+            this._LcSpeakerUDB.LevelUp += new System.EventHandler(this._LcSpeakerUDB_LevelUp);
             // 
             // TlfDaView
             // 
@@ -206,7 +201,6 @@ namespace HMI.Presentation.Urr.Views
         private System.Windows.Forms.TableLayoutPanel _TlfDaTLP;
         private System.Windows.Forms.Timer _FastBlinkTimer;
         private System.Windows.Forms.Timer _SlowBlinkTimer;
-        private System.Windows.Forms.Timer _CallRingerTimer;
 
 
     }

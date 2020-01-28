@@ -302,15 +302,24 @@
     <value>second radio </value>
   </data>
   <data name="BadOperation" xml:space="preserve">
-    <value>Bad operation</value>
+    <value>Bad Operation</value>
   </data>
   <data name="CarrierDetectionError" xml:space="preserve">
-    <value>Carrier not found</value>
+    <value>Carrier not found.</value>
   </data>
   <data name="TxConfirmationDetectionError" xml:space="preserve">
-    <value>Transmission not confirmed</value>
+    <value>Transmission not confirmed.</value>
   </data>
   <data name="TxFailure" xml:space="preserve">
     <value>Transmission failure</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>More</value>
+  </data>
+  <data name="PickUp" xml:space="preserve">
+    <value>Pick Up</value>
+  </data>
+  <data name="Forward" xml:space="preserve">
+    <value>Forward</value>
   </data>
 </root>

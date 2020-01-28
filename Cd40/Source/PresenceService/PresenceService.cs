@@ -252,9 +252,10 @@ namespace U5ki.PresenceService
                         else if (!master && _Master)
                         {
                             DeactivateService();
+                            LastVersion = string.Empty;
                         }
+                        PSHelper.LOGGER.Trace<U5kPresService>(String.Format("OnMasterStatusChanged {0}->{1}", _Master, master));
                         _Master = master;
-                        LastVersion = string.Empty;
 
                         LogInfo<U5kPresService>(_Master ? "MASTER" : "SLAVE",
                             U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "PresenceService",
@@ -289,7 +290,7 @@ namespace U5ki.PresenceService
                 {
                     try
                     {
-                        MemoryStream ms = new MemoryStream(e.Content);
+                        MemoryStream ms = new MemoryStream(Tools.Decompress(e.Content));
                         Cd40Cfg cfg = Serializer.Deserialize<Cd40Cfg>(ms);
 
                         if (LastVersion == cfg.Version)
@@ -327,6 +328,8 @@ namespace U5ki.PresenceService
         /// <param name="e"></param>
         private void OnAgentEventOccurred(object sender, Interfaces.AgentEventArgs e)
         {
+            if (!_Master)
+                return;
 #if _WITH_EVENTQUEUE_
             _WorkingThread.Enqueue("OnAgentEventOcurred", delegate()
 #else
@@ -415,7 +418,7 @@ namespace U5ki.PresenceService
             {
                 if (smpAccesMain.Acquire())
                 {
-                    if (ServiceConfigured == true)
+                    if (ServiceConfigured == true && _Master)
                     {
                         agents.ForEach(agent =>
                         {
@@ -445,7 +448,7 @@ namespace U5ki.PresenceService
                 PSHelper.LOGGER.Trace<U5kPresService>(String.Format("OnOptionsResponse: [{0}],[{1}],[{2}],[{3}],[{4}]", from, callid, code, supported, allowed));
                 if (smpAccesMain.Acquire())
                 {
-                    if (ServiceConfigured == true)
+                    if (ServiceConfigured == true && _Master)
                     {
                         agents.ForEach(agent =>
                         {
@@ -475,7 +478,7 @@ namespace U5ki.PresenceService
                     dst_uri, subscription_status, presence_status));
                 if (smpAccesMain.Acquire())
                 {
-                    if (ServiceConfigured == true)
+                    if (ServiceConfigured == true && _Master)
                     {
                         try
                         {
@@ -574,22 +577,20 @@ namespace U5ki.PresenceService
                         new 
                         {
                             Name = d.IdHost, IsInterno = d.Interno, IsMain = true,
-                            ProxyEP = SipUtilities.SipEndPoint.Parse(d.IpRed1),
-                            PresenceEP = SipUtilities.SipEndPoint.Parse(d.SrvPresenciaIpRed1)
-                            //ProxyEP = d.IpRed1,
-                            //PresenceEP = d.SrvPresenciaIpRed1
+                            ProxyEP = PSHelper.SipEndPointFrom(d.IpRed1),
+                            PresenceEP = PSHelper.SipEndPointFrom(d.SrvPresenciaIpRed1)
                         },
                         new 
                         {
                             Name = d.IdHost, IsInterno = d.Interno, IsMain = false,
-                            ProxyEP = SipUtilities.SipEndPoint.Parse(d.IpRed2),
-                            PresenceEP = SipUtilities.SipEndPoint.Parse(d.SrvPresenciaIpRed2)
+                            ProxyEP = PSHelper.SipEndPointFrom(d.IpRed2),
+                            PresenceEP = PSHelper.SipEndPointFrom(d.SrvPresenciaIpRed2)
                         },
                         new 
                         {
                             Name = d.IdHost, IsInterno = d.Interno, IsMain = false,
-                            ProxyEP = SipUtilities.SipEndPoint.Parse(d.IpRed3),
-                            PresenceEP = SipUtilities.SipEndPoint.Parse(d.SrvPresenciaIpRed3)
+                            ProxyEP = PSHelper.SipEndPointFrom(d.IpRed3),
+                            PresenceEP = PSHelper.SipEndPointFrom(d.SrvPresenciaIpRed3)
                         }
                     }
                 }).
@@ -637,7 +638,7 @@ namespace U5ki.PresenceService
             });
 
             /** Activar el Agente de Agentes */
-            global_agent = new Agentes.PSProxiesAgent();
+            global_agent = new Agentes.PSProxiesAgent( ServiceSite);
             global_agent.Init(OnAgentEventOccurred, agents);
             global_agent.Start();
 
@@ -747,7 +748,7 @@ namespace U5ki.PresenceService
 #endif
                 if (smpAccesMain.Acquire())
                 {
-                    if (ServiceConfigured == true)
+                    if (ServiceConfigured == true && _Master)
                     {
                         try
                         {

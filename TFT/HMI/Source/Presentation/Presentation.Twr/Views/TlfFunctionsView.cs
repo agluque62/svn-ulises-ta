@@ -53,32 +53,55 @@ namespace HMI.Presentation.Twr.Views
         // el tipo de jack, con o sin auricular
         //private static bool _AltavozTlfHabilitado = Settings.Default.SpeakerTlfEnable && !Settings.Default.MicroMano;
         private Image _imagenTlfSpeakerBT;
-   
+        //Numero de página de teclas de función
+        private int _FunctionsPage = Settings.Default.PageTlfFuntions;
 		private bool _PriorityEnabled
 		{
 			get
 			{
 				return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
-					((_StateManager.Tlf.Priority.State != PriorityState.Idle) ||
+					((_StateManager.Tlf.Priority.State != FunctionState.Idle) ||
 					(((_StateManager.Permissions & Permissions.Priority) == Permissions.Priority) &&
 					 _StateManager.Jacks.SomeJack &&
-					(_StateManager.Tlf.Listen.State == ListenState.Idle) &&
-					(_StateManager.Tlf.Transfer.State == TransferState.Idle) &&
+					(_StateManager.Tlf.Listen.State == FunctionState.Idle) &&
+					(_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.PickUp.State == FunctionState.Idle) &&
 					(_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] +
 					_StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteHold] == 0)));
 			}
 		}
+        private bool _PickUpEnabled
+        {
+            get
+            {
+                return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
+                    ((_StateManager.Tlf.PickUp.State != FunctionState.Idle) ||
+                    _StateManager.Jacks.SomeJack &&
+                    (((_StateManager.Permissions & Permissions.Capture) == Permissions.Capture) &&
+                    (_StateManager.Tlf.Priority.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Listen.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Forward.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.Busy] +
+					_StateManager.Tlf[TlfState.Hold] + _StateManager.Tlf[TlfState.RemoteHold] +
+					_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] +
+					_StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteIn] /*+
+					_StateManager.Tlf[TlfState.In] + _StateManager.Tlf[TlfState.InPrio]*/ == 0)));
+            }
+        }
 		private bool _ListenEnabled
 		{
 			get
 			{
 				return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
-					((_StateManager.Tlf.Listen.State != ListenState.Idle) ||
+					((_StateManager.Tlf.Listen.State != FunctionState.Idle) ||
 					(((_StateManager.Permissions & Permissions.Listen) == Permissions.Listen) &&
 					 _StateManager.Jacks.SomeJack &&
-					(_StateManager.Tlf.Priority.State == PriorityState.Idle) &&
-					(_StateManager.Tlf.Transfer.State == TransferState.Idle) &&
-					(_StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.Busy] +
+					(_StateManager.Tlf.Priority.State == FunctionState.Idle) &&
+					(_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.PickUp.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Forward.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.Busy] +
 					_StateManager.Tlf[TlfState.Hold] + _StateManager.Tlf[TlfState.RemoteHold] +
 					_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] +
 					_StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteIn] +
@@ -92,9 +115,9 @@ namespace HMI.Presentation.Twr.Views
 				return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
 					((_StateManager.Permissions & Permissions.Hold) == Permissions.Hold) &&
 					 _StateManager.Jacks.SomeJack &&
-					(_StateManager.Tlf.Priority.State == PriorityState.Idle) &&
-					(_StateManager.Tlf.Listen.State == ListenState.Idle) && 
-					(_StateManager.Tlf.Transfer.State == TransferState.Idle) &&
+					(_StateManager.Tlf.Priority.State == FunctionState.Idle) &&
+					(_StateManager.Tlf.Listen.State == FunctionState.Idle) && 
+					(_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
 					(_StateManager.Tlf[TlfState.Set] + /* _StateManager.Tlf[TlfState.Conf] */ + _StateManager.Tlf[TlfState.RemoteHold] > 0) &&
                     (_StateManager.Tlf[TlfState.Conf] == 0);
 			}
@@ -104,27 +127,53 @@ namespace HMI.Presentation.Twr.Views
 			get
 			{
 				return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
-					((_StateManager.Tlf.Transfer.State != TransferState.Idle) ||
+					((_StateManager.Tlf.Transfer.State != FunctionState.Idle) ||
 					(((_StateManager.Permissions & Permissions.Transfer) == Permissions.Transfer) &&
 					 _StateManager.Jacks.SomeJack &&
-					(_StateManager.Tlf.Priority.State == PriorityState.Idle) &&
-					(_StateManager.Tlf.Listen.State == ListenState.Idle) &&
-					(_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] == 1) &&
+					(_StateManager.Tlf.Priority.State == FunctionState.Idle) &&
+					(_StateManager.Tlf.Listen.State == FunctionState.Idle) &&
+					(_StateManager.Tlf[TlfState.Set] /*+ _StateManager.Tlf[TlfState.Conf] */== 1) &&
                     //No se permiten transferencias si participa en una intrusión
                     (_StateManager.Tlf.IntrudedBy.By.Length == 0) &&
                     (_StateManager.Tlf.IntrudeTo.To.Length == 0)));
 			}
 		}
-		private bool _TlfViewEnabled
+        private bool _ForwardEnabled
+        {
+            get
+            {
+                return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
+                    ((_StateManager.Tlf.Forward.State != FunctionState.Idle) ||
+                    _StateManager.Jacks.SomeJack &&
+                    (((_StateManager.Permissions & Permissions.Forward) == Permissions.Forward) &&
+                    (_StateManager.Tlf.Priority.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Listen.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf.PickUp.State == FunctionState.Idle) &&
+                    (_StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.Busy] +
+                    _StateManager.Tlf[TlfState.Hold] + _StateManager.Tlf[TlfState.RemoteHold] +
+                    _StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] +
+                    _StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteIn] +
+					_StateManager.Tlf[TlfState.In] + _StateManager.Tlf[TlfState.InPrio] == 0)));
+            }
+        }
+        private bool _TlfViewEnabled
 		{
 			get 
 			{
 				return _StateManager.Tft.Enabled;
 			}
 		}
+        private bool _MoreEnabled
+        {
+            get
+            {
+                return _StateManager.Tft.Enabled;
+            }
+        }
 		private bool _CancelEnabled
 		{
-			get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative ; }
+			get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative && (_StateManager.Tlf.Listen.State == FunctionState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
 		}
         private bool _TlfSpeakerBtEnabled
         {
@@ -145,6 +194,18 @@ namespace HMI.Presentation.Twr.Views
         private string _Escucha // Miguel
         {
             get { return Resources.Escucha; }
+        }
+        private string _More
+        {
+            get { return Resources.More; }
+        }
+        private string _PickUp
+        {
+            get { return Resources.PickUp; }
+        }
+        private string _Forward
+        {
+            get { return Resources.Forward; }
         }
         private string _AI // Miguel
         {
@@ -188,6 +249,9 @@ namespace HMI.Presentation.Twr.Views
 			_TlfViewBT.Enabled = _TlfViewEnabled;
 			_CancelBT.Enabled = _CancelEnabled;
             _TlfSpeakerBT.Enabled = _TlfSpeakerBtEnabled;
+            _MoreBT.Enabled = _MoreEnabled;
+            _PickUpBT.Enabled = _PickUpEnabled;
+            _ForwardBT.Enabled = _ForwardEnabled;
 
             this._TlfSpeakerBT.Visible = _StateManager.Tlf.AltavozTlfHabilitado;
             if (_StateManager.Tlf.AltavozTlfEstado)
@@ -201,6 +265,14 @@ namespace HMI.Presentation.Twr.Views
             _TransferBT.Text = _Transferir;
             _HoldBT.Text = _Retener;
             _TlfViewBT.Text = _AI;
+            _MoreBT.Text = _More;
+            _PickUpBT.Text = _PickUp;
+            _ForwardBT.Text = _Forward;
+            if (_FunctionsPage == 1)
+            {
+                _FunctionsPage = 0;
+                ChangeFunctionsTlfPage();
+            }
 		}
 
 		[EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
@@ -214,7 +286,10 @@ namespace HMI.Presentation.Twr.Views
 			_TlfViewBT.Enabled = _TlfViewEnabled;
 			_CancelBT.Enabled = _CancelEnabled;
             _TlfSpeakerBT.Enabled = _TlfSpeakerBtEnabled;
-		}
+            _PickUpBT.Enabled = _PickUpEnabled;
+            _ForwardBT.Enabled = _ForwardEnabled;
+            _MoreBT.Enabled = _MoreEnabled;
+        }
 
 		[EventSubscription(EventTopicNames.ActiveViewChanging, ThreadOption.Publisher)]
 		public void OnActiveViewChanging(object sender, EventArgs<string> e)
@@ -238,6 +313,8 @@ namespace HMI.Presentation.Twr.Views
 			_ListenBT.Enabled = _ListenEnabled;
 			_HoldBT.Enabled = _HoldEnabled;
 			_TransferBT.Enabled = _TransferEnabled;
+            _PickUpBT.Enabled = _PickUpEnabled;
+            _ForwardBT.Enabled = _ForwardEnabled;
             if (_TlfSpeakerBT.Enabled && !_TlfSpeakerBtEnabled && !_StateManager.Tlf.AltavozTlfEstado)
                 try
                 {
@@ -259,10 +336,12 @@ namespace HMI.Presentation.Twr.Views
 			_ListenBT.Enabled = _ListenEnabled;
 			_HoldBT.Enabled = _HoldEnabled;
 			_TransferBT.Enabled = _TransferEnabled;
-
+            _PickUpBT.Enabled = _PickUpEnabled;
+            _ForwardBT.Enabled = _ForwardEnabled;
+            ChangeColorMore();
 			switch (_StateManager.Tlf.Priority.State)
 			{
-				case PriorityState.Idle:
+				case FunctionState.Idle:
 					if (_SlowBlinkList.Remove(_PriorityBT) && (_SlowBlinkList.Count == 0))
 					{
 						_SlowBlinkTimer.Enabled = false;
@@ -270,12 +349,12 @@ namespace HMI.Presentation.Twr.Views
 					}
 					_PriorityBT.ButtonColor = VisualStyle.ButtonColor;
 					break;
-				case PriorityState.Ready:
+				case FunctionState.Ready:
 					_PriorityBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
 					_SlowBlinkList[_PriorityBT] = VisualStyle.Colors.Yellow;
 					_SlowBlinkTimer.Enabled = true;
 					break;
-				case PriorityState.Error:
+				case FunctionState.Error:
 					if (_SlowBlinkList.Remove(_PriorityBT) && (_SlowBlinkList.Count == 0))
 					{
 						_SlowBlinkTimer.Enabled = false;
@@ -285,58 +364,93 @@ namespace HMI.Presentation.Twr.Views
 					break;
 			}
 		}
-
+        [EventSubscription(EventTopicNames.TlfPickUpChanged, ThreadOption.Publisher)]
+        public void OnTlfPickUpChanged(object sender, EventArgs e)
+        {
+            _PriorityBT.Enabled = _PriorityEnabled;
+            _ListenBT.Enabled = _ListenEnabled;
+            _HoldBT.Enabled = _HoldEnabled;
+            _TransferBT.Enabled = _TransferEnabled;
+            _PickUpBT.Enabled = _PickUpEnabled;
+            _ForwardBT.Enabled = _ForwardEnabled;
+            ChangeColorMore();
+            switch (_StateManager.Tlf.PickUp.State)
+            {
+                case FunctionState.Idle:
+                    if (_SlowBlinkList.Remove(_PickUpBT) && (_SlowBlinkList.Count == 0))
+                    {
+                        _SlowBlinkTimer.Enabled = false;
+                        _SlowBlinkOn = true;
+                    }
+                    _PickUpBT.ButtonColor = VisualStyle.ButtonColor;
+                    break;
+                case FunctionState.Ready:
+                    _PickUpBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
+                    _SlowBlinkList[_PickUpBT] = VisualStyle.Colors.Yellow;
+                    _SlowBlinkTimer.Enabled = true;
+                    break;
+                case FunctionState.Executing:
+                    if (_SlowBlinkList.Remove(_PickUpBT) && (_SlowBlinkList.Count == 0))
+                    {
+                        _SlowBlinkTimer.Enabled = false;
+                        _SlowBlinkOn = true;
+                    }
+                    _PickUpBT.ButtonColor = VisualStyle.Colors.Yellow;
+                    break;
+                case FunctionState.Error:
+                    if (_SlowBlinkList.Remove(_PickUpBT) && (_SlowBlinkList.Count == 0))
+                    {
+                        _SlowBlinkTimer.Enabled = false;
+                        _SlowBlinkOn = true;
+                    }
+                    _PickUpBT.ButtonColor = VisualStyle.Colors.Red;
+                    break;
+            }
+        }
 		[EventSubscription(EventTopicNames.TlfListenChanged, ThreadOption.Publisher)]
-		public void OnTlfListenChanged(object sender, EventArgs e)
+        public void OnTlfListenChanged(object sender, EventArgs e)
 		{
 			_PriorityBT.Enabled = _PriorityEnabled;
 			_ListenBT.Enabled = _ListenEnabled;
 			_HoldBT.Enabled = _HoldEnabled;
 			_TransferBT.Enabled = _TransferEnabled;
+            _PickUpBT.Enabled = _PickUpEnabled;
             //La tecla cancel está deshabilitada mientras se realiza una escucha, para evitar cancelar la escucha.
             //La escucha es una llamada que se cancela pulsando de nuevo la tecla escucha.
             _CancelBT.Enabled = _CancelEnabled;
             _TlfSpeakerBT.Enabled = _TlfSpeakerBtEnabled;
-
+            _ForwardBT.Enabled = _ForwardEnabled;
+            ChangeColorMore();
 			switch (_StateManager.Tlf.Listen.State)
 			{
-				case ListenState.Idle:
+				case FunctionState.Idle:
 					if (_SlowBlinkList.Remove(_ListenBT) && (_SlowBlinkList.Count == 0))
 					{
 						_SlowBlinkTimer.Enabled = false;
 						_SlowBlinkOn = true;
 					}
 					_ListenBT.ButtonColor = VisualStyle.ButtonColor;
-                    //VMG 12/09/2018
-                    //Generar evento para poner los botones como estuvieran
-                    _CmdManager.RdSwitchRxToHeadphone();
 					break;
-				case ListenState.Ready:
+				case FunctionState.Ready:
 					_ListenBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
 					_SlowBlinkList[_ListenBT] = VisualStyle.Colors.Yellow;
 					_SlowBlinkTimer.Enabled = true;
 					break;
-				case ListenState.Executing:
+				case FunctionState.Executing:
 					if (_SlowBlinkList.Remove(_ListenBT) && (_SlowBlinkList.Count == 0))
 					{
 						_SlowBlinkTimer.Enabled = false;
 						_SlowBlinkOn = true;
 					}
 					_ListenBT.ButtonColor = VisualStyle.Colors.Yellow;
-                    //VMG 12/09/2018
-                    //Generar evento para poner los botones en cascos
-                    _CmdManager.RdSwitchRxToSpeaker();
 					break;
-				case ListenState.Error:
+				case FunctionState.Error:
 					if (_SlowBlinkList.Remove(_ListenBT) && (_SlowBlinkList.Count == 0))
 					{
 						_SlowBlinkTimer.Enabled = false;
 						_SlowBlinkOn = true;
 					}
 					_ListenBT.ButtonColor = VisualStyle.Colors.Red;
-                    //VMG 12/09/2018
-                    //Generar evento para poner los botones como estuvieran
-                    _CmdManager.RdSwitchRxToHeadphone();
 					break;
 			}
 		}
@@ -356,10 +470,12 @@ namespace HMI.Presentation.Twr.Views
 			_ListenBT.Enabled = _ListenEnabled;
 			_HoldBT.Enabled = _HoldEnabled;
 			_TransferBT.Enabled = _TransferEnabled;
-
+            _PickUpBT.Enabled = _PickUpEnabled;
+            _ForwardBT.Enabled = _ForwardEnabled;
+            ChangeColorMore();
 			switch (_StateManager.Tlf.Transfer.State)
 			{
-				case TransferState.Idle:
+				case FunctionState.Idle:
 					if (_SlowBlinkList.Remove(_TransferBT) && (_SlowBlinkList.Count == 0))
 					{
 						_SlowBlinkTimer.Enabled = false;
@@ -367,13 +483,13 @@ namespace HMI.Presentation.Twr.Views
 					}
 					_TransferBT.ButtonColor = VisualStyle.ButtonColor;
 					break;
-				case TransferState.Ready:
-				case TransferState.Executing:
+				case FunctionState.Ready:
+				case FunctionState.Executing:
 					_TransferBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
 					_SlowBlinkList[_TransferBT] = VisualStyle.Colors.Yellow;
 					_SlowBlinkTimer.Enabled = true;
 					break;
-				case TransferState.Error:
+				case FunctionState.Error:
 					if (_SlowBlinkList.Remove(_TransferBT) && (_SlowBlinkList.Count == 0))
 					{
 						_SlowBlinkTimer.Enabled = false;
@@ -384,7 +500,51 @@ namespace HMI.Presentation.Twr.Views
 			}
 		}
 
-		[EventSubscription(EventTopicNames.TlfHangToneChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TlfForwardChanged, ThreadOption.Publisher)]
+        public void OnTlfForwardChanged(object sender, EventArgs e)
+        {
+            _PriorityBT.Enabled = _PriorityEnabled;
+            _ListenBT.Enabled = _ListenEnabled;
+            _HoldBT.Enabled = _HoldEnabled;
+            _TransferBT.Enabled = _TransferEnabled;
+            _PickUpBT.Enabled = _PickUpEnabled;
+            _ForwardBT.Enabled = _ForwardEnabled;
+            ChangeColorMore();
+            switch (_StateManager.Tlf.Forward.State)
+            {
+                case FunctionState.Idle:
+                    if (_SlowBlinkList.Remove(_ForwardBT) && (_SlowBlinkList.Count == 0))
+                    {
+                        _SlowBlinkTimer.Enabled = false;
+                        _SlowBlinkOn = true;
+                    }
+                    _ForwardBT.ButtonColor = VisualStyle.ButtonColor;
+                    break;
+                case FunctionState.Ready:
+                    _ForwardBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
+                    _SlowBlinkList[_ForwardBT] = VisualStyle.Colors.Yellow;
+                    _SlowBlinkTimer.Enabled = true;
+                    break;
+                case FunctionState.Executing:
+                    if (_SlowBlinkList.Remove(_ForwardBT) && (_SlowBlinkList.Count == 0))
+                    {
+                        _SlowBlinkTimer.Enabled = false;
+                        _SlowBlinkOn = true;
+                    }
+                    _ForwardBT.ButtonColor = VisualStyle.Colors.Yellow;
+                    break;
+                case FunctionState.Error:
+                    if (_SlowBlinkList.Remove(_ForwardBT) && (_SlowBlinkList.Count == 0))
+                    {
+                        _SlowBlinkTimer.Enabled = false;
+                        _SlowBlinkOn = true;
+                    }
+                    _ForwardBT.ButtonColor = VisualStyle.Colors.Red;
+                    break;
+            }
+        }
+
+        [EventSubscription(EventTopicNames.TlfHangToneChanged, ThreadOption.Publisher)]
 		public void OnTlfHangToneChanged(object sender, EventArgs e)
 		{
 			_CancelBT.ButtonColor = _StateManager.Tlf.HangTone.On ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
@@ -397,6 +557,8 @@ namespace HMI.Presentation.Twr.Views
 			_ListenBT.Enabled = _ListenEnabled;
 			_HoldBT.Enabled = _HoldEnabled;
 			_TransferBT.Enabled = _TransferEnabled;
+            _PickUpBT.Enabled = _PickUpEnabled;
+            _ForwardBT.Enabled = _ForwardEnabled;
 		}
 
 		[EventSubscription(EventTopicNames.TlfChanged, ThreadOption.Publisher)]
@@ -406,8 +568,9 @@ namespace HMI.Presentation.Twr.Views
 			_HoldBT.Enabled = _HoldEnabled;
 			_TransferBT.Enabled = _TransferEnabled;
 			_ListenBT.Enabled = _ListenEnabled;
-
-			_HoldBT.ButtonColor = _StateManager.Tlf[TlfState.Hold] == 0 ? VisualStyle.ButtonColor : VisualStyle.Colors.Yellow;
+            _PickUpBT.Enabled = _PickUpEnabled;
+            _ForwardBT.Enabled = _ForwardEnabled;
+            _HoldBT.ButtonColor = _StateManager.Tlf[TlfState.Hold] == 0 ? VisualStyle.ButtonColor : VisualStyle.Colors.Yellow;
 
 			ResetTlfViewBt(_AD);
 		}
@@ -554,7 +717,10 @@ namespace HMI.Presentation.Twr.Views
 					_FastBlinkList[bt] = VisualStyle.Colors.Yellow;
 					_FastBlinkTimer.Enabled = true;
 					break;
-			}
+                case TlfState.InProcess:
+                    backColor = VisualStyle.Colors.Yellow;
+                    break;
+            }
 
 			return backColor;
 		}
@@ -680,6 +846,98 @@ namespace HMI.Presentation.Twr.Views
                 _Logger.Error("ERROR pulsando tecla modo altavoz telefonía", ex);
             }
         }
-	}
+
+        private void _MoreBT_Click(object sender, EventArgs e)
+        {
+            ChangeFunctionsTlfPage();
+
+            Settings.Default.PageTlfFuntions = _FunctionsPage;
+            Settings.Default.Save();
+        }
+
+        private void ChangeFunctionsTlfPage()
+        {
+            if (_FunctionsPage == 0)
+            {
+                this._TlfFunctionsTLP.Controls.Add(this._PriorityBT, 1, 2);
+                this._TlfFunctionsTLP.Controls.Add(this._ListenBT, 0, 0);
+                this._TlfFunctionsTLP.Controls.Add(this._HoldBT, 1, 3);
+                this._TlfFunctionsTLP.Controls.Add(this._PickUpBT, 0, 1);
+                this._TlfFunctionsTLP.Controls.Add(this._TransferBT, 1, 1);
+                this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 1, 1);
+                _FunctionsPage = 1;
+            }
+            else
+            {
+                this._TlfFunctionsTLP.Controls.Add(this._PriorityBT, 0, 0);
+                this._TlfFunctionsTLP.Controls.Add(this._ListenBT, 1, 2);
+                this._TlfFunctionsTLP.Controls.Add(this._HoldBT, 0, 1);
+                this._TlfFunctionsTLP.Controls.Add(this._PickUpBT, 1, 3);
+                this._TlfFunctionsTLP.Controls.Add(this._TransferBT, 1, 1);
+                this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 2, 2);
+                _FunctionsPage = 0;
+            }
+            //Visibles en pagina 0
+            _PriorityBT.Visible = (_FunctionsPage == 0)  && (Settings.Default.EnablePriority);
+            _HoldBT.Visible = (_FunctionsPage == 0) && (Settings.Default.EnableHold);
+            _TransferBT.Visible = (_FunctionsPage == 0) && (Settings.Default.EnableTransfer);
+            //Visibles en pagina 1
+            _ListenBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableListen);
+            _PickUpBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnablePickUp);
+            _ForwardBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableForward);
+            ChangeColorMore();
+        }
+
+        private void ChangeColorMore()
+        {
+            bool otherPageActive = ((_FunctionsPage == 0) &&
+                ((_StateManager.Tlf.Listen.State != FunctionState.Idle) ||
+                 (_StateManager.Tlf.PickUp.State != FunctionState.Idle) ||
+                 (_StateManager.Tlf.Forward.State != FunctionState.Idle)));
+            otherPageActive |= ((_FunctionsPage == 1) &&
+                ((_StateManager.Tlf.Priority.State != FunctionState.Idle) ||
+                 (_StateManager.Tlf.Transfer.State != FunctionState.Idle)));
+
+            if (otherPageActive)
+            {
+                _MoreBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
+                _SlowBlinkList[_MoreBT] = VisualStyle.Colors.Yellow;
+                _SlowBlinkTimer.Enabled = true;
+            }
+            else
+            {
+                if (_SlowBlinkList.Remove(_MoreBT) && (_SlowBlinkList.Count == 0))
+                {
+                    _SlowBlinkTimer.Enabled = false;
+                    _SlowBlinkOn = true;
+                }
+                _MoreBT.ButtonColor = VisualStyle.ButtonColor;
+            }
+        }
+
+        private void _PickUpBT_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _CmdManager.PickUpClick();
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error("ERROR pulsando tecla de captura", ex);
+            }
+        }
+
+        private void _ForwardBT_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _CmdManager.ForwardClick();
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error("ERROR pulsando tecla de captura", ex);
+            }
+        }
+    }
 }
 

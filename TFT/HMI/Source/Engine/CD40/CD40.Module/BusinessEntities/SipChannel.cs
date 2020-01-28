@@ -6,10 +6,15 @@ using System.Diagnostics;
 using U5ki.Infrastructure;
 using Utilities;
 using NLog;
+using System.Collections;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
+#if DEBUG
+    public class SipLine
+#else
 	class SipLine
+#endif	
 	{
 		public string Id
 		{
@@ -42,17 +47,21 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public bool Equals(string id, string ip)
 		{
-            return (SipUtilities.SipEndPoint.EqualSipEndPoint(ip, Ip) && (string.Compare(Id, id, true) == 0));
+			return (SipUtilities.EqualSIPIPAddress(Ip, ip) && (string.Compare(Id, id, true) == 0));
 		}
 
 		public bool Find(string id, string ip)
 		{
             //Comentado para permitir recibir transf directa de PP interna SCV
-            return (SipUtilities.SipEndPoint.EqualSipEndPoint(ip, Ip)/* && (string.IsNullOrEmpty(id) || (string.Compare(Id, id, true) == 0))*/);
+            return (SipUtilities.EqualSIPIPAddress(Ip, ip)/* && (string.IsNullOrEmpty(id) || (string.Compare(Id, id, true) == 0))*/);
 		}
 	}
 
+#if DEBUG
+    public class SipRemote
+#else
 	class SipRemote
+#endif	
 	{
 		public readonly List<string> Ids;
 		public readonly string SubId = null;
@@ -116,7 +125,11 @@ namespace HMI.CD40.Module.BusinessEntities
 		}
 	}
 
+#if DEBUG
+	public class SipPath
+#else
 	class SipPath
+#endif	
 	{
 		public readonly SipLine Line;
 		public readonly SipRemote Remote;
@@ -131,7 +144,22 @@ namespace HMI.CD40.Module.BusinessEntities
             set {modoSinProxy = value;}
             get { return modoSinProxy; }
         }
+        public string Uri
+        {
+            get
+            {
+                string dstParams = "";
 
+                if (!string.IsNullOrEmpty(Remote.SubId))
+                {
+                    return string.Format("<sip:{0}@{1}{2}>", Remote.SubId, Line.Ip, dstParams);
+                }
+                else
+                {
+                    return string.Format("<sip:{0}@{1}{2}>", Remote.Ids[0], Line.Ip, dstParams);
+                }
+            }
+        }
         public SipPath(SipRemote remote, SipLine line, Resource rsProxyPropio)
         {
             Line = line;
@@ -168,16 +196,24 @@ namespace HMI.CD40.Module.BusinessEntities
         }
     }
 
+#if DEBUG
+	public struct SipResult
+#else
 	struct SipResult
-	{
+#endif
+    {
 		public int Result;
 		public int PrioResult;
 	}
 
+#if DEBUG
+	public abstract class SipChannel
+#else
 	abstract class SipChannel
+#endif	
 	{
         public enum DestinationState {Idle, NotReachable, Busy};
-		public event GenericEventHandler RsChanged
+		public virtual event GenericEventHandler RsChanged
 		{
 			add
 			{
@@ -220,11 +256,19 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			get { return null; }
 		}
-
-        public virtual string Domain
+        public virtual string UriPropia
         {
             get { return null; }
         }
+
+        public virtual string Domain
+		{
+			get { return null; }
+		}
+        public virtual ArrayList GetUris
+		{
+			get { return null; }
+		}
 
 		public virtual TipoInterface Type
 		{
@@ -260,6 +304,12 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             get { return _PriorityAllowed; }
         }
+
+        public bool IsPP
+        {
+            get { return _IsPP; }
+        }
+
 
         public SipChannel()
         {
@@ -334,10 +384,30 @@ namespace HMI.CD40.Module.BusinessEntities
             }
 			return null;
 		}
+        public SipPath FindPath(string uri)
+        {
+            SipPath sipPath = null;
+            string sipUri = new SipUtilities.SipUriParser(uri).UlisesFormat;
+            foreach (SipRemote remote in _RemoteDestinations)
+            {
+                foreach (SipLine line in _Lines)
+                {
+                    if (line.IsAvailable)
+                    {
+                        sipPath = new SipPath(remote, line, RsProxyPropio);
+                        string pathUri = new SipUtilities.SipUriParser(sipPath.Uri).UlisesFormat;
+                        if (sipUri.CompareTo(pathUri) == 0)
+                            return sipPath;
+                    }
+                }
+            }
+
+            return null;
+        }
 
         public SipPath FindPathNoConfigured(string id, string subId)
         {
-            //Busco un path que contenga en RemoteDestination el id anque no coincida la ip y rs
+            //Busco un path que contenga en RemoteDestination el id aunque no coincida la ip y rs
             //Este caso es una llamada entrante de que llega de tránsito desde un SCV intermedio
             //donde no conozco la IP de origen, ni el recurso (pasarela de otro SCV)
             foreach (SipRemote remote in _RemoteDestinations)
@@ -559,6 +629,7 @@ namespace HMI.CD40.Module.BusinessEntities
         public Resource RsProxyPropio = null;
         //Se utiliza para detectar canales de tipo PP de pasarela que no admiten prioridad, o lineas de otra red no ATS
         protected bool _PriorityAllowed = true;
+        protected bool _IsPP = false;
         protected string _UnknownUri = null;
 
 
@@ -606,10 +677,10 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			if (_Results[0, 0].PrioResult == 0)
 			{
-				int resut = _Results[0, 0].Result;
+				int result = _Results[0, 0].Result;
 
-				if ((resut == 0) ||
-					((resut == SipAgent.SIP_BUSY) && (priority == CORESIP_Priority.CORESIP_PR_EMERGENCY)))
+				if ((result == 0) ||
+					((result == SipAgent.SIP_BUSY) && (priority == CORESIP_Priority.CORESIP_PR_EMERGENCY)))
 				{
 					return new SipPath(remote, line, RsProxyPropio);
 				}
@@ -621,13 +692,40 @@ namespace HMI.CD40.Module.BusinessEntities
 
 	class IntChannel : SipChannel
 	{
-		public override string Uri
-		{
-            //Devuelve la uri formada con la dirección del proxy si está disponible, 
-            //Si el proxy no está disponibel se envía la dirección propia del sector
-			get {
-                return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].IsAvailable? _Lines[0].Ip: _Lines[1].Ip ); }
-		}
+        ///<summary>
+        ///Devuelve la uri formada con la dirección del proxy si está disponible, 
+        ///Si el proxy no está disponible se envía la dirección propia del sector
+        /// </summary>
+        public override string Uri
+        {
+            get
+            {
+                return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], Domain);
+            }
+        }
+        /// <summary>
+        /// Devuelve la uri formada propia del sector
+        /// </summary>
+        public override string UriPropia
+        {   
+            get
+            {
+                return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[1].Ip);
+            }
+        }
+
+        public override ArrayList GetUris
+        {
+            get
+            {
+                ArrayList listaUris = new ArrayList();
+                foreach (SipRemote dest in _RemoteDestinations)
+                    foreach (string idDest in dest.Ids)
+                        listaUris.Add(string.Format("<sip:{0}@{1}>", idDest, Domain));
+                return listaUris;
+            }
+        }
+
         public override string Domain
         {
             get { return _Lines[0].IsAvailable ? _Lines[0].Ip : _Lines[1].Ip; }
@@ -783,6 +881,19 @@ namespace HMI.CD40.Module.BusinessEntities
 				return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip);
 			}
 		}
+
+        public override ArrayList GetUris
+        {
+            get
+            {
+                ArrayList listaUris = new ArrayList();
+                foreach (SipRemote dest in _RemoteDestinations)
+                    foreach (string idDest in dest.Ids)
+                        listaUris.Add(string.Format("<sip:{0}@{1}>", idDest, Domain));
+                return listaUris;
+            }
+        }
+
         public override string Domain
         {
             get { return _Lines[0].Ip; }
@@ -810,12 +921,15 @@ namespace HMI.CD40.Module.BusinessEntities
             //Hago la distinción comparando la Ip de la línea con la del proxy
             //TODO Deberían llegar configurados de otra forma si tienen comportamiento diferente
             //#3595 y #3082 Cambio de criterio: No se permite la prioridad en AD no ATS, ni siquiera telefonos IP
-            //if (rsIp != Top.Cfg.GetProxyIp(out idEquipo) &&
-            //    ((type == TipoInterface.TI_BC) || (type == TipoInterface.TI_BL)))
+            //En lineas PP recursos de pasarela se admiten facilidades como desvío
+            if (rsIp != Top.Cfg.GetProxyIp(out idEquipo) &&
+                ((type == TipoInterface.TI_BC) || (type == TipoInterface.TI_BL)))
             {
                 //Es un recurso PP de pasarela
-                _PriorityAllowed = false;
+                _IsPP = true;
+                //_PriorityAllowed = false;
             }
+            _PriorityAllowed = false;
 		}
 
 		public override SipPath GetPreferentPath(CORESIP_Priority priority)
@@ -911,7 +1025,181 @@ namespace HMI.CD40.Module.BusinessEntities
             return st;
         }
     }
+    class TlfFocusChannel : SipChannel
+    {
+        /// <summary>
+        /// Lista de recurso que representan los destinos finales
+        /// Se utiliza para calcular el estado global del focusChannel
+        /// </summary>
+        private List<Resource> _RsDstList = new List<Resource> ();
+        private string _Host = null;
+        private bool _ImMember = false;
+        public bool ImMember
+        { set { _ImMember = value; } }
+        /// <summary>
+        /// Este canal se utiliza para hacer llamadas al Phone Service Channel que esta en PhoneService y actua como foco.
+        /// </summary>
+        /// <param name="localId">own accountId</param>
+        /// <param name="name">name of focus</param>
+        public TlfFocusChannel(string localId, string name)
+		{
+            _Id = "Focus";
+            _UnknownUri = name;
+            _AccId = localId;
+            _PriorityAllowed = false;
+            _Prefix = Cd40Cfg.MD_DST;   //? para que no se identifique con otro tipo
+            //Primera línea por el proxy, unica valida para crear un SipPath
+            string idEquipo;
+            string rsIp = Top.Cfg.GetProxyIp(out idEquipo);
+            if (rsIp != null)
+            {
+                Rs<GwTlfRs> rs = Top.Registry.GetRs<GwTlfRs>(idEquipo);
+                _Lines.Add(new SipLine(rs, rsIp, true));
+            }
+			_RemoteDestinations.Add(new SipRemote(name));
+			_Results = new SipResult[_RemoteDestinations.Count, _Lines.Count];
+        }
+        public TlfFocusChannel(string localId, string name, string host)
+        {
+            _Host = host;
+            _Id = "PhoneService";
+            _UnknownUri = name;
+            _AccId = localId;
+            _PriorityAllowed = false;
+            _Prefix = Cd40Cfg.MD_DST;   //? para que no se identifique con otro tipo
+            
+            //Primera línea por el proxy, unica valida para crear un SipPath
+            string idEquipo;
+            string rsIp = Top.Cfg.GetProxyIp(out idEquipo);
+            if (rsIp != null)
+            {
+                Rs<GwTlfRs> rs = Top.Registry.GetRs<GwTlfRs>(idEquipo);
+                _Lines.Add(new SipLine(rs, rsIp, true));
+            }
+            _RemoteDestinations.Add(new SipRemote(name));
+            _Results = new SipResult[_RemoteDestinations.Count, _Lines.Count];
+        }
 
+        //Añade lineas que sirven unicamente para dar la disponibilidad (aspa)
+        //No sirven para encaminar
+        public void AddFinalDestination(string name, string number, uint prefix)
+        {
+            switch (prefix)
+            {
+                case Cd40Cfg.INT_DST:
+                    string hostId = Top.Cfg.GetUserHost(name);
+                    Rs<TopRs> rsTop = Top.Registry.GetRs<TopRs>(hostId);
+                    _RsDstList.Add(rsTop);
+                    break;
+                case Cd40Cfg.ATS_DST:
+                    Rs<GwTlfRs> rsAts = Top.Registry.GetRs<GwTlfRs>(number);
+                    _RsDstList.Add(rsAts);
+                    StrNumeroAbonado altNet = null;
+                    TlfNet net = Top.Cfg.GetNet(prefix, number, ref altNet);
+                    foreach (SipLine line in net.Lines)
+                    {
+                        _RsDstList.Add(line.RsLine);
+                    }
+                    if (altNet != null)
+                    {
+                         net = Top.Cfg.GetNet(altNet.Prefijo, altNet.NumeroAbonado, ref altNet);
+                         foreach (SipLine line in net.Lines)
+                         {
+                             _RsDstList.Add(line.RsLine);
+                         }
+                    }
+                    break;
+                case Cd40Cfg.RTB_DST:
+                    List <PlanRecursos> listRec = Top.Cfg.GetNetResources(prefix, number);
+                    foreach (PlanRecursos recurso in listRec)
+                    {
+                        Rs<GwTlfRs> rsRtb = Top.Registry.GetRs<GwTlfRs>(recurso.IdRecurso);
+                        _RsDstList.Add(rsRtb);
+                    }
+                    break;
+                case Cd40Cfg.IP_DST:
+                case Cd40Cfg.PP_DST:
+                    Rs<GwTlfRs> rs = Top.Registry.GetRs<GwTlfRs>(name);
+                    _RsDstList.Add(rs);
+                    break;
+                default:
+                    //TODO faltan otros tipos
+                    break;
+            }
+        }
+        public override string Uri
+        {
+            get
+            {
+                if (_Host == null)
+                    return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip);
+                else
+                    return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Host);
+            }
+        }
+        /// <summary>
+        /// Para construir el path se usa unicamente la primera línea por el proxy
+        /// </summary>
+        /// <param name="priority"></param>
+        /// <returns></returns>
+        public override SipPath GetPreferentPath(CORESIP_Priority priority)
+        {
+            SipPath sipPath = null;
+
+            for (int i = 0; i < _Lines.Count; i++)
+            {
+                if (_Lines[i].IsAvailable)
+                    if (_Results[0, i].PrioResult == 0)
+                    {
+                        if ((_Results[0, i].Result == 0) ||
+                            ((_Results[0, i].Result == SipAgent.SIP_BUSY) && (priority == CORESIP_Priority.CORESIP_PR_EMERGENCY)))
+                        {
+                            return new SipPath(_RemoteDestinations[0], _Lines[i], RsProxyPropio);
+                        }
+                    }
+                _Logger.Debug("TlfFocusChannel not available, line {0}, results:{1}, {2}", _Lines[i].RsLine.Id, _Results[0, i].PrioResult, _Results[0, i].Result);
+            }
+
+            return sipPath;
+        }
+        /// <summary>
+        /// Devuelve el estado del destino
+        /// El estado lo da la disponibilidad de los destinos finales y el estado de las lineas
+        /// </summary>
+        public override DestinationState DestinationReachableState()
+        {
+            if (_ImMember)
+                return base.DestinationReachableState();
+            //TODO falta incluir la presencia del PhoneService
+            DestinationState st = DestinationState.NotReachable;
+            if (1 <= _RsDstList.FindAll(x => x.IsValid).Count)
+                return base.DestinationReachableState();
+            return st;
+        }
+        public override event GenericEventHandler RsChanged
+        {
+            add
+            {
+                foreach (SipLine line in _Lines)
+                {
+                    if (line.RsLine != null)
+                        line.RsLine.Changed += value;
+                }
+                foreach (Resource res in _RsDstList)
+                    res.Changed += value;
+            }
+            remove
+            {
+                foreach (SipLine line in _Lines)
+                {
+                    if (line.RsLine != null)
+                        line.RsLine.Changed -= value;
+                }
+                foreach (Resource res in _RsDstList)
+                    res.Changed -= value;
+            }
+        }
+    }
 	class TlfNetChannel : SipChannel
 	{
 		public override string Uri
@@ -932,15 +1220,19 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     return string.Format("<sip:{0}@{1}{2}>", _RemoteDestinations[0].SubId[0], _Lines[0].Ip, dstParams);
                 }
-                else
+                else 
                 {
                     //Para redes externas, es necesario enviar el recurso
                     if (Prefix > Cd40Cfg.ATS_DST)
                         return string.Format("<sip:{0}@{1}{2}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip, dstParams);
                     return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip);
-                }   
 			}
 		}
+		}
+        public override string Domain
+        {
+            get { return _Lines[0].Ip; }
+        }
 
         /// <summary>
         /// Este canal se utiliza para los teléfonos IP y para sacar por IP hacia fuera recursos ajenos al SCV

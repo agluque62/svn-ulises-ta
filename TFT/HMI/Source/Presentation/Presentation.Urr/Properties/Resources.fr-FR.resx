@@ -220,4 +220,7 @@
   <data name="TlfBlank" xml:space="preserve">
     <value> </value>
   </data>
+  <data name="BadOperation" xml:space="preserve">
+    <value>Mauvaise opération</value>
+  </data>
 </root>

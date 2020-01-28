@@ -147,8 +147,8 @@ namespace HMI.Model.Module.UI
 					_StateManager.Tlf[TlfState.Conf], _StateManager.Tlf[TlfState.Congestion], _StateManager.Tlf[TlfState.Busy], Environment.NewLine);
 				str += string.Format("RemoteIn = {0}, In = {1}, InPrio = {2}{3}",
 					_StateManager.Tlf[TlfState.RemoteIn], _StateManager.Tlf[TlfState.In], _StateManager.Tlf[TlfState.InPrio], Environment.NewLine);
-				str += string.Format("NotAllowed = {0}",
-					_StateManager.Tlf[TlfState.NotAllowed], Environment.NewLine);
+				str += string.Format("NotAllowed = {0}, Inactive = {1}",
+                    _StateManager.Tlf[TlfState.NotAllowed], _StateManager.Tlf[TlfState.Inactive], Environment.NewLine);
 
 				NotifMsg msg = new NotifMsg("StateInfo", "Estado", str, 0, MessageType.Information, MessageButtons.Ok);
 				_StateManager.ShowUIMessage(msg);

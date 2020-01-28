@@ -215,7 +215,7 @@ namespace HMI.Presentation.Urr.UI
             //color1 = m_hovercolor1;
             //color2 = m_hovercolor2;
         }
-
+        
         //method mouse leave  
         protected override void OnMouseLeave(EventArgs e)
         {
@@ -313,7 +313,7 @@ namespace HMI.Presentation.Urr.UI
 
             //Degradado
             Brush brush2 = new LinearGradientBrush(ClientRectangle, c1, c2, angle);
-
+            
             //Los tres puntos que representan al triángulo
             Point[] points = { 
                 new Point(this.Width, this.Height), 
@@ -329,7 +329,7 @@ namespace HMI.Presentation.Urr.UI
                 //
                 g.DrawLine(new Pen(buttonborder_1), this.Width - i - 1, 0 + i, this.Width - i - 1, this.Height - i);
                 //
-                g.DrawLine(new Pen(buttonborder_1), 0 + i, (this.Height / 2), (this.Width) - (i / 2), 0 + i);
+                g.DrawLine(new Pen(buttonborder_1), 0 + i, (this.Height / 2), (this.Width) - (i/2), 0 + i);
                 //
                 g.DrawLine(new Pen(buttonborder_1), 0 + i, (this.Height / 2), this.Width, this.Height - i);
             }
@@ -463,5 +463,5 @@ namespace HMI.Presentation.Urr.UI
             }
         }
 
-    }
+    }  
 }

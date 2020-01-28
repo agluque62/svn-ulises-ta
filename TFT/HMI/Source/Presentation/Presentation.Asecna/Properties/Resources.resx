@@ -470,7 +470,7 @@
     <value>Falsa maniobra</value>
   </data>
   <data name="CarrierDetectionError" xml:space="preserve">
-    <value>Portadora no detectada</value>
+    <value>Portadora no detectada.</value>
   </data>
   <data name="TxConfirmationDetectionError" xml:space="preserve">
     <value>Transmisión no confirmada.</value>

@@ -8,12 +8,10 @@ using Utilities;
 
 namespace HMI.Model.Module.BusinessEntities
 {
-	public sealed class Jacks
+	public sealed class Jacks :Description
 	{
 		private bool _LeftJack = false;
 		private bool _RightJack = false;
-		private string _StateDescription = "";
-		private string _PreviusStateDescription = "";
 
 		[EventPublication(EventTopicNames.JacksChanged, PublicationScope.Global)]
 		public event EventHandler JacksChanged;
@@ -28,16 +26,6 @@ namespace HMI.Model.Module.BusinessEntities
 			get { return _RightJack; }
 		}
 
-		public string StateDescription
-		{
-			get { return _StateDescription; }
-		}
-
-		public string PreviusStateDescription
-		{
-			get { return _PreviusStateDescription; }
-		}
-
 		public bool SomeJack
 		{
 			get { return (_LeftJack || _RightJack); }
@@ -50,8 +38,7 @@ namespace HMI.Model.Module.BusinessEntities
 				_LeftJack = leftJack;
 				_RightJack = rightJack;
 
-				_PreviusStateDescription = _StateDescription;
-				_StateDescription = SomeJack ? "" : Resources.NoJacksStateDescription;
+				StateDescription = SomeJack ? "" : Resources.NoJacksStateDescription;
 
 				General.SafeLaunchEvent(JacksChanged, this);
 			}

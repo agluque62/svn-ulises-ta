@@ -5,24 +5,31 @@ using HMI.Model.Module.BusinessEntities;
 
 namespace HMI.Model.Module.Messages
 {
-	public sealed class ListenMsg : EventArgs
+	public sealed class ListenPickUpMsg : EventArgs
 	{
-		public readonly ListenState State;
+		public readonly FunctionState State;
 		public readonly int Id = -1;
 		public readonly string Dst = "";
+        public readonly string OtherDst = "";
 
-		public ListenMsg(ListenState st)
+        public ListenPickUpMsg(FunctionState st)
 		{
 			State = st;
 		}
 
-		public ListenMsg(ListenState st, string dst)
+		public ListenPickUpMsg(FunctionState st, string dst)
 		{
 			State = st;
 			Dst = dst;
 		}
+        public ListenPickUpMsg(FunctionState st, string dst, string otherDst)
+        {
+            State = st;
+            Dst = dst;
+            OtherDst = otherDst;
+        }
 
-		public ListenMsg(ListenState st, string dst, int id)
+        public ListenPickUpMsg(FunctionState st, string dst, int id)
 		{
 			State = st;
 			Dst = dst;
@@ -31,7 +38,7 @@ namespace HMI.Model.Module.Messages
 
 		public override string ToString()
 		{
-			return string.Format("[ListenState={0}] [Dst={2}] [Id={1}]", State, Id, Dst);
-		}
-	}
+            return string.Format("[State={0}] [Dst={2}] [Id={1}] [OtherDst={3}]", State, Id, Dst, OtherDst);
+        }
+    }
 }

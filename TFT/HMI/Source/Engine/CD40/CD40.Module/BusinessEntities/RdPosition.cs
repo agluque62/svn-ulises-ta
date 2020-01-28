@@ -1,12 +1,9 @@
 #define _HF_GLOBAL_STATUS_
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Diagnostics;
 using System.Timers;
-using HMI.Model.Module.Constants;
 using HMI.Model.Module.BusinessEntities;
-using HMI.CD40.Module.Properties;
 
 using Utilities;
 using U5ki.Infrastructure;
@@ -14,7 +11,7 @@ using NLog;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
-	class RdPosition
+    class RdPosition
 	{
 		public event GenericEventHandler StateChanged;
 		public event GenericEventHandler TxAlreadyAssigned;
@@ -188,7 +185,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /** 20190205. RTX Information */
         public string PttSrcId { get { return _PttSrcId; } }
 
-		public RdPosition(int pos)
+        public RdPosition(int pos)
 		{
 			_Pos = pos;
             _PttOffTimer.Interval = 100;
@@ -435,7 +432,6 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="audioVia"></param>
         public void SetAudioVia(RdRxAudioVia audioVia)
 		{
-			Debug.Assert(audioVia != RdRxAudioVia.NoAudio);
 
             if (/*Rx && */ (_AudioVia != audioVia) &&
                 ((audioVia == RdRxAudioVia.Speaker && Top.Hw.RdSpeaker) ||
@@ -448,11 +444,8 @@ namespace HMI.CD40.Module.BusinessEntities
                     foreach (int port in _RxPorts.Values)
                     {
                         Top.Mixer.Unlink(port);
-                        if (AnySquelch)
-                        {
-                            MixerDev dev = (audioVia == RdRxAudioVia.HeadPhones ? MixerDev.MhpRd : (audioVia == RdRxAudioVia.HfSpeaker ? MixerDev.SpkHf : MixerDev.SpkRd));
-                            Top.Mixer.Link(port, dev, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
-                        }
+                        MixerDev dev = (audioVia == RdRxAudioVia.HeadPhones ? MixerDev.MhpRd : (audioVia == RdRxAudioVia.HfSpeaker ? MixerDev.SpkHf : MixerDev.SpkRd));
+                        Top.Mixer.Link(port, dev, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
                     }
                 }
 
@@ -853,7 +846,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 			else if (pttSrcId == "NO_CARRIER")
 			{
-				ptt = PttState.CarrierError;
+                ptt = PttState.CarrierError;
 			}
             else if (pttSrcId == "ERROR")
             {
@@ -869,7 +862,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		private void OnFrMsg(object msg, short type)
 		{
-			switch (type)
+            _Logger.Trace("*** OnFrMsg({0}) {1}:",type, _Literal );
+            switch (type)
 			{
 				case Identifiers.FR_TX_CHANGE_RESPONSE_MSG:
 					if (_Tx == AssignState.Trying)
@@ -959,6 +953,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			Rs<RdSrvFrRs> rs = (Rs<RdSrvFrRs>)sender;
 			bool changed = false;
+            bool changedQidx = false;
 
 			if (!rs.IsValid)
 			{
@@ -1016,15 +1011,18 @@ namespace HMI.CD40.Module.BusinessEntities
                 switch (_TipoFrecuencia)
                 {
                     case TipoFrecuencia_t.FD:                        
-                        if (_Squelch != (SquelchState)frRs.Squelch || ChangeInQidxInfo(frRs))
+                        if (_Squelch != (SquelchState)frRs.Squelch)
                         {
                             _Squelch = (SquelchState)frRs.Squelch;
                             changed = true;
-
+                        }
+                        if (ChangeInQidxInfo(frRs))
+                        {
                             // BSS Information
                             _QidxMethod = frRs.QidxMethod;
                             _QidxResource = _Squelch == SquelchState.NoSquelch ? string.Empty : frRs.SqSite;
                             _QidxValue = _Squelch == SquelchState.NoSquelch ? 0 : frRs.QidxValue;
+                            changedQidx = true;
                         }
                         break;
                     // EM
@@ -1066,14 +1064,18 @@ namespace HMI.CD40.Module.BusinessEntities
                 // En este caso hay que evaluar el audio
 				if (ptt != _Ptt || changed || frRs.PttSrcId != _PttSrcId)
 				{
-                    if (ptt != _Ptt)
+                    if (ptt != _Ptt) 
                     {
                         if (ptt == PttState.NoPtt)
                         {
-                            //Al desactivarse el Ptt arranca un timer durante el cual se inhibe el audio de Rd Rx
-                            _PttOffTimer.Enabled = true;
+                            if ((_Ptt == PttState.ExternPtt) || (_Ptt == PttState.PttOnlyPort) || (_Ptt == PttState.PttPortAndMod))
+                            {
+                                //Al desactivarse el Ptt arranca un timer durante el cual se inhibe el audio de Rd Rx
+                                //Solo cuando el estado anterior es un ptt #3830
+                                _PttOffTimer.Enabled = true;
+                            }
                         }
-                        else 
+                        else
                         {
                             //Cualquier activacion del Ptt anula el timer
                             _PttOffTimer.Enabled = false;
@@ -1090,12 +1092,20 @@ namespace HMI.CD40.Module.BusinessEntities
 							Top.Mixer.Unlink(port);
 						}
 					}
-					else if (Rx && (Squelch == SquelchState.SquelchOnlyPort))
+					else 
 					{
 						foreach (int port in _RxPorts.Values)
 						{
-                            MixerDev dev = (_AudioVia == RdRxAudioVia.HeadPhones ? MixerDev.MhpRd : (_AudioVia == RdRxAudioVia.HfSpeaker ? MixerDev.SpkHf : MixerDev.SpkRd));
-							Top.Mixer.Link(port, dev, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                            if (Rx)
+                                if(Squelch == SquelchState.SquelchOnlyPort)
+                                {
+                                    MixerDev dev = (_AudioVia == RdRxAudioVia.HeadPhones ? MixerDev.MhpRd : (_AudioVia == RdRxAudioVia.HfSpeaker ? MixerDev.SpkHf : MixerDev.SpkRd));
+                                    Top.Mixer.Link(port, dev, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                                }
+                                else if (Squelch == SquelchState.NoSquelch)
+                                {
+                                    Top.Mixer.Unlink(port);
+                                }
 						}
 					}
 
@@ -1129,7 +1139,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			}
 
-			if (changed)
+			if (changed || changedQidx)
 			{
 				General.SafeLaunchEvent(StateChanged, this);
 			}
@@ -1150,7 +1160,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			if (Rx)
 			{
 				string rsId = rs.Id.ToUpper();
-                    _Logger.Debug("*** OnFrRxchanged(sender). rs.IsValid es {0} pos:", rs.IsValid, Pos);
+                _Logger.Debug("*** OnFrRxchanged({2}). rs.IsValid es {0} {1}:", rs.IsValid, Pos, rsId);
 				if (rs.IsValid)
 				{
 					// Debug.Assert(!_RxPorts.ContainsKey(rsId));
@@ -1181,7 +1191,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         /* Fin cambio */
                     }
 
-                        _Logger.Debug("*** OnFrRxchanged(sender). Llamando a CreateRdRxPort({0}, pos {1})", rsId, Pos);
+                    _Logger.Debug("*** OnFrRxchanged({2}). Llamando a CreateRdRxPort({0}, pos {1})", rsId, Pos, rsId);
                         CreateRxAudio(rs, rsId);
 				}
 				else
@@ -1191,7 +1201,7 @@ namespace HMI.CD40.Module.BusinessEntities
 					{
 						Top.Mixer.Unlink(port);
 
-                            _Logger.Debug("*** OnFrRxChanged(sender). Llamando a DestroyRdRxPort({0})", port);
+                            _Logger.Debug("*** OnFrRxChanged({2}). Llamando a DestroyRdRxPort({0})", port, rsId);
 
 						SipAgent.DestroyRdRxPort(port);
 

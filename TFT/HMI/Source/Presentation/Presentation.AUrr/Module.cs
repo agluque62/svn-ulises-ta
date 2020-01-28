@@ -36,7 +36,7 @@ namespace HMI.Presentation.AUrr
         {
             _rootWorkItem = rootWorkItem;
 
-            Settings stts = Settings.Default;
+            Properties.Settings stts = Presentation.AUrr.Properties.Settings.Default;
 
             VisualStyle.UseModernStyle = stts.ThemeUseModernStyle;
             VisualStyle.UnknownScv = stts.ThemeUnknownScv;

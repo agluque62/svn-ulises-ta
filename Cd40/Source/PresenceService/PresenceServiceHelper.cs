@@ -468,6 +468,25 @@ namespace U5ki.PresenceService
                 ping.SendAsync(host, timeout, buffer, options);
             }
         }
+        /// <summary>
+        /// Retorna un EndPoint en funcion de especificacion en STRING
+        /// </summary>
+        /// <param name="endpoint"></param>
+        /// <returns></returns>
+        public static IPEndPoint SipEndPointFrom(string endpoint)
+        {
+            string[] parts = endpoint.Split(':');
+            string ip = parts[0];
+            string port = parts.Count() == 2 ? parts[1] : "5060";
+
+            IPAddress Ip;
+            int Port;
+            if (IPAddress.TryParse(ip, out Ip) == false ||
+                Int32.TryParse(port, out Port) == false)
+                return null;
+
+            return new IPEndPoint(Ip, Port);
+        }
 
 #endregion
     }

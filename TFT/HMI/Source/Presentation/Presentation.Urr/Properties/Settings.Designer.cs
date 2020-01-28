@@ -12,7 +12,7 @@ namespace HMI.Presentation.Urr.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.8.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -277,37 +277,22 @@ namespace HMI.Presentation.Urr.Properties {
                 return ((bool)(this["ShowBssProperties"]));
             }
         }
-
+        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int TxConfirmationDetectionTimeOut
-        {
-            get
-            {
-                return ((int)(this["TxConfirmationDetectionTimeOut"]));
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsTxErrorWait {
+            get {
+                return ((bool)(this["IsTxErrorWait"]));
             }
         }
-
+        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int CarrierDetectionTimeOut
-        {
-            get
-            {
-                return ((int)(this["CarrierDetectionTimeOut"]));
-            }
-        }
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int RingerTimeOut
-        {
-            get
-            {
-                return ((int)(this["RingerTimeOut"]));
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EmergencyModeWarn {
+            get {
+                return ((bool)(this["EmergencyModeWarn"]));
             }
         }
     }

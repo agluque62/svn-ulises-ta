@@ -103,6 +103,7 @@ namespace HMI.Presentation.AUrr.Views
             this._UrrBrightnessUDB.TabIndex = 10;
             this._UrrBrightnessUDB.LevelDown += new System.EventHandler(this._BrightnessUDB_LevelDown);
             this._UrrBrightnessUDB.LevelUp += new System.EventHandler(this._BrightnessUDB_LevelUp);
+            //this._UrrBrightnessUDB.Hide();
             // 
             // _UrrBuzzerUDB
             // 

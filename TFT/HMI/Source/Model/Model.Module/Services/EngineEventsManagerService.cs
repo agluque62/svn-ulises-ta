@@ -142,33 +142,33 @@ namespace HMI.Model.Module.Services
 			}
 			else
 			{
-				if (_StateManager.Tlf.Priority.State != PriorityState.Idle)
+				if (_StateManager.Tlf.Priority.State != FunctionState.Idle)
 				{
 					_StateManager.Tlf.Priority.Reset();
 				}
 
-				if (_StateManager.Tlf.Listen.State == ListenState.Ready)
+				if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
 				{
-					_StateManager.Tlf.Listen.State = ListenState.Idle;
+					_StateManager.Tlf.Listen.State = FunctionState.Idle;
 				}
-				else if (_StateManager.Tlf.Listen.State == ListenState.Executing)
+				else if (_StateManager.Tlf.Listen.State == FunctionState.Executing)
 				{
 					_EngineCmdManager.CancelListen();
 				}
-				else if (_StateManager.Tlf.Listen.State == ListenState.Error)
+				else if (_StateManager.Tlf.Listen.State == FunctionState.Error)
 				{
 					_EngineCmdManager.RecognizeListenState();
 				}
 
-				if (_StateManager.Tlf.Transfer.State == TransferState.Ready)
+				if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
 				{
-					_StateManager.Tlf.Transfer.State = TransferState.Idle;
+					_StateManager.Tlf.Transfer.State = FunctionState.Idle;
 				}
-				else if (_StateManager.Tlf.Transfer.State == TransferState.Executing)
+				else if (_StateManager.Tlf.Transfer.State == FunctionState.Executing)
 				{
 					_EngineCmdManager.CancelTransfer();
 				}
-				else if (_StateManager.Tlf.Transfer.State == TransferState.Error)
+				else if (_StateManager.Tlf.Transfer.State == FunctionState.Error)
 				{
 					_EngineCmdManager.RecognizeTransferState();
 				}
@@ -501,7 +501,7 @@ namespace HMI.Model.Module.Services
         }
         
         [EventSubscription(EventTopicNames.PriorityStateEngine, ThreadOption.UserInterface)]
-		public void OnPriorityStateEngine(object sender, StateMsg<PriorityState> msg)
+		public void OnPriorityStateEngine(object sender, StateMsg<FunctionState> msg)
 		{
 			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.PriorityStateEngine, msg);
 
@@ -543,7 +543,7 @@ namespace HMI.Model.Module.Services
 		}
 
 		[EventSubscription(EventTopicNames.ListenStateEngine, ThreadOption.UserInterface)]
-		public void OnListenStateEngine(object sender, ListenMsg msg)
+		public void OnListenStateEngine(object sender, ListenPickUpMsg msg)
 		{
 			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.ListenStateEngine, msg);
 
@@ -551,11 +551,11 @@ namespace HMI.Model.Module.Services
 		}
 
 		[EventSubscription(EventTopicNames.RemoteListenStateEngine, ThreadOption.UserInterface)]
-		public void OnRemoteListenStateEngine(object sender, ListenMsg msg)
+		public void OnRemoteListenStateEngine(object sender, ListenPickUpMsg msg)
 		{
 			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.RemoteListenStateEngine, msg);
 
-			if (msg.State == ListenState.Executing)
+			if (msg.State == FunctionState.Executing)
 			{
 				NotifMsg notif = new NotifMsg("ListenBy" + msg.Id, Resources.MessageInfoCaption, Resources.ListenByConfirmation, 29000, MessageType.Warning, MessageButtons.OkCancel, msg);
 				_StateManager.ShowUIMessage(notif);
@@ -568,7 +568,7 @@ namespace HMI.Model.Module.Services
 		}
 
 		[EventSubscription(EventTopicNames.TransferStateEngine, ThreadOption.UserInterface)]
-		public void OnTransferStateEngine(object sender, StateMsg<TransferState> msg)
+		public void OnTransferStateEngine(object sender, StateMsg<FunctionState> msg)
 		{
 			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.TransferStateEngine, msg);
 
@@ -680,7 +680,7 @@ namespace HMI.Model.Module.Services
 		[EventSubscription(EventTopicNames.PermissionsEngine, ThreadOption.UserInterface)]
 		public void OnPermissionsEngine(object sender, StateMsg<Permissions> msg)
 		{
-            _Logger.Trace("Procesando {0}: {1}", EventTopicNames.PermissionsEngine, msg.ToString());
+			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.PermissionsEngine);
 
 			_StateManager.Permissions = msg.State;
 		}
@@ -771,15 +771,15 @@ namespace HMI.Model.Module.Services
 					_ScreenSaverTimer.Enabled = true;
 				}
 
-				if (_StateManager.Tlf.Listen.State == ListenState.Ready)
+				if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
 				{
-					_StateManager.Tlf.Listen.State = ListenState.Idle;
+					_StateManager.Tlf.Listen.State = FunctionState.Idle;
 				}
-				if (_StateManager.Tlf.Transfer.State == TransferState.Ready)
+				if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
 				{
-					_StateManager.Tlf.Transfer.State = TransferState.Idle;
+					_StateManager.Tlf.Transfer.State = FunctionState.Idle;
 				}
-				if (_StateManager.Tlf.Priority.State == PriorityState.Ready)
+				if (_StateManager.Tlf.Priority.State == FunctionState.Ready)
 				{
 					_StateManager.Tlf.Priority.Reset();
 				}
@@ -840,5 +840,38 @@ namespace HMI.Model.Module.Services
 				}
 			}
 		}
-	}
+
+        [EventSubscription(EventTopicNames.PickUpStateEngine, ThreadOption.UserInterface)]
+        public void OnPickUpStateEngine(object sender, ListenPickUpMsg msg)
+        {
+            _Logger.Trace("Procesando {0}: {1}", EventTopicNames.PickUpStateEngine, msg);
+
+            _StateManager.Tlf.PickUp.Reset(msg);
+        }
+
+        [EventSubscription(EventTopicNames.ForwardStateEngine, ThreadOption.UserInterface)]
+        public void OnForwardStateEngine(object sender, ListenPickUpMsg msg)
+        {
+            _Logger.Trace("Procesando {0}: {1}", EventTopicNames.ForwardStateEngine, msg);
+
+            _StateManager.Tlf.Forward.Reset(msg);
+        }
+
+        [EventSubscription(EventTopicNames.RemoteForwardStateEngine, ThreadOption.UserInterface)]
+        public void OnRemoteForwardStateEngine(object sender, ListenPickUpMsg remoteName)
+        {
+            _Logger.Trace("Procesando {0}: {1}", EventTopicNames.RemoteForwardStateEngine, remoteName);
+
+            _StateManager.Tlf.Forward.Reset(remoteName.Dst);
+        }
+
+        [EventSubscription(EventTopicNames.RedirectedCallEngine, ThreadOption.UserInterface)]
+        public void OnRedirectedCallEngine(object sender, PositionIdMsg position)
+        {
+            _Logger.Trace("Procesando {0}: {1}", EventTopicNames.RedirectedCallEngine, position);
+
+            _StateManager.Tlf.Priority.RedirectCall(int.Parse( position.Id));
+        }
+
+    }
 }

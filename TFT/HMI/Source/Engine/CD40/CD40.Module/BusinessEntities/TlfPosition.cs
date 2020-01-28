@@ -11,19 +11,25 @@ using HMI.CD40.Module.Properties;
 using U5ki.Infrastructure;
 using Utilities;
 using NLog;
+using System.Collections;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
     /// <summary>
     /// 
     /// </summary>
+#if DEBUG
+	public class TlfPosition : IDisposable
+#else
 	class TlfPosition : IDisposable
+#endif	
 	{
         /// <summary>
         /// 
         /// </summary>
-		public event GenericEventHandler StateChanged;
+		public event GenericEventHandler TlfPosStateChanged;
 		public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
+        public event GenericEventHandler<string> ForwardedCallMsg;
 
         /// <summary>
         /// 
@@ -52,10 +58,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <summary>
         /// 
         /// </summary>
-		public TlfState State
+		public virtual TlfState State
 		{
 			get { return _State; }
-			protected set 
+			set 
 			{
                 if (_State != value)
 				{
@@ -66,7 +72,8 @@ namespace HMI.CD40.Module.BusinessEntities
 						_Tone = -1;
 					}
 
-					if ((_SipCall != null) && !_SipCall.Monitoring)
+					if (((_SipCall != null) && !_SipCall.Monitoring)
+                        || (_SipCall== null))
 					{
 						switch (value)
 						{
@@ -148,7 +155,7 @@ namespace HMI.CD40.Module.BusinessEntities
 					}
 
                     DeleteInScreen();
-                    General.SafeLaunchEvent(StateChanged, this);
+                    General.SafeLaunchEvent(TlfPosStateChanged, this);
 				}
 			}
 		}
@@ -216,6 +223,18 @@ namespace HMI.CD40.Module.BusinessEntities
 				return null;
 			}
 		}
+        public string UriPropia
+        {
+            get
+            {
+                if (_Channels.Count > 0)
+                {
+                    return _Channels[0].UriPropia;
+                }
+
+                return null;
+            }
+        }
 
         public bool ChAllowsPriority()
         {
@@ -225,9 +244,25 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public string Domain
+        {
+            get
+            {
+                if (_Channels.Count > 0)
+                {
+                    return _Channels[0].Domain;
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Devuelve los numeros de abonado del primer canal y primer destino
         /// </summary>
-        public List<string> NumeroAbonado
+        public IList<string> NumeroAbonado
         {
             get
             {
@@ -238,8 +273,28 @@ namespace HMI.CD40.Module.BusinessEntities
 
                 return null;
             }
+            set //Only for unit testing
+            {
+            } 
         }
-
+        /// <summary>
+        /// Devuelve los numeros de abonado del primer canal 
+        /// Es virtual para poder mockearla
+        /// </summary>
+        public virtual IList<string> NumerosAbonado
+        {
+            get
+            {
+                if (_Channels.Count > 0)
+                {
+                    List<string> ret = new List<string>();
+                    foreach (SipRemote remote in _Channels[0].RemoteDestinations)
+                        ret.Add(remote.Ids[0]);
+                    return ret;
+                }
+                return null;
+            }
+        }
 
         /// <summary>
         /// 
@@ -249,6 +304,25 @@ namespace HMI.CD40.Module.BusinessEntities
 			get { return (_Channels.Count > 0) && (_Channels[0].Prefix == Cd40Cfg.INT_DST); }
 		}
 
+        public bool IsPP
+        {
+            get { return (_Channels.Count > 0) && (_Channels[0].IsPP);
+            }
+        }
+        public bool IsAtsIP
+        {
+            get
+            {  
+                return (_Channels.Count > 0) && (_Channels[0].Prefix == Cd40Cfg.ATS_DST) && 
+                       (_Channels[0].ListLines.Count > 0) && (_Channels[0].ListLines[0].centralIP) ;
+            }
+        }
+
+        public bool ChAllowsForward
+        {
+            get { return IsPP || IsTop || IsAtsIP; }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -256,6 +330,10 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			get { return _Cfg; }
 		}
+        public List<SipChannel> Channels
+        {
+            get { return _Channels; }
+        }
 
         /// <summary>
         /// 
@@ -283,6 +361,37 @@ namespace HMI.CD40.Module.BusinessEntities
             set { _HoldOnEstablish = value; }
         }
 
+        public bool InOperation()
+        {
+            if (Cfg != null)
+            {
+                switch (State)
+                {
+                    case TlfState.Conf:
+                    case TlfState.Hold:
+                    case TlfState.In:
+                    case TlfState.InPrio:
+                    case TlfState.InProcess:
+                    case TlfState.Out:
+                    case TlfState.RemoteHold:
+                    case TlfState.RemoteIn:
+                    case TlfState.Set:
+                        return true;
+                    case TlfState.NotAllowed:
+                    case TlfState.Inactive:
+                    case TlfState.Mem:
+                    case TlfState.OutOfService:
+                    case TlfState.PaPBusy:
+                    case TlfState.RemoteMem:
+                    case TlfState.Unavailable:
+                    case TlfState.UnChanged:
+                    case TlfState.Busy:
+                    case TlfState.Congestion:
+                        return false;
+                }
+            }
+            return false;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -306,7 +415,13 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				ch.RsChanged -= OnRsChanged;
 			}
-		}
+            _Channels.Clear();
+            _CallTout.Dispose();
+            if (_Conference != null)
+            _Conference.Dispose();
+            if (_SipCall != null)
+                _SipCall = null;
+        }
 
 		#endregion
 
@@ -317,11 +432,12 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			MakeHangUp(0);
 
+            State = TlfState.Unavailable; //para lanzar el evento antes de borrar los datos
 			_Cfg = null;
 			_Literal = "";
 			_Channels.Clear();
 
-			State = TlfState.Unavailable;
+			//State = TlfState.Unavailable;
             _HoldOnEstablish = false;
 		}
 
@@ -331,9 +447,21 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="cfg"></param>
 		public virtual void Reset(CfgEnlaceInterno cfg)
 		{
-			_Cfg = cfg;
+            bool setToIdle = false;
 			_Literal = cfg.Literal;
 			_Priority = (CORESIP_Priority)cfg.Prioridad;
+            //Si cambia el origen, lo reinicio sin colgar porque ya ha cambiado la cuenta.
+            if ((_Cfg != null) && !cfg.OrigenR2.Equals(_Cfg.OrigenR2))
+            {
+                //A la espera de un cambio en el SOAP para que venga el OrigenR2 coherente
+                //tengo que colgar porque puede no ser un cambio de OrigenR2 sino de tipo 
+                //de destino
+                MakeHangUp(0);
+                setToIdle = true;
+                State = TlfState.Idle;
+                _Logger.Warn("Cuelgo llamada con {0} por cambio de identidad", _Literal);
+            }
+            _Cfg = cfg;
 			_Channels.Clear();
 
 			foreach (CfgRecursoEnlaceInterno dst in cfg.ListaRecursos)
@@ -438,14 +566,19 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 			}
 
-			if ((_SipCall != null) && !_SipCall.IsValid(_Channels))
-			{
-				MakeHangUp(0);	// Cortamos llamadas y quitamos busy y congestion
-			}
+			if ((_SipCall != null) && (_SipCall.Ch != null))
+            {
+                if (!_SipCall.IsValid(_Channels))
+                {
+                    MakeHangUp(0);	// Cortamos llamadas y quitamos busy y congestion
+                    State = TlfState.Idle;
+                    _Logger.Warn("Cuelgo llamada con {0} por cambio de configuracion", _Literal);
+                }
+            }
 
 			if (_SipCall == null)
 			{
-				State = GetState();
+                State = GetReachableState(setToIdle);
 			}
 		}
 
@@ -504,21 +637,61 @@ namespace HMI.CD40.Module.BusinessEntities
 			Debug.Assert((_State == TlfState.NotAllowed) || (_State == TlfState.Unavailable) || (_State == TlfState.PaPBusy) || (_State == TlfState.Idle));
 			Debug.Assert(_SipCall == null);
 				
+            if (Top.Tlf.Forward.IsForwardedHead(NumeroAbonado))
+            {                
+                return;
+            }
+
 			CORESIP_Priority priority = prio ? CORESIP_Priority.CORESIP_PR_EMERGENCY : _Priority;
 			_SipCall = SipCallInfo.NewTlfCall(_Channels, priority, null);
 
 			State = TryCall();
-			if (_State == TlfState.Out)
-			{
-				_CallTout.Enabled = true;
-			}
+            if (_State == TlfState.Out)
+            {
+                _CallTout.Enabled = true;
+            }
 			//if (State == TlfState.NotAllowed)
 			//{
 			//    MakeHangUp(0);
 			//    State = TlfState.Idle;
 			//}
 		}
+        public bool CallPickUp(TlfPickUp.DialogData dialog)
+        {
+            int sipCallId = -1;
+            SipPath path = null;
+            SipChannel channel = null;
+            Debug.Assert(_State == TlfState.In);
+            Debug.Assert(_SipCall == null);
+            _SipCall = SipCallInfo.NewReplacesCall (_Channels, dialog);
+            foreach (SipChannel ch in _Channels)
+            {
+                path = ch.FindPath(dialog.remoteId);
+                if (path != null)
+                {
+                    channel = ch;
+                    break;
+                }
+            }
+            if ((channel == null) || (path == null))
+                return false;
 
+            CORESIP_CallFlags flags = CORESIP_CallFlags.CORESIP_CALL_NO_FLAGS;
+            if (path.ModoSinProxy == false)
+                flags |= CORESIP_CallFlags.CORESIP_CALL_EXTERNAL_IP;
+
+            sipCallId = SipAgent.MakeTlfCallReplaces(channel.AccId, dialog.remoteId, _SipCall.Priority, flags, _SipCall.Dialog.callId,
+                _SipCall.Dialog.toTag, _SipCall.Dialog.fromTag);
+            _SipCall.Update(sipCallId, channel.AccId, channel.RemoteDestinations[0].Ids[0], channel, path.Remote, path.Line);
+
+            _Logger.Info("PickUp call to: {0} {1:X}", dialog.remoteId, sipCallId);
+            if (sipCallId != -1)
+            {
+                _State = TlfState.Out;
+                _CallTout.Enabled = true;
+            }
+            return (sipCallId != -1);
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -628,15 +801,21 @@ namespace HMI.CD40.Module.BusinessEntities
 			if (_SipCall != null)
 			{
 				MakeHangUp(reason);
-                State = (_State == TlfState.Set) || (_State == TlfState.Congestion) || (_State == TlfState.OutOfService) || (_State == TlfState.Busy) ? GetState() : (Top.Tlf.PriorityCall ? TlfState.PaPBusy : TlfState.Idle);
-
-                Top.Tlf.PriorityCall = false;
 			}
 			else
 			{
 				// Reflejamos de nuevo nuestro estado por si hay una disfuncion en el HMI
-				General.SafeLaunchEvent(StateChanged, this);
+				General.SafeLaunchEvent(TlfPosStateChanged, this);
 			}
+            //Se cambia el estado siempre, aunque no haya llamada, 
+            //para tener una forma de limpiar la tecla en caso de inconsistencia
+            State = TlfState.Idle;
+            State = GetReachableState();
+
+            //State = (_State == TlfState.Set) || (_State == TlfState.Congestion) || (_State == TlfState.OutOfService) || (_State == TlfState.Busy) ? GetReachableState()/*TlfState.Idle*/ : (Top.Tlf.PriorityCall ? TlfState.PaPBusy : TlfState.Idle);
+
+            Top.Tlf.PriorityCall = false;
+
 		}
 
         /// <summary>
@@ -759,7 +938,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="sipCallId"></param>
         /// <param name="stateInfo"></param>
         /// <returns></returns>
-		public bool HandleChangeInCallState(int sipCallId, CORESIP_CallStateInfo stateInfo)
+		public virtual bool HandleChangeInCallState(int sipCallId, CORESIP_CallStateInfo stateInfo)
 		{
 			if ((_SipCall != null) && (_SipCall.Id == sipCallId))
 			{
@@ -810,6 +989,8 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 				else if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED)
 				{
+                    if (_SipCall.Redirect)
+                        General.SafeLaunchEvent(ForwardedCallMsg, this, null);
 
                     _CallTout.Enabled = false;
 					Top.Mixer.Unlink(sipCallId);
@@ -875,7 +1056,11 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 				else if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED)
 				{
-					_SipCall.Id = -1;
+					if (!_SipCall.Redirect)
+                        _SipCall.Id = -1;
+                    else
+                        General.SafeLaunchEvent(ForwardedCallMsg, this, null);
+
 					_RemoteHangUp = stateInfo.LastCode != SipAgent.SIP_REQUEST_TIMEOUT &&
 									stateInfo.LastCode != SipAgent.SIP_ERROR &&
                                     stateInfo.LastCode != SipAgent.SIP_CONGESTION &&
@@ -941,8 +1126,28 @@ namespace HMI.CD40.Module.BusinessEntities
 							_Conference = null;
 						}
 
-						_SipCall = null;
-						State = TlfState.Idle;
+                        if ((_State == TlfState.Conf) && (stateInfo.LastCode != SipAgent.SIP_OK))
+                        {
+                            //_SipCall.LastCallResult = stateInfo.LastCode;
+                            _CallTout.Enabled = false;
+                            switch (stateInfo.LastCode)
+                            {
+                                case SipAgent.SIP_BUSY:
+                                    State = TlfState.Busy;
+                                    break;
+                                case SipAgent.SIP_NOT_FOUND:
+                                    State = TlfState.OutOfService;
+                                    break;
+                                default:
+                                    State = TlfState.Congestion;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            State = TlfState.Idle;
+                            _SipCall = null;
+                        }
 					}
 				}
                 if (State != TlfState.Out)
@@ -954,6 +1159,11 @@ namespace HMI.CD40.Module.BusinessEntities
 			return false;
 		}
 
+        public virtual bool IsForMe(CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
+        {
+            SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, -1, info, inInfo, this is TlfIaPosition);
+            return (inCall != null);
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -990,7 +1200,8 @@ namespace HMI.CD40.Module.BusinessEntities
 						if (_State == TlfState.Out)
 						{
 							_CallTout.Enabled = false;
-							SipAgent.HangupCall(_SipCall.Id);
+                            _Logger.Debug("HandleIncomingCall HangupCall: {0}", _SipCall.RemoteId); 
+                            SipAgent.HangupCall(_SipCall.Id);
 
 							_SipCall = inCall;
                             CORESIP_CallFlags flags = Settings.Default.EnableEchoCanceller && (_SipCall.Ch.Prefix == Cd40Cfg.PP_DST || (_SipCall.Ch.Prefix >= Cd40Cfg.RTB_DST && _SipCall.Ch.Prefix < Cd40Cfg.EyM_DEST)) ? CORESIP_CallFlags.CORESIP_CALL_EC : CORESIP_CallFlags.CORESIP_CALL_NO_FLAGS;
@@ -1020,6 +1231,36 @@ namespace HMI.CD40.Module.BusinessEntities
 			return SipAgent.SIP_DECLINE;
 		}
 
+        public virtual bool HandleCallMoved(int sipCallId, out CORESIP_Priority prio)
+        {
+            prio = CORESIP_Priority.CORESIP_PR_UNKNOWN;
+            if ((_SipCall != null) && (_SipCall.Id == sipCallId))
+            {
+                prio = _SipCall.Priority;
+                _CallTout.Enabled = false;
+                //Top.Mixer.Unlink(_SipCall.Id);
+                _SipCall = null;
+                State = TlfState.Idle;
+                return true;
+            }
+            return false;
+        }
+
+        public void RedirectCall(int sipCallId, string givenDstUri)
+        {
+            CORESIP_Priority priority = this.CallPriority;
+            _SipCall = SipCallInfo.NewRedirectCall(_Channels, priority, sipCallId);
+            State = TryCall();
+            if (_State == TlfState.Out)
+            {
+                _CallTout.Enabled = true;
+            }
+            else if ((_State == TlfState.NotAllowed) || (_State == TlfState.Congestion))
+            {
+                SipAgent.CallProccessRedirect(sipCallId, givenDstUri, CORESIP_REDIRECT_OP.CORESIP_REDIRECT_REJECT);
+            }
+            General.SafeLaunchEvent(ForwardedCallMsg, this, _Literal);
+        }
 		#region Protected Members
         /// <summary>
         /// 
@@ -1035,9 +1276,13 @@ namespace HMI.CD40.Module.BusinessEntities
 		protected TlfState _State = TlfState.Idle;
 		protected TlfState _OldState = TlfState.Idle;
 		protected List<SipChannel> _Channels = new List<SipChannel>();
+#if DEBUG
+        public SipCallInfo _SipCall = null;
+#else
 		protected SipCallInfo _SipCall = null;
+#endif
 		protected Timer _CallTout = new Timer(Settings.Default.TlfCallsTout);
-		protected TlfConference _Conference = null;
+        protected TlfConference _Conference = null;
 		protected int _Tone = -1;
 		protected IntPtr _EvSub = IntPtr.Zero;
 		protected bool _RemoteHangUp = false;
@@ -1077,10 +1322,13 @@ namespace HMI.CD40.Module.BusinessEntities
 		}
 
         /// <summary>
-        /// 
+        /// Return TlfState having into account state of channels.
+        /// If Channel is Idle (i.e available), by defaultkeep state with no changes
+        /// or return idle if required in param
         /// </summary>
+        /// <param name="defaultState"></param>
         /// <returns></returns>
-		protected TlfState GetState()
+		protected TlfState GetReachableState(bool setIdle = false )
 		{
             SipChannel.DestinationState state;
 			TlfState st = TlfState.Unavailable;
@@ -1091,9 +1339,16 @@ namespace HMI.CD40.Module.BusinessEntities
                 switch (state)
 				{
                     case SipChannel.DestinationState.Busy:
-                        return TlfState.PaPBusy;
+                        //No se envía PaP si está señalizando algo (por ejemplo In de captura)
+                        //El estado PaP busy sólo se tiene en cuenta cuando está en reposo o
+                        //y significa que está disponible, por eso no mantiene el unavailable
+                        if (((_State == TlfState.Idle) || (_State == TlfState.Unavailable)) && !setIdle)
+                            return TlfState.PaPBusy;
+                        else return _State;
                     case SipChannel.DestinationState.Idle:
-							return TlfState.Idle;
+                        if ((_State == TlfState.Unavailable) || (_State == TlfState.PaPBusy) || setIdle)
+                            return TlfState.Idle;
+                        else return _State;
                     case SipChannel.DestinationState.NotReachable:
                         //Caso de 19+1 canal sin lineas encontradas en la configuracion, 
                         //siempre está en reposo
@@ -1113,7 +1368,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="path"></param>
         /// <param name="prio"></param>
         /// <returns></returns>
-		protected bool TryCall(SipChannel ch, SipPath path, int prio)
+		protected virtual bool TryCall(SipChannel ch, SipPath path, int prio)
 		{
 			string dstParams = "";
 			string remoteId = path.Remote.Ids[0];
@@ -1123,19 +1378,19 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 //Estos parametros son internos, sirven para dar información a la pasarela
                 //En encaminamiento IP no se deben usar
-			if (!string.IsNullOrEmpty(path.Remote.SubId))
-			{
-				dstParams += string.Format(";isub={0}", path.Remote.SubId);
-			}
-			if ((ch.Prefix != Cd40Cfg.INT_DST) && (ch.Prefix != Cd40Cfg.IP_DST) && (ch.Prefix != Cd40Cfg.UNKNOWN_DST) &&
-                    ((ch.Prefix != Cd40Cfg.PP_DST) || (string.Compare(remoteId, path.Line.Id, true /*ignoreCase*/) != 0)))
-			{
-				dstParams += string.Format(";cd40rs={0}", path.Line.Id);
-			}
-			if (ch.Prefix == Cd40Cfg.ATS_DST)
-			{
-				dstParams += string.Format(";cd40prio={0}", prio);
-			}
+			    if (!string.IsNullOrEmpty(path.Remote.SubId))
+			    {
+				    dstParams += string.Format(";isub={0}", path.Remote.SubId);
+			    }
+			    if ((ch.Prefix != Cd40Cfg.INT_DST) && (ch.Prefix != Cd40Cfg.IP_DST) && (ch.Prefix != Cd40Cfg.UNKNOWN_DST) &&
+                        ((ch.Prefix != Cd40Cfg.PP_DST) || (string.Compare(remoteId, path.Line.Id, true /*ignoreCase*/) != 0)))
+			    {
+				    dstParams += string.Format(";cd40rs={0}", path.Line.Id);
+			    }
+			    if (ch.Prefix == Cd40Cfg.ATS_DST)
+			    {
+				    dstParams += string.Format(";cd40prio={0}", prio);
+			    }
             }
 
             //Si el destino es un recurso ajeno a mi SCV (no configurado) utilizo la URI recibida.
@@ -1158,15 +1413,25 @@ namespace HMI.CD40.Module.BusinessEntities
                         flags |= CORESIP_CallFlags.CORESIP_CALL_EXTERNAL_IP;
                     sipCallId = SipAgent.MakeMonitoringCall(ch.AccId, dstUri, flags);
 				}
-				else
-				{
-                    flags = Settings.Default.EnableEchoCanceller && 
-                        (ch.Prefix == Cd40Cfg.PP_DST || (ch.Prefix >= Cd40Cfg.RTB_DST && ch.Prefix < Cd40Cfg.EyM_DEST)) ? 
-                        CORESIP_CallFlags.CORESIP_CALL_EC : CORESIP_CallFlags.CORESIP_CALL_NO_FLAGS;
-                    if (path.ModoSinProxy == false)
-                        flags |= CORESIP_CallFlags.CORESIP_CALL_EXTERNAL_IP;
-                    sipCallId = SipAgent.MakeTlfCall(ch.AccId, dstUri, _SipCall.ReferBy, _SipCall.Priority, flags);
+                else if (_SipCall.Dialog != null)
+                    {
+                        sipCallId = SipAgent.MakeTlfCallReplaces(ch.AccId, dstUri, _SipCall.Priority, flags, _SipCall.Dialog.callId,
+                            _SipCall.Dialog.toTag, _SipCall.Dialog.fromTag);
+                    }
+                else if (_SipCall.Redirect)
+                {
+                    sipCallId =_SipCall.Id;
+                    SipAgent.CallProccessRedirect(_SipCall.Id, dstUri, CORESIP_REDIRECT_OP.CORESIP_REDIRECT_ACCEPT);
                 }
+                    else
+                    {
+                        flags = Settings.Default.EnableEchoCanceller &&
+                            (ch.Prefix == Cd40Cfg.PP_DST || (ch.Prefix >= Cd40Cfg.RTB_DST && ch.Prefix < Cd40Cfg.EyM_DEST)) ?
+                            CORESIP_CallFlags.CORESIP_CALL_EC : CORESIP_CallFlags.CORESIP_CALL_NO_FLAGS;
+                        if (path.ModoSinProxy == false)
+                            flags |= CORESIP_CallFlags.CORESIP_CALL_EXTERNAL_IP;
+                        sipCallId = SipAgent.MakeTlfCall(ch.AccId, dstUri, _SipCall.ReferBy, _SipCall.Priority, flags);
+                    }
 
 				_SipCall.Update(sipCallId, ch.AccId, remoteId, ch, path.Remote, path.Line);
 
@@ -1182,6 +1447,12 @@ namespace HMI.CD40.Module.BusinessEntities
 			return false;
 		}
 
+        public ArrayList GetUris()
+        {
+            if (_Channels[0].GetType() == typeof(IntChannel))
+                return _Channels[0].GetUris;
+           return null;
+                        }
         /// <summary>
         /// Realiza un intento de llamada por el siguiente path que le corresponde
         /// </summary>
@@ -1190,7 +1461,6 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			bool ats = false;
 
-			Debug.Assert((_SipCall != null) && !_SipCall.IsActive);
 			TlfState estado = TlfState.Congestion;
 
             foreach (SipChannel ch in _Channels)
@@ -1312,14 +1582,13 @@ namespace HMI.CD40.Module.BusinessEntities
 						_Conference = null;
 					}
 
-					SipAgent.HangupCall(_SipCall.Id, reason);
                     _Logger.Debug("HangupCall: {0}", _SipCall.RemoteId);
-
+                    SipAgent.HangupCall(_SipCall.Id, reason);
 				}
 				else
 				{
 					Debug.Assert((_State == TlfState.Congestion) || (_State == TlfState.NotAllowed) || (_State == TlfState.Busy) || (_State == TlfState.OutOfService));
-				}
+				}                
 
 				_SipCall = null;
                 _HoldOnEstablish = false;
@@ -1340,7 +1609,8 @@ namespace HMI.CD40.Module.BusinessEntities
 				{
 					Debug.Assert((_SipCall != null) && _SipCall.IsActive);
 
-					SipAgent.HangupCall(_SipCall.Id);
+                    _Logger.Debug("OnCallTimeout HangupCall: {0}", _SipCall.RemoteId); 
+                    SipAgent.HangupCall(_SipCall.Id);
 
 					_SipCall.Id = -1;
 					State = TlfState.Congestion;
@@ -1363,7 +1633,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			if (!rs.IsValid)
 			{
-				TlfState st = GetState();
+				TlfState st = GetReachableState();
 
 				if (st == TlfState.Unavailable)
 				{
@@ -1395,6 +1665,7 @@ namespace HMI.CD40.Module.BusinessEntities
 						{
 							if (_State == TlfState.Out)
 							{
+                                _Logger.Debug("OnRsChanged HangupCall: {0}", _SipCall.RemoteId); 
 								SipAgent.HangupCall(_SipCall.Id);
 								_SipCall.Id = -1;
 
@@ -1403,6 +1674,7 @@ namespace HMI.CD40.Module.BusinessEntities
 							else
 							{
 								MakeHangUp(0);
+                                st = TlfState.Unavailable;
 							}
 						}
 						else
@@ -1456,8 +1728,12 @@ namespace HMI.CD40.Module.BusinessEntities
 				{
                     //Pone a idle la tecla sin tener en cuenta todos sus canales y recursos
                     //No funciona para proxy propio en una tecla de un TopRs
-					//State = (rsState == GwTlfRs.State.Idle) ? TlfState.Idle : GetState();
-                    State = GetState();
+                    //bool setIdle = true;
+                    //if ((rsState == GwTlfRs.State.BusyInterruptionAllow) ||
+                    //   (rsState == GwTlfRs.State.BusyInterruptionNotAllow))
+                    //    setIdle = false;
+                    //State = GetReachableState(setIdle);
+                    State = GetReachableState();
 				}
 			}
 		}

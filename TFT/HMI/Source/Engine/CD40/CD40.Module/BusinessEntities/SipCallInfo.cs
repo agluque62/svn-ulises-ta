@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Text;
+
 using U5ki.Infrastructure;
+using Utilities;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
+#if DEBUG
+    public class SipCallInfo
+#else
 	class SipCallInfo
+#endif		
 	{
 		public int Id
 		{
@@ -59,6 +64,15 @@ namespace HMI.CD40.Module.BusinessEntities
 			get { return _Monitoring; }
 		}
 
+        public TlfPickUp.DialogData Dialog
+        {
+            get { return _Dialog; }
+        }
+
+        public bool Redirect
+        {
+            get { return _Redirect; }
+        }
         public bool LastErrorInIP()
         {
             if (_Ch == null)
@@ -75,17 +89,19 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
             //Si el Id es -1, la clase no tiene todos sus miembros rellenos (crash en _Ch)
             //es el caso de llamadas que no han prosperado y están en espera de cuelgue
-            if (Id > 0)
+            if (_Ch != null) 
             {   
                 foreach (SipChannel ch in channels)
                 {
                     if (ch.Prefix == _Ch.Prefix)
                     {
                         _Remote = ch.ContainsRemote(_RemoteId, _Remote.SubId);
-                        if (_Remote != null)
+                        if ((_Remote != null) && (_Line !=null))
                         {
-                            _Line = ch.ContainsLine(_Line.Id, _Line.Ip);
-                            if (_Line != null)
+                            if (!_LocalId.Equals(ch.AccId))
+                                break;
+                            SipLine  line = ch.ContainsLine(_Line.Id, _Line.Ip);
+                            if (line != null)
                             {
                                 return _Line.IsAvailable;
                             }
@@ -122,25 +138,44 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public static SipCallInfo NewLcCall(IEnumerable<SipChannel> channels)
 		{
-			foreach (SipChannel ch in channels)
-			{
-				ch.ResetCallResults(true);
-			}
-
-			SipCallInfo info = new SipCallInfo();
+            SipCallInfo info = NewCall(channels);
 			info._Priority = CORESIP_Priority.CORESIP_PR_URGENT;
 
 			return info;
 		}
 
-		public static SipCallInfo NewMonitoringCall(IEnumerable<SipChannel> channels)
-		{
-			foreach (SipChannel ch in channels)
-			{
-				ch.ResetCallResults(true);
-			}
+        public static SipCallInfo NewReplacesCall(IEnumerable<SipChannel> channels, TlfPickUp.DialogData dialog)
+        {
+            SipCallInfo info = NewCall(channels);
+            info._Dialog = dialog;
 
-			SipCallInfo info = new SipCallInfo();
+            return info;
+        }
+
+        public static SipCallInfo NewRedirectCall(IEnumerable<SipChannel> channels, CORESIP_Priority priority, int callId)
+        {
+            SipCallInfo info = NewCall(channels);
+            info._Redirect = true;
+            info._Id = callId;
+            info._Priority = priority;
+
+            return info;
+        }
+
+        private static SipCallInfo NewCall(IEnumerable<SipChannel> channels)
+        {
+            foreach (SipChannel ch in channels)
+            {
+                ch.ResetCallResults(true);
+            }
+
+            SipCallInfo info = new SipCallInfo();
+            return info;
+        }
+
+        public static SipCallInfo NewMonitoringCall(IEnumerable<SipChannel> channels)
+		{
+            SipCallInfo info = NewCall(channels);
 			info._Monitoring = true;
 
 			return info;
@@ -148,12 +183,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public static SipCallInfo NewTlfCall(IEnumerable<SipChannel> channels, CORESIP_Priority priority, string referBy)
 		{
-			foreach (SipChannel ch in channels)
-			{
-				ch.ResetCallResults(true);
-			}
-
-			SipCallInfo info = new SipCallInfo();
+            SipCallInfo info = NewCall(channels);
 			info._Priority = priority;
 			info._ReferBy = referBy;
 
@@ -163,20 +193,21 @@ namespace HMI.CD40.Module.BusinessEntities
 		public static SipCallInfo NewIncommingCall(IEnumerable<SipChannel> channels, int callId, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo, bool findNoConfigured)
 		{
             SipPath path = null;
+            SipChannel channel = null;
 			foreach (SipChannel ch in channels)
 			{
 				ch.First = false;
 			}
-            IPEndPoint sipEP = new IPEndPoint(IPAddress.Parse(inInfo.SrcIp), (int)inInfo.SrcPort);
+
 			foreach (SipChannel ch in channels)
 			{
-				path = ch.FindPath(inInfo.SrcId, sipEP.ToString(), inInfo.SrcSubId, inInfo.SrcRs);
+				path = ch.FindPath(inInfo.SrcId, inInfo.SrcIp, inInfo.SrcSubId, inInfo.SrcRs);
                 if (path != null)
                 {
-                    ch.First = true;
-                    return new SipCallInfo(callId, inInfo.DstId, inInfo.SrcId, info.Priority, info.Type, ch, path.Remote, path.Line);
+                    channel = ch;
+                    break;
                 }
-			}
+            }
             //Si no se encuentra path en todos los canales,
             //se hace una busqueda sin comparar con el recurso.
             if ((path == null) && (findNoConfigured))
@@ -186,13 +217,19 @@ namespace HMI.CD40.Module.BusinessEntities
                     path = ch.FindPathNoConfigured(inInfo.SrcId, inInfo.SrcSubId);
                     if (path != null)
                     {
-                        ch.First = true;
-                        return new SipCallInfo(callId, inInfo.DstId, inInfo.SrcId, info.Priority, info.Type, ch, path.Remote, path.Line);
+                        channel = ch;
+                        break;
                     }
                 }
             }
-			return null;
-		}
+            if (path != null)
+            {
+                channel.First = true;
+                return new SipCallInfo(callId, inInfo.DstId, inInfo.SrcId, info.Priority, info.Type, channel, path.Remote, path.Line);
+            }
+
+            return null;
+        }
 
 		#region Private Members
 
@@ -208,6 +245,8 @@ namespace HMI.CD40.Module.BusinessEntities
         //en una interrupción por prioridad
 		private bool _InterruptionWarning;
 		private bool _Monitoring;
+        private bool _Redirect;
+        private TlfPickUp.DialogData _Dialog = null;
 
 		private SipCallInfo()
 		{

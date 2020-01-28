@@ -14,7 +14,7 @@ namespace HMI.Presentation.Urr.UI
 {
     public class UrrWidthBar : System.Windows.Forms.Button
     {
-
+        
         Color clr1, clr2;
         private Color color1 = Color.Gainsboro;
         private Color color2 = Color.DarkGray;
@@ -85,7 +85,7 @@ namespace HMI.Presentation.Urr.UI
             get { return minimum; }
             set { minimum = value; Invalidate(); }
         }
-
+        
         void SetBorderColor(Color bdrColor)
         {
             int red = bdrColor.R - 40;
@@ -328,7 +328,7 @@ namespace HMI.Presentation.Urr.UI
 
             //Degradado
             Brush brush2 = new LinearGradientBrush(ClientRectangle, c1, c2, angle);
-
+            
             //Los tres puntos que representan al triángulo
             Point[] points = { 
                 new Point(this.Width, this.Height/2), 
@@ -389,10 +389,10 @@ namespace HMI.Presentation.Urr.UI
             //cursorPosition=0;;cursorPosition=6
 
             //Normalizar los valores
-            if ((actualValue - cursorPosition) > 2)
+            if ((actualValue - cursorPosition)>2 )
                 actualValue -= 1;
-
-            if ((actualValue - cursorPosition) <= -1)
+            
+            if ((actualValue - cursorPosition)<=-1)
                 actualValue += 1;
 
 
@@ -512,5 +512,5 @@ namespace HMI.Presentation.Urr.UI
             }
         }
 
-    }
+    }  
 }

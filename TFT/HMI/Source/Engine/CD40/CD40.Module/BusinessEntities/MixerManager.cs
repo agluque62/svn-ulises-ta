@@ -18,7 +18,12 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// Identificadores para la gestión de la Mezcla en puesto.
     /// </summary>
-	enum MixerDev { MhpTlf,                     // Microcasco + Mic en Telefonía
+#if DEBUG
+    public enum MixerDev
+#else
+	enum MixerDev
+#endif
+    { MhpTlf,                     // Microcasco + Mic en Telefonía
                     MhpLc,                      // Microcasco + Mic en LC
                     MhpRd,                      // Microcasco + Mic en Radio.
                     SpkLc,                      // Altavoz de LC
@@ -29,7 +34,12 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// Identificadores de los tipos de enlaces programados en el mezclador.
     /// </summary>
-	enum MixerDir { Send,                       // IN --> OUT Altavoz rx
+#if DEBUG
+    public enum MixerDir
+#else
+	enum MixerDir
+#endif
+    { Send,                       // IN --> OUT Altavoz rx
                     Recv,                       // IN <-- OUT micro tx
                     SendRecv                    // IN <-> OUT
                   }
@@ -44,8 +54,12 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// 
     /// </summary>
+#if DEBUG
+    public 	class MixerManager
+#else
 	class MixerManager
-	{
+#endif
+    {
         /// <summary>
         /// 
         /// </summary>
@@ -172,7 +186,8 @@ namespace HMI.CD40.Module.BusinessEntities
 			Top.Tlf.ActivityChanged += OnTlfActivityChanged;
             Top.Hw.SpeakerExtChangedHw += OnHwChanged;
             Top.Hw.SpeakerChangedHw += OnHwChanged;
-
+            Top.Tlf.Listen.ListenChanged += OnListenChanged;
+            Top.Tlf.HangToneChanged += OnTlfToneChanged;
             _UnlinkGlpRadioTimer.AutoReset = false;
             _UnlinkGlpRadioTimer.Elapsed += OnUnlinkGlpRadioTimerElapsed;
 
@@ -237,21 +252,23 @@ namespace HMI.CD40.Module.BusinessEntities
                     _InstructorRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input);
                     _AlumnRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input);
                     _RadioRecorderDevIn = -1;
-                    _LcRecorderDevIn = -1;
+                    _LcRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input);
                     _RadioHfRecorderIn = -1;
 
                     /** Salidas de Grabacion. */
-                    _IntRecorderDevOut = -1;
+                    _IntRecorderDevOut = -1;                    
                     _AlumnRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Output);
                     if (Settings.Default.CMediaBkpVersion == "B41A")
                     {
                         // BKP_VERSION_B41A
                         _InstructorRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output);
+                        //No es compatible la grabación analogica de telefona por altavoz con este hw
                     }
                     else
                     {
                         // BKP_VERSION_B43A
                         _InstructorRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Output);
+                        _IntRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output);
                     }
                 }
             }
@@ -765,12 +782,12 @@ namespace HMI.CD40.Module.BusinessEntities
 
 				case MixerDev.MhpLc:
                     ManageECHandsFreeByLC();
-                    if (_InstructorDev >= 0 && _SplitMode == SplitMode.Off)
+                    if ((_InstructorDev >= 0 && _InstructorJack) && _SplitMode == SplitMode.Off)
                     {
                         Link(id, _InstructorDev, dir, priority);
                         Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, true);
                     }
-                    if (_AlumnDev >= 0)
+                    if (_AlumnDev >= 0 && _AlumnJack)
                     {
                         Link(id, _AlumnDev, dir, priority);
                         Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, true);
@@ -854,6 +871,7 @@ namespace HMI.CD40.Module.BusinessEntities
 							}
 						}
 					}
+                    Top.Rd.UpdateRadioSpeakerLed();
 					break;
 
 				case MixerDev.SpkLc:
@@ -864,8 +882,11 @@ namespace HMI.CD40.Module.BusinessEntities
 						_Mixer.Link(id, Mixer.UNASSIGNED_PRIORITY, _LcSpeakerDev, priority);
                         Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
 
-                        /*- AGL.REC La grabacion del Altavoz-LC es Continua  */
-                        /*  Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, true);*/
+                        /*- AGL.REC La grabacion del Altavoz-LC es Continua ...
+                        BS si es grabacion unificada. 
+                        * En el caso de la telefonía por altavoz no unificada, no es continua */
+                        if (Settings.Default.RecordMode == 0)
+                            Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, true);
                         
                         //Se llama desde arriba
                         //Top.Recorder.SessionGlp(id, tipoFuente, true);
@@ -992,8 +1013,11 @@ namespace HMI.CD40.Module.BusinessEntities
 
 					case MixerDev.SpkLc:
                        ManageECHandsFreeByLC();
-                       /*- AGL.REC La grabacion del Altavoz-LC es Continua ...*/						
-                        /*    Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, false);*/
+                       /*- AGL.REC La grabacion del Altavoz-LC es Continua ...
+                        BS si es grabacion unificada. 
+                        * En el caso de la telefonía por altavoz no unificada, no es continua */
+                       if (Settings.Default.RecordMode == 0)
+                        Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, false);
 
                         Top.Recorder.SessionGlp(info._TipoFuente, false);
                         Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
@@ -1040,8 +1064,11 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 			}
 
-			if (removed > 0) 
+            if (removed > 0)
+            {
                 _Mixer.Unlink(id);
+                Top.Rd.UpdateRadioSpeakerLed();
+            }
 			_TlfListens.Remove(id);
 
             /** */
@@ -1084,7 +1111,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		public void UnlinkRdInstructorTx()
 		{
 
-			if (_InstructorDev >= 0)
+			if ((_InstructorDev >= 0) && ((_SplitMode == SplitMode.Off) || (_SplitMode == SplitMode.LcTf)))
 			{
 				_Mixer.Unlink(_InstructorDev, Mixer.RD_REMOTE_PORT_ID);
                 Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, false);
@@ -1114,7 +1141,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
 		public void UnlinkRdAlumnTx()
 		{
-			if (_AlumnDev >= 0)
+			if ((_AlumnDev >= 0) && ((_SplitMode == SplitMode.Off) || (_SplitMode == SplitMode.RdLc)))
 			{
 				_Mixer.Unlink(_AlumnDev, Mixer.RD_REMOTE_PORT_ID);
                 Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, false);
@@ -1195,7 +1222,8 @@ namespace HMI.CD40.Module.BusinessEntities
                     {CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, _InstructorRecorderDevOut},
                     {CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, _InstructorRecorderDevOut},
                     {CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, _AlumnRecorderDevOut},
-                    {CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, _AlumnRecorderDevOut}
+                    {CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, _AlumnRecorderDevOut},
+                    {CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, _IntRecorderDevOut}
                 };
                 if (Type2DevOut.ContainsKey(dev) == true)
                 {
@@ -1259,21 +1287,28 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="via"></param>       
         public void LinkReplay(int file, ViaReplay via)
         {
+            LinkInfo link = null;
+            
             switch (via)
             {
                 case ViaReplay.HeadphonesAlumn:
+                    link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
                     Link(file,_AlumnDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
                     break;
                 case ViaReplay.HeadphonesInstructor:
+                    link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
                     Link(file,_InstructorDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
                     break;
                 case ViaReplay.SpeakerRadio:
+                    link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
                     Link(file,_RdSpeakerDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
                     break;
                 case ViaReplay.SpeakerLc:
+                    link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
                     Link(file,_LcSpeakerDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
                     break;
             }
+            _LinksList.Add(link);
         }
 
 #if _AUDIOGENERIC_
@@ -1316,7 +1351,7 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             //Si la Tlf cambia a cascos (speaker false), la radio pasa de cascos a altavoz (mphToSpk true)
             //Si la Tlf cambia a altavoz (speaker true), la radio vuelve de altavoz a cascos (mphToSpk false)
-            if (Top.Tlf.Activity())
+            if ((Top.Tlf!= null) && Top.Tlf.Activity())
                 TogleRxAudioRadio(!speaker);
             Top.Rd.UpdateRadioSpeakerLed();
         }
@@ -1810,7 +1845,8 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="sender"></param>
         public bool AutChangeToRdSpeaker()
         {
-            if ((Top.Tlf.Activity()) && (_RxTlfAudioVia == TlfRxAudioVia.HeadPhones))
+            if (_RxTlfAudioVia == TlfRxAudioVia.HeadPhones &&
+               (Top.Tlf.Listen.State == FunctionState.Executing || Top.Tlf.Activity() || Top.Tlf.ToneOn))
                 return true;
             else 
                 return false;
@@ -1823,12 +1859,38 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="sender"></param>
 		private void OnTlfActivityChanged(object sender)
 		{
+            ManageTogleRxAudio();
+		}
+
+        /// <summary>
+        /// Evento recibido por cambio en el tono de telefonía
+        /// sólo se tiene en cuenta si compite con la radio por los cascos
+        /// </summary>
+        private void OnTlfToneChanged(object sender, bool toneOn)
+        {
+            ManageTogleRxAudio();
+        }
+
+        /// <summary>
+        /// Evento recibido por cambio en la actividad de escucha.
+        /// </summary>
+        /// <param name="sender"></param>
+        private void OnListenChanged(object sender, ListenPickUpMsg msg)
+        {
+            ManageTogleRxAudio();
+        }
+
+        /// <summary>
+        /// Se tiene en cuenta si compite con la radio por los cascos
+        /// </summary>
+        private void ManageTogleRxAudio()
+        {
             if (_RxTlfAudioVia == TlfRxAudioVia.Speaker)
                 return;
 
-            TogleRxAudioRadio(Top.Tlf.Activity());
+            TogleRxAudioRadio(Top.Tlf.Listen.State == FunctionState.Executing || Top.Tlf.Activity() || Top.Tlf.ToneOn);
             Top.Rd.UpdateRadioSpeakerLed();
-		}
+        }
 
         /// <summary>
         /// Pasa automaticamente la salida de audio de las radios seleccionadas por cascos, 

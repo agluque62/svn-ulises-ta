@@ -8,11 +8,14 @@ using Utilities;
 
 namespace HMI.Model.Module.BusinessEntities
 {
+    /// <summary>
+    /// "Alumno/Ejecutivo <-| (izq) y |-> Instructor/ayudante (dcha)"
+    /// </summary>
 	public enum SplitMode
 	{
-		Off = 0,
-		LcTf,
-		RdLc
+		Off = 0,  
+		LcTf, //Alumno/ejecutivo LC y TF. Instructor ayudante LC
+        RdLc  //Alumno/ejecutivo LC y Rd. Instructor ayudante TF
 	}
 
 	public sealed class Split

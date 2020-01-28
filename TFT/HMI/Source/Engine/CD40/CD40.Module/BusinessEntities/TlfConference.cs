@@ -11,7 +11,11 @@ using Utilities;
 using NLog;
 namespace HMI.CD40.Module.BusinessEntities
 {
+#if DEBUG
+	public class TlfConference : IDisposable
+#else
 	class TlfConference : IDisposable
+#endif	
 	{
         /// <summary>
         /// 

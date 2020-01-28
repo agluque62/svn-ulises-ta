@@ -155,22 +155,30 @@ namespace U5ki.NodeBox
 				}
 			}
 
-            /// 20181130. Identificar el tipo de servidor de servicios.
-            if (RadioService != null && CfgService != null && PhoneService == null && TifxService == null && PresenceService == null)
-            {
-                ServerType = ServicesServerTypes.Radio;
-                ServicesHelpers.VersionsFileAdjust("RadioService", new List<string>() { "CfgService", "RdService", "RemoteControlService" });
-            }
-            else if (RadioService == null && CfgService == null && PhoneService != null && TifxService != null && PresenceService != null)
-            {
-                ServerType = ServicesServerTypes.Phone;
-                ServicesHelpers.VersionsFileAdjust("PhoneService", new List<string>() { "TifxService", "PresenceService", "PhoneService" });
-            }
-            else
-            {
-                ServerType = ServicesServerTypes.Mixed;
-                ServicesHelpers.VersionsFileAdjust("Nodebox", null);
-            }
+            /** 20190408. En 259 esto da problemas. Reconsiderar en 2.5.10*/
+//            /// 20181130. Identificar el tipo de servidor de servicios.
+//            if (RadioService != null && CfgService != null && PhoneService == null && TifxService == null && PresenceService == null)
+//            {
+//                ServerType = ServicesServerTypes.Radio;
+//                ServicesHelpers.VersionsFileAdjust("RadioService", new List<string>() { "CfgService", "RdService", "RemoteControlService" });
+//        }
+//            else if (RadioService == null && CfgService == null && PhoneService != null && TifxService != null && PresenceService != null)
+//            {
+//                ServerType = ServicesServerTypes.Phone;
+//                ServicesHelpers.VersionsFileAdjust("PhoneService", new List<string>() { "TifxService", "PresenceService", "PhoneService" });
+//            }
+//#if PHONE_AND_CFG
+//            else if (RadioService == null && PhoneService != null && TifxService != null && PresenceService != null)
+//            {
+//                ServerType = ServicesServerTypes.Phone;
+//                ServicesHelpers.VersionsFileAdjust("PhoneServiceCfg", new List<string>() { "TifxService", "PresenceService", "PhoneService", "CfgService" });
+//            }
+//#endif
+//            else
+//            {
+//                ServerType = ServicesServerTypes.Mixed;
+//                ServicesHelpers.VersionsFileAdjust("Nodebox", null);
+//            }
 
             // VersionsFileAdjust();
         }
@@ -267,7 +275,6 @@ namespace U5ki.NodeBox
         /// <summary>
         /// 
         /// </summary>
-		// List<IService> _Services = new List<IService>();
         Dictionary<String, IService> _Services = new Dictionary<string, IService>();
 
         /// <summary>
@@ -415,7 +422,7 @@ namespace U5ki.NodeBox
 
                 if (_isNetworkOnline == true)
                 {
-                    /** 20180309. Arranque del Sip AGENT y del Servicio WEB ... */
+                /** 20180309. Arranque del Sip AGENT y del Servicio WEB ... */
                     if (SipAgentStarted == false)
                     {
                         SipAgentStart();
@@ -431,7 +438,7 @@ namespace U5ki.NodeBox
                     /** 20170725. La presencia informa del estado de todos sus servicios. */
                     Presencia();
 
-                    /** 20170614. Query IGMP cada x minutos si habiltado y master */
+                    /** 20170614. Query IGMP cada x minutos si habilitado y master */
                     IgmpQuery();              
                 }
                 else
@@ -476,12 +483,12 @@ namespace U5ki.NodeBox
                 _histproc = null;
 #endif
                 if (WebServerStarted == true)
-                    WebServerStop();
+                WebServerStop();
 
                 ///** 20180208. Inicializa el SipAgent para que pueda se utilizado por diferentes servicios */
                 //SipAgent.End();
                 if (SipAgentStarted == true)
-                    SipAgentStop();
+                SipAgentStop();
                 
                 /** */
                 _Logger.InfoManager(String.Format("Nodo detenido {0}.",++_cntRun));
@@ -534,9 +541,9 @@ namespace U5ki.NodeBox
                     /** 20181130. Cambio el formato a TXT/JSON */
                     using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp) )
                     {
-                        IPEndPoint dst = new IPEndPoint(IPAddress.Parse(settings.HistServer), settings.PuertoPresencia);
+                    IPEndPoint dst = new IPEndPoint(IPAddress.Parse(settings.HistServer), settings.PuertoPresencia);
                         var data = new
-                        {
+                    {
                             Machine = Environment.MachineName,
                             ServerType = ServerType.ToString(),
                             GlobalMaster = GlobalMasterState.ToString(),
@@ -547,10 +554,10 @@ namespace U5ki.NodeBox
                             PresenceService = ServiceMasterStateByValue(PresenceService).ToString(),
                             WebPort = settings.PuertoControlRemoto,
                             TimeStamp = DateTime.Now
-                        };
+                    };
 
                         sock.SendTo(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(data)), dst);
-                    }                    
+                }
                 }
                 catch (Exception x)
                 {
@@ -630,7 +637,7 @@ namespace U5ki.NodeBox
                                 level = ServiceMasterStateByValue(RadioService).ToString()
                             },
 	                        mn  = new  
-                            {
+                        {
                                 std = mnInfo,
                                 level = ServiceMasterStateByValue(RadioService).ToString()
                             },
@@ -640,7 +647,7 @@ namespace U5ki.NodeBox
                                 level = ServiceMasterStateByValue(CfgService).ToString()
                             },
 	                        ifx = new  
-                            {
+                        {
                                 std = ServiceStatusByValue(TifxService).ToString(),
                                 level = ServiceMasterStateByValue(TifxService).ToString()
                             },
@@ -650,14 +657,14 @@ namespace U5ki.NodeBox
                                 level = ServiceMasterStateByValue(PresenceService).ToString()
                             },
 	                        pho = new  
-                            {
+                        {
                                 std = ServiceStatusByValue(PhoneService).ToString(),
                                 level = ServiceMasterStateByValue(PhoneService).ToString()
                             }
                         };
 
                         return stdGlobal;
-                    }
+            }
 
                 case CmdSupervision.cmdCfgLst:                      // Lista de Preconfiguraciones.
                     {
@@ -1130,8 +1137,8 @@ namespace U5ki.NodeBox
             get
             {
                 return ServiceByName("Cd40RdService");
-            }
-        }
+                    }
+                }
 
         /// <summary>
         /// 
@@ -1148,12 +1155,12 @@ namespace U5ki.NodeBox
         /// 
         /// </summary>
         protected IService PhoneService
-        {
+                {
             get
-            {
+                    {
                 return ServiceByName("PhoneService");
-            }
-        }
+                    }
+                }
 
         /// <summary>
         /// 
@@ -1163,8 +1170,8 @@ namespace U5ki.NodeBox
             get
             {
                 return ServiceByName("Cd40TifxService");
-            }
-        }
+                    }
+                }
 
         /// <summary>
         /// 
@@ -1178,9 +1185,9 @@ namespace U5ki.NodeBox
         }
 
         protected ServiceMasterStates GlobalMasterState
-        {
+                {
             get
-            {
+                    {
                 List<ServiceMasterStates> RadioServerStates = new List<ServiceMasterStates>()
                 {
                     ServiceMasterStateByValue(RadioService),
@@ -1214,9 +1221,9 @@ namespace U5ki.NodeBox
 
                     default:
                         return ServiceMasterStates.Error;
+                    }
                 }
             }
-        }
 
         /// <summary>
         /// Obtiene el Interfaz de Red a partir de la IP.
@@ -1258,15 +1265,22 @@ namespace U5ki.NodeBox
             try
             {
                 _Logger.InfoManager("Iniciando SipAgent.");
-
+                uint sipPort = U5ki.NodeBox.Properties.Settings.Default.SipPort;
+                if (ServerType == ServicesServerTypes.Phone)
+                {
+                    sipPort = U5ki.NodeBox.Properties.Settings.Default.SipPortPhone;
+                }
                 SipAgent.Init(
                     U5ki.NodeBox.Properties.Settings.Default.SipUser,
                     U5ki.NodeBox.Properties.Settings.Default.IpPrincipal,
-                    U5ki.NodeBox.Properties.Settings.Default.SipPort, 128);
+                    sipPort, 128);
+                if (ServerType != ServicesServerTypes.Phone)
+                {
                 SipAgent.ReceiveFromRemote(
                     U5ki.NodeBox.Properties.Settings.Default.IpPrincipal,
                     U5ki.NodeBox.Properties.Settings.Default.ListenIp,
                     U5ki.NodeBox.Properties.Settings.Default.ListenPort);
+                }
                 SipAgent.Start();
                 SipAgentStarted = true;
             }

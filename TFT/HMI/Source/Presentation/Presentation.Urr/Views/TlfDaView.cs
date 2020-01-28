@@ -85,7 +85,7 @@ namespace HMI.Presentation.Urr.Views
                 for (int column = 0; column < _TlfButtonsTLP.ColumnCount; column++, pos++)
                 {
                     HMIButton bt = new HMIButton();
-                    // _TlfButtonsTLP.Controls.Add(bt, column, row);
+                   // _TlfButtonsTLP.Controls.Add(bt, column, row);
                     //_TlfButtons.Add(bt);
 
                     bt.Dock = DockStyle.Fill;
@@ -266,10 +266,10 @@ namespace HMI.Presentation.Urr.Views
         {
             return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
                     !dst.Unavailable &&
-                    (_StateManager.Tlf.Priority.State != PriorityState.Executing) &&
-                    ((_StateManager.Tlf.Listen.State == ListenState.Idle) || (_StateManager.Tlf.Listen.State == ListenState.Ready)) &&
-                    ((_StateManager.Tlf.Transfer.State == TransferState.Idle) ||
-                    ((_StateManager.Tlf.Transfer.State == TransferState.Ready) &&
+                    (_StateManager.Tlf.Priority.State != FunctionState.Executing) &&
+                    ((_StateManager.Tlf.Listen.State == FunctionState.Idle) || (_StateManager.Tlf.Listen.State == FunctionState.Ready)) &&
+                    ((_StateManager.Tlf.Transfer.State == FunctionState.Idle) ||
+                    ((_StateManager.Tlf.Transfer.State == FunctionState.Ready) &&
                     ((dst.State == TlfState.Idle) || (dst.State == TlfState.Hold) || (dst.State == TlfState.NotAllowed) ||
                     (dst.State == TlfState.Mem) || (dst.State == TlfState.RemoteMem))));
         }
@@ -333,14 +333,6 @@ namespace HMI.Presentation.Urr.Views
                 case TlfState.PaPBusy:
                     break;
                 case TlfState.In:
-                    //VMG 08/10/2018 Min intervalo de 10 segs.
-                    // Usando el cambio de color para detectar la llamada en la vista
-                    if (Settings.Default.RingerTimeOut >= 10000)
-                    {
-                        _CallRingerTimer.Interval = Settings.Default.RingerTimeOut;
-                        _CallRingerTimer.Enabled = true;
-                    }
-                    ////
                     backColor = _SlowBlinkOn ? VisualStyle.Colors.Orange : VisualStyle.ButtonColor;
                     _SlowBlinkList[bt] = VisualStyle.Colors.Orange;
                     _SlowBlinkTimer.Enabled = true;
@@ -357,7 +349,6 @@ namespace HMI.Presentation.Urr.Views
                     backColor = VisualStyle.Colors.Red;
                     break;
                 case TlfState.Mem:
-                    _CallRingerTimer.Enabled = false;//Desactivamos el timer al colgar
                     backColor = VisualStyle.Colors.Orange;
                     break;
                 case TlfState.RemoteMem:
@@ -429,36 +420,6 @@ namespace HMI.Presentation.Urr.Views
             catch (Exception ex)
             {
                 _Logger.Error("ERROR generando parpadeo lento para teclas TlfAD", ex);
-            }
-        }
-
-        //VMG 04/10/2018
-        /// <summary>
-        /// Timer para cortar la llamada entrante. 
-        /// Usamos la función del ButtonCancel.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _CallRingerTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_CallRingerTimer.Enabled)
-                {
-                    try
-                    {
-                        _Logger.Debug("Llamada cancelada por timer en ", _CallRingerTimer.Interval);
-                        _CmdManager.CancelTlfClick();
-                    }
-                    catch (Exception ex)
-                    {
-                        _Logger.Error("ERROR anulando la llamada por timer", ex);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error("ERROR generando _CallRingerTimer_Tick", ex);
             }
         }
 

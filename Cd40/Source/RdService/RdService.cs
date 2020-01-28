@@ -47,6 +47,7 @@ namespace U5ki.RdService
         private System.Timers.Timer _Timer = new System.Timers.Timer(Settings.Default.ConectionRetryTimer * 1000);
         private System.Timers.Timer _TimerHfStatus = new System.Timers.Timer(500);
         private string _SipIp = Settings.Default.SipIp;
+        Cd40Cfg _Cfg = null;
         private ServiceStatus _Status = ServiceStatus.Stopped;
         /// <summary>
         /// 
@@ -834,35 +835,30 @@ namespace U5ki.RdService
         {
             // Debug.Assert(_Master != master);
             // _Logger.Info("RdService.OnMasterStatusChanged {0}", _IsClosing);
-            /** AGL.. Trato de Retrasar el cambio a MASTER al menos 1 segundo.. */
-            _EventQueue.Enqueue("OnMasterStatusChanged-1", delegate()
+            _EventQueue.Enqueue("OnMasterStatusChanged-2", delegate()
             {
                 if (_Master == master)
                 {
-                    LogError<RdService>("U5ki.RdService: OnMasterStatusChanged... _Master==master");
-                    return;
+                    //Espero a publicar para asegurarme que no se cruzan con los mensajes de
+                    //un master temporal
+                    System.Threading.Thread.Sleep(1000);
+                    if (_Master)
+                    {
+                        foreach (RdFrecuency rdFr in Frecuencies.Values)
+                        {
+                            rdFr.Publish();
+                        }
+                    }
                 }
-
-                if (master == true)
-                {
-                    _sync = true;
-                    RdRegistry.PublishMaster(ServiceSite);
-                    System.Threading.Thread.Sleep(2000);
-                }
-                _sync = false;
-                _Master = master;
-                /** 20161219. AGL. Comprobar que no es la misma config, generada por una entrada 'merge' de otro NBX. */
-                LastVersion = string.Empty;
             });
 
-            _EventQueue.Enqueue("OnMasterStatusChanged-2", delegate()
+            _EventQueue.Enqueue("OnMasterStatusChanged-1", delegate()
             {
 #if DEBUG
                 if (Globals.Test.IsTestRunning)
                     return;
 #endif
-
-                if (_Master)
+                if (master && !_Master)
                 {
                     try
                     {
@@ -870,8 +866,8 @@ namespace U5ki.RdService
 #if DEBUG
                         LogTrace<RdService>("RdService.OnMasterStatusChanged => Activating Registry.");
 #endif
+                        RdRegistry._Master = true;
                         InitializeSip();
-                        RdRegistry.Activate(true);
                         _Timer.Enabled = true;
                         _Timer.Start();
 
@@ -879,6 +875,20 @@ namespace U5ki.RdService
                         MNManager.Start();
 #endif
                         LogInfo<RdService>("MASTER", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "RdService", "MASTER");
+
+                         _Master = master;
+
+                        /** 20161219. AGL. Comprobar que no es la misma config, generada por una entrada 'merge' de otro NBX. */
+                        LastVersion = string.Empty;
+                        //A veces no llega la configuración....asi que uso lo último recibido
+                        if (_Cfg != null)
+                            ProcessNewConfig(_Cfg);
+                        //System.Threading.Thread.Sleep(1000);
+                        //retraso el refresco al entrar en master por si soy master transitorio
+                        foreach (RdFrecuency rdFr in Frecuencies.Values)
+                        {
+                            rdFr.Publish();
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -886,24 +896,25 @@ namespace U5ki.RdService
                         ExceptionManage<RdService>("OnMasterStatusChangedMaster", ex, "OnMasterStatusChanged => MASTER Exception: " + ex.Message);
                     }
                 }
-                else
+                else if (!master && _Master)
                 {
                     try
                     {
                         LogInfo<RdService>("U5ki.RdService ==> " + "SLAVE");
-
+                        RdRegistry._Master = false;
+                        //Lo adelanto para que no entren las tareas periodicas de inicio sesion SIP
+                        _Master = master;
                         /** AGL... */
                         _gestorHF.Limpiar();
 
                         _Timer.Enabled = false;
 
-                        RdRegistry.Activate(false);
                         /** 20180208. Para que convivan mas de un proceso con la misma CORESIP */
                         FinalizeSip();
                         // SipAgent.End();
                         /****/
 
-                        Frecuencies.Clear();
+                        //Frecuencies.Clear();
                         _SndRxPorts.Clear();
 						
                         // JOI 201709 NEWRDRP INI
@@ -912,7 +923,7 @@ namespace U5ki.RdService
 #if _MN_NEW_START_STOP
                         if (MNManager.Status == ServiceStatus.Running)
                             MNManager.Dispose();//JOI 20170907 antes Stopped
-#endif
+#endif                        
                         LogInfo<RdService>("SLAVE", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "RdService", "SLAVE");
                     }
                     catch (Exception x)
@@ -921,7 +932,9 @@ namespace U5ki.RdService
                         ExceptionManage<RdService>("OnMasterStatusChangedSlave", x, "OnMasterStatusChanged => SLAVE Exception: " + x.Message);
                     }
                 }
+
             });
+
         }
 
         /// <summary>
@@ -936,22 +949,17 @@ namespace U5ki.RdService
                 {
                     try
                     {
+                        MemoryStream ms = new MemoryStream(Tools.Decompress(e.Content));
+                        _Cfg = Serializer.Deserialize<Cd40Cfg>(ms);
 
-                        MemoryStream ms = new MemoryStream(e.Content);
-
-                        Cd40Cfg cfg = Serializer.Deserialize<Cd40Cfg>(ms);
-
-                        if (_Master && !_sync)
-                        {
-                            LogInfo<RdService>(String.Format("Recibida nueva configuracion ({0})", cfg.Version), U5kiIncidencias.U5kiIncidencia.IGNORE);
-                        }
+                        LogInfo<RdService>(String.Format("Recibida nueva configuracion ({0})", _Cfg.Version), U5kiIncidencias.U5kiIncidencia.IGNORE);
 
                         _EventQueue.Enqueue("OnCfgChanged", delegate()
                         {
                             _onResourceChangedSemaphore.WaitOne();
                             try
                             {
-                                ProcessNewConfig(cfg);
+                                ProcessNewConfig(_Cfg);
                             }
                             catch (Exception ex)
                             {
@@ -1007,15 +1015,17 @@ namespace U5ki.RdService
         /// <param name="msg"></param>
         private void OnMsgReceived(object sender, SpreadDataMsg msg)
         {
+            if (!_Master)
+                return;
+            MemoryStream ms= new MemoryStream(msg.Data, 0, msg.Length);
             switch (msg.Type)
             {
-                case Identifiers.FR_RX_CHANGE_ASK_MSG:
+                case Identifiers.FR_RX_CHANGE_ASK_MSG:                         
                     _EventQueue.Enqueue("RxChangeAsk", delegate()
                     {
-                        MemoryStream ms;
-                        FrRxChangeAsk ask;
+                        FrRxChangeAsk ask; 
                         try
-                        {
+                        {                               
                             ms = new MemoryStream(msg.Data, 0, msg.Length);
                             ask = Serializer.Deserialize<FrRxChangeAsk>(ms);
                             ProcessRxChangeAsk(msg.From, ask);
@@ -1032,13 +1042,12 @@ namespace U5ki.RdService
                 case Identifiers.FR_TX_CHANGE_ASK_MSG:
                     _EventQueue.Enqueue("TxChangeAsk", delegate()
                     {
-                        MemoryStream ms;
                         FrTxChangeAsk ask;
                         try
                         {
                             ms = new MemoryStream(msg.Data, 0, msg.Length);
                             ask = Serializer.Deserialize<FrTxChangeAsk>(ms);
-                            ProcessTxChangeAsk(msg.From, ask);
+                                ProcessTxChangeAsk(msg.From, ask);
                         }
                         catch (Exception ex)
                         {
@@ -1052,25 +1061,40 @@ namespace U5ki.RdService
                 case Identifiers.PTT_CHANGE_ASK_MSG:
                     _EventQueue.Enqueue("PttChangeAsk", delegate()
                     {
-                        MemoryStream ms = new MemoryStream(msg.Data, 0, msg.Length);
-                        PttChangeAsk ask = Serializer.Deserialize<PttChangeAsk>(ms);
-                        ProcessPttChangeAsk(msg.From, ask);
+                        try
+                        {
+                            PttChangeAsk ask = Serializer.Deserialize<PttChangeAsk>(ms);
+                            ProcessPttChangeAsk(msg.From, ask);
+                        }
+                        catch (Exception ex)
+                        {
+                            ExceptionManage<RdService>("OnMsgReceived", ex, "PttChangeAsk Exception: " + ex.Message +
+                                ". Data: " + BitConverter.ToString(msg.Data, 0, msg.Length),
+                                false);
+                        }
                     });
                     break;
 
                 case Identifiers.RTX_GROUP_CHANGE_ASK_MSG:
                     _EventQueue.Enqueue("RtxGroupChangeAsk", delegate()
                     {
-                        MemoryStream ms = new MemoryStream(msg.Data, 0, msg.Length);
-                        RtxGroupChangeAsk ask = Serializer.Deserialize<RtxGroupChangeAsk>(ms);
-                        ProcessRtxGroupChangeAsk(msg.From, ask);
+                        try
+                        {
+                            RtxGroupChangeAsk ask = Serializer.Deserialize<RtxGroupChangeAsk>(ms);
+                            ProcessRtxGroupChangeAsk(msg.From, ask);
+                        }
+                        catch (Exception ex)
+                        {
+                            ExceptionManage<RdService>("OnMsgReceived", ex, "RtxChangeAsk Exception: " + ex.Message +
+                                ". Data: " + BitConverter.ToString(msg.Data, 0, msg.Length),
+                                false);
+                        }
                     });
                     break;
 
                 case Identifiers.SELCAL_PREPARE:
                     _EventQueue.Enqueue("SelcalPrepare", delegate()
                     {
-                        MemoryStream ms = new MemoryStream(msg.Data, 0, msg.Length);
                         SelcalPrepareMsg ask = Serializer.Deserialize<SelcalPrepareMsg>(ms);
                         ProcessSelcalPrepare(msg.From, ask);
                     });
@@ -1079,7 +1103,6 @@ namespace U5ki.RdService
                 case Identifiers.SELCAL_SEND_TONES:
                     _EventQueue.Enqueue("SelcalSendTones", delegate()
                     {
-                        MemoryStream ms = new MemoryStream(msg.Data, 0, msg.Length);
                         SelcalPrepareMsg ask = Serializer.Deserialize<SelcalPrepareMsg>(ms);
                         ProcessSelcalSendTones(msg.From, ask);
                     });
@@ -1088,7 +1111,6 @@ namespace U5ki.RdService
                 case Identifiers.SITE_CHANGING_MSG:
                     _EventQueue.Enqueue("ChangingSite", delegate()
                     {
-                        MemoryStream ms = new MemoryStream(msg.Data, 0, msg.Length);
                         ChangeSiteMsg ask = Serializer.Deserialize<ChangeSiteMsg>(ms);
                         ProcessChangingSite(msg.From, ask);
                     });
@@ -1125,6 +1147,9 @@ namespace U5ki.RdService
         /// </summary>
         void TimerHfStatus_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (!_Master)
+                return;
+
             SendStatusHF();
         }
         /// <summary>
@@ -1238,13 +1263,9 @@ namespace U5ki.RdService
         /// </summary>
         private void SendStatusHF()
         {
-            /** 20180731. Solo se envia el estado global si hay equipos configurados */
-            if (_gestorHF.Equipos.Count > 0)
-            {
-                HFStatus status = new HFStatus() { code = HFStatusCodes.DISC };
-                status.code = _gestorHF.GlobalStatus();
-                RdRegistry.SendHFStatus(status);
-            }
+            HFStatus status = new HFStatus() { code = HFStatusCodes.DISC };
+            status.code = _gestorHF.GlobalStatus();
+            RdRegistry.SendHFStatus(status);
         }
 #endif
         /// <summary>
@@ -1445,6 +1466,11 @@ namespace U5ki.RdService
             }
             finally
             {
+                //foreach (RdFrecuency rdFr in Frecuencies.Values)
+                //{
+                //    rdFr.Publish();
+                //}
+
                 _Timer.Enabled = true;
                 _Timer.Start();
             }
@@ -1583,6 +1609,8 @@ namespace U5ki.RdService
             // 20161124. AGL. A veces este parámetro viene a NULL ????
             if (ask.Frecuency == null)
                 return ret;
+            if (!_Master)
+                return ret;
 
             if (Frecuencies.TryGetValue(ask.Frecuency.ToUpper(), out rdFr))
             {
@@ -1619,6 +1647,8 @@ namespace U5ki.RdService
         private void TxChangeProcessed(IAsyncResult cookie)
         {
             string rdFrData = "";
+            if (!_Master)
+                return;
 
             try
             {
@@ -1883,7 +1913,6 @@ namespace U5ki.RdService
                 }
                 finally { }
             }
-            Frecuencies.Clear();
 
             /** Desconecto el agente */
             SipAgent.KaTimeout -= OnKaTimeout;
@@ -1911,7 +1940,7 @@ namespace U5ki.RdService
                     if (rdFr.HandleKaTimeout(call, out rdRes))
                     {
                         /** 20170126. AGL. Generar Historico KEEP-ALIVE TIMEOUT */
-                        LogError<RdService>(String.Format("KeepAlive Timeout. Frecuencia {0}, Equipo {1}", rdFr.Frecuency, rdRes.ID),
+                        LogInfo<RdService>(String.Format("KeepAlive Timeout. Frecuencia {0}, Equipo {1}", rdFr.Frecuency, rdRes.ID),
                             U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR,
                             rdFr.Frecuency,
                             "Recurso: " + rdRes.ID + " KeepAlive Timeout.");
@@ -1931,14 +1960,14 @@ namespace U5ki.RdService
             {
                 if (_Master)
                 {
-                    foreach (RdFrecuency rdFr in Frecuencies.Values)
+                foreach (RdFrecuency rdFr in Frecuencies.Values)
+                {
+                    rdFr.SupervisionPortadora = ConfirmaSupervisionPortadora(rdFr.PttSrc, rdFr.Frecuency);
+                    if (rdFr.HandleRdInfo(call, info))
                     {
-                        rdFr.SupervisionPortadora = ConfirmaSupervisionPortadora(rdFr.PttSrc, rdFr.Frecuency);
-                        if (rdFr.HandleRdInfo(call, info))
-                        {
-                            break;
-                        }
+                        break;
                     }
+                }
                 }
 
             });
@@ -2004,7 +2033,7 @@ namespace U5ki.RdService
                                     /** 20170126. AGL. Control de Eventos de Conexion / Desconexion */
                                     if (_sessions_sip_control.Event(rdRes.ID, CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED) == true)
                                     {
-                                        LogError<RdService>(String.Format("Desconexion SIP. Causa: {0}. Frecuencia {1}, Equipo {2}", stateInfo.LastCode, rdFr.Value.Frecuency, rdRes.ID),
+                                        LogWarn<RdService>(String.Format("Desconexion SIP. Causa: {0}. Frecuencia {1}, Equipo {2}", stateInfo.LastCode, rdFr.Value.Frecuency, rdRes.ID),
                                             U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR,
                                             rdFr.Value.Frecuency,
                                             CTranslate.translateResource("Recurso: " + rdRes.ID +". Desconexion SIP. Causa: "+ stateInfo.LastCode.ToString() + "." ));
@@ -2024,7 +2053,7 @@ namespace U5ki.RdService
                                     /**********************************/
                                 }
                                 /****************************/
-                                LogDebug<RdService>(String.Format("Sesion SIP Radio <{0};{1}>: {2} con {3}", rdFr.Value.Frecuency, rdRes.ID,
+                                LogTrace<RdService>(String.Format("Sesion SIP Radio <{0};{1}>: {2} con {3}", rdFr.Value.Frecuency, rdRes.ID,
                                     stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED ? "Conectada" : "Desconectada", rdRes.Uri1
                                     ));
                                 eventZombie = false;
@@ -2137,6 +2166,9 @@ namespace U5ki.RdService
         /// <param name="allowed"></param>
         private void OnOptionsResponse(string from, string callid, int code, string supported, string allowed)
         {
+            if (!_Master)
+                return;
+
             if (_gestorHF != null)
             {
                 _gestorHF.OptionsResponseReceived(from, code, supported, allowed);

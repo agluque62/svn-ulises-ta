@@ -61,8 +61,10 @@ angular.module("Uv5kinbx")
         return (type != srvtypes.Radio && type != srvtypes.Mixed);
     };
 
-    ctrl.DisablePhoneServiceComponent = function () {
+    ctrl.DisablePhoneServiceComponent = function (isfocus) {
         var type = $lserv.globalType();
+		if (isfocus)
+			return type != srvtypes.Phone;
         return (type != srvtypes.Phone && type != srvtypes.Mixed);
     };
 

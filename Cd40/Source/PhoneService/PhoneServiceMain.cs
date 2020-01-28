@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using U5ki.Infrastructure;
 using ProtoBuf;
 using Utilities;
+using System.Net;
 
 #if _CORESIP_2_
 using CoreSipNet;
@@ -85,6 +86,11 @@ namespace u5ki.PhoneService
                     LogInfo<PhoneService>("Iniciando parada servicio");
 
                     ResourcesRelease();
+                    if (_Registry != null)
+                    {
+                        _Registry.Dispose();
+                        _Registry = null;
+                    }
                 }
                 catch (Exception x)
                 {
@@ -92,6 +98,7 @@ namespace u5ki.PhoneService
                 }
                 finally
                 {
+                    Status = ServiceStatus.Stopped;
                     LogInfo<PhoneService>("Servicio Detenido.", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
                         "PhoneService", Translate.CTranslate.translateResource("Servicio detenido."));               // TODO. Translate.
                     smpAccesMain.Release();
@@ -101,7 +108,7 @@ namespace u5ki.PhoneService
 
         #endregion IService Interfaz
 
-        #region Contructores
+        #region Contructores 
         public PhoneService()
         {
             Name = "PhoneService";
@@ -112,7 +119,16 @@ namespace u5ki.PhoneService
             TraceControl = new ServicesHelpers.TraceInOut<PhoneService>();
         }
         #endregion
-
+        #region miembros Clase
+        private List <MDCall> _MDCalls = new List<MDCall>();
+        public List<MDCall> MDCalls
+        {
+            get { return _MDCalls; }
+        }
+        Config.LocalSettings settings = null;
+        private string _IdProxy = null;
+        Cd40Cfg _Cfg = null;
+        #endregion
         #region Gestion Global del Servicio.
 
         /// <summary>
@@ -126,24 +142,35 @@ namespace u5ki.PhoneService
             LastVersion = String.Empty;
             Status = ServiceStatus.Running;
 
-
-            /** Inicializacion de las comunicaciones por MULTICAST */
-            _Registry = new Registry(Identifiers.PhoneMasterTopic);
-
-            _Registry.ChannelError += OnChannelError;
-            _Registry.MasterStatusChanged += OnMasterStatusChanged;
-            _Registry.ResourceChanged += OnResourceChanged;
-
-            _Registry.SubscribeToMasterTopic(Identifiers.PhoneMasterTopic);
-            _Registry.SubscribeToTopic<SrvMaster>(Identifiers.PhoneMasterTopic);
-            _Registry.SubscribeToTopic<Cd40Cfg>(Identifiers.CfgTopic);
-            _Registry.Join(Identifiers.PhoneMasterTopic, Identifiers.PhoneTopic, Identifiers.CfgTopic);
+            InitRegistry();
 
             /** */
             SipAgentStart();
 
+            /* Subscribe to CFG mesages */
+            _Registry.SubscribeToTopic<Cd40Cfg>(Identifiers.CfgTopic);
+            _Registry.Join(Identifiers.PhoneMasterTopic, Identifiers.PhoneTopic, Identifiers.CfgTopic);
+
+
             /** Otras Inicializaciones */
             TraceControl.TraceOut(tcontrol);
+        }
+
+        private void InitRegistry()
+        {
+            /** Inicializacion de las comunicaciones por MULTICAST */
+            /* solo para recibir mensajes de otro PhoneService para gestionar master/slave */
+            _Registry = new Registry(Identifiers.PhoneMasterTopic);
+
+            _Registry.ChannelError += OnChannelError;
+            _Registry.MasterStatusChanged += OnMasterStatusChanged;
+            _Registry.ResourceChanged += OnConfigChanged;
+
+            _Registry.SubscribeToMasterTopic(Identifiers.PhoneMasterTopic);
+            _Registry.SubscribeToTopic<SrvMaster>(Identifiers.PhoneMasterTopic);
+            //_Registry.Join(Identifiers.PhoneMasterTopic, Identifiers.PhoneTopic);
+
+
         }
 
         /// <summary>
@@ -155,17 +182,10 @@ namespace u5ki.PhoneService
 
             if (Master == true)
             {
+                MDCallsRelease();
                 SipAgentStop();
-                ServiceDeactivate();
             }
 
-            if (_Registry != null)
-            {
-                _Registry.Dispose();
-                _Registry = null;
-            }
-
-            // TODO. Limpiar los demas Recursos...
             TraceControl.TraceOut(tcontrol);
         }
 
@@ -176,9 +196,11 @@ namespace u5ki.PhoneService
         {
             Int64 tcontrol = TraceControl.TraceIn();
 
-            // TODO... Inicializar variables,
-            SipAgentSetup();
-
+            if (SipAgentRunning == false)
+            {
+                SipAgentRunning = true;
+                SipAgentSetup();
+            }
             TraceControl.TraceOut(tcontrol);
         }
         /// <summary>
@@ -187,27 +209,97 @@ namespace u5ki.PhoneService
         private void ServiceDeactivate()
         {
             Int64 tcontrol = TraceControl.TraceIn();
-
-            // TODO..., 
-            SipAgentRelease();
-
+            ResourcesRelease();
             TraceControl.TraceOut(tcontrol);
         }
         /// <summary>
         /// Se ejecuta al recibir una nueva configuracion...
+        /// Es publica para poder llamarse desde un test unitario
         /// </summary>
         /// <param name="cfg"></param>
-        private void ServiceSetupConfig(Cd40Cfg cfg)
+        public void ServiceSetupConfig(Cd40Cfg cfg)
         {
+            string rsIp;
             Int64 tcontrol = TraceControl.TraceIn();
-            // TODO...
 
+            _Cfg = cfg;
+            //Variable para gestionar los posibles cambios en configuración
+            List<MDCall> MDCallsNewCfg = new List<MDCall>();
+
+            //Get Proxy IP
+            IPEndPoint ipProxy = null;
+            foreach (DireccionamientoIP obj in cfg.ConfiguracionGeneral.PlanDireccionamientoIP)
+            {
+                if ((obj.TipoHost == Tipo_Elemento_HW.TEH_EXTERNO_TELEFONIA) && obj.EsCentralIP)
+                {
+                    if (obj.Interno)
+                    {
+                        ipProxy = SipUtilities.SipEndPoint.Parse(obj.IpRed1);
+                        _IdProxy = obj.IdHost;
+                        break;
+                    }
+                }
+            }
+            if (ipProxy == null)
+            {
+                LogError<PhoneService>("Phone ServiceSetupConfig Error: Proxy not configured");
+                return;
+            }
+            
+            //Create MDCall and its members
+            foreach (ConfiguracionUsuario userCfg in cfg.ConfiguracionUsuarios)
+            {
+                foreach (CfgEnlaceInterno link in MDLinksPropios (userCfg))
+                {
+                    //Check Name of multidestination groups is unique
+                    if (MDCallsNewCfg.Exists(x => x.Name == link.Literal) == false)
+                    {
+                        MDCall newMDCall = new MDCall(link.Literal, Properties.Settings.Default.IpPrincipal, Properties.Settings.Default.SipPortPhone, ipProxy);
+                        foreach (CfgRecursoEnlaceInterno rec in link.ListaRecursos)
+                        {
+                            switch (rec.Prefijo)
+                            {
+                                case Cd40Cfg.INT_DST:
+                                    if (string.IsNullOrEmpty(rec.NombreRecurso) == false)
+                                        rec.NumeroAbonado = cfg.ConfiguracionGeneral.GetUserAlias(rec.NombreRecurso, Cd40Cfg.ATS_DST);
+                                    newMDCall.AddMember(rec.NombreRecurso, rec.NumeroAbonado, ipProxy);
+                                    break;
+                                case Cd40Cfg.RTB_DST:
+                                    List <PlanRecursos> listRec = cfg.ConfiguracionGeneral.GetNetResources(rec.Prefijo, rec.NumeroAbonado);            
+                                    foreach (PlanRecursos recurso in listRec)
+                                    {
+                                        string idEquipo;
+                                        rsIp = cfg.ConfiguracionGeneral.GetGwRsIp(recurso.IdRecurso, out idEquipo);
+                                        if (rsIp != null)
+                                            newMDCall.AddMember(rec.NombreMostrar, rec.NumeroAbonado, SipUtilities.SipEndPoint.Parse(rsIp), recurso.IdRecurso);
+                                    }
+                                    break;
+                                case Cd40Cfg.PP_DST:
+                                    string gw;
+                                    rsIp = cfg.ConfiguracionGeneral.GetGwRsIp(rec.NombreRecurso, out gw);
+                                    if (rsIp != null)
+                                        newMDCall.AddMember(rec.NombreMostrar, rec.NombreRecurso, SipUtilities.SipEndPoint.Parse(rsIp));
+                                    break;
+                                case Cd40Cfg.ATS_DST:
+                                    newMDCall.AddMember(rec.NombreRecurso, rec.NumeroAbonado, ipProxy);
+                                    break;
+                                default:
+                                    break;
+                            }
+                       }
+                        MDCallsNewCfg.Add(newMDCall);
+                    }
+                }
+            }
+            synchronizeMDConfig(MDCallsNewCfg);
             TraceControl.TraceOut(tcontrol);
+
         }
         /// <summary>
         /// Se ejecuta como rutina de limpieza de la configuracion antes de cargar una nueva...
+        /// Es publica para poder llamarse desde un test unitario
         /// </summary>
-        private void ServiceReleaseConfig()
+        public void ServiceReleaseConfig()
         {
             Int64 tcontrol = TraceControl.TraceIn();
 
@@ -227,6 +319,14 @@ namespace u5ki.PhoneService
             {
 
                 TraceControl.TraceOut(tcontrol);
+                if (_Registry != null)
+                {
+                    _Registry.Dispose();
+                    _Registry = null;
+                } 
+                Status = ServiceStatus.Stopped;
+                LastVersion = String.Empty;
+                LogError<PhoneService>("OnChannelError: " + error, U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR);
             }, (x) =>
             {
                 LogException<PhoneService>("OnCallState  Exception", x, false);
@@ -242,9 +342,12 @@ namespace u5ki.PhoneService
             Int64 tcontrol = TraceControl.TraceIn();
             ProcessGlobalEvent(() =>
             {
-                if (master && !Master)
+               if (master && !Master)
                 {
                     ServiceActivate();
+                   //A veces no llega la configuración....asi que uso lo último recibido
+                   if (_Cfg != null)
+                    ServiceSetupConfig(_Cfg);
                 }
                 else if (!master && Master)
                 {
@@ -269,14 +372,14 @@ namespace u5ki.PhoneService
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnResourceChanged(object sender, RsChangeInfo e)
+        private void OnConfigChanged(object sender, RsChangeInfo e)
         {
             Int64 tcontrol = TraceControl.TraceIn();
             ProcessGlobalEvent(() =>
             {
                 if (Master && e.Content != null && e.Type == Identifiers.TypeId(typeof(Cd40Cfg)))
                 {
-                    MemoryStream ms = new MemoryStream(e.Content);
+                    MemoryStream ms= new MemoryStream(Tools.Decompress(e.Content));
                     Cd40Cfg cfg = Serializer.Deserialize<Cd40Cfg>(ms);
 
                     if (LastVersion == cfg.Version)
@@ -327,6 +430,51 @@ namespace u5ki.PhoneService
             });
         }
 
+        private IEnumerable<CfgEnlaceInterno> MDLinksPropios(ConfiguracionUsuario cfg)
+        {
+                if (cfg != null)
+                {
+                    foreach (CfgEnlaceInterno link in cfg.TlfLinks)
+                    {
+                        if (link.TipoEnlaceInterno == "MD" && link.Dominio == "PROPIO")
+                        {
+                            yield return link;
+                        }
+                    }
+                }
+        }
+
+        private void synchronizeMDConfig(List<MDCall> MDCallsNewCfg)
+        {
+            MDCall found = null;
+            List<MDCall> MDCallsCopy = new List<MDCall> (_MDCalls);
+            foreach (MDCall MDCfg in MDCallsCopy)
+            {
+                found = MDCallsNewCfg.Find(x => MDCfg.Equals(x));
+                if (found == null)
+                {
+                    MDCfg.Dispose();
+                    _MDCalls.Remove(MDCfg);
+                }
+                else
+                    MDCallsNewCfg.Remove(found);
+            }
+
+            foreach (MDCall newMDCall in MDCallsNewCfg)
+            {
+                _MDCalls.Add(newMDCall);
+                newMDCall.InitAgent();
+            }
+        }
+
+        private void MDCallsRelease()
+        {
+            foreach (MDCall MDCall in _MDCalls)
+            {
+                MDCall.Dispose();
+            }
+            _MDCalls.Clear();
+        }
         #endregion
 
         #region Control de Agente SIP y eventos asociados
@@ -336,10 +484,12 @@ namespace u5ki.PhoneService
         void SipAgentStart()
         {
             Int64 tcontrol = TraceControl.TraceIn();
-
+            LogInfo<PhoneService>(Master ? "MASTER" : "SLAVE",
+    U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "PhoneService",
+    Master ? "MASTER" : "SLAVE");
             if (SipAgentRunning==false)
             {
-                using (Config.LocalSettings settings = new Config.LocalSettings())
+                using (settings = new Config.LocalSettings())
                 {
                     settings.Init();
 #if _CORESIP_2_
@@ -366,8 +516,8 @@ namespace u5ki.PhoneService
                     SipAgentNet.Init(sipSettings, settings.Sip.AgentName, settings.Ip, settings.Sip.UdpPort, 1000);
                     SipAgentNet.Start();
 #endif
-                    SipAgentSetup();
                     SipAgentRunning = true;
+                    SipAgentSetup();
                 }
             }
 
@@ -376,7 +526,7 @@ namespace u5ki.PhoneService
         /// <summary>
         /// 
         /// </summary>
-        void SipAgentSetup()
+        public void SipAgentSetup()
         {
             Int64 tcontrol = TraceControl.TraceIn();
 #if _CORESIP_2_
@@ -385,6 +535,8 @@ namespace u5ki.PhoneService
 #else
             SipAgent.CallIncoming += OnCallIncoming;
             SipAgent.CallState += OnCallState;
+            SipAgent.IncomingSubscribeConfAcc += OnIncomingSubscribeConf;
+
 #endif
             TraceControl.TraceOut(tcontrol);
         }
@@ -401,6 +553,7 @@ namespace u5ki.PhoneService
 #else
             SipAgent.CallState -= OnCallState;
             SipAgent.CallIncoming -= OnCallIncoming;
+            SipAgent.IncomingSubscribeConfAcc -= OnIncomingSubscribeConf;
 #endif
 
             TraceControl.TraceOut(tcontrol);
@@ -437,7 +590,8 @@ namespace u5ki.PhoneService
 
             ProcessGlobalEvent(() =>
             {
-
+                foreach (MDCall MDcall in _MDCalls)
+                    MDcall.OnCallState(call, info, stateInfo);
                 TraceControl.TraceOut(tcontrol);
             }, (x) =>
             {
@@ -454,21 +608,36 @@ namespace u5ki.PhoneService
 #if _CORESIP_2_
         void OnCallIncoming(int call, int call2replace, CoreSipNet.CORESIP_CallInfo info, CoreSipNet.CORESIP_CallInInfo inInfo)
 #else
-        void OnCallIncoming(int call, int call2replace, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
+        public void OnCallIncoming(int call, int call2replace, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
 #endif
         {
             Int64 tcontrol = TraceControl.TraceIn();
 
             ProcessGlobalEvent(() =>
             {
-
+               foreach (MDCall MDcall in _MDCalls)
+                    MDcall.OnCallIncoming(call, call2replace, info, inInfo);
                 TraceControl.TraceOut(tcontrol);
             }, (x) =>
             {
                 LogException<PhoneService>("OnCallIncoming  Exception", x, false);
             });
         }
+        public void OnIncomingSubscribeConf(string id, string info, uint lenInfo)
+        {
+            Int64 tcontrol = TraceControl.TraceIn();
 
+            ProcessGlobalEvent(() =>
+            {
+                foreach (MDCall MDcall in _MDCalls)                    
+                    MDcall.OnIncomingSubscribeConf(id, info, lenInfo);
+                TraceControl.TraceOut(tcontrol);
+            }, (x) =>
+            {
+                LogException<PhoneService>("OnCallIncoming  Exception", x, false);
+            });
+
+        }
         #endregion
 
         #region Private Attributes

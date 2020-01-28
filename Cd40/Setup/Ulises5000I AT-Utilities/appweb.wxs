@@ -64,14 +64,14 @@
             <Component Id="cmp9B37DDB8B2C73CC1BF8E9B33821638CF" Directory="dir85BCC3EAF2E721CB10BA1B66A6AA38B0" Guid="*">
                 <File Id="filB2794003433BCAD2243E1FBBE5F15027" KeyPath="yes" Source="$(var.SourcePath)\app\views\Uv5kinbx-tlf.html" />
             </Component>
-            <Component Id="cmp479BE3F6D0BD0BF2A861262E86138621" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
-                <File Id="fil38E659B6FE0B52AC761EC13727CA7EA5" KeyPath="yes" Source="$(var.SourcePath)\images\Corporativo.png" />
+            <Component Id="cmpD2B3B677397FE13F871F373382A63B88" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
+                <File Id="fil36A0B443B879278E13EE98F73DF0AA14" KeyPath="yes" Source="$(var.SourcePath)\images\corporativo-a.png" />
+            </Component>
+            <Component Id="cmp3E6E7867C2A2E505A0BFD1323902120A" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
+                <File Id="fil20B6C7D6E3DD756C8161901FAF65FA8B" KeyPath="yes" Source="$(var.SourcePath)\images\corporativo.png" />
             </Component>
             <Component Id="cmp8065EE4DAFA407FEA968CA3DB445FDDC" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
                 <File Id="filFAB7D3A5F4AAA6FB8630A2537994842F" KeyPath="yes" Source="$(var.SourcePath)\images\nucleo-df-new.jpg" />
-            </Component>
-            <Component Id="cmpCEA062B24E8F8796FF98A41FAF701020" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
-                <File Id="filD210942305DADDE9EF055A9607EACC09" KeyPath="yes" Source="$(var.SourcePath)\images\Trama.png" />
             </Component>
             <Component Id="cmp2A835553B60B203FAEE47592FC575DD3" Directory="dir615130E60E81F8E36CB9489BA96897C9" Guid="*">
                 <File Id="fil9ACCFE1D0967FB48B3CB446E51858596" KeyPath="yes" Source="$(var.SourcePath)\languages\en_US.json" />
@@ -1471,9 +1471,6 @@
             <Component Id="cmp15C8BB754848D0E123AFEC9F0988C829" Directory="dir7C2FAD6E7933E5FBF78A87B423644714" Guid="*">
                 <File Id="fil13B153039E3DBDF30BC478EB3A351980" KeyPath="yes" Source="$(var.SourcePath)\simulate\lconfig.json" />
             </Component>
-            <Component Id="cmp949C4BF8156E00AB06CBDDA9D9CF2CAD" Directory="dir7C2FAD6E7933E5FBF78A87B423644714" Guid="*">
-                <File Id="fil034EEE57B4E11949386D7FA84B5451D8" KeyPath="yes" Source="$(var.SourcePath)\simulate\msman.json" />
-            </Component>
             <Component Id="cmp715AA1CA8A92D47F2CCB191D3C29428E" Directory="dir7C2FAD6E7933E5FBF78A87B423644714" Guid="*">
                 <File Id="fil7D40D7FAFC3F7512C1A2CCACE55A6E3A" KeyPath="yes" Source="$(var.SourcePath)\simulate\preconf.json" />
             </Component>
@@ -1482,9 +1479,6 @@
             </Component>
             <Component Id="cmp0C147ED5530753160D142321DB3B6B15" Directory="dir7C2FAD6E7933E5FBF78A87B423644714" Guid="*">
                 <File Id="fil96DC52EC91C3CDC1A4E1B3D6C0AD0720" KeyPath="yes" Source="$(var.SourcePath)\simulate\rdhf.json" />
-            </Component>
-            <Component Id="cmpC1B094BEC249D0AD91F1E6AF7AFBD1B4" Directory="dir7C2FAD6E7933E5FBF78A87B423644714" Guid="*">
-                <File Id="fil5B2848510DBF00425639583F113AFD76" KeyPath="yes" Source="$(var.SourcePath)\simulate\rdsessions - copia.json" />
             </Component>
             <Component Id="cmp18359436E60FEEACE3083D0A577AD0BF" Directory="dir7C2FAD6E7933E5FBF78A87B423644714" Guid="*">
                 <File Id="fil51CCA30CD5A1D34775BC5F47302660A1" KeyPath="yes" Source="$(var.SourcePath)\simulate\rdsessions.json" />

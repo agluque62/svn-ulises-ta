@@ -412,9 +412,10 @@ namespace HMI.Presentation.Twr.Views
 				RdDst dst = _StateManager.Radio[i];
 				EstadoAsignacion estado = _EstadosAsignacion[i - absPageBegin];
 				Reset(bt, dst, ref estado);
+                /** Esta funcion se ha trasladado al MODEL MODULE */
                 // Para versión Enaire no hay recuperación de estados de asignación
                 // 26/01/2017
-				//_EstadosAsignacion[i - absPageBegin] = estado;
+                //_EstadosAsignacion[i - absPageBegin] = estado;
                 //
                 //if (i < Settings.Default.AssignatedStates.Count)
                 //{
@@ -429,12 +430,12 @@ namespace HMI.Presentation.Twr.Views
                 //                                        ((dst.TipoFrecuencia == 1) ? false : _EstadosAsignacion[i - absPageBegin]._Tx) +
                 //                                            "," + _EstadosAsignacion[i - absPageBegin]._AudioVia + "," + _EstadosAsignacion[i - absPageBegin].Unavailable);
                 //}
-			}
+            }
 
-			//Settings.Default.Save();
+            //Settings.Default.Save();
             // Fin modificación 26/01/2017
 
-			_RtxBT.Enabled = _RtxEnabled;
+            _RtxBT.Enabled = _RtxEnabled;
 		}
 
 		[EventSubscription(EventTopicNames.TitleIdChanged, ThreadOption.Publisher)]
@@ -545,39 +546,40 @@ namespace HMI.Presentation.Twr.Views
         //        _Logger.Error("ERROR generando timer Ptt", ex);
         //    }
         //}
-        
-		private void RecuperaEstadoAsignacionFrecuencias()
-		{
-			int absPageBegin = _RdPageBT.Page * _NumPositionsByPage;
 
-			for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
-			{
-				if (i < Settings.Default.AssignatedStates.Count)
-				{
-					string[] estado = Settings.Default.AssignatedStates[i].Split(',');
+        /** Esta funcion se ha trasladado al MODEL MODULE */
+  //      private void RecuperaEstadoAsignacionFrecuencias()
+		//{
+		//	int absPageBegin = _RdPageBT.Page * _NumPositionsByPage;
 
-					EstadoAsignacion eAsignacion = new EstadoAsignacion();
+		//	for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
+		//	{
+		//		if (i < Settings.Default.AssignatedStates.Count)
+		//		{
+		//			string[] estado = Settings.Default.AssignatedStates[i].Split(',');
 
-					eAsignacion._Rx = estado[1] == "True";
-					eAsignacion._Tx = estado[2] == "True";
-					switch (estado[3])
-					{
-						case "HeadPhones":
-							eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
-							break;
-						case "Speaker":
-							eAsignacion._AudioVia = RdRxAudioVia.Speaker;
-							break;
-						case "NoAudio":
-							eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
-							break;
-					}
+		//			EstadoAsignacion eAsignacion = new EstadoAsignacion();
 
-                    _EstadosAsignacion[i - absPageBegin] = eAsignacion;
+		//			eAsignacion._Rx = estado[1] == "True";
+		//			eAsignacion._Tx = estado[2] == "True";
+		//			switch (estado[3])
+		//			{
+		//				case "HeadPhones":
+		//					eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
+		//					break;
+		//				case "Speaker":
+		//					eAsignacion._AudioVia = RdRxAudioVia.Speaker;
+		//					break;
+		//				case "NoAudio":
+		//					eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
+		//					break;
+		//			}
 
-				}
-			}
-		}
+  //                  _EstadosAsignacion[i - absPageBegin] = eAsignacion;
+
+		//		}
+		//	}
+		//}
 
 		private void Reset(RdButton bt, RdDst dst, ref EstadoAsignacion estado)
 		{
@@ -712,7 +714,8 @@ namespace HMI.Presentation.Twr.Views
 					}
 
                     NotifMsg msg = null;
-					switch (dst.Ptt)
+                    title = VisualStyle.ButtonColor;
+                    switch (dst.Ptt)
 					{
                         case PttState.NoPtt:
                             break;
@@ -735,8 +738,9 @@ namespace HMI.Presentation.Twr.Views
                             msg = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.CarrierDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
                             General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
                             break;
-                       //VMG 05/09/2018 Cambios en los estados
+                        //VMG 05/09/2018 Cambios en los estados
                         case PttState.CarrierError://Error en portadora
+							ptt = Resources.Ptt;
                             title = VisualStyle.Colors.Red;
                             txForeColor = VisualStyle.Colors.Red;
                             if (!_CarrierDetectionEventFired && !_TxErrorEventFired)
@@ -801,14 +805,14 @@ namespace HMI.Presentation.Twr.Views
                 if (Settings.Default.ShowBssProperties)
                 {
                     bt.Reset(dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? dst.QidxResource : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
-                    dst.QidxResource, dst.QidxValue, dst.State == FrequencyState.Degraded);
+                    dst.QidxResource, dst.QidxValue, dst.State);
                 }
                 else
                 {
                     /** 20180321. AGL. ALIAS a mostrar en la tecla... */
                     // bt.Reset(dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? string.Empty : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
                     bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
-                    dst.State == FrequencyState.Degraded);
+                    dst.State );
                 }
                 // Las frecuencias co solo RX (RxOnly), tienen deshabilitada la parte TX de la tecla
                 if (dst.RxOnly)
@@ -1221,6 +1225,6 @@ namespace HMI.Presentation.Twr.Views
                     break;
             }
         }
-	}
+    }
 }
 

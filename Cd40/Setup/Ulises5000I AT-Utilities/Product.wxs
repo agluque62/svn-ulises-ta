@@ -3,8 +3,8 @@
   <Product
     Id="*"
     Name="Ulises5000I Audio Terminal Utilities"
-    Language="1033" Version="2.5.10"
-    Manufacturer="DF Nucleo"
+    Language="1033" Version="2.6.0"
+    Manufacturer="NucleoCC"
     UpgradeCode="c17a4cae-94cf-4435-ada9-69eaefc872eb">
 
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
@@ -17,7 +17,7 @@
     <Property Id="MCAST_INSTALLFOLDER_NAME" Value="Ulises5000I-MCast"></Property>
     <Property Id="NBOX_INSTALLFOLDER_NAME" Value="Ulises5000I-NodeBox"></Property>
     <Property Id="NBOX_AUT" Value="True"></Property>
-    <Property Id="PVERSION" Value="2.5.10"></Property>
+    <Property Id="PVERSION" Value="2.5.9"></Property>
 
     <!-- Propiedades para los directorios de Instalacion -->
     <Property Id="MCAST_FOLDER">
@@ -124,7 +124,7 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="COMPANYFOLDER" Name="DF Nucleo">
+        <Directory Id="COMPANYFOLDER" Name="NucleoCC">
           <Directory Id="U5ki.MCast.INSTALLFOLDER" Name="Ulises5000I-MCast"/>
           <Directory Id="U5ki.NodeBox.INSTALLFOLDER" Name="Ulises5000I-NodeBox">
             <Component Id="CreateProgramFolder" Guid="{2718F974-886C-49BB-8C4E-B7282AB16A14}">
@@ -240,7 +240,7 @@
       <Component Id='U5ki.Infrastructure' Guid='{0A881215-5A24-48A7-B815-50DCCD19AB66}'>
         <File Id='U5ki.Infrastructure' Name='U5ki.Infrastructure.dll'/>
       </Component>
-      <Component Id='NodeBox_versiones' Guid='{BF366A74-7340-4F2E-877B-7FB41FA5EAC6}'>
+      <Component Id='NodeBox_versiones' Guid='*'>
         <File Id='NodeBox_versiones' Name='versiones.json'/>
       </Component>
       <Component Id='U5ki.NodeBox.cfg' Guid='{862BF10F-006A-4A91-A9BE-31C60AC07A72}' >

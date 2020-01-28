@@ -44,6 +44,9 @@ namespace HMI.Presentation.Twr.Views
 		{
             this.components = new System.ComponentModel.Container();
             this._TlfFunctionsTLP = new System.Windows.Forms.TableLayoutPanel();
+            this._ForwardBT = new HMI.Model.Module.UI.HMIButton();
+            this._PickUpBT = new HMI.Model.Module.UI.HMIButton();
+            this._MoreBT = new HMI.Model.Module.UI.HMIButton();
             this._TlfSpeakerBT = new HMI.Model.Module.UI.HMIButton();
             this._PriorityBT = new HMI.Model.Module.UI.HMIButton();
             this._ListenBT = new HMI.Model.Module.UI.HMIButton();
@@ -63,9 +66,12 @@ namespace HMI.Presentation.Twr.Views
             this._TlfFunctionsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 28F));
             this._TlfFunctionsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
             this._TlfFunctionsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
+            this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 0, 2);
+            this._TlfFunctionsTLP.Controls.Add(this._PickUpBT, 0, 2);
+            this._TlfFunctionsTLP.Controls.Add(this._MoreBT, 1, 0);
             this._TlfFunctionsTLP.Controls.Add(this._TlfSpeakerBT, 3, 1);
             this._TlfFunctionsTLP.Controls.Add(this._PriorityBT, 0, 0);
-            this._TlfFunctionsTLP.Controls.Add(this._ListenBT, 1, 0);
+            this._TlfFunctionsTLP.Controls.Add(this._ListenBT, 0, 2);
             this._TlfFunctionsTLP.Controls.Add(this._HoldBT, 0, 1);
             this._TlfFunctionsTLP.Controls.Add(this._TransferBT, 1, 1);
             this._TlfFunctionsTLP.Controls.Add(this._TlfViewBT, 2, 0);
@@ -80,6 +86,51 @@ namespace HMI.Presentation.Twr.Views
             this._TlfFunctionsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this._TlfFunctionsTLP.Size = new System.Drawing.Size(429, 129);
             this._TlfFunctionsTLP.TabIndex = 2;
+            // 
+            // _ForwardBT
+            // 
+            this._ForwardBT.DataBindings.Add(new System.Windows.Forms.Binding("Visible", global::HMI.Presentation.Twr.Properties.Settings.Default, "EnableForward", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._ForwardBT.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._ForwardBT.DrawX = false;
+            this._ForwardBT.Enabled = false;
+            this._ForwardBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._ForwardBT.Location = new System.Drawing.Point(122, 110);
+            this._ForwardBT.Margin = new System.Windows.Forms.Padding(2);
+            this._ForwardBT.Name = "_ForwardBT";
+            this._ForwardBT.Size = new System.Drawing.Size(116, 17);
+            this._ForwardBT.TabIndex = 9;
+            this._ForwardBT.Text = "Desvío";
+            this._ForwardBT.Visible = false;
+            this._ForwardBT.Click += new System.EventHandler(this._ForwardBT_Click);
+            // 
+            // _PickUpBT
+            // 
+            this._PickUpBT.DataBindings.Add(new System.Windows.Forms.Binding("Visible", global::HMI.Presentation.Twr.Properties.Settings.Default, "EnablePickUp", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._PickUpBT.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._PickUpBT.DrawX = false;
+            this._PickUpBT.Enabled = false;
+            this._PickUpBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._PickUpBT.Location = new System.Drawing.Point(242, 110);
+            this._PickUpBT.Margin = new System.Windows.Forms.Padding(2);
+            this._PickUpBT.Name = "_PickUpBT";
+            this._PickUpBT.Size = new System.Drawing.Size(90, 17);
+            this._PickUpBT.TabIndex = 8;
+            this._PickUpBT.Text = "Captura";
+            this._PickUpBT.Visible = false;
+            this._PickUpBT.Click += new System.EventHandler(this._PickUpBT_Click);
+            // 
+            // _MoreBT
+            // 
+            this._MoreBT.DrawX = false;
+            this._MoreBT.Enabled = false;
+            this._MoreBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._MoreBT.Location = new System.Drawing.Point(122, 2);
+            this._MoreBT.Margin = new System.Windows.Forms.Padding(2);
+            this._MoreBT.Name = "_MoreBT";
+            this._MoreBT.Size = new System.Drawing.Size(116, 50);
+            this._MoreBT.TabIndex = 7;
+            this._MoreBT.Text = "Más";
+            this._MoreBT.Click += new System.EventHandler(this._MoreBT_Click);
             // 
             // _TlfSpeakerBT
             // 
@@ -119,13 +170,13 @@ namespace HMI.Presentation.Twr.Views
             this._ListenBT.DrawX = false;
             this._ListenBT.Enabled = false;
             this._ListenBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._ListenBT.Location = new System.Drawing.Point(122, 2);
+            this._ListenBT.Location = new System.Drawing.Point(336, 110);
             this._ListenBT.Margin = new System.Windows.Forms.Padding(2);
             this._ListenBT.Name = "_ListenBT";
-            this._ListenBT.Size = new System.Drawing.Size(116, 50);
+            this._ListenBT.Size = new System.Drawing.Size(91, 17);
             this._ListenBT.TabIndex = 1;
             this._ListenBT.Text = "Escucha";
-            this._ListenBT.Visible = global::HMI.Presentation.Twr.Properties.Settings.Default.EnableListen;
+            this._ListenBT.Visible = false;
             this._ListenBT.Click += new System.EventHandler(this._ListenBT_Click);
             // 
             // _HoldBT
@@ -223,6 +274,9 @@ namespace HMI.Presentation.Twr.Views
 		private System.Windows.Forms.Timer _FastBlinkTimer;
         private Model.Module.UI.HMIButton _TlfSpeakerBT;
         private System.Windows.Forms.TableLayoutPanel _TlfFunctionsTLP;
-	}
+        private HMI.Model.Module.UI.HMIButton _MoreBT;
+        private Model.Module.UI.HMIButton _PickUpBT;
+        private Model.Module.UI.HMIButton _ForwardBT;
+    }
 }
 

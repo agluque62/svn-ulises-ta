@@ -20,7 +20,6 @@ namespace HMI.Model.Module.Services
 		private StateManagerService _StateManager = null;
 		private IEngineCmdManagerService _EngineCmdManager = null;
 		private bool _RdButtonClick = false;
-        private List<int> idList = null;//Ids de los botones cambiados en escucha a otro puesto
 
 		[EventPublication(EventTopicNames.SplitShowModeSelectionUI, PublicationScope.Global)]
 		public event EventHandler SplitShowModeSelectionUI;
@@ -56,18 +55,26 @@ namespace HMI.Model.Module.Services
 			if (_StateManager.Tft.Enabled)
 			{
 				_StateManager.Radio.SetRtx(0,0);
-				if (_StateManager.Tlf.Priority.State == PriorityState.Ready)
+				if (_StateManager.Tlf.Priority.State == FunctionState.Ready)
 				{
 					_StateManager.Tlf.Priority.Reset();
 				}
-				if (_StateManager.Tlf.Listen.State == ListenState.Ready)
+				if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
 				{
-					_StateManager.Tlf.Listen.State = ListenState.Idle;
+					_StateManager.Tlf.Listen.State = FunctionState.Idle;
 				}
-				if (_StateManager.Tlf.Transfer.State == TransferState.Ready)
+				if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
 				{
-					_StateManager.Tlf.Transfer.State = TransferState.Idle;
+					_StateManager.Tlf.Transfer.State = FunctionState.Idle;
 				}
+                if (_StateManager.Tlf.PickUp.State == FunctionState.Ready)
+                {
+                    _StateManager.Tlf.PickUp.State = FunctionState.Idle;
+                }
+                if (_StateManager.Tlf.Forward.State == FunctionState.Ready)
+                {
+                    _StateManager.Tlf.Forward.State = FunctionState.Idle;
+                }
 
 				_StateManager.Tft.Enabled = false;
 			}
@@ -86,7 +93,7 @@ namespace HMI.Model.Module.Services
 
 			if (msg.Id.StartsWith("ListenBy"))
 			{
-				ListenMsg info = (ListenMsg)msg.Info;
+				ListenPickUpMsg info = (ListenPickUpMsg)msg.Info;
 
 				_EngineCmdManager.SetRemoteListen(response == NotifMsgResponse.Ok || response == NotifMsgResponse.Timeout, info.Id);
                 if (response == NotifMsgResponse.Ok || response == NotifMsgResponse.Timeout)
@@ -388,37 +395,6 @@ namespace HMI.Model.Module.Services
             _EngineCmdManager.SetRdAudio(id, via);
         }
 
-        /* VMG 04/09/2018 */
-        ///<summary>
-        /// Cambiar el estado a altavoz con escucha a otro puesto.
-        ///</summary>
-        public void RdSwitchRxToSpeaker()
-        {
-            int id = 0;
-            idList = new List<int>();
-
-            foreach (RdDst dst in _StateManager.Radio.Destinations)
-            {
-                if (dst.AudioVia == RdRxAudioVia.HeadPhones)
-                {
-                    RdForceRxState(id);
-                    idList.Add(id);
-                }
-                id++;
-            }
-        }
-
-        /* VMG 04/09/2018 */
-        ///<summary>
-        /// Cambiar el estado a micro cuando se termina la escucha.
-        ///</summary>
-        public void RdSwitchRxToHeadphone()
-        {
-            foreach (int id in idList)
-                RdForceRxState(id);
-            idList.Clear();
-        }
-
         public void RdSwitchRxState(int id, bool longClick)
         {
             RdDst dst = _StateManager.Radio[id];
@@ -515,16 +491,31 @@ namespace HMI.Model.Module.Services
 				case TlfState.PaPBusy:
 					if (id < Tlf.NumDestinations)
 					{
-						if (_StateManager.Tlf.Listen.State == ListenState.Ready)
+						if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
 						{
 							_EngineCmdManager.ListenTo(id);
 						}
-						else if (_StateManager.Tlf.Transfer.State == TransferState.Ready)
+						else if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
 						{
 							_EngineCmdManager.TransferTo(id, true);
 						}
+                        else if (_StateManager.Tlf.PickUp.State == FunctionState.Ready)
+                        {
+                            _EngineCmdManager.PreparePickUp(id);
+                        }
+                        else if (_StateManager.Tlf.PickUp.State == FunctionState.Executing) 
+                        {
+                            _EngineCmdManager.CancelPickUp();
+                            _EngineCmdManager.PreparePickUp(id);
+                        }
+                        else if (_StateManager.Tlf.Forward.State == FunctionState.Ready)
+                        {
+                            _EngineCmdManager.PrepareForward(id);
+                        }
 						else
 						{
+                            if (_StateManager.Tlf.PickUp.State == FunctionState.Error)
+                                _EngineCmdManager.CancelPickUp();
 							_EngineCmdManager.BeginTlfCall(id, _StateManager.Tlf.Priority.NewCall(id));
 						}
 					}
@@ -536,6 +527,10 @@ namespace HMI.Model.Module.Services
 				case TlfState.In:
 				case TlfState.InPrio:
 				case TlfState.RemoteIn:
+                    if (_StateManager.Tlf.PickUp.State == FunctionState.Ready)
+                    {
+                        _StateManager.Tlf.PickUp.Reset();
+                    }
 					_EngineCmdManager.AnswerTlfCall(id);
 					break;
 				case TlfState.Out:
@@ -559,7 +554,7 @@ namespace HMI.Model.Module.Services
 					_StateManager.Tlf.ResetMem(id);
 					break;
 				case TlfState.Hold:
-					if (_StateManager.Tlf.Transfer.State == TransferState.Ready)
+					if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
 					{
 						_EngineCmdManager.TransferTo(id, false);
 					}
@@ -572,6 +567,9 @@ namespace HMI.Model.Module.Services
 						_EngineCmdManager.SetHold(id, false);
 					}
 					break;
+                case TlfState.InProcess:
+                    //Do nothing
+                    break;
 			}
 		}
 
@@ -584,7 +582,7 @@ namespace HMI.Model.Module.Services
 		{
 			switch (_StateManager.Tlf.Priority.State)
 			{
-				case PriorityState.Idle:
+				case FunctionState.Idle:
 					if (_StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.Busy] > 0)
 					{
 						int id = _StateManager.Tlf.GetFirstInState(TlfState.Congestion, TlfState.Busy);
@@ -597,9 +595,9 @@ namespace HMI.Model.Module.Services
 						_StateManager.Tlf.Priority.Reset(-1);
 					}
 					break;
-				case PriorityState.Ready:
-				case PriorityState.Executing:
-				case PriorityState.Error:
+				case FunctionState.Ready:
+				case FunctionState.Executing:
+				case FunctionState.Error:
 					_StateManager.Tlf.Priority.Reset();
 					break;
 			}
@@ -609,16 +607,16 @@ namespace HMI.Model.Module.Services
 		{
 			switch (_StateManager.Tlf.Listen.State)
 			{
-				case ListenState.Idle:
-					_StateManager.Tlf.Listen.State = ListenState.Ready;
+				case FunctionState.Idle:
+					_StateManager.Tlf.Listen.State = FunctionState.Ready;
 					break;
-				case ListenState.Ready:
-					_StateManager.Tlf.Listen.State = ListenState.Idle;
+				case FunctionState.Ready:
+					_StateManager.Tlf.Listen.State = FunctionState.Idle;
 					break;
-				case ListenState.Executing:
+				case FunctionState.Executing:
 					_EngineCmdManager.CancelListen();
 					break;
-				case ListenState.Error:
+				case FunctionState.Error:
 					_EngineCmdManager.RecognizeListenState();
 					break;
 			}
@@ -645,16 +643,16 @@ namespace HMI.Model.Module.Services
 		{
 			switch (_StateManager.Tlf.Transfer.State)
 			{
-				case TransferState.Idle:
-					_StateManager.Tlf.Transfer.State = TransferState.Ready;
+				case FunctionState.Idle:
+					_StateManager.Tlf.Transfer.State = FunctionState.Ready;
 					break;
-				case TransferState.Ready:
-					_StateManager.Tlf.Transfer.State = TransferState.Idle;
+				case FunctionState.Ready:
+					_StateManager.Tlf.Transfer.State = FunctionState.Idle;
 					break;
-				case TransferState.Executing:
+				case FunctionState.Executing:
 					_EngineCmdManager.CancelTransfer();
 					break;
-				case TransferState.Error:
+				case FunctionState.Error:
 					_EngineCmdManager.RecognizeTransferState();
 					break;
 			}
@@ -675,34 +673,34 @@ namespace HMI.Model.Module.Services
 
 		public void CancelTlfClick()
 		{
-			if (_StateManager.Tlf.Priority.State == PriorityState.Error)
+			if (_StateManager.Tlf.Priority.State == FunctionState.Error)
 			{
 				_StateManager.Tlf.Priority.Reset();
 			}
-			else if (_StateManager.Tlf.Listen.State == ListenState.Error)
+			else  if (_StateManager.Tlf.Listen.State == FunctionState.Error)
 			{
 				_EngineCmdManager.RecognizeListenState();
 			}
-			else if (_StateManager.Tlf.Transfer.State == TransferState.Error)
+			else if (_StateManager.Tlf.Transfer.State == FunctionState.Error)
 			{
 				_EngineCmdManager.RecognizeTransferState();
 			}
-			else if (_StateManager.Tlf.Priority.State == PriorityState.Ready)
+			else if (_StateManager.Tlf.Priority.State == FunctionState.Ready)
 			{
 				_StateManager.Tlf.Priority.Reset();
 			}
-			else if (_StateManager.Tlf.Listen.State == ListenState.Ready)
+			else if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
 			{
-				_StateManager.Tlf.Listen.State = ListenState.Idle;
+				_StateManager.Tlf.Listen.State = FunctionState.Idle;
 			}
-			else if (_StateManager.Tlf.Transfer.State == TransferState.Ready)
+			else if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
 			{
-				_StateManager.Tlf.Transfer.State = TransferState.Idle;
+				_StateManager.Tlf.Transfer.State = FunctionState.Idle;
 			}
-			else if (_StateManager.Tlf.Transfer.State == TransferState.Executing)
-			{
-				_EngineCmdManager.CancelTransfer();
-			}
+            else if (_StateManager.Tlf.Transfer.State == FunctionState.Executing)
+            {
+                _EngineCmdManager.CancelTransfer();
+            }
 			else if ((_StateManager.Tlf[TlfState.RemoteIn] > 0) && Settings.Default.SupportInTlfCancel)
 			{
 				int id = _StateManager.Tlf.GetFirstInState(TlfState.RemoteIn);
@@ -769,10 +767,6 @@ namespace HMI.Model.Module.Services
 			{
 				// No hacemos nada
 			}
-            else if (_StateManager.Tlf.ListenBy.IsListen)
-            {
-                // No hacemos nada
-            }
 			else
 			{
 				_EngineCmdManager.Cancel();
@@ -818,6 +812,40 @@ namespace HMI.Model.Module.Services
                 }
         }
 
+        public void PickUpClick()
+        {
+            switch (_StateManager.Tlf.PickUp.State)
+            {
+                case FunctionState.Idle:
+                    _StateManager.Tlf.PickUp.State = FunctionState.Ready;
+                    break;
+                case FunctionState.Ready:
+                    _StateManager.Tlf.PickUp.Reset();
+                    break;
+                case FunctionState.Executing:
+                case FunctionState.Error:
+                    _EngineCmdManager.CancelPickUp();
+                    break;
+            }
+        }
+
+        public void ForwardClick()
+        {
+            switch (_StateManager.Tlf.Forward.State)
+            {
+                case FunctionState.Idle:
+                    _StateManager.Tlf.Forward.State = FunctionState.Ready;
+                    break;
+                case FunctionState.Ready:
+                    _StateManager.Tlf.Forward.State = FunctionState.Idle;
+                    break;
+                case FunctionState.Executing:
+                case FunctionState.Error:
+                    _EngineCmdManager.CancelForward();
+                    break;
+            }
+        }
+
 		#endregion
 
         private void TlfClick(string number, bool ia, string givenLiteral = null, int id = Int32.MaxValue)
@@ -827,13 +855,26 @@ namespace HMI.Model.Module.Services
             {
                 number = Tlf.NumberToEngine(number);
 
-                if (_StateManager.Tlf.Listen.State == ListenState.Ready)
+                if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
                 {
                     _EngineCmdManager.ListenTo(number);
                 }
-                else if (_StateManager.Tlf.Transfer.State == TransferState.Ready)
+                else if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
                 {
                     _EngineCmdManager.TransferTo(number);
+                }
+                else if (_StateManager.Tlf.PickUp.State == FunctionState.Ready)
+                {
+                    _EngineCmdManager.PreparePickUp(number);
+                }
+                else if (_StateManager.Tlf.PickUp.State == FunctionState.Executing)
+                {
+                    _EngineCmdManager.CancelPickUp();
+                    _EngineCmdManager.PreparePickUp(number);
+                }
+                else if (_StateManager.Tlf.Forward.State == FunctionState.Ready)
+                {
+                    _EngineCmdManager.PrepareForward(number);
                 }
                 else
                 {
@@ -866,6 +907,9 @@ namespace HMI.Model.Module.Services
                                 _EngineCmdManager.EndTlfCall(i);
                                 wait = true;
                                 break;
+                            case TlfState.InProcess:
+                            //Do nothing
+                                break;
                         }
                     }
 
@@ -873,6 +917,8 @@ namespace HMI.Model.Module.Services
                     {
                         _EngineCmdManager.Wait(500);
                     }
+                    if (_StateManager.Tlf.PickUp.State == FunctionState.Error)
+                        _EngineCmdManager.CancelPickUp();
                     if (id != Int32.MaxValue)
                         _EngineCmdManager.BeginTlfCall(number, _StateManager.Tlf.Priority.NewCall(Tlf.IaMappedPosition), id, literal);
                     else

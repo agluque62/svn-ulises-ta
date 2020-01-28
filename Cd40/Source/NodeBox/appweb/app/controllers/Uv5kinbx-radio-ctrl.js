@@ -217,7 +217,7 @@ angular.module("Uv5kinbx")
     }
     /** */
     ctrl.txtOnVHF = function () {
-        return ctrl.site_select + ' (VFH)' /* txtMdSelect(ctrl.vhf_mode_select)*/;
+        return ctrl.site_select + ' (VHF)' /* txtMdSelect(ctrl.vhf_mode_select)*/;
     }
     /** */
     ctrl.txtOnUHF = function () {

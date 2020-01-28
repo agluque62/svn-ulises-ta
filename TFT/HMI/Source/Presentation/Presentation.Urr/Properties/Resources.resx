@@ -124,9 +124,6 @@
   <data name="HfSpeaker" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\HfSpeaker.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Error" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Error.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="JackOn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\JackOn.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -154,17 +151,11 @@
   <data name="BuzzerUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BuzzerUp.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="UrrBrigthness" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UrrBrigthness.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Rtx" xml:space="preserve">
     <value>Rtx</value>
   </data>
   <data name="UrrJackOff" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UrrJackOff.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="BadOperation" xml:space="preserve">
-    <value>Falsa maniobra</value>
   </data>
   <data name="SpeakerDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SpeakerDown.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -205,9 +196,6 @@
   <data name="Prioridad" xml:space="preserve">
     <value>Prioridad</value>
   </data>
-  <data name="CarrierDetectionError" xml:space="preserve">
-    <value>Portadora no detectada.</value>
-  </data>
   <data name="AI" xml:space="preserve">
     <value>AI</value>
   </data>
@@ -217,8 +205,11 @@
   <data name="Funcion" xml:space="preserve">
     <value>Función:</value>
   </data>
-  <data name="RxHeadPhonesBlack" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\RxHeadPhonesBlack.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="TlfPage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\TlfPage.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UrrHeadphones" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UrrHeadphones.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Aena" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Aena.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -232,6 +223,9 @@
   <data name="Tipo" xml:space="preserve">
     <value>Tipo:</value>
   </data>
+  <data name="PttBlocked" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PttBlocked.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Button" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Button.bmp;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -241,32 +235,20 @@
   <data name="InfoIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Info.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="UrrJackOff1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UrrJackOff.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="BrightnessDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BrightnessDown.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="RxHeadPhones" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RxHeadPhones.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="RxHeadPhonesBlack" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RxHeadPhonesBlack.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="RdPageDownDisabled" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RdPageDownDisabled.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SplitRdLc" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SplitRdLc.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="TlfPage" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\TlfPage.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="UrrBrigthness1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UrrBrigthness.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="TxConfirmationDetectionError" xml:space="preserve">
-    <value>Transmisión no confirmada.</value>
-  </data>
-  <data name="Info" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Info.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="GlobalOk" xml:space="preserve">
     <value>Comunicaciones Ok</value>
@@ -289,14 +271,8 @@
   <data name="HeadPhonesDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\HeadPhonesDown.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="TlfBlank" xml:space="preserve">
-    <value> </value>
-  </data>
   <data name="INF" xml:space="preserve">
     <value>INFO</value>
-  </data>
-  <data name="UrrBuzzer" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UrrBuzzer.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Wait" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Wait.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -319,9 +295,6 @@
   <data name="Warning" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Warning.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="RxSpeakerBlack" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\RxSpeakerBlack.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="WarningIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Warning.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -337,6 +310,9 @@
   <data name="RxSpeaker" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RxSpeaker.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="RxSpeakerBlack" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RxSpeakerBlack.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="AGVN" xml:space="preserve">
     <value>AGVN:</value>
   </data>
@@ -346,14 +322,14 @@
   <data name="Num2" xml:space="preserve">
     <value>Num 2.</value>
   </data>
-  <data name="PttBlocked" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\PttBlocked.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Info" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Info.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="GlobalDisconnected" xml:space="preserve">
     <value>Desconectado</value>
   </data>
-  <data name="UrrHeadphones" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UrrHeadphones.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Error" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Error.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="BrightnessUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BrightnessUp.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -367,7 +343,22 @@
   <data name="Ptt" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Ptt.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="UrrJackOn1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UrrJackOn.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="UrrBrigthness" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UrrBrigthness.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UrrBuzzer" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UrrBuzzer.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="BadOperation" xml:space="preserve">
+    <value>Falsa maniobra</value>
+  </data>
+  <data name="TxConfirmationDetectionError" xml:space="preserve">
+    <value>Transmisión no confirmada.</value>
+  </data>
+  <data name="CarrierDetectionError" xml:space="preserve">
+    <value>Portadora no detectada.</value>
+  </data>
+  <data name="TlfBlank" xml:space="preserve">
+    <value> </value>
   </data>
 </root>

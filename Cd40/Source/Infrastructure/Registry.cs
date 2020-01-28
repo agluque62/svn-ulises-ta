@@ -7,6 +7,7 @@ using System.Diagnostics;
 using NLog;
 using ProtoBuf;
 using Utilities;
+using U5ki.Infrastructure.Properties;
 
 namespace U5ki.Infrastructure
 {
@@ -172,17 +173,28 @@ namespace U5ki.Infrastructure
 		{
 			byte[] content = null;
 
-			if (rs != null)
-			{
-				MemoryStream rsMs = new MemoryStream();
-				Serializer.Serialize(rsMs, rs);
-				content = rsMs.ToArray();
-			}
+            try
+            {
+			    if (rs != null)
+			    {
+                    MemoryStream rsMs = new MemoryStream();
+                    Serializer.Serialize(rsMs, rs);
+                    content = rsMs.ToArray();
 
-			SetValue(topic, Identifiers.TypeId(typeof(T)), instanceId, content);
-		}
+                    if ((Settings.Default.CompressCfg) && (instanceId == Identifiers.CfgRsId))
+                    {
+                        content = Tools.Compress(content);
+                    }
+                }
+                SetValue(topic, Identifiers.TypeId(typeof(T)), instanceId, content);
+            }
+            catch (Exception exc)
+            {
+                _Logger.Error("Exception setting  Cfg {0}", exc.Message);
+            }
+        }
 
-        /// <summary>
+         /// <summary>
         /// Marca un cambio... 
         /// </summary>
         /// <param name="topic"></param>
@@ -594,8 +606,10 @@ namespace U5ki.Infrastructure
                                 PublisherInfo publisherInfo;
                                 if (subscriberTopicInfo.Publishers.TryGetValue(msg.MemberChanged, out publisherInfo))
                                 {
-                                    /** AGL. Esto pone, entre otras cosas, las aspas en RADIO !!!!... */
-                                    if (ResourceChanged != null)
+                                    if ((ResourceChanged != null) && 
+                                        ((msg.Topic == Identifiers.TopTopic) ||
+                                        //Esto pone ASPAS en las radios cuando se va el último servicio RdService (master/esclavo)
+                                         (msg.Topic == Identifiers.RdTopic && subscriberTopicInfo.Publishers.Count == 1)))
                                     {
                                         foreach (RsInfo rs in publisherInfo.ReceivedRs.Values)
                                         {
@@ -646,7 +660,9 @@ namespace U5ki.Infrastructure
         {
             bool masterInfo;
             String otherPublished;
-
+            String myId = Id.Split('#')[2];
+            if (!_MasterTopicInfo.TryGetValue(msg.Topic, out masterInfo))
+                return;
             switch (msg.Change)
             {
                 case MembershipChange.Leave:
@@ -656,14 +672,13 @@ namespace U5ki.Infrastructure
                         if (subStrings[2] == _OtherPublishedMaster[msg.Topic])
                         {
                             _OtherPublishedMaster[msg.Topic] = NO_OTHER_MASTER_PUB;
-                            _Logger.Trace("-- Master Leaved!! topic {0}", msg.Topic);
+                            _Logger.Trace("-- Master Left!! topic {0}", msg.Topic);
                         }
                     }
                     break;
                 case MembershipChange.Join:
                     //Publico si soy master, para que el nuevo miembro lo sepa
-                    if (_MasterTopicInfo.TryGetValue(msg.Topic, out masterInfo) &&
-                        _OtherPublishedMaster.TryGetValue(msg.Topic, out otherPublished))
+                    if (_OtherPublishedMaster.TryGetValue(msg.Topic, out otherPublished))
                     {
                         if (masterInfo == true)
                         {
@@ -671,8 +686,8 @@ namespace U5ki.Infrastructure
                             if ((otherPublished == NO_OTHER_MASTER_PUB) ||
                             ((otherPublished != NO_OTHER_MASTER_PUB) && (msg.FirstForMaster == true)))
                             {
-                                String[] subStrings = Id.Split('#');
-                                PublishMaster(subStrings[2], subStrings[1]);
+                                PublishMaster(myId, msg.Topic);
+                                _OtherPublishedMaster[msg.Topic] = NO_OTHER_MASTER_PUB;
                             }
                         }
                     }
@@ -682,13 +697,13 @@ namespace U5ki.Infrastructure
                     break;
             }
 
-            if (_MasterTopicInfo.TryGetValue(msg.Topic, out masterInfo) &&
-                _OtherPublishedMaster.TryGetValue(msg.Topic, out otherPublished))
+            if (_OtherPublishedMaster.TryGetValue(msg.Topic, out otherPublished))
             {
                 if ((otherPublished == NO_OTHER_MASTER_PUB) && (masterInfo == false) && (msg.FirstForMaster == true))
                 {
                     _MasterTopicInfo[msg.Topic] = msg.FirstForMaster;
                     _Logger.Trace("-- I become Master !! topic {0}", msg.Topic);
+                    PublishMaster(myId, msg.Topic);
                     General.SafeLaunchEvent(MasterStatusChanged, msg.Topic, true);
                 }
                 else if ((otherPublished != NO_OTHER_MASTER_PUB) && (masterInfo == true) && (msg.FirstForMaster == false))
@@ -700,7 +715,6 @@ namespace U5ki.Infrastructure
                 }
                 // En cualquier otro caso no cambio de estado
             }
-
 
         }
 
@@ -818,7 +832,7 @@ namespace U5ki.Infrastructure
 
         /// <summary>
         /// Guarda el host recibido como master
-        /// Si hay conflicto de master y no soy el primero cambio a slave
+        /// Si hay conflicto de master y no soy el primero, cambio a slave
         /// </summary>
         /// <param name="msg"></param>
         private void ProcessMasterMsg(SpreadDataMsg msg)
@@ -834,6 +848,12 @@ namespace U5ki.Infrastructure
                 _MasterTopicInfo[subStrings[1]] = false;
                 _Logger.Trace("--ProcessMasterMsg: I become Slave !! topic {0}", subStrings[1]);
                 General.SafeLaunchEvent(MasterStatusChanged, subStrings[1], msg.FirstForMaster);
+            }
+            else if ((_MasterTopicInfo[subStrings[1]] == true) && (msg.FirstForMaster == true))
+            {
+                _Logger.Trace("--ProcessMasterMsg: refresco master !! topic {0}", subStrings[1]);
+                General.SafeLaunchEvent(MasterStatusChanged, subStrings[1], msg.FirstForMaster);
+
             }
         }
         

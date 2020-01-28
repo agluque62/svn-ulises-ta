@@ -1534,6 +1534,15 @@ namespace U5ki.Infrastructure
       get { return _TiempoVueltaADefecto; }
       set { _TiempoVueltaADefecto = value; }
     }
+
+    private uint _PorcentajeRSSI = default(uint);
+    [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"PorcentajeRSSI", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint PorcentajeRSSI
+    {
+      get { return _PorcentajeRSSI; }
+      set { _PorcentajeRSSI = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1579,6 +1588,15 @@ namespace U5ki.Infrastructure
     {
       get { return _Interface; }
       set { _Interface = value; }
+    }
+
+    private string _NombreMostrar = "";
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"NombreMostrar", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string NombreMostrar
+    {
+      get { return _NombreMostrar; }
+      set { _NombreMostrar = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1650,6 +1668,24 @@ namespace U5ki.Infrastructure
     {
       get { return _OrigenR2; }
       set { _OrigenR2 = value; }
+    }
+
+    private string _Dominio = "";
+    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"Dominio", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string Dominio
+    {
+      get { return _Dominio; }
+      set { _Dominio = value; }
+    }
+
+    private string _Host = "";
+    [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"Host", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string Host
+    {
+      get { return _Host; }
+      set { _Host = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

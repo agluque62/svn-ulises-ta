@@ -54,7 +54,7 @@ namespace HMI.Presentation.Urr.Views
         }
         private bool _InfoEnabled
         {
-            get { return _StateManager.Tft.Enabled && (_StateManager.Tlf.Listen.State == ListenState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
+            get { return _StateManager.Tft.Enabled && (_StateManager.Tlf.Listen.State == FunctionState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
         }
         private bool _BrightnessEnabled
         {
@@ -138,7 +138,8 @@ namespace HMI.Presentation.Urr.Views
         [EventSubscription(EventTopicNames.ProxyPresent, ThreadOption.Publisher)]
         public void OnProxyPresent(object sender, EventArgs e)
         {
-            BackColor = _StateManager.Scv.ProxyState ? System.Drawing.Color.Gainsboro : BackColor = System.Drawing.Color.Khaki;
+            if (Settings.Default.EmergencyModeWarn)
+                BackColor = _StateManager.Scv.ProxyState ? System.Drawing.Color.Gainsboro : BackColor = System.Drawing.Color.Khaki;
         }
 
         [EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
@@ -437,7 +438,7 @@ namespace HMI.Presentation.Urr.Views
                 _InfoBT.ForeColor = System.Drawing.Color.DarkGray;
                 _InfoBT.Refresh();
                 _CmdManager.ShowInfo();
-
+                
             }
             catch (Exception ex)
             {

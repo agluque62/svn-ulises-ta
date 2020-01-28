@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Net;
 using System.Timers;
+using System.Threading.Tasks;
 
 using Microsoft.Win32.SafeHandles;
 
@@ -118,6 +119,15 @@ namespace HMI.CD40.Module.BusinessEntities
             return false;
         }
 
+        public int GetValue(int pos)
+        {
+            if (pos < file_in_content.Length)
+            {
+                return file_in_content[pos];
+            }
+            return -1;
+        }
+
         /**  */
         public int SetGpio(int gpio, byte estado)
         {
@@ -227,7 +237,6 @@ namespace HMI.CD40.Module.BusinessEntities
         string FileOutPath = string.Empty;
         string file_out_content = "0000";
         int _ncmedia = 0;
-        bool _bInit = false;
 
         #endregion
 
@@ -370,6 +379,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <summary>
         /// 
         /// </summary>
+        bool generandoRafaga = false;
         protected void CheckPresencia()
         {
             if (!GlobalError)
@@ -395,17 +405,47 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     if (_dev1_eje != null && _dev2_ayu != null && _dev3_alr != null && _dev4_alt != null)
                     {
-                        _dev1_eje.Jack = _dev1_eje.GetPresencia(0);         // JACK de Ejecutivo
-                        _dev1_eje.Ptt = _dev1_eje.GetPresencia(1);          // PTT de Ejecutivo
+                        if (_dev1_eje.GetValue(1) == '2')
+                        {
+                            if (generandoRafaga == false)
+                            {
+                                generandoRafaga = true;
 
-                        _dev2_ayu.Jack = _dev2_ayu.GetPresencia(0);         // JACK de Ayudante.
-                        _dev2_ayu.Ptt = _dev2_ayu.GetPresencia(1);          // PTT de Ayudante.
+                                Task.Factory.StartNew(() =>
+                                {
+                                    Random r = new Random(DateTime.Now.Millisecond);
+                                    /** Simula una rafaga de PTT's... */
+                                    while (generandoRafaga)
+                                    {
+                                        _dev1_eje.Ptt = true;
+                                        Task.Delay(r.Next(75, 500)).Wait();
+                                        _dev1_eje.Ptt = false;
+                                        Task.Delay(r.Next(75, 500)).Wait();
+                                    }
+                                    _dev1_eje.Ptt = true;
+                                });
+                            }
+                        }
+                        else
+                        {
+                            if (generandoRafaga == true)
+                                generandoRafaga = false;
+                            else
+                            {
 
-                        _dev3_alr.Jack = _dev3_alr.GetPresencia(0);         // Presencia Altavoz Radio VHF
-                        _dev3_alr.Ptt = _dev3_alr.GetPresencia(1);          // Presencia Altavoz Radio HF.
+                                _dev1_eje.Jack = _dev1_eje.GetPresencia(0);         // JACK de Ejecutivo
+                                _dev1_eje.Ptt = _dev1_eje.GetPresencia(1);          // PTT de Ejecutivo
 
-                        _dev4_alt.Jack = _dev4_alt.GetPresencia(0);         // Presencia de Altavoz LC.
-                        _dev4_alt.Ptt = _dev4_alt.GetPresencia(1);          // Presencia Cable Grabacion.
+                                _dev2_ayu.Jack = _dev2_ayu.GetPresencia(0);         // JACK de Ayudante.
+                                _dev2_ayu.Ptt = _dev2_ayu.GetPresencia(1);          // PTT de Ayudante.
+
+                                _dev3_alr.Jack = _dev3_alr.GetPresencia(0);         // Presencia Altavoz Radio VHF
+                                _dev3_alr.Ptt = _dev3_alr.GetPresencia(1);          // Presencia Altavoz Radio HF.
+
+                                _dev4_alt.Jack = _dev4_alt.GetPresencia(0);         // Presencia de Altavoz LC.
+                                _dev4_alt.Ptt = _dev4_alt.GetPresencia(1);          // Presencia Cable Grabacion.
+                            }
+                        }
                     }
                 }
             }

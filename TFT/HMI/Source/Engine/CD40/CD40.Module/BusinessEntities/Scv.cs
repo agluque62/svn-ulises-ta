@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+
 using U5ki.Infrastructure;
 using Utilities;
 
@@ -31,6 +31,20 @@ namespace HMI.CD40.Module.BusinessEntities
                 this.tipo = tipo;
             }
         }
+         /// <summary>
+        /// Guarda lo datos de cada proxy
+        /// </summary>
+        private class IpElem
+        {
+            public string ipAddr;
+
+            public IpElem(string ipAddr)
+            {
+                //TODO Le quito la informacion de puerto que no me sirve, de momento, hay que cambiar CORESIP y mas
+                //this.ipAddr = ipAddr.Contains(':') ? ipAddr: ipAddr+":5060";
+                this.ipAddr = ipAddr;
+            }
+        }
 
         public string Id
         {
@@ -48,38 +62,30 @@ namespace HMI.CD40.Module.BusinessEntities
             set { esCentralIp = value; }
         }
  
-        public string GetProxyIpAddress(out string id)
-        {
-            id = null;
-            if (!EsCentralIp) return null;
-            id = Id;
-            return ipProxy[(int)RolScv.SCV_PRINCIPAL].Address.ToString();
-        }
-
         public string GetProxyIp(out string id)
         {
             id = null;
             if (!EsCentralIp) return null;
             id = Id;
-            return ipProxy[(int)RolScv.SCV_PRINCIPAL].ToString();
+            return ipProxy[(int)RolScv.SCV_PRINCIPAL].ipAddr;
         }
 
         public void SetIpServPres(RolScv index, string ipAddr)
         {
-            srvPresencia[(int)index] = SipUtilities.SipEndPoint.Parse(ipAddr);
+            srvPresencia[(int)index] = new IpElem(ipAddr);
         }
 
         public void SetIpData(DireccionamientoIP objCfg)
         {
             esCentralIp = objCfg.EsCentralIP;
-
-            ipProxy[(int)RolScv.SCV_PRINCIPAL] = SipUtilities.SipEndPoint.Parse(objCfg.IpRed1);
+            
+            ipProxy[(int)RolScv.SCV_PRINCIPAL]= new IpElem(objCfg.IpRed1);
             //En el arranque este es el activo
-            ipProxy[(int)RolScv.SCV_ALTERNATIVO1] = SipUtilities.SipEndPoint.Parse(objCfg.IpRed2);
-            ipProxy[(int)RolScv.SCV_ALTERNATIVO2] = SipUtilities.SipEndPoint.Parse(objCfg.IpRed3);
-            srvPresencia[(int)RolScv.SCV_PRINCIPAL] = SipUtilities.SipEndPoint.Parse(objCfg.SrvPresenciaIpRed1);
-            srvPresencia[(int)RolScv.SCV_ALTERNATIVO1] = SipUtilities.SipEndPoint.Parse(objCfg.SrvPresenciaIpRed2);
-            srvPresencia[(int)RolScv.SCV_ALTERNATIVO2] = SipUtilities.SipEndPoint.Parse(objCfg.SrvPresenciaIpRed3);
+            ipProxy[(int)RolScv.SCV_ALTERNATIVO1] = new IpElem(objCfg.IpRed2);
+            ipProxy[(int)RolScv.SCV_ALTERNATIVO2] = new IpElem(objCfg.IpRed3);
+            srvPresencia[(int)RolScv.SCV_PRINCIPAL] = new IpElem(objCfg.SrvPresenciaIpRed1);
+            srvPresencia[(int)RolScv.SCV_ALTERNATIVO1] = new IpElem(objCfg.SrvPresenciaIpRed2);
+            srvPresencia[(int)RolScv.SCV_ALTERNATIVO2] = new IpElem(objCfg.SrvPresenciaIpRed3);
         }
 
         //Constructor sin rango
@@ -92,7 +98,7 @@ namespace HMI.CD40.Module.BusinessEntities
             if (Propio)
             {
                 ManageProxyState();
-            }
+        }
 
         }
 
@@ -130,24 +136,24 @@ namespace HMI.CD40.Module.BusinessEntities
             return (found != null);
         }
         #region Private Members
-        private const int SCV_MAX_IP_ADDR = 3;
-        /// <summary>
-        /// Datos procedentes de configuracion 
-        /// </summary>
-        private string id;
-        private bool propio;
+            private const int SCV_MAX_IP_ADDR = 3;
+            /// <summary>
+            /// Datos procedentes de configuracion 
+            /// </summary>
+         	private string id;
+            private bool propio;
 
-        private List<RangeTlf> rangos;
-        private bool esCentralIp;
-        /// <summary>
+            private List<RangeTlf> rangos;
+            private bool esCentralIp;
+            /// <summary>
         /// Lista de IPs de proxies y servidores de presencia.
         /// El primero es el principal y los otros son alternativos.
-        /// </summary>
-        private IPEndPoint[] ipProxy = new IPEndPoint[SCV_MAX_IP_ADDR];
-        private IPEndPoint[] srvPresencia = new IPEndPoint[SCV_MAX_IP_ADDR];
+            /// </summary>
+            private IpElem[] ipProxy = new IpElem[SCV_MAX_IP_ADDR];
+            private IpElem[] srvPresencia = new IpElem[SCV_MAX_IP_ADDR];
         private enum ProxyStateValue { UNKNOWN = 0,  PRESENT = 1, NOT_PRESENT = 2};
         private ProxyStateValue proxyState = ProxyStateValue.UNKNOWN;
-        
+
         private void ManageProxyState()
         {
             Resource recursoProxy = Top.Registry.GetRs<GwTlfRs>(Id);

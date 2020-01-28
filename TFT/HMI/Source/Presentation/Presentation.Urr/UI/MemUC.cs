@@ -33,11 +33,11 @@ namespace HMI.Presentation.Urr.UI
             {
                 return (_MemLB.SelectedIndex >= 0) &&
                     _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
-                    (_StateManager.Tlf.Priority.State != PriorityState.Error) &&
-                    (_StateManager.Tlf.Listen.State != ListenState.Executing) &&
-                    (_StateManager.Tlf.Listen.State != ListenState.Error) &&
-                    (_StateManager.Tlf.Transfer.State != TransferState.Executing) &&
-                    (_StateManager.Tlf.Transfer.State != TransferState.Error) &&
+                    (_StateManager.Tlf.Priority.State != FunctionState.Error) &&
+                    (_StateManager.Tlf.Listen.State != FunctionState.Executing) &&
+                    (_StateManager.Tlf.Listen.State != FunctionState.Error) &&
+                    (_StateManager.Tlf.Transfer.State != FunctionState.Executing) &&
+                    (_StateManager.Tlf.Transfer.State != FunctionState.Error) &&
                     (_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.In) &&
                     (_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.InPrio) &&
                     (_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.RemoteIn);

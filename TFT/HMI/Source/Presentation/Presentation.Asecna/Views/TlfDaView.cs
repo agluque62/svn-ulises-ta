@@ -50,6 +50,8 @@ namespace HMI.Presentation.Asecna.Views
 		private bool _SlowBlinkOn = true;
 		private int _Page = 0;
 		private int _NumPositionsByPage;
+        //List to manage easily a variable number of pages
+        private List<HMIButton> _TlfPageButtons = new List<HMIButton>();
 
 		public TlfDaView([ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
 		{
@@ -102,9 +104,7 @@ namespace HMI.Presentation.Asecna.Views
 			_TlfHeadPhonesUDB.Level = _StateManager.TlfHeadPhones.Level;
 			_LcSpeakerUDB.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative;
 			_TlfHeadPhonesUDB.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative;
-			_TlfPage2BT.Enabled = _StateManager.Tft.Enabled;
-			_TlfPage3BT.Enabled = _StateManager.Tft.Enabled;
-
+            DrawConfigTelPages();
             // Si está habilitada la posibilidad de telefonía por altavoz
             // las imagenes de inicio de _TlfHeadPhonesUDB dependen del valor guardado
             if ((_StateManager.Tlf.AltavozTlfHabilitado && _StateManager.Tlf.AltavozTlfEstado) || _StateManager.Tlf.SoloAltavoces)
@@ -116,14 +116,66 @@ namespace HMI.Presentation.Asecna.Views
             }
         }
 
+        private void DrawConfigTelPages()
+        {
+            //Minimun 1 page. Active page at init always first
+            _TlfPageButtons.Add(_TlfPage1BT);
+            if (Settings.Default.NumTelPages >= 2)
+            {
+                _TlfPageButtons.Add(_TlfPage2BT);
+                _TlfPage2BT.Visible = true;
+                _TlfPage2BT.Enabled = true;
+            }
+            if (Settings.Default.NumTelPages >= 3)
+            {
+                _TlfPageButtons.Add(_TlfPage3BT);
+                _TlfPage3BT.Visible = true;
+                _TlfPage3BT.Enabled = true;
+            }
+            if (Settings.Default.NumTelPages >= 4)
+            {
+                _TlfPageButtons.Add(_TlfPage4BT);
+                _TlfPage4BT.Visible = true;
+                _TlfPage4BT.Enabled = true;
+            }
+            if (Settings.Default.NumTelPages >= 5)
+            {
+                _TlfPageButtons.Add(_TlfPage5BT);
+                _TlfPage5BT.Visible = true;
+                _TlfPage5BT.Enabled = true;
+            }
+            if (Settings.Default.NumTelPages >= 6)
+            {
+                _TlfPageButtons.Add(_TlfPage6BT);
+                _TlfPage6BT.Visible = true;
+                _TlfPage6BT.Enabled = true;
+            }
+            if (Settings.Default.NumTelPages >= 7)
+            {
+                _TlfPageButtons.Add(_TlfPage7BT);
+                _TlfPage7BT.Visible = true;
+                _TlfPage7BT.Enabled = true;
+            }
+            if (Settings.Default.NumTelPages >= 8)
+            {
+                _TlfPageButtons.Add(_TlfPage8BT);
+                _TlfPage8BT.Visible = true;
+                _TlfPage8BT.Enabled = true;
+            }
+            if (Settings.Default.NumTelPages >= 9)
+            {
+                _TlfPageButtons.Add(_TlfPage9BT);
+                _TlfPage9BT.Visible = true;
+                _TlfPage9BT.Enabled = true;
+            }
+         }
+
 		[EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
 		[EventSubscription(EventTopicNames.EngineStateChanged, ThreadOption.Publisher)]
 		public void OnTftEngineChanged(object sender, EventArgs e)
 		{
 			_LcSpeakerUDB.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative;
 			_TlfHeadPhonesUDB.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative;
-			_TlfPage2BT.Enabled = _StateManager.Tft.Enabled;
-			_TlfPage3BT.Enabled = _StateManager.Tft.Enabled;
 
 			foreach (HMIButton bt in _TlfButtons)
 			{
@@ -183,9 +235,10 @@ namespace HMI.Presentation.Asecna.Views
 				_Page = e.Page;
 				int absPageBegin = _Page * _NumPositionsByPage;
 
-
-                _TlfPage1BT.Enabled = _TlfPage2BT.Enabled = _TlfPage3BT.Enabled = _TlfPage4BT.Enabled = _TlfPage5BT.Enabled =
-                    _TlfPage6BT.Enabled = _TlfPage7BT.Enabled = _TlfPage8BT.Enabled = _TlfPage9BT.Enabled = true;
+                foreach (HMIButton page in _TlfPageButtons)
+                {
+                    page.Enabled = true;
+                }
 
 				for (int i = 0; i < _NumPositionsByPage; i++)
 				{
@@ -352,10 +405,10 @@ namespace HMI.Presentation.Asecna.Views
 		{
 			return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
 					!dst.Unavailable && 
-					(_StateManager.Tlf.Priority.State != PriorityState.Error) &&
-					((_StateManager.Tlf.Listen.State == ListenState.Idle) || (_StateManager.Tlf.Listen.State == ListenState.Ready)) &&
-					((_StateManager.Tlf.Transfer.State == TransferState.Idle) ||
-					((_StateManager.Tlf.Transfer.State == TransferState.Ready) &&
+					(_StateManager.Tlf.Priority.State != FunctionState.Error) &&
+					((_StateManager.Tlf.Listen.State == FunctionState.Idle) || (_StateManager.Tlf.Listen.State == FunctionState.Ready)) &&
+					((_StateManager.Tlf.Transfer.State == FunctionState.Idle) ||
+					((_StateManager.Tlf.Transfer.State == FunctionState.Ready) &&
 					((dst.State == TlfState.Idle) || (dst.State == TlfState.Hold) || (dst.State == TlfState.NotAllowed) ||
 					(dst.State == TlfState.Mem) || (dst.State == TlfState.RemoteMem))));
 		}
@@ -437,14 +490,6 @@ namespace HMI.Presentation.Asecna.Views
 					backColor = VisualStyle.Colors.Red;
 					break;
 				case TlfState.In:
-                    //VMG 08/10/2018 Min intervalo de 10 segs.
-                    // Usando el cambio de color para detectar la llamada en la vista
-                    if (Settings.Default.RingerTimeOut >= 10000)
-                    {
-                        _CallRingerTimer.Interval = Settings.Default.RingerTimeOut;
-                        _CallRingerTimer.Enabled = true;
-                    }
-                    ////
 					backColor = _SlowBlinkOn ? VisualStyle.Colors.Orange : VisualStyle.ButtonColor;
 					_SlowBlinkList[bt] = VisualStyle.Colors.Orange;
 					_SlowBlinkTimer.Enabled = true;
@@ -461,7 +506,6 @@ namespace HMI.Presentation.Asecna.Views
 					backColor = VisualStyle.Colors.Red;
 					break;
 				case TlfState.Mem:
-                    _CallRingerTimer.Enabled = false;//Desactivamos el timer al colgar
 					backColor = VisualStyle.Colors.Orange;
 					break;
 				case TlfState.RemoteMem:
@@ -535,36 +579,6 @@ namespace HMI.Presentation.Asecna.Views
 				_Logger.Error("ERROR generando parpadeo lento para teclas TlfAD", ex);
 			}
 		}
-
-        //VMG 04/10/2018
-        /// <summary>
-        /// Timer para cortar la llamada entrante. 
-        /// Usamos la función del ButtonCancel.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _CallRingerTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_CallRingerTimer.Enabled)
-                {
-                    try
-                    {
-                        _Logger.Debug("Llamada cancelada por timer en ", _CallRingerTimer.Interval);
-                        _CmdManager.CancelTlfClick();
-                    }
-                    catch (Exception ex)
-                    {
-                        _Logger.Error("ERROR anulando la llamada por timer", ex);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error("ERROR generando _CallRingerTimer_Tick", ex);
-            }
-        }
 
 		private void _LcSpeakerUDB_LevelDown(object sender, EventArgs e)
 		{

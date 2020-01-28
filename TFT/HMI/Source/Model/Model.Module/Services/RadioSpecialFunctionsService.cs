@@ -23,6 +23,10 @@ namespace HMI.Model.Module.Services
 {
     class RadioSpecialFunctionsService
     {
+        #region DEBUG
+
+        #endregion DEBUG
+
         #region TIPOS
 
         public class SyncObject
@@ -139,7 +143,7 @@ namespace HMI.Model.Module.Services
             public bool Rx { get; set; }
             public RdRxAudioVia Via { get; set; }
         }
-        
+
         #endregion TIPOS
 
         #region ATRIBUTOS
@@ -173,7 +177,7 @@ namespace HMI.Model.Module.Services
         /// </summary>
         /// <param name="stateManager"></param>
         /// <param name="engineCmdManager"></param>
-        public RadioSpecialFunctionsService([ServiceDependency] StateManagerService stateManager, 
+        public RadioSpecialFunctionsService([ServiceDependency] StateManagerService stateManager,
             [ServiceDependency] IEngineCmdManagerService engineCmdManager)
         {
             StateManager = stateManager;
@@ -187,10 +191,17 @@ namespace HMI.Model.Module.Services
 
             txInProgressControl = new TxInProgressControl((code) =>
             {
-                if (code == 1 || code == 2)
-                    EngineCmdManager.GenerateRadioBadOperationTone(-1);
+                /** 20190313. Desacoplo el evento para evitar los lazos de muerte */
+                Task.Factory.StartNew(() =>
+                {
+                    LogManager.GetLogger("RSFService")
+                        .Trace("TxInProgressControl EventError {0}", code);
 
-                General.SafeLaunchEvent(TxInProgressError, this, new TxInProgressErrorCode(code) { });
+                    if (code == 1 || code == 2)
+                        EngineCmdManager.GenerateRadioBadOperationTone(-1);
+
+                    General.SafeLaunchEvent(TxInProgressError, this, new TxInProgressErrorCode(code) { });
+                });
             });
 
             LogManager.GetLogger("RSFService").Trace("Starting RadioStatusRecoveryService");
@@ -207,7 +218,7 @@ namespace HMI.Model.Module.Services
 
             /** AGL. Notifica los cambios de configuracion. */
             EventInit = true;
-            Init(); 
+            Init();
         }
         /// <summary>
         /// 
@@ -219,15 +230,21 @@ namespace HMI.Model.Module.Services
         {
             LogManager.GetLogger("RSFService").Trace("(2) Processing Event {0}: {1}", EventTopicNames.RdPosStateEngine, msg);
             EventPos = true;
-            
-            /** AGL. Notifica cambios de estadp en posiciones radio, Tx, Tx, Ptt, sqh, ... */            
+
+            /** AGL. Notifica cambios de estadp en posiciones radio, Tx, Tx, Ptt, sqh, ... */
             int pos = msg.From;
             msg.Info.ToList().ForEach(item =>
             {
                 EventOnPos(pos++, item);
                 /** 20190205 */
                 if (txInProgressControl != null)
-                    txInProgressControl.RtxGroupEvent(StateManager, item);
+                {
+                    /** */
+                    if (!(item.Ptt == PttState.ExternPtt && item.PttSrcId.StartsWith("Rtx") == false))
+                    {
+                        txInProgressControl.RtxGroupEvent(StateManager, item);
+                    }
+                }
             });
         }
         /// <summary>
@@ -297,16 +314,16 @@ namespace HMI.Model.Module.Services
             {
                 RdDst onlinepos = StateManager.Radio[pos];
 
-                LogManager.GetLogger("RSFService").Trace("EventOnPos {0} (Frec={1}): Tx=>{2}, Rx=>{3}, Ad=>{4}, Available=>{5}, Restored=>{5}",
+                LogManager.GetLogger("RSFService").Trace("EventOnPos {0} (Frec={1}): Tx=>{2}, Rx=>{3}, Ad=>{4}, Available=>{5}, Restored=>{6}",
                     pos, onlinepos.Frecuency, onlinepos.Tx, onlinepos.Rx, onlinepos.AudioVia, !onlinepos.Unavailable,
                     onlinepos.Restored);
 
                 /** 20180716. Si viene un ASPA durante el PTT en una posicion seleccionada en TX, generar el tono de Falsa Maniobra */
-                if (onlinepos.Unavailable == true && lastStatus.TxStatus && StateManager.Radio.PttOn )
+                if (onlinepos.Unavailable == true && lastStatus.TxStatus && StateManager.Radio.PttOn)
                 {
                     EngineCmdManager.GenerateRadioBadOperationTone(2000);
                 }
-                
+
                 if (OffOnTransition(onlinepos) == true)
                 {
                     LogManager.GetLogger("RSFService").Trace("Restoring {0}", pos);
@@ -454,9 +471,9 @@ namespace HMI.Model.Module.Services
                 {
                     /** 20180716. Incidencia #3648. Espero a PTT-OFF */
                     var isRecoveringTx = s.Where(p => p.TxStatus).FirstOrDefault() == null ? false : s.Where(p => p.TxStatus).FirstOrDefault().TxStatus;
-                    int count =  600;                                       /** Espero 60 seg.. a que desaparezca el PTT. */
+                    int count = 600;                                       /** Espero 60 seg.. a que desaparezca el PTT. */
                     bool falsaManiobraSignal = false;
-                    while (isRecoveringTx && StateManager.Radio.PttOn==true && --count > 0)
+                    while (isRecoveringTx && StateManager.Radio.PttOn == true && --count > 0)
                     {
                         Task.Delay(100).Wait();
                         /** Señalizacion Acustica de Falsa Maniobra durante 2 segundos */
@@ -668,7 +685,7 @@ namespace HMI.Model.Module.Services
         {
             if (txInProgressControl != null)
             {
-                txInProgressControl.LocalPttEvent(StateManager);
+                txInProgressControl.NewLocalPttEvent(StateManager);
             }
         }
 
@@ -679,9 +696,9 @@ namespace HMI.Model.Module.Services
         {
             enum eRtxGroupStates { Inactive, TxInProgress, RtxInProgress }
             private eRtxGroupStates grpStatus = eRtxGroupStates.Inactive;
-            private eRtxGroupStates GrpStatus { get => grpStatus; set => grpStatus = value; }
+            private eRtxGroupStates GrpStatus { get { return grpStatus; } set { grpStatus = value; } }
             private Action<int> EventError = null;
-            private Object Locker = new object();
+            private Object TxInProgressControlLocker = new object();
             private int TxConfirmationTime { get; set; }
             private int SquelchConfirmationTime { get; set; }
             public TxInProgressControl(Action<int> eventError)
@@ -697,17 +714,22 @@ namespace HMI.Model.Module.Services
             /// <param name="dst"></param>
             public void RtxGroupEvent(StateManagerService stateManager, RdState dst)
             {
-                lock (Locker)
+                lock (TxInProgressControlLocker)
                 {
                     var TxInProgressSupervisionEnable = TxConfirmationTime > 10 || SquelchConfirmationTime > 10;
                     if (TxInProgressSupervisionEnable)
                     {
+                        LogManager.GetLogger("RSFService").Trace("RtxGroupEvent...");
                         bool thereIsGroup = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0).ToList().Count > 0;
                         if (thereIsGroup && dst.RtxGroup > 0)   // Si hay grupo y el evento es en el grupo.
                         {
                             bool eventRtxOn = dst.Ptt == PttState.NoPtt && dst.Squelch == SquelchState.SquelchOnlyPort;
                             bool eventTxOn = dst.Ptt == PttState.PttOnlyPort;
                             bool eventOff = dst.Ptt == PttState.NoPtt && dst.Squelch == SquelchState.NoSquelch;
+
+                            LogManager.GetLogger("RSFService").Trace("RtxGroupEvent Processing {0}, {1}, {2}, {3}",
+                                GrpStatus, eventRtxOn, eventTxOn, eventOff);
+
                             switch (GrpStatus)
                             {
                                 case eRtxGroupStates.Inactive:
@@ -730,6 +752,9 @@ namespace HMI.Model.Module.Services
                                     else if (eventOff)
                                     {
                                         var squelchsInGroup = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0 && d.Squelch != SquelchState.NoSquelch).ToList().Count;
+
+                                        LogManager.GetLogger("RSFService").Trace("RtxGroupEvent Processing eventOff on TxInProgress {0}", squelchsInGroup);
+
                                         if (squelchsInGroup == 0)
                                         {
                                             GrpStatus = eRtxGroupStates.Inactive;
@@ -747,6 +772,7 @@ namespace HMI.Model.Module.Services
                                     else if (eventOff)
                                     {
                                         var squelchsInGroup = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0 && d.Squelch != SquelchState.NoSquelch).ToList().Count;
+                                        LogManager.GetLogger("RSFService").Trace("RtxGroupEvent Processing eventOff on RtxInProgress {0}", squelchsInGroup);
                                         if (squelchsInGroup == 0)
                                         {
                                             GrpStatus = eRtxGroupStates.Inactive;
@@ -760,6 +786,7 @@ namespace HMI.Model.Module.Services
                         else if (!thereIsGroup)
                         {
                             GrpStatus = eRtxGroupStates.Inactive;
+                            LogManager.GetLogger("RSFService").Trace("RtxGroupEvent Not Processed");
                         }
                     }
                 }
@@ -774,15 +801,22 @@ namespace HMI.Model.Module.Services
                     RtxSpTask = Task.Factory.StartNew(() =>
                     {
                         var time = (TxConfirmationTime > SquelchConfirmationTime ? TxConfirmationTime : SquelchConfirmationTime) + 500;
+                        LogManager.GetLogger("RSFService")
+                            .Trace("RtxSupervisor Processing Started");
                         if (RtxSpTaskAbort.WaitOne(time) == false)
                         {
-                            lock (Locker)
+                            lock (TxInProgressControlLocker)
                             {
                                 if (GrpStatus == eRtxGroupStates.RtxInProgress)
                                 {
                                     var items = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0).ToList().Count;
                                     var itemsInSquelch = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0 && d.Squelch != SquelchState.NoSquelch).ToList().Count;
                                     var itemsInPtt = stateManager.Radio.Destinations.Where(d => d.RtxGroup > 0 && d.Ptt == PttState.ExternPtt).ToList().Count;
+
+                                    LogManager.GetLogger("RSFService")
+                                        .Trace("RtxSupervisor Processing RtxInProgress {0}, {1}, {2}",
+                                         items, itemsInSquelch, itemsInPtt);
+
                                     if (itemsInSquelch != items || itemsInPtt != (items - 1))
                                     {
                                         // Error en Grupo
@@ -793,12 +827,19 @@ namespace HMI.Model.Module.Services
                                     {
                                     }
                                 }
+                                else
+                                {
+                                    LogManager.GetLogger("RSFService")
+                                        .Trace("RtxSupervisor Processing Not in RtxInProgress");
+                                }
                             }
                         }
                         else
                         {
+                            LogManager.GetLogger("RSFService")
+                                .Trace("RtxSupervisor Processing Canceled");
                         }
-                        lock (Locker)
+                        lock (TxInProgressControlLocker)
                         {
                             RtxSpTaskAbort = null;
                             RtxSpTask = null;
@@ -813,9 +854,10 @@ namespace HMI.Model.Module.Services
             }
 
             private System.Threading.ManualResetEvent TxInProgressSpCancel = null;
+            private Task TxInProgressSpTask = null;
             public void LocalPttEvent(StateManagerService stateManager)
             {
-                lock (Locker)
+                lock (TxInProgressControlLocker)
                 {
                     var TxInProgressSupervisionEnable = TxConfirmationTime > 10 || SquelchConfirmationTime > 10;
                     if (TxInProgressSupervisionEnable)
@@ -823,64 +865,96 @@ namespace HMI.Model.Module.Services
                         if (stateManager.Radio.PttOn)
                         {
                             // PTTON de Operador.
-                            TxInProgressSpCancel = new System.Threading.ManualResetEvent(false);
-                            Task.Factory.StartNew(() =>
+                            LogManager.GetLogger("RSFService")
+                                .Trace("LocalPttEvent Processing PTT-ON");
+                            if (TxInProgressSpCancel == null)
                             {
-                                var NewSqhConfirmationTime = SquelchConfirmationTime;
-                                // Espera la confirmacion de TX
-                                if (TxConfirmationTime > 10 && !TxInProgressSpCancel.WaitOne(TxConfirmationTime))
+                                // PTT Supervisado
+                                TxInProgressSpCancel = new System.Threading.ManualResetEvent(false);
+                                TxInProgressSpTask = Task.Factory.StartNew(() =>
                                 {
-                                    // Chequea que todos los PTT estan confirmados...
-                                    lock (Locker)
+                                    var NewSqhConfirmationTime = SquelchConfirmationTime;
+                                    if (TxConfirmationTime > 10)
                                     {
-                                        var txSelItems = stateManager.Radio.Destinations.Where(d => d.Tx == true).ToList().Count;
-                                        var inPttItems = stateManager.Radio.Destinations.Where(d =>
-                                            d.Ptt == PttState.PttOnlyPort ||
-                                            d.Ptt == PttState.PttPortAndMod ||
-                                            d.Ptt == PttState.ExternPtt ||
-                                            d.Ptt == PttState.Blocked).ToList().Count;
-                                        bool confirmados = txSelItems == inPttItems;
-                                        if (!confirmados)
+                                        // Espera la confirmacion de TX
+                                        LogManager.GetLogger("RSFService")
+                                            .Trace("LocalPttEvent Starting Supervision TX {0}", TxConfirmationTime);
+                                        if (!TxInProgressSpCancel.WaitOne(TxConfirmationTime))
                                         {
-                                            EventError(1);
-                                        }
-                                        NewSqhConfirmationTime -= TxConfirmationTime;
-                                    }
-                                }
-                                else
-                                {
-                                    NewSqhConfirmationTime = 0;
-                                }
-                                // Espera la confirmacion de portadoras.
-                                if (NewSqhConfirmationTime > 10 && !TxInProgressSpCancel.WaitOne(NewSqhConfirmationTime))
-                                {
-                                    // Chequea que todos los SQH estan confirmados...
-                                    lock (Locker)
-                                    {
-                                        var inCarrierErrorItems = stateManager.Radio.Destinations.Where(d => d.Ptt == PttState.CarrierError).ToList().Count;
-                                        var inPttItems = stateManager.Radio.Destinations.Where(d =>
-                                        d.Ptt == PttState.PttOnlyPort ||
-                                        d.Ptt == PttState.PttPortAndMod ||
-                                        d.Ptt == PttState.ExternPtt ||
-                                        d.Ptt == PttState.Blocked).ToList().Count;
-                                        var inSqhItems = stateManager.Radio.Destinations.Where(d => d.Squelch == SquelchState.SquelchOnlyPort ||
-                                            d.Squelch == SquelchState.SquelchPortAndMod).ToList().Count;
-                                        bool confirmados = inCarrierErrorItems==0 && inPttItems == inSqhItems;
-                                        if (!confirmados)
-                                        {
-                                            EventError(2);
-                                        }
-                                    }
-                                }
-                                else
-                                {
+                                            // Chequea que todos los PTT estan confirmados...
+                                            lock (TxInProgressControlLocker)
+                                            {
+                                                var txSelItems = stateManager.Radio.Destinations.Where(d => d.Tx == true).ToList().Count;
+                                                var inPttItems = stateManager.Radio.Destinations.Where(d => d.Tx == true && (
+                                                    d.Ptt == PttState.PttOnlyPort ||
+                                                    d.Ptt == PttState.PttPortAndMod ||
+                                                    d.Ptt == PttState.ExternPtt ||
+                                                    d.Ptt == PttState.Blocked)).ToList().Count;
+                                                bool confirmados = txSelItems == inPttItems;
+                                                NewSqhConfirmationTime -= TxConfirmationTime;
 
-                                }
-                                lock (Locker)
-                                {
-                                    TxInProgressSpCancel = null;
-                                }
-                            });
+                                                LogManager.GetLogger("RSFService")
+                                                    .Trace(string.Format("LocalPttEvent Supervision TX processed {0}, {1}, {2}"),
+                                                     txSelItems, inPttItems, confirmados);
+
+                                                if (!confirmados)
+                                                {
+                                                    EventError(1);
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            NewSqhConfirmationTime = 0;
+                                            LogManager.GetLogger("RSFService")
+                                                .Trace("LocalPttEvent Supervision TX Canceled");
+                                        }
+                                    }
+                                    if (NewSqhConfirmationTime > 10)
+                                    {
+                                        // Espera la confirmacion de portadoras.
+                                        LogManager.GetLogger("RSFService")
+                                            .Trace("LocalPttEvent Starting Supervision RX {0}", NewSqhConfirmationTime);
+                                        if (NewSqhConfirmationTime > 10 && !TxInProgressSpCancel.WaitOne(NewSqhConfirmationTime))
+                                        {
+                                            // Chequea que todos los SQH estan confirmados...
+                                            lock (TxInProgressControlLocker)
+                                            {
+                                                var inCarrierErrorItems = stateManager.Radio.Destinations.Where(d => d.Ptt == PttState.CarrierError).ToList().Count;
+                                                var inPttItems = stateManager.Radio.Destinations.Where(d => d.Tx == true && (
+                                                d.Ptt == PttState.PttOnlyPort ||
+                                                d.Ptt == PttState.PttPortAndMod ||
+                                                d.Ptt == PttState.ExternPtt ||
+                                                d.Ptt == PttState.Blocked)).ToList().Count;
+                                                var inSqhItems = stateManager.Radio.Destinations.Where(d => d.Tx == true && (d.Squelch == SquelchState.SquelchOnlyPort ||
+                                                    d.Squelch == SquelchState.SquelchPortAndMod)).ToList().Count;
+                                                bool confirmados = inCarrierErrorItems == 0 && inPttItems == inSqhItems;
+                                                if (!confirmados)
+                                                {
+                                                    EventError(2);
+                                                }
+                                                LogManager.GetLogger("RSFService")
+                                                    .Trace("LocalPttEvent Supervision RX processed {0}, {1}, {2}, {3}",
+                                                     inCarrierErrorItems, inPttItems, inSqhItems, confirmados);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            LogManager.GetLogger("RSFService")
+                                                .Trace("LocalPttEvent Supervision RX Canceled");
+                                        }
+                                    }
+                                    lock (TxInProgressControlLocker)
+                                    {
+                                        TxInProgressSpCancel = null;
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                // PTT ON No supervisado...
+                                LogManager.GetLogger("RSFService").Debug("PTT ON No supervisado...");
+                            }
                         }
                         else
                         {
@@ -889,10 +963,142 @@ namespace HMI.Model.Module.Services
                             {
                                 TxInProgressSpCancel.Set();
                             }
+                            else
+                            {
+                                // PTT OFF No supervisado...
+                                LogManager.GetLogger("RSFService").Debug("PTT OFF No supervisado...");
+                            }
                             EventError(0);
                         }
                     }
                 }
+            }
+
+            public void NewLocalPttEvent(StateManagerService stateManager)
+            {
+                lock (TxInProgressControlLocker)
+                {
+                    if (stateManager.Radio.PttOn)
+                    {
+                        // PTTON de Operador.
+                        LogManager.GetLogger("RSFService")
+                            .Trace("NewLocalPttEvent Processing PTT-ON");
+                        if (TxInProgressSpCancel == null)
+                        {
+                            // PTT Supervisado
+                            TxInProgressSpCancel = new System.Threading.ManualResetEvent(false);
+                            TxInProgressSpTask = Task.Factory.StartNew(() =>
+                            {
+                                DateTime pttStart = DateTime.Now;
+                                TimeSpan txGuard = TimeSpan.FromMilliseconds(TxConfirmationTime);
+                                TimeSpan rxGuard = TimeSpan.FromMilliseconds(SquelchConfirmationTime);
+                                bool lastTxStatus = true;
+                                bool lastRxStatus = true;
+                                while (TxInProgressSpCancel.WaitOne(TimeSpan.FromMilliseconds(200)) == false)
+                                {
+                                    TimeSpan elapsed = DateTime.Now - pttStart;
+                                    if (txGuard.TotalMilliseconds > 0 && txGuard < elapsed)
+                                    {
+                                        /** Supervision de TX. Chequea que todos los PTT estan confirmados... */
+                                        lock (TxInProgressControlLocker)
+                                        {
+                                            if (LCOutActivity(stateManager) == true)
+                                            {
+                                                lastTxStatus = true;
+                                                pttStart = DateTime.Now;
+                                            }
+                                            else
+                                            {
+                                                var txSelItems = stateManager.Radio.Destinations.Where(d => d.Tx == true).ToList().Count;
+                                                var inPttItems = stateManager.Radio.Destinations.Where(d => d.Tx == true && (
+                                                    d.Ptt == PttState.PttOnlyPort ||
+                                                    d.Ptt == PttState.PttPortAndMod ||
+                                                    d.Ptt == PttState.ExternPtt ||
+                                                    d.Ptt == PttState.Blocked ||
+                                                    d.Ptt == PttState.CarrierError)).ToList().Count;
+                                                bool confirmados = txSelItems == inPttItems;
+
+                                                if (!confirmados && confirmados != lastTxStatus)
+                                                {
+                                                    EventError(1);
+                                                    LogManager.GetLogger("RSFService")
+                                                        .Error("NewLocalPttEvent Supervision TX failed {0}, {1}, {2}",
+                                                         txSelItems, inPttItems, confirmados);
+                                                }
+                                                lastTxStatus = confirmados;
+                                            }
+                                        }
+                                    }
+                                    if (rxGuard.TotalMilliseconds > 0 && rxGuard < elapsed)
+                                    {
+                                        /** Supervision de RX. Chequea que todos los SQH estan confirmados.. */
+                                        lock (TxInProgressControlLocker)
+                                        {
+                                            if (LCOutActivity(stateManager) == true)
+                                            {
+                                                lastRxStatus = true;
+                                                pttStart = DateTime.Now;
+                                            }
+                                            else {
+                                                var inCarrierErrorItems = stateManager.Radio.Destinations.Where(d => d.Ptt == PttState.CarrierError).ToList().Count;
+                                                var inPttItems = stateManager.Radio.Destinations.Where(d => d.Tx == true && (
+                                                d.Ptt == PttState.PttOnlyPort ||
+                                                d.Ptt == PttState.PttPortAndMod ||
+                                                d.Ptt == PttState.ExternPtt ||
+                                                d.Ptt == PttState.Blocked)).ToList().Count;
+                                                var inSqhItems = stateManager.Radio.Destinations.Where(d => d.Tx == true && (d.Squelch == SquelchState.SquelchOnlyPort ||
+                                                    d.Squelch == SquelchState.SquelchPortAndMod)).ToList().Count;
+                                                bool confirmados = inCarrierErrorItems == 0 && inPttItems == inSqhItems;
+
+                                                if (!confirmados && lastRxStatus != confirmados)
+                                                {
+                                                    EventError(2);
+                                                    LogManager.GetLogger("RSFService")
+                                                        .Error("NewLocalPttEvent Supervision RX failed {0}, {1}, {2}, {3}",
+                                                         inCarrierErrorItems, inPttItems, inSqhItems, confirmados);
+                                                }
+                                                lastRxStatus = confirmados;
+                                            }
+                                        }
+                                    }
+                                }
+                                /** Abortar el Proceso */
+                                lock (TxInProgressControlLocker)
+                                {
+                                    TxInProgressSpCancel = null;
+                                }
+                            });
+                        }
+                        else
+                        {
+                            // PTT ON No supervisado...
+                            LogManager.GetLogger("RSFService").Debug("NewLocalPttEvent. PTT ON No supervisado...");
+                        }
+                    }
+                    else
+                    {
+                        // PTTOFF de Operador.
+                        LogManager.GetLogger("RSFService")
+                            .Trace("NewLocalPttEvent Processing PTT-OFF");
+                        if (TxInProgressSpCancel != null)
+                        {
+                            TxInProgressSpCancel.Set();
+                        }
+                        else
+                        {
+                            // PTT OFF No supervisado...
+                            LogManager.GetLogger("RSFService").Debug("NewLocalPttEvent. PTT OFF No supervisado...");
+                        }
+                        EventError(0);
+                    }
+                }
+
+            }
+            bool LCOutActivity(StateManagerService stateManager)
+            {
+                var lcDestInTx = stateManager.Lc.Destinations.Where(d => d.Tx == LcTxState.Tx ||
+                    d.Tx == LcTxState.Out || d.Tx == LcTxState.Congestion || d.Tx == LcTxState.Busy).Count();
+                return lcDestInTx > 0;
             }
         }
 

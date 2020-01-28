@@ -12,7 +12,11 @@ using NLog;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
+#if DEBUG
+    public class TopRegistry : Registry
+#else
 	class TopRegistry : Registry
+#endif     	
 	{
 		public event GenericEventHandler<Cd40Cfg> NewConfig;
 
@@ -63,7 +67,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			Resource rs;
 			string type = Identifiers.TypeId(typeof(T));
-			string rsUid = rsName.ToUpper() + "_" + type;
+			string rsUid = rsName + "_" + type;
 
 			if (!_Resources.TryGetValue(rsUid, out rs))
 			{
@@ -81,12 +85,12 @@ namespace HMI.CD40.Module.BusinessEntities
                                                         //aparezca con aspa al inicio si no está presente
                         )
 					{
-						rs.Reset(null, new T());
+						rs.Reset(null, new T());   //Se inicializa sin ASPA
 					}
 				}
 			}
 
-			return (Rs<T>)rs;
+			return (Rs<T>)rs;  //Se inicializa con ASPA
 		}
 
 		public void SetRx(string fr, bool rx)
@@ -377,7 +381,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		private void CfgChanged(RsChangeInfo change)
 		{
-			Cd40Cfg cfg = Deserialize<Cd40Cfg>(change.Content);
+            Cd40Cfg cfg = Deserialize<Cd40Cfg>(Tools.Decompress(change.Content));
 
             if (cfg != null)
 			{
@@ -417,13 +421,16 @@ namespace HMI.CD40.Module.BusinessEntities
  
                 if (((GwTlfRs)rsTlf).Type >= (uint)RsChangeInfo.RsTypeInfo.ExternalSub)
                 {
+                    //TODO Le quito la informacion de puerto que no me sirve, de momento, hay que cambiar CORESIP y mas
+                    String[] userData = ((GwTlfRs)rsTlf).GwIp.ToString().Split(':');
+                    ((GwTlfRs)rsTlf).GwIp = userData[0];
                     if (((GwTlfRs)rsTlf).St == GwTlfRs.State.NotAvailable)
                         rs = null;
                }
             }
             string type = Identifiers.TypeId(typeof(T));
 
-            string rsUid = id.ToUpper() + "_" + type;
+            string rsUid = id + "_" + type;
             Top.WorkingThread.Enqueue("RsChanged", delegate()
             {
                 Resource resource;

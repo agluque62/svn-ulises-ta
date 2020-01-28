@@ -201,4 +201,28 @@
   <data name="RtxActiveNoRemove" xml:space="preserve">
     <value>Active Squelch, it is not allowed to remove an element from RTX group</value>
   </data>
+  <data name="MultidestinationCall" xml:space="preserve">
+    <value>Multidestination Call:</value>
+  </data>
+  <data name="PickUpDescription" xml:space="preserve">
+    <value>Capture call of </value>
+  </data>
+  <data name="BriefingFunction" xml:space="preserve">
+    <value>Do you want to start "briefing"?</value>
+  </data>
+  <data name="ForwardDescription" xml:space="preserve">
+    <value>Diverted calls to:</value>
+  </data>
+  <data name="DeleteSessionGLP" xml:space="preserve">
+    <value>Do you want to delete local recording session?</value>
+  </data>
+  <data name="RemoteForwardDescription" xml:space="preserve">
+    <value>Calls diverted from </value>
+  </data>
+  <data name="ForwardError" xml:space="preserve">
+    <value>Forward Error. It is not allowed to call the source of an active forward.</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>from</value>
+  </data>
 </root>

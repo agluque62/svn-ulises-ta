@@ -28,7 +28,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			_State = IntrusionState.Queued;
 			_AssociateCall = intruderCall;
-			_AssociateCall.StateChanged += OnAssociateCallStateChanged;
+			_AssociateCall.TlfPosStateChanged += OnAssociateCallStateChanged;
 
 			_IntrusionTout.AutoReset = false;
 			_IntrusionTout.Elapsed += OnIntrusionTimeout;
@@ -42,7 +42,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				_IntrusionTout.Enabled = false;
 				Top.Tlf.ActivityChanged -= OnActivityChanged;
-				_AssociateCall.StateChanged -= OnAssociateCallStateChanged;
+				_AssociateCall.TlfPosStateChanged -= OnAssociateCallStateChanged;
 			}
 			else if (_State == IntrusionState.InProgress)
 			{
@@ -55,7 +55,7 @@ namespace HMI.CD40.Module.BusinessEntities
 					_Conference.Dispose();
 					_Conference = null;
 				}
-				_AssociateCall.StateChanged -= OnAssociateCallStateChanged;
+				_AssociateCall.TlfPosStateChanged -= OnAssociateCallStateChanged;
 			}
 			else if (_State == IntrusionState.On)
 			{
@@ -230,7 +230,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			try
 			{
 				SipAgent.AnswerCall(_AssociateCall.CallId, SipAgent.SIP_INTRUSION_IN_PROGRESS);
-                Top.Tlf.setShortTone(1000, "Warning_Operator_Intervening.wav");
+                Top.Tlf.SetShortTone(1000, "Warning_Operator_Intervening.wav");
 			}
 			catch (Exception ex)
 			{
@@ -241,7 +241,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				_Conference.TryAddIncoming(_AssociateCall);
 				_State = IntrusionState.On;
-				_AssociateCall.StateChanged -= OnAssociateCallStateChanged;
+				_AssociateCall.TlfPosStateChanged -= OnAssociateCallStateChanged;
 			}
 			catch (Exception ex)
 			{

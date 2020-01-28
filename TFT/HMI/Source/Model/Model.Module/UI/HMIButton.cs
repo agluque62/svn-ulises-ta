@@ -18,6 +18,7 @@ namespace HMI.Model.Module.UI
 		private BtnState _BtnState = BtnState.Normal;
 		protected BtnInfo _BtnInfo = new BtnInfo();
 		private int _LongClickMs = 2000;
+        private Rectangle _TypeRect = new Rectangle(4, 4, 24, 24);
 
 		public new event EventHandler Click;
 		public event EventHandler LongClick;
@@ -415,14 +416,21 @@ namespace HMI.Model.Module.UI
 			_Timer.Tick += OnLongClick;
 		}
 
-		public void Reset(string text, bool drawX, Color buttonColor)
-		{
-			_DrawX = drawX;
-			_BtnInfo.Text = text;
-			_BtnInfo.SetBackColor(BtnState.Normal, buttonColor);
+        public void Reset(string text, bool drawX, Color buttonColor, Image img = null)
+        {
+            _DrawX = drawX;
+            _BtnInfo.Text = text;
+            _BtnInfo.SetBackColor(BtnState.Normal, buttonColor);
+            SetImage(img);
 
-			Invalidate();
-		}
+            Invalidate();
+        }
+
+        public void SetImage(Image img)
+        {
+            _BtnInfo.ImageAlign = ContentAlignment.TopCenter;
+            _BtnInfo.SetImage(BtnState.Normal, img);
+        }
 
 		protected override void OnPaint(PaintEventArgs e)
 		{

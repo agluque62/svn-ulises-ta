@@ -35,7 +35,7 @@ message RdSrvFrRs
 	
 	optional uint32 RtxGroupId = 3 [default = 0];
 	optional string RtxGroupOwner = 4;
-	optional string SqlSite = 5;
+	optional string SqSite = 5;
 	optional string ResourceId = 6;
 	optional string QidxMethod = 7;
 	optional uint32 QidxValue = 8;

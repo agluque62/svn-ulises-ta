@@ -264,7 +264,7 @@ namespace HMI.Model.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
         public int LcMemNotifSg {
             get {
                 return ((int)(this["LcMemNotifSg"]));

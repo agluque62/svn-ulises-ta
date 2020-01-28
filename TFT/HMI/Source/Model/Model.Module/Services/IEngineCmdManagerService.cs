@@ -61,12 +61,18 @@ namespace HMI.Model.Module.Services
         bool SetAudioViaTlf(bool speaker);
         void ModoSoloAltavoces();
         void SetDoubleRadioSpeaker();
-
+        void PreparePickUp(int id);
+        void PreparePickUp(string number);
+        void PickUp(int id);
+        void CancelPickUp();
         void MakeConference(bool viable);
         void SetHold(bool on);
         bool HayConferencia();
         void FunctionReplay(FunctionReplay function, ViaReplay via, string fileName, long fileLength);
         void SelCalPrepare(bool prepareOnOff, string code);
+        void PrepareForward(int id);
+        void PrepareForward(string number);
+        void CancelForward();
 
         void SendCmdHistoricalEvent(string user, string frec);
         void SetManagingSite(bool managing);

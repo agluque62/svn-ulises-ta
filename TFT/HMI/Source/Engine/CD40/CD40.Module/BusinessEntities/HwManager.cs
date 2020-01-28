@@ -30,7 +30,11 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// Definicion de la Clase que Gestiona un dispositivo de audio en referencia a PTT, JACK y Volumen.
     /// </summary>
+#if DEBUG
+    public interface ISndDevIO
+#else
     interface ISndDevIO
+#endif
     {
         event GenericEventHandler<bool> JackConnected;
         event GenericEventHandler<bool> PttPulsed;
@@ -62,7 +66,11 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// 
     /// </summary>
-    abstract class HwManager 
+#if DEBUG
+    public abstract class HwManager
+#else
+	abstract class HwManager
+#endif     
 	{
 		// public const int OUT_GRABACION = 7;
         // public const int OUT_ALTAVOZ = 6;

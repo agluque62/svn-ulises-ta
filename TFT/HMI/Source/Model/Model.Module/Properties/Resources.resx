@@ -123,10 +123,6 @@
   <data name="BrightnessError" xml:space="preserve">
     <value>Error abriendo controladora de brillo</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Button" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Button.bmp;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="DisableTft" xml:space="preserve">
     <value>Deshabilitar TFT</value>
   </data>
@@ -210,5 +206,20 @@
   </data>
   <data name="RtxActiveNoRemove" xml:space="preserve">
     <value>Squelch activo, no es posible sacar un elemento del grupo de Rtx</value>
+  </data>
+  <data name="MultidestinationCall" xml:space="preserve">
+    <value>Llamada a grupo:</value>
+  </data>
+  <data name="PickUpDescription" xml:space="preserve">
+    <value>Captura llamadas de </value>
+  </data>
+  <data name="ForwardDescription" xml:space="preserve">
+    <value>Telefonía desviada a</value>
+  </data>
+  <data name="RemoteForwardDescription" xml:space="preserve">
+    <value>Telefonía desviada desde</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>desde </value>
   </data>
 </root>

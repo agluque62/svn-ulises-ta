@@ -173,10 +173,10 @@ namespace HMI.OPE.Module.Services
 		public event EventHandler<RangeMsg<LcState>> LcPosStateEngine;
 
 		[EventPublication(EventTopicNames.PriorityStateEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<PriorityState>> PriorityStateEngine;
+		public event EventHandler<StateMsg<FunctionState>> PriorityStateEngine;
 
 		[EventPublication(EventTopicNames.TransferStateEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<TransferState>> TransferStateEngine;
+		public event EventHandler<StateMsg<FunctionState>> TransferStateEngine;
 
 		[EventPublication(EventTopicNames.IntrudedByEngine, PublicationScope.Global)]
 		public event EventHandler<StateMsg<string>> IntrudedByEngine;
@@ -188,7 +188,7 @@ namespace HMI.OPE.Module.Services
 		public event EventHandler<StateMsg<string>> IntrudeToEngine;
 
 		[EventPublication(EventTopicNames.ListenStateEngine, PublicationScope.Global)]
-		public event EventHandler<ListenMsg> ListenStateEngine;
+		public event EventHandler<ListenPickUpMsg> ListenStateEngine;
 
 		[EventPublication(EventTopicNames.HangToneStateEngine, PublicationScope.Global)]
 		public event EventHandler<StateMsg<bool>> HangToneStateEngine;
@@ -203,7 +203,7 @@ namespace HMI.OPE.Module.Services
 		//public event EventHandler<EventArgs<string>> HideNotifMsgEngine;
 
 		[EventPublication(EventTopicNames.RemoteListenStateEngine, PublicationScope.Global)]
-		public event EventHandler<ListenMsg> RemoteListenStateEngine;
+		public event EventHandler<ListenPickUpMsg> RemoteListenStateEngine;
 
 		[EventPublication(EventTopicNames.ConfListEngine, PublicationScope.Global)]
 		public event EventHandler<RangeMsg<string>> ConfListEngine;
@@ -896,23 +896,23 @@ namespace HMI.OPE.Module.Services
 					General.SafeLaunchEvent(PermissionsEngine, this, new StateMsg<Permissions>(permissions));
 					break;
 				case TlfEventType.TransferState:
-					TransferState transferSt = TransferState.Idle;
+					FunctionState transferSt = FunctionState.Idle;
 					switch ((TransferStType)data[2])
 					{
 						case TransferStType.Idle:
 							break;
 						case TransferStType.Error:
-							transferSt = TransferState.Error;
+							transferSt = FunctionState.Error;
 							break;
 						case TransferStType.Ready:
-							transferSt = TransferState.Executing;
+							transferSt = FunctionState.Executing;
 							break;
 						default:
 							_Logger.Warn("Estado TransferStType desconocido: {0}", data[2]);
 							break;
 					}
 
-					General.SafeLaunchEvent(TransferStateEngine, this, new StateMsg<TransferState>(transferSt));
+					General.SafeLaunchEvent(TransferStateEngine, this, new StateMsg<FunctionState>(transferSt));
 					break;
 
 				case TlfEventType.ConfState:
@@ -926,7 +926,7 @@ namespace HMI.OPE.Module.Services
 						if ((data[3] > 0) && (data[3] <= Tlf.NumDestinations) && _TlfMask[data[3] - 1])
 						{
 							string onListenDst = _CfgServer.GetEquivalentName(_Encoding.GetString(data, 4, 8).Trim());
-							General.SafeLaunchEvent(ListenStateEngine, this, new ListenMsg(ListenState.Executing, onListenDst));
+							General.SafeLaunchEvent(ListenStateEngine, this, new ListenPickUpMsg(FunctionState.Executing, onListenDst));
 						}
 					}
 					else if ((TlfPosType)data[2] == TlfPosType.Ai)
@@ -934,18 +934,18 @@ namespace HMI.OPE.Module.Services
 						if ((data[3] > 0) && (data[3] <= Tlf.NumIaDestinations))
 						{
 							string onListenDst = _CfgServer.GetEquivalentName(_Encoding.GetString(data, 4, 8).Trim());
-							General.SafeLaunchEvent(ListenStateEngine, this, new ListenMsg(ListenState.Executing, onListenDst));
+							General.SafeLaunchEvent(ListenStateEngine, this, new ListenPickUpMsg(FunctionState.Executing, onListenDst));
 						}
 					}
 					break;
 				case TlfEventType.RejectListen:
-					General.SafeLaunchEvent(ListenStateEngine, this, new ListenMsg(ListenState.Error));
+					General.SafeLaunchEvent(ListenStateEngine, this, new ListenPickUpMsg(FunctionState.Error));
 					break;
 				case TlfEventType.ListenOff:
-					General.SafeLaunchEvent(ListenStateEngine, this, new ListenMsg(ListenState.Idle));
+					General.SafeLaunchEvent(ListenStateEngine, this, new ListenPickUpMsg(FunctionState.Idle));
 					break;
 				case TlfEventType.ListenReady:
-					General.SafeLaunchEvent(ListenStateEngine, this, new ListenMsg(ListenState.Ready));
+					General.SafeLaunchEvent(ListenStateEngine, this, new ListenPickUpMsg(FunctionState.Ready));
 					break;
 				case TlfEventType.Priority:
 					_Priority = (PriorityStType)data[2];
@@ -957,7 +957,7 @@ namespace HMI.OPE.Module.Services
 							break;
 						case PriorityStType.Error:
 							Send(new byte[] { (byte)OpeEventType.Tlf, (byte)TlfCmdType.SetPriorityOff });
-							General.SafeLaunchEvent(PriorityStateEngine, this, new StateMsg<PriorityState>(PriorityState.Error));
+							General.SafeLaunchEvent(PriorityStateEngine, this, new StateMsg<FunctionState>(FunctionState.Error));
 							break;
 						default:
 							_Logger.Warn("Estado PriorityStType desconocido: {0}", data[2]);
@@ -1023,23 +1023,23 @@ namespace HMI.OPE.Module.Services
 					}
 					else
 					{
-						TransferState directTransferSt = TransferState.Idle;
+						FunctionState directTransferSt = FunctionState.Idle;
 						switch ((TransferDirectStType)data[2])
 						{
 							case TransferDirectStType.Idle:
 								break;
 							case TransferDirectStType.Error:
-								directTransferSt = TransferState.Error;
+								directTransferSt = FunctionState.Error;
 								break;
 							case TransferDirectStType.Ready:
-								directTransferSt = TransferState.Executing;
+								directTransferSt = FunctionState.Executing;
 								break;
 							default:
 								_Logger.Warn("Estado TransferDirectStType desconocido: {0}", data[2]);
 								break;
 						}
 
-						General.SafeLaunchEvent(TransferStateEngine, this, new StateMsg<TransferState>(directTransferSt));
+						General.SafeLaunchEvent(TransferStateEngine, this, new StateMsg<FunctionState>(directTransferSt));
 					}
 					break;
 
@@ -1064,7 +1064,7 @@ namespace HMI.OPE.Module.Services
 					break;
 				case TlfEventType.RemoteListen:
 					string listenBy = _CfgServer.GetEquivalentName(_Encoding.GetString(data, 4, 8).Trim());
-					ListenMsg remoteListen = new ListenMsg(data[2] > 0 ? ListenState.Executing : ListenState.Idle, listenBy, data[3]);
+					ListenPickUpMsg remoteListen = new ListenPickUpMsg(data[2] > 0 ? FunctionState.Executing : FunctionState.Idle, listenBy, data[3]);
 					General.SafeLaunchEvent(RemoteListenStateEngine, this, remoteListen);
 					break;
 			}

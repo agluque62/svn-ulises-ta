@@ -24,7 +24,11 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// 
     /// </summary>
+#if DEBUG
+    public static class Top
+#else
 	static class Top
+#endif
 	{
 
         /// <summary>
@@ -106,6 +110,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		public static TlfManager Tlf
 		{
 			get { return _TlfManager; }
+            set { _TlfManager = value; } //only for testing, injecting mock dependencies
 		}
 
         /// <summary>
@@ -508,6 +513,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 mon = null;
             }
 #endif
+
             NtpClientSupervisor.Enabled = false;
             NtpClientSupervisor.Elapsed -= NtpClientSupervisor_tick;
             /*****************/

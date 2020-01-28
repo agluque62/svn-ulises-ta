@@ -142,6 +142,9 @@
             <Component Id="cmpB3334F2C905BC7E0EF739D97E5D78A2F" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
                 <File Id="fil54CCAD14DC5C04A7F9EC4B29614347E3" KeyPath="yes" Source="$(var.SourcePath)\logo_AENA.PNG" />
             </Component>
+            <Component Id="cmp4840480EA3B1E925A9612D7727C795A0" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filE29BD01FFD74A9322D9233A7E6E39DD9" KeyPath="yes" Source="$(var.SourcePath)\logo_Kenia.png" />
+            </Component>
             <Component Id="cmp1DAEB3DB26ABDD4CEB39700AE40C051A" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
                 <File Id="fil6789D8DD0AEE90ABD4F9E23EEDCE6204" KeyPath="yes" Source="$(var.SourcePath)\nucleodf.bmp" />
             </Component>
@@ -228,24 +231,6 @@
             </Component>
             <Component Id="cmpF048E1663FE89A593736104CCC96B0A4" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
                 <File Id="filB22FDA07FFFFF4AEF6C40E0EABDEF0E7" KeyPath="yes" Source="$(var.SourcePath)\UnhangDisabled.gif" />
-            </Component>
-            <Component Id="cmpF478B0A1091827C7E30643B91852E980" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
-                <File Id="filD50D47FE36DDB67B3C24A4A87ED3E26E" KeyPath="yes" Source="$(var.SourcePath)\UrrBrigthness.gif" />
-            </Component>
-            <Component Id="cmpAFD724EB80E99A234E9F9C735B3C017E" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
-                <File Id="filA6CCF747C11A207156E57D882EDEDB15" KeyPath="yes" Source="$(var.SourcePath)\UrrBuzzer.gif" />
-            </Component>
-            <Component Id="cmp76FA39DEF6F74697A9F605CDB6542F29" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
-                <File Id="fil9089AA7B9FFCABB9274B319326B525B7" KeyPath="yes" Source="$(var.SourcePath)\UrrHeadphones.gif" />
-            </Component>
-            <Component Id="cmp61CBAFE9BD583C5D59A12E17D8CE84DB" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
-                <File Id="fil071DF0C6F182CC322E3EA63361B04223" KeyPath="yes" Source="$(var.SourcePath)\UrrJackOff.gif" />
-            </Component>
-            <Component Id="cmpA549BBE0D13BE5733056556B24BBB8EF" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
-                <File Id="fil006020DF261215B7A61A02329EAB16CD" KeyPath="yes" Source="$(var.SourcePath)\UrrJackOn.gif" />
-            </Component>
-            <Component Id="cmpE91BD865E281ABDDB5297F35FF47C452" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
-                <File Id="fil128980FFE20C51AA1C79A447A84D2FB2" KeyPath="yes" Source="$(var.SourcePath)\UrrSpeaker.gif" />
             </Component>
             <Component Id="cmp47C1E74D8E951B8253967C7888FCCF6C" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
                 <File Id="fil25EA39EF4B1C3A97AA1E8FFC3860C31C" KeyPath="yes" Source="$(var.SourcePath)\Wait.ico" />

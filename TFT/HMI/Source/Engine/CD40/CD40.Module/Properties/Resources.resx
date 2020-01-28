@@ -129,14 +129,26 @@
   <data name="BadOperation" xml:space="preserve">
     <value>Falsa maniobra</value>
   </data>
+  <data name="CaptureErrorCapacity" xml:space="preserve">
+    <value>Error en captura porque se ha sobrepasado la capacidad de llamadas o no hay permiso de red</value>
+  </data>
   <data name="DeviceError" xml:space="preserve">
     <value>Error en dispositivo</value>
+  </data>
+  <data name="ForwardError" xml:space="preserve">
+    <value>Error en desvío. No es posible llamar al origen de un desvío activo.</value>
   </data>
   <data name="FrecuencyRtxError" xml:space="preserve">
     <value>Frecuencia implicada en grupo de retransmisión</value>
   </data>
+  <data name="HasCaptured" xml:space="preserve">
+    <value> ha capturado llamada de </value>
+  </data>
   <data name="Headphones" xml:space="preserve">
     <value>Auriculares</value>
+  </data>
+  <data name="Info" xml:space="preserve">
+    <value>Información</value>
   </data>
   <data name="LCSpeakerBusy" xml:space="preserve">
     <value>Altavoz ocupado por linea caliente</value>

@@ -280,17 +280,17 @@ namespace U5ki.TifxService
         private void SetGwResource(RsInfo rsInfo, string gwIp)
         {
             /** Linea Caliente */
-            if (rsInfo.Type == (uint)RsChangeInfo.RsTypeInfo.IcLine)
+            if (rsInfo.Type == 2)
             {
                 GwLcRs rs = new GwLcRs();
 
                 rs.GwIp = gwIp;
 
-                _Registry.SetValue<GwLcRs>(Identifiers.GwTopic, rsInfo.RsId.ToUpper(), rs);
+                _Registry.SetValue<GwLcRs>(Identifiers.GwTopic, rsInfo.RsId, rs);
                 LogDebug<TifxService>(String.Format("Publicando recurso lc [{0}]", rsInfo.RsId));
             } 
                 /** Los demas tipos se consideran Recursos de Telefonía */
-            else if (rsInfo.Type /*== 1*/ <= (uint)RsChangeInfo.RsTypeInfo.ExternalAltProxy)
+            else if (rsInfo.Type /*== 1*/ <= 8)
             {
                 GwTlfRs rs = new GwTlfRs();
                 string RsId = GetGwResourceId(rsInfo);
@@ -319,9 +319,8 @@ namespace U5ki.TifxService
                         LogDebug<TifxService>(String.Format("Estado desconocido para recurso telefonico [{0}({2}):{1}]", rsInfo.RsId, rsInfo.State, rsInfo.Type));
                         return;
                 }
-
-                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, /*rsInfo.*/RsId.ToUpper(), rs);
-                LogDebug<TifxService>(String.Format("Publicando RCTLF T:{2}, [{3}, {0}]: {1}", 
+                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, /*rsInfo.*/RsId, rs);
+                LogTrace<TifxService>(String.Format("Publicando RCTLF T:{2}, [{3}, {0}]: {1}", 
                     /*rsInfo.*/RsId, rsInfo.State, rsInfo.Type, rs.GwIp));
             }
             else
@@ -336,29 +335,23 @@ namespace U5ki.TifxService
         private void RemoveGwResource(RsInfo rsInfo, string motivo)
         {
             /** Linea Caliente */
-            if (rsInfo.Type == (uint)RsChangeInfo.RsTypeInfo.IcLine)
+            if (rsInfo.Type == 2)
             {
-                _Registry.SetValue<GwLcRs>(Identifiers.GwTopic, rsInfo.RsId.ToUpper(), null);
+                _Registry.SetValue<GwLcRs>(Identifiers.GwTopic, rsInfo.RsId, null);
                 LogDebug<TifxService>(String.Format("Eliminando recurso lc [{0}] por {1}", rsInfo.RsId, motivo));
             }
-            else if (rsInfo.Type == (uint)RsChangeInfo.RsTypeInfo.PhLine)
+            else if (rsInfo.Type == 1)
             {
-                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, rsInfo.RsId.ToUpper(), null);
+                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, rsInfo.RsId, null);
                 LogDebug<TifxService>(String.Format("Eliminando recurso telefonico [{0}] por {1}", rsInfo.RsId, motivo));
             }
             /** Los demas tipos se consideran Recursos de Telefonía */
-            else if (rsInfo.Type <= (uint)RsChangeInfo.RsTypeInfo.ExternalAltProxy)
+            else if (rsInfo.Type < 9)
             {
                 string RsId = GetGwResourceId(rsInfo);
-                if (rsInfo.Type < (uint)RsChangeInfo.RsTypeInfo.ExternalSub)
-                {
-                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, /*rsInfo.*/RsId.ToUpper(), null);
+                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, /*rsInfo.*/RsId, null);
                 LogDebug<TifxService>(String.Format("Eliminando RCTLF T:{2}, [{3}, {0}]: {1} por {4}",
                     /*rsInfo.*/RsId, rsInfo.State, rsInfo.Type, rsInfo.GwIp, motivo));
-            }
-            else
-                    LogDebug<TifxService>(String.Format("***No envio: Eliminando RCTLF T:{2}, [{3}, {0}]: {1} por {4}",
-                        /*rsInfo.*/RsId, rsInfo.State, rsInfo.Type, rsInfo.GwIp, motivo));
             }
             else
             {
@@ -388,7 +381,7 @@ namespace U5ki.TifxService
                 {
                     GwInfo oldGwInfo = null;
 
-                    if (_LastGwInfo.TryGetValue(gwInfo.GwId.ToUpper(), out oldGwInfo))
+                    if (_LastGwInfo.TryGetValue(gwInfo.GwId, out oldGwInfo))
                     {
                         if (oldGwInfo.Version != gwInfo.Version ||
                             oldGwInfo.GwIp != gwInfo.GwIp)
@@ -442,7 +435,7 @@ namespace U5ki.TifxService
             }
 
             gwInfo.LastReceived = Environment.TickCount;
-            _LastGwInfo[gwInfo.GwId.ToUpper()] = gwInfo;
+            _LastGwInfo[gwInfo.GwId] = gwInfo;
             LogTrace<TifxService>(String.Format("{3}. TIFX {0}. Mensaje Version {1,2} Recibido. TickCount: {2}", 
                 gwInfo.GwId, gwInfo.Version, gwInfo.LastReceived, PabxFramesCount));
         }
@@ -504,7 +497,7 @@ namespace U5ki.TifxService
                 {
                     foreach (RsInfo rsInfo in gwInfo.Resources)
                     {
-                        //_Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, rsInfo.RsId.ToUpper(), rs);
+                        //_Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, rsInfo.RsId, rs);
                         SetGwResource(rsInfo, gwInfo.GwIp);
                     }
                 }
@@ -543,7 +536,6 @@ namespace U5ki.TifxService
         /// <param name="master"></param>
         private void OnMasterStatusChanged(object sender, bool master)
         {
-            Debug.Assert(_Master != master);
             _Master = master;
 
             _WorkingThread.Enqueue("OnMasterStatusChanged", delegate()
@@ -556,28 +548,21 @@ namespace U5ki.TifxService
 #endif
                     if (_Master)
                     {
-                        _Registry.PublishMaster(ServiceSite, Identifiers.GwMasterTopic);
+                        if (!_Timer.Enabled)
+                            _Timer.Enabled = true;
                         foreach (GwInfo gwInfo in _LastGwInfo.Values)
                         {
                             SetGwResources(gwInfo);
                         }
 
-                        _Registry.Publish();
+                        _Registry.Publish();                        
                         LogInfo<TifxService>("MASTER", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "TifxService", "MASTER");
                     }
                     else
                     {
                         _Registry.SetValue(Identifiers.GwTopic, null, null, null);
-                        _Registry.Publish(/*null, false*/);
+                        _Registry.Publish(null, false);
                         LogInfo<TifxService>("SLAVE", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "TifxService", "SLAVE");
-                        //Gestion master/slave
-                        //Si paso de master a slave, reinicio el Registry
-                        if (_Registry != null)
-                        {
-                            _Registry.Dispose();
-                            _Registry = null;
-                        }
-                        InitRegistry();
                     }
 
                     // AGL-2015. Notifica Evento MASTER...
@@ -604,6 +589,8 @@ namespace U5ki.TifxService
         /// <param name="dg"></param>
         private void OnNewData(object sender, DataGram dg)
         {
+            if (!_Master)
+                return;
             //            if ((dg.Data.Length >= 4) && (dg.Data[3] == 0x01))
             // AGL. Tramas Tipo 2 son del servicio PABX. La IP viene en el ID de Pasarela... 
             /** */
@@ -631,13 +618,23 @@ namespace U5ki.TifxService
                                     case 5:     // Recursos de PABX Interna...
                                         gwInfo.GwIp = gwInfo.GwId;
                                         break;
-                                    case 1:     // De Pasarela.
                                     case 4:     // Informacion de Proxies...
+                                        if (IPAddress.Parse(Settings.Default.tifxMcastSrc).ToString().Equals(dg.Client.Address.ToString()))
+                                            gwInfo.GwIp = gwInfo.GwId;
+                                        else
+                                            //Descarto datos del servicio de presencia de otro NBX
+                                            return;
+                                        break;
 #if DEBUG1
                                         return;
 #endif
                                     case 3:     // Abonados Externos.
-                                        gwInfo.GwIp = gwInfo.Type == 1 ? dg.Client.Address.ToString() : gwInfo.GwIp;
+                                        //Descarto datos del servicio de presencia de otro NBX
+                                        if (!IPAddress.Parse(Settings.Default.tifxMcastSrc).ToString().Equals(dg.Client.Address.ToString()))
+                                            return;
+                                        break;
+                                    case 1:     // De Pasarela.
+                                        gwInfo.GwIp = dg.Client.Address.ToString();
                                         break;
                                 }
 
@@ -684,18 +681,20 @@ namespace U5ki.TifxService
         private int tick_count = 0;
         private void OnTimeElapsed(object sender, ElapsedEventArgs e)
         {
+            if (!_Master)
+                return;
             _WorkingThread.Enqueue("TifxService:OnTimeElapsed", delegate()
             {
 #if _LOCKING_
                 lock (_lock)
                 {
 #endif
-                CheckTouts();   // Chequea que se estan enviando las tramas...
+                    CheckTouts();   // Chequea que se estan enviando las tramas...
 
-                if ((tick_count++ % 60) == 0)   // TODO. Cada N segundos... Se reenvian las Info Activas tipos 3 y 5
-                {
-                    RefreshActiveProxiesAndSubscribers();
-                }
+                    if ((tick_count++ % 60) == 0)   // TODO. Cada N segundos... Se reenvian las Info Activas tipos 3 y 5
+                    {
+                        RefreshActiveProxiesAndSubscribers();
+                    }
 #if _LOCKING_
                 }
 #endif
@@ -713,7 +712,7 @@ namespace U5ki.TifxService
                 {
                     if (e.Content != null)
                     {
-                        MemoryStream ms = new MemoryStream(e.Content);
+                        MemoryStream ms = new MemoryStream(Tools.Decompress(e.Content));
                         last_cfg = ProtoBuf.Serializer.Deserialize<Cd40Cfg>(ms);
                         /** */
                         Dependencias = last_cfg.ConfiguracionGeneral.PlanDireccionamientoIP.Where(d =>
@@ -740,16 +739,16 @@ namespace U5ki.TifxService
         public string GetGwResourceIpInfo(RsInfo rsInfo, string gwIp)
         {
             /** Para recursos de pasarelas y abonados PBX, como hasta ahora */
-            if (rsInfo.Type == (uint)RsChangeInfo.RsTypeInfo.PhLine || rsInfo.Type == (uint)RsChangeInfo.RsTypeInfo.IcLine || rsInfo.Type == (uint)RsChangeInfo.RsTypeInfo.InternalSub)
+            if (rsInfo.Type == 1 || rsInfo.Type == 2 || rsInfo.Type == 3)
                 return gwIp;
 
             if (last_cfg != null)
             {
-                if (rsInfo.Type == (uint)RsChangeInfo.RsTypeInfo.ExternalSub)
+                if (rsInfo.Type == 4)
                 {
                     /** Para abonandos. El ID es el SIP-URI <sip:UUUUU@zzz.yyy.xxx.www:ppppp> 
                         La ip debe contener la dependencia */
-                    return (new SipUtilities.SipUriParser(rsInfo.RsId)).Dominio;
+                    return (new SipUtilities.SipUriParser(rsInfo.RsId)).HostPort;
                 }
                 else if (rsInfo.Type < 9)
                 {
@@ -819,6 +818,8 @@ namespace U5ki.TifxService
         /// <returns></returns>
         protected string GetResourceDep(RsInfo rsInfo)
         {
+            if (Dependencias == null)
+                return "No configured";
             /** Para recursos de pasarelas y abonados PBX, como hasta ahora */
             if (rsInfo.Type == 1 || rsInfo.Type == 2 || rsInfo.Type == 3)
             {
@@ -831,7 +832,7 @@ namespace U5ki.TifxService
                     La ip debe contener la dependencia */
                 /** Para proxies. El ID es el Endpoint zzz.yyy.xxx.www:ppppp , viene configurado con o sin puerto
                     La ip debe contener la dependencia */
-                var dominio = rsInfo.Type == 4 ? (new SipUtilities.SipUriParser(rsInfo.RsId)).Dominio : rsInfo.RsId;
+                var dominio = rsInfo.Type == 4 ? (new SipUtilities.SipUriParser(rsInfo.RsId)).HostPort : rsInfo.RsId;
                 var dependencia = Dependencias
                     .Where(dep =>
                         (dep.IpRed1 != "" && dominio.Contains(dep.IpRed1) == true) ||

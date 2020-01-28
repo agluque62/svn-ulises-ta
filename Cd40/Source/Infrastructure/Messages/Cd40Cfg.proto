@@ -354,6 +354,7 @@ message CfgEnlaceExterno
 	optional Tipo_ModoTransmision ModoTransmision = 21;
     optional string EmplazamientoDefecto = 22;
 	optional int32 TiempoVueltaADefecto = 23;
+	optional uint32 PorcentajeRSSI = 24;
 }
 
 message CfgRecursoEnlaceInterno
@@ -362,6 +363,7 @@ message CfgRecursoEnlaceInterno
 	optional string NombreRecurso = 2;
 	optional string NumeroAbonado = 3;
 	optional TipoInterface Interface = 4;
+	optional string NombreMostrar = 5;
 }
 
 message CfgEnlaceInterno
@@ -373,6 +375,8 @@ message CfgEnlaceInterno
 	optional string Dependencia = 5;
 	optional uint32 Prioridad = 6;
 	optional string OrigenR2 = 7;
+	optional string Dominio = 8;
+	optional string Host = 9;
 }
 
 message ConfiguracionSistema 

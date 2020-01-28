@@ -31,7 +31,6 @@ using HMI.Model.Module.Messages;
 using HMI.Model.Module.BusinessEntities;
 using HMI.Presentation.Twr.Constants;
 using HMI.Presentation.Twr.Properties;
-using HMI.Presentation.Twr.UI;
 using Utilities;
 using NLog;
 
@@ -262,6 +261,8 @@ namespace HMI.Presentation.Twr.Views
 		[EventSubscription(EventTopicNames.TlfPriorityChanged, ThreadOption.Publisher)]
 		[EventSubscription(EventTopicNames.TlfListenChanged, ThreadOption.Publisher)]
 		[EventSubscription(EventTopicNames.TlfTransferChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TlfPickUpChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TlfForwardChanged, ThreadOption.Publisher)]       
 		public void OnFacilityChanged(object sender, EventArgs e)
 		{
 			int absPageBegin = _Page * _NumPositionsByPage;
@@ -335,14 +336,25 @@ namespace HMI.Presentation.Twr.Views
 
 		private bool TlfDstEnabled(TlfDst dst)
 		{
-			return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
+			return (_StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
 					!dst.Unavailable && 
-					(_StateManager.Tlf.Priority.State != PriorityState.Executing) &&
-					((_StateManager.Tlf.Listen.State == ListenState.Idle) || (_StateManager.Tlf.Listen.State == ListenState.Ready)) &&
-					((_StateManager.Tlf.Transfer.State == TransferState.Idle) ||
-					((_StateManager.Tlf.Transfer.State == TransferState.Ready) &&
+					(_StateManager.Tlf.Priority.State != FunctionState.Executing) &&
+					((_StateManager.Tlf.Listen.State == FunctionState.Idle) || (_StateManager.Tlf.Listen.State == FunctionState.Ready)) &&
+					((_StateManager.Tlf.Transfer.State == FunctionState.Idle) ||
+					((_StateManager.Tlf.Transfer.State == FunctionState.Ready) &&
 					((dst.State == TlfState.Idle) || (dst.State == TlfState.Hold) || (dst.State == TlfState.NotAllowed) ||
-					(dst.State == TlfState.Mem) || (dst.State == TlfState.RemoteMem))));
+                    (dst.State == TlfState.Mem) || (dst.State == TlfState.RemoteMem)))) &&
+                    (dst.State != TlfState.Inactive)) &&
+                    //Hay destinos que no permiten ser llamados con prioridad (lineas PP)
+                    //por eso se deshabilita su AD cuando se pulsa la tecla prioridad.
+                    ((dst.PriorityAllowed) || (_StateManager.Tlf.Priority.State != FunctionState.Ready)) &&
+                    //La escucha, y la Captura solo se permiten a Tops (puestos de operador internos)
+                    //Durante la captura se admiten llamadas entrantes
+                    ((dst.IsTop ||
+                    ((_StateManager.Tlf.PickUp.State == FunctionState.Idle) || (dst.State == TlfState.In))) &&                   
+                    //El desvío se permiten a tops y a punto a punto
+                    (dst.ForwardAllowed ||
+                    ((_StateManager.Tlf.Forward.State != FunctionState.Ready))));
 		}
 
 		private void Reset(HMIButton bt, TlfDst dst)
@@ -361,23 +373,24 @@ namespace HMI.Presentation.Twr.Views
 			}
 
 			if (dst.IsConfigurated)
-			{
-				Color backColor = VisualStyle.ButtonColor;
+            {
+                Color backColor = VisualStyle.ButtonColor;
 
-				if (!dst.Unavailable)
-				{
-					backColor = GetStateColor(bt, dst.State);
-				}
+                if (!dst.Unavailable)
+                {
+                    backColor = GetStateColor(bt, dst.State);
+                }
 
-				bt.Reset(dst.Dst, dst.Unavailable, backColor);
-				bt.Enabled = TlfDstEnabled(dst);
+                if (dst.Type == TlfType.Md)
+                {
+                    bt.Reset(dst.Dst, dst.Unavailable, backColor, Resources.group);
+                }
+                else
+                    bt.Reset(dst.Dst, dst.Unavailable, backColor);
+                bt.Enabled = TlfDstEnabled(dst);
                 //Hay destinos que no permiten ser llamados con prioridad (lineas PP)
                 //por eso se deshabilita su AD cuando se pulsa la tecla prioridad.
-                if ((bt.Enabled == true) &&
-                    (dst.PriorityAllowed == false) &&
-                    (_StateManager.Tlf.Priority.State == PriorityState.Ready))
-                    bt.Enabled = false;
-			}
+             }
 
 			bt.Visible = dst.IsConfigurated;
 		}
@@ -406,18 +419,13 @@ namespace HMI.Presentation.Twr.Views
 
 			switch (st)
 			{
-				case TlfState.Idle:
-				case TlfState.PaPBusy:
-					break;
+                case TlfState.Idle:
+                    break;
+                case TlfState.PaPBusy:
+                    //Do not change color
+                    backColor = bt.ButtonColor;
+ 					break;
 				case TlfState.In:
-                    //VMG 08/10/2018 Min intervalo de 10 segs.
-                    // Usando el cambio de color para detectar la llamada en la vista
-                    if (Settings.Default.RingerTimeOut >= 10000)
-                    {
-                        _CallRingerTimer.Interval = Settings.Default.RingerTimeOut;
-                        _CallRingerTimer.Enabled = true;
-                    }
-                    ////
 					backColor = _SlowBlinkOn ? VisualStyle.Colors.Orange : VisualStyle.ButtonColor;
 					_SlowBlinkList[bt] = VisualStyle.Colors.Orange;
 					_SlowBlinkTimer.Enabled = true;
@@ -434,7 +442,6 @@ namespace HMI.Presentation.Twr.Views
 					backColor = VisualStyle.Colors.Red;
 					break;
 				case TlfState.Mem:
-                    _CallRingerTimer.Enabled = false;//Desactivamos el timer al colgar
 					backColor = VisualStyle.Colors.Orange;
 					break;
 				case TlfState.RemoteMem:
@@ -466,6 +473,10 @@ namespace HMI.Presentation.Twr.Views
 					_SlowBlinkList[bt] = VisualStyle.Colors.Yellow;
 					_SlowBlinkTimer.Enabled = true;
 					break;
+                case TlfState.InProcess:
+                    backColor = VisualStyle.Colors.Yellow;
+                    break;
+
 			}
 
 			return backColor;
@@ -508,36 +519,6 @@ namespace HMI.Presentation.Twr.Views
 				_Logger.Error("ERROR generando parpadeo lento para teclas TlfAD", ex);
 			}
 		}
-
-        //VMG 04/10/2018
-        /// <summary>
-        /// Timer para cortar la llamada entrante. 
-        /// Usamos la función del ButtonCancel.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _CallRingerTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_CallRingerTimer.Enabled)
-                {
-                    try
-                    {
-                        _Logger.Debug("Llamada cancelada por timer en ", _CallRingerTimer.Interval);
-                        _CmdManager.CancelTlfClick();
-                    }
-                    catch (Exception ex)
-                    {
-                        _Logger.Error("ERROR anulando la llamada por timer", ex);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error("ERROR generando _CallRingerTimer_Tick", ex);
-            }
-        }
 
 		private void _LcSpeakerUDB_LevelDown(object sender, EventArgs e)
 		{

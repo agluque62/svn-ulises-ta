@@ -42,27 +42,13 @@ namespace HMI.Presentation.Twr.Views
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this._MsgLB = new System.Windows.Forms.ListBox();
             this._InfoBT = new HMI.Model.Module.UI.HMIButton();
             this._TitleBT = new HMI.Model.Module.UI.HMIButton();
+            this._MsgLB = new System.Windows.Forms.TextBox();
             this._SplitUC = new HMI.Presentation.Twr.UI.SplitUC();
             this._BrightnessUDB = new HMI.Presentation.Twr.UI.UpDownButton();
             this._BuzzerUDB = new HMI.Presentation.Twr.UI.UpDownButton();
             this.SuspendLayout();
-            // 
-            // _MsgLB
-            // 
-            this._MsgLB.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._MsgLB.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._MsgLB.FormattingEnabled = true;
-            this._MsgLB.ItemHeight = 15;
-            this._MsgLB.Location = new System.Drawing.Point(417, 3);
-            this._MsgLB.Name = "_MsgLB";
-            this._MsgLB.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this._MsgLB.Size = new System.Drawing.Size(200, 79);
-            this._MsgLB.TabIndex = 5;
             // 
             // _InfoBT
             // 
@@ -70,7 +56,7 @@ namespace HMI.Presentation.Twr.Views
             | System.Windows.Forms.AnchorStyles.Left)));
             this._InfoBT.DrawX = false;
             this._InfoBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._InfoBT.Location = new System.Drawing.Point(357, 17);
+            this._InfoBT.Location = new System.Drawing.Point(355, 17);
             this._InfoBT.Name = "_InfoBT";
             this._InfoBT.Size = new System.Drawing.Size(54, 53);
             this._InfoBT.TabIndex = 2;
@@ -92,6 +78,17 @@ namespace HMI.Presentation.Twr.Views
             this._TitleBT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this._TitleBT.Click += new System.EventHandler(this._TitleBT_Click);
             // 
+            // _MsgLB
+            // 
+            this._MsgLB.AcceptsReturn = true;
+            this._MsgLB.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._MsgLB.Location = new System.Drawing.Point(415, 3);
+            this._MsgLB.MaxLength = 8276;
+            this._MsgLB.Multiline = true;
+            this._MsgLB.Name = "_MsgLB";
+            this._MsgLB.Size = new System.Drawing.Size(200, 66);
+            this._MsgLB.TabIndex = 5;
+            // 
             // _SplitUC
             // 
             this._SplitUC.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -100,7 +97,7 @@ namespace HMI.Presentation.Twr.Views
             this._SplitUC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this._SplitUC.JackOff = global::HMI.Presentation.Twr.Properties.Resources.JackOff;
             this._SplitUC.JackOn = global::HMI.Presentation.Twr.Properties.Resources.JackOn;
-            this._SplitUC.Location = new System.Drawing.Point(162, 3);
+            this._SplitUC.Location = new System.Drawing.Point(160, 3);
             this._SplitUC.Margin = new System.Windows.Forms.Padding(5);
             this._SplitUC.Name = "_SplitUC";
             this._SplitUC.Size = new System.Drawing.Size(190, 79);
@@ -142,26 +139,27 @@ namespace HMI.Presentation.Twr.Views
             // HeaderView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
+            this.Controls.Add(this._MsgLB);
             this.Controls.Add(this._SplitUC);
             this.Controls.Add(this._BrightnessUDB);
             this.Controls.Add(this._BuzzerUDB);
-            this.Controls.Add(this._MsgLB);
             this.Controls.Add(this._InfoBT);
             this.Controls.Add(this._TitleBT);
             this.Name = "HeaderView";
             this.Size = new System.Drawing.Size(800, 86);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 
 		#endregion
 
 		private HMI.Model.Module.UI.HMIButton _TitleBT;
-		private HMI.Model.Module.UI.HMIButton _InfoBT;
-		private System.Windows.Forms.ListBox _MsgLB;
+        private HMI.Model.Module.UI.HMIButton _InfoBT;
 		private HMI.Presentation.Twr.UI.UpDownButton _BrightnessUDB;
 		private HMI.Presentation.Twr.UI.UpDownButton _BuzzerUDB;
 		private HMI.Presentation.Twr.UI.SplitUC _SplitUC;
+        private System.Windows.Forms.TextBox _MsgLB;
 	}
 }
 

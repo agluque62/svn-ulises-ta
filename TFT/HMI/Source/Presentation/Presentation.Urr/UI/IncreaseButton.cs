@@ -335,7 +335,7 @@ namespace HMI.Presentation.Urr.UI
 
             //Degradado
             Brush brush2 = new LinearGradientBrush(ClientRectangle, c1, c2, angle);
-
+            
             //Los tres puntos que representan al triángulo
             Point[] points = { 
                 new Point(this.Width, this.Height/2), 
@@ -482,5 +482,5 @@ namespace HMI.Presentation.Urr.UI
             }
         }
 
-    }
+    }  
 }

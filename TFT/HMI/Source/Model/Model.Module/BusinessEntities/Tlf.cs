@@ -34,39 +34,26 @@ namespace HMI.Model.Module.BusinessEntities
 		RemoteIn,
 		In,
 		InPrio,
-		OutOfService
+		OutOfService, 
+        Inactive,
+        InProcess //Telephony function in process (i.e. selected target for pickUp)
 	}
 
 	public enum TlfType
 	{
 		Unknown,
 		Ad,
-		Ai
+		Ai,
+        Md
 	}
 
-	public enum PriorityState
-	{
-		Idle,
-		Ready,
-		Executing,
-		Error
-	}
-
-	public enum ListenState
-	{
-		Idle,
-		Ready,
-		Executing,
-		Error
-	}
-
-	public enum TransferState
-	{
-		Idle,
-		Ready,
-		Executing,
-		Error
-	}
+    public enum FunctionState
+    {
+        Idle,
+        Ready,
+        Executing,
+        Error
+    }
 
 	public enum ConfState
 	{
@@ -89,7 +76,52 @@ namespace HMI.Model.Module.BusinessEntities
 		NotAllowed = TlfState.NotAllowed
 	}
 
-	public sealed class TlfDst
+    /// <summary>
+    /// Clase base que gestiona la parte de los mensajes de descripcion que usan
+    /// las funciones de telefonía y los jacks
+    /// </summary>
+    public class Description
+    {
+        private string _StateDescription = "";
+        private string _PreviusStateDescription = "";
+        public string StateDescription
+        {
+            get { return _StateDescription; }
+            set {
+                _PreviusStateDescription = _StateDescription;
+                if (value.Length > 0)
+                    _StateDescription = value + Environment.NewLine;
+                else
+                    _StateDescription = value;
+            }
+        }
+
+        public string PreviusStateDescription
+        {
+            get { return _PreviusStateDescription; }
+            set
+            {
+                if (value.Length > 0)
+                    _PreviusStateDescription = value + Environment.NewLine;
+                else
+                    _PreviusStateDescription = value;
+            }
+        }
+        public void ResetDescription()
+        {
+            _PreviusStateDescription = _StateDescription;
+            _StateDescription = "";
+        }
+    }
+
+    public interface IPublishingState
+    {
+        event EventHandler StateChangeEvent;
+        FunctionState State { get; set; }
+        void Reset();
+        void Reset(ListenPickUpMsg msg);
+    }
+	public sealed class TlfDst :Description
 	{
 		private int _Id;
 		private string _Dst = "";
@@ -97,13 +129,14 @@ namespace HMI.Model.Module.BusinessEntities
 		private string _Digits = "";
 		private TlfState _State = TlfState.Idle;
 		private TlfState _PrevState = TlfState.Idle;
-		private string _StateDescription = "";
-		private string _PreviusStateDescription = "";
 		private UiTimer _MemNotifTimer = null;
 		private UiTimer _IaTimer = null;
         private bool _PriorityAllowed = true;
+        private bool _IsTop = true;
+        private bool _AllowsForward = false;
+        private TlfType _Type = TlfType.Unknown;
 
-		public event GenericEventHandler StChanged;
+ 		public event GenericEventHandler StChanged;
 
 		public int Id
 		{
@@ -136,16 +169,6 @@ namespace HMI.Model.Module.BusinessEntities
 			get { return _PrevState; }
 		}
 
-		public string StateDescription
-		{
-			get { return _StateDescription; }
-		}
-
-		public string PreviusStateDescription
-		{
-			get { return _PreviusStateDescription; }
-		}
-
 		public bool IsConfigurated
 		{
 			get { return _Dst != null && _Dst.Length > 0; }
@@ -159,6 +182,19 @@ namespace HMI.Model.Module.BusinessEntities
         public bool PriorityAllowed
         {
             get { return _PriorityAllowed; }
+        }
+        public TlfType Type
+        {
+            get { return _Type; }
+        }
+        public bool IsTop
+        {
+            get { return _IsTop; }
+        }
+
+        public bool ForwardAllowed
+        {
+            get { return _AllowsForward; }
         }
 
 		public TlfDst(int id)
@@ -195,10 +231,12 @@ namespace HMI.Model.Module.BusinessEntities
 			_Number = "";
 			_Digits = "";
 			_PrevState = _State;
-			_PreviusStateDescription = _StateDescription;
+            ResetDescription();
 			_State = TlfState.Idle;
-			_StateDescription = "";
-		}
+            _Type = TlfType.Unknown;
+            _IsTop = true;
+            _AllowsForward = false;
+        }
 
 		public void Reset(TlfInfo dst)
 		{
@@ -210,7 +248,10 @@ namespace HMI.Model.Module.BusinessEntities
 			{
 				_Dst = dst.Dst;
                 _PriorityAllowed = dst._PriorityAllowed;
-				ChangeState(dst.St);
+                _Type = dst._Type;
+                _IsTop = dst._IsTop;
+                _AllowsForward = dst._AllowsForward;
+                ChangeState(dst.St);
 				ChangeStateDescription();
 			}
 			else
@@ -236,7 +277,7 @@ namespace HMI.Model.Module.BusinessEntities
 				// Después de llamarse a esta función se va a notificar el cambio
 				// por lo que hay que actualizar _PreviusStateDescription
 				_PrevState = _State;
-				_PreviusStateDescription = _StateDescription;
+				PreviusStateDescription = StateDescription;
 			}
 		}
 
@@ -252,7 +293,7 @@ namespace HMI.Model.Module.BusinessEntities
 			else
 			{
 				_PrevState = _State;
-				_PreviusStateDescription = _StateDescription;
+				PreviusStateDescription = StateDescription;
 			}
 		}
 
@@ -282,7 +323,7 @@ namespace HMI.Model.Module.BusinessEntities
 			else
 			{
 				_PrevState = _State;
-				_PreviusStateDescription = _StateDescription;
+				PreviusStateDescription = StateDescription;
 			}
 		}
 
@@ -318,25 +359,26 @@ namespace HMI.Model.Module.BusinessEntities
 
 		private void ChangeStateDescription()
 		{
-			_PreviusStateDescription = _StateDescription;
-
 			switch (_State)
 			{
 				case TlfState.Set:
 				case TlfState.Conf:
-					_StateDescription = Resources.TalkTlfStateDescription + " " + _Dst;
+                    if (_Type == TlfType.Md)
+                        StateDescription = Resources.MultidestinationCall + " " + _Dst;
+					else
+					    StateDescription = Resources.TalkTlfStateDescription + " " + _Dst;
 					break;
 				case TlfState.Hold:
-					_StateDescription = Resources.HoldToTlfStateDescription + " " + _Dst;
+					StateDescription = Resources.HoldToTlfStateDescription + " " + _Dst;
 					break;
 				case TlfState.RemoteHold:
-					_StateDescription = Resources.HoldByTlfStateDescription + " " + _Dst;
+					StateDescription = Resources.HoldByTlfStateDescription + " " + _Dst;
 					break;
 				//case TlfState.InPrio:
 				//    _StateDescription = Resources.IntrudedByDescription + " " + _Dst;
 				//    break;
 				default:
-					_StateDescription = "";
+					StateDescription = "";
 					break;
 			}
 		}
@@ -346,7 +388,7 @@ namespace HMI.Model.Module.BusinessEntities
 			if ((_State == TlfState.Mem) || (_State == TlfState.NotAllowed) || (_State == TlfState.RemoteMem))
 			{
 				_PrevState = _State;
-				_PreviusStateDescription = _StateDescription;
+				PreviusStateDescription = StateDescription;
 
 				_State = TlfState.Idle;
 
@@ -369,12 +411,12 @@ namespace HMI.Model.Module.BusinessEntities
 	public sealed class Priority
 	{
 		private int _AssociatePosition = -1;
-		private PriorityState _State = PriorityState.Idle;
+		private FunctionState _State = FunctionState.Idle;
 
 		[EventPublication(EventTopicNames.TlfPriorityChanged, PublicationScope.Global)]
 		public event EventHandler TlfPriorityChanged;
 
-		public PriorityState State
+		public FunctionState State
 		{
 			get { return _State; }
 			private set
@@ -395,18 +437,18 @@ namespace HMI.Model.Module.BusinessEntities
 		public void Reset()
 		{
 			_AssociatePosition = -1;
-			State = PriorityState.Idle;
+			State = FunctionState.Idle;
 		}
 
 		public void Reset(int associatePosition)
 		{
 			_AssociatePosition = associatePosition;
-			State = PriorityState.Ready;
+			State = FunctionState.Ready;
 		}
 
-		public void Reset(PriorityState st)
+		public void Reset(FunctionState st)
 		{
-			if ((_State == PriorityState.Ready) || (_State == PriorityState.Executing))
+			if ((_State == FunctionState.Ready) || (_State == FunctionState.Executing))
 			{
 				_AssociatePosition = -1;
 				State = st;
@@ -415,77 +457,83 @@ namespace HMI.Model.Module.BusinessEntities
 
 		public bool NewCall(int id)
 		{
-			if ((_State == PriorityState.Ready) && (_AssociatePosition == -1))
+			if ((_State == FunctionState.Ready) && (_AssociatePosition == -1))
 			{
 				_AssociatePosition = id;
 				return true;
 			}
 
 			_AssociatePosition = -1;
-			State = PriorityState.Idle;
+			State = FunctionState.Idle;
 
 			return false;
 		}
 
+        public void RedirectCall(int id)
+        { 
+            if ((_State == FunctionState.Executing) && (_AssociatePosition != -1))
+                _AssociatePosition = id;
+        }
 		public void CheckTlfStChanged(TlfDst dst)
 		{
 			if (_AssociatePosition == dst.Id)
 			{
-				Debug.Assert((_State == PriorityState.Ready) || (_State == PriorityState.Executing));
+				Debug.Assert((_State == FunctionState.Ready) || (_State == FunctionState.Executing));
 
 				switch (dst.State)
 				{
-					case TlfState.Idle:
+                    //Cambio el case Idle hacer que funcione el caso de desvío de una llamada con prioridad
+                    //No entiendo para qué servía esto (B. Santamaria)
+                    case TlfState.Idle:
+                        break;
 					case TlfState.Unavailable:
-					case TlfState.PaPBusy:
-						if (_State == PriorityState.Executing)
-						{
-							// Puede ocurrir que antes realizar la llamada por acceso indirecto
-							// tengamos que colgar una ya existente. De ahí la comprobación
-							_AssociatePosition = -1;
-							State = PriorityState.Error;
-						}
+                    case TlfState.PaPBusy:
+                        if (_State == FunctionState.Executing)
+                        {
+                            // Puede ocurrir que antes realizar la llamada por acceso indirecto
+                            // tengamos que colgar una ya existente. De ahí la comprobación
+                            _AssociatePosition = -1;
+                            State = FunctionState.Error;
+                        }
 						break;
 					case TlfState.Out:
-						State = PriorityState.Executing;
+						State = FunctionState.Executing;
 						break;
 					case TlfState.Congestion:
 					case TlfState.OutOfService:
 					case TlfState.Busy:
 						_AssociatePosition = -1;
-						State = PriorityState.Error;
+						State = FunctionState.Error;
 						break;
 					default:
 						_AssociatePosition = -1;
-						State = PriorityState.Idle;
+						State = FunctionState.Idle;
 						break;
 				}
 			}
-			else if ((_State == PriorityState.Ready) && (_AssociatePosition >= Tlf.NumDestinations) && (dst.Id < Tlf.NumDestinations))
+			else if ((_State == FunctionState.Ready) && (_AssociatePosition >= Tlf.NumDestinations) && (dst.Id < Tlf.NumDestinations))
 			{
 				// Puede ocurrir que una llamada por acceso indirecto coincida con una tecla de acceso directo
 				switch (dst.State)
 				{
 					case TlfState.Out:
 						_AssociatePosition = dst.Id;
-						State = PriorityState.Executing;
+						State = FunctionState.Executing;
 						break;
 					case TlfState.Congestion:
 					case TlfState.OutOfService:
 					case TlfState.Busy:
 						_AssociatePosition = -1;
-						State = PriorityState.Error;
+						State = FunctionState.Error;
 						break;
 				}
 			}
 		}
 	}
 
-	public sealed class IntrudedBy
+	public sealed class IntrudedBy :Description
 	{
 		private string _By = "";
-		private string _StateDescription = "";
-		private string _PreviusStateDescription = "";
 
 		[EventPublication(EventTopicNames.TlfIntrudedByChanged, PublicationScope.Global)]
 		public event EventHandler TlfIntrudedByChanged;
@@ -495,23 +543,12 @@ namespace HMI.Model.Module.BusinessEntities
             get { return _By; }
         }
 
-		public string StateDescription
-		{
-			get { return _StateDescription; }
-		}
-
-		public string PreviusStateDescription
-		{
-			get { return _PreviusStateDescription; }
-		}
-
 		public void Reset()
 		{
 			if (_By != "")
 			{
 				_By = "";
-				_PreviusStateDescription = _StateDescription;
-				_StateDescription = "";
+                ResetDescription();
 
 				General.SafeLaunchEvent(TlfIntrudedByChanged, this);
 			}
@@ -522,32 +559,19 @@ namespace HMI.Model.Module.BusinessEntities
 			if (_By != msg.State)
 			{
 				_By = msg.State;
-				_PreviusStateDescription = _StateDescription;
-				_StateDescription = _By.Length > 0 ? Resources.IntrudedByDescription + " " + _By : "";
+				StateDescription = _By.Length > 0 ? Resources.IntrudedByDescription + " " + _By : "";
 
 				General.SafeLaunchEvent(TlfIntrudedByChanged, this);
 			}
 		}
 	}
 
-	public sealed class IntrudeTo
+	public sealed class IntrudeTo : Description
 	{
 		private string _To = "";
-		private string _StateDescription = "";
-		private string _PreviusStateDescription = "";
 
 		[EventPublication(EventTopicNames.TlfIntrudeToChanged, PublicationScope.Global)]
 		public event EventHandler TlfIntrudeToChanged;
-
-		public string StateDescription
-		{
-			get { return _StateDescription; }
-		}
-
-		public string PreviusStateDescription
-		{
-			get { return _PreviusStateDescription; }
-		}
 
 		public bool IsIntrudingTo
 		{
@@ -564,9 +588,7 @@ namespace HMI.Model.Module.BusinessEntities
 			if (_To != "")
 			{
 				_To = "";
-				_PreviusStateDescription = _StateDescription;
-				_StateDescription = "";
-
+                ResetDescription();
 				General.SafeLaunchEvent(TlfIntrudeToChanged, this);
 			}
 		}
@@ -576,41 +598,26 @@ namespace HMI.Model.Module.BusinessEntities
 			if (_To != msg.State)
 			{
 				_To = msg.State;
-				_PreviusStateDescription = _StateDescription;
-				_StateDescription = _To.Length > 0 ? Resources.IntrudeToDescription + " " + _To : "";
+				StateDescription = _To.Length > 0 ? Resources.IntrudeToDescription + " " + _To : "";
 
 				General.SafeLaunchEvent(TlfIntrudeToChanged, this);
 			}
 		}
 	}
 
-	public sealed class InterruptedBy
+	public sealed class InterruptedBy :Description
 	{
 		private string _By = "";
-		private string _StateDescription = "";
-		private string _PreviusStateDescription = "";
 
 		[EventPublication(EventTopicNames.TlfInterruptedByChanged, PublicationScope.Global)]
 		public event EventHandler TlfInterruptedByChanged;
-
-		public string StateDescription
-		{
-			get { return _StateDescription; }
-		}
-
-		public string PreviusStateDescription
-		{
-			get { return _PreviusStateDescription; }
-		}
 
 		public void Reset()
 		{
 			if (_By != "")
 			{
 				_By = "";
-				_PreviusStateDescription = _StateDescription;
-				_StateDescription = "";
-
+                ResetDescription();
 				General.SafeLaunchEvent(TlfInterruptedByChanged, this);
 			}
 		}
@@ -620,32 +627,19 @@ namespace HMI.Model.Module.BusinessEntities
 			if (_By != msg.State)
 			{
 				_By = msg.State;
-				_PreviusStateDescription = _StateDescription;
-				_StateDescription = _By.Length > 0 ? Resources.InterruptedByDescription + " " + _By : "";
+				StateDescription = _By.Length > 0 ? Resources.InterruptedByDescription + " " + _By : "";
 
 				General.SafeLaunchEvent(TlfInterruptedByChanged, this);
 			}
 		}
 	}
 
-	public sealed class ListenBy
+	public sealed class ListenBy :Description
 	{
 		private Dictionary<int, string> _By = new Dictionary<int, string>();
-		private string _StateDescription = "";
-		private string _PreviusStateDescription = "";
 
 		[EventPublication(EventTopicNames.TlfListenByChanged, PublicationScope.Global)]
 		public event EventHandler TlfListenByChanged;
-
-		public string StateDescription
-		{
-			get { return _StateDescription; }
-		}
-
-		public string PreviusStateDescription
-		{
-			get { return _PreviusStateDescription; }
-		}
 
 		public bool IsListen
 		{
@@ -659,33 +653,29 @@ namespace HMI.Model.Module.BusinessEntities
 
 			foreach (string by in listeners.Values)
 			{
-				_PreviusStateDescription = Resources.ListenByStateDescription + " " + by;
-				_StateDescription = "";
-
+                ResetDescription();
 				General.SafeLaunchEvent(TlfListenByChanged, this);
 			}
 		}
 
-		public void Reset(ListenMsg msg)
+		public void Reset(ListenPickUpMsg msg)
 		{
-			if (msg.State == ListenState.Executing)
+			if (msg.State == FunctionState.Executing)
 			{
 				_By[msg.Id] = msg.Dst;
-				_PreviusStateDescription = "";
-				_StateDescription = Resources.ListenByStateDescription + " " + msg.Dst;
+				StateDescription = Resources.ListenByStateDescription + " " + msg.Dst;
 
 				General.SafeLaunchEvent(TlfListenByChanged, this);
 			}
 			else
 			{
-				Debug.Assert(msg.State == ListenState.Idle);
+				Debug.Assert(msg.State == FunctionState.Idle);
 				string by;
 
 				if (_By.TryGetValue(msg.Id, out by))
 				{
 					_By.Remove(msg.Id);
-					_PreviusStateDescription = Resources.ListenByStateDescription + " " + by;
-					_StateDescription = "";
+                    ResetDescription();
 
 					General.SafeLaunchEvent(TlfListenByChanged, this);
 				}
@@ -693,32 +683,18 @@ namespace HMI.Model.Module.BusinessEntities
 		}
 	}
 
-	public sealed class ConfList
+	public sealed class ConfList :Description
 	{
 		private List<string> _Participants = new List<string>();
-		private string _StateDescription = "";
-		private string _PreviusStateDescription = "";
 
 		[EventPublication(EventTopicNames.TlfConfListChanged, PublicationScope.Global)]
 		public event EventHandler TlfConfListChanged;
-
-		public string StateDescription
-		{
-			get { return _StateDescription; }
-		}
-
-		public string PreviusStateDescription
-		{
-			get { return _PreviusStateDescription; }
-		}
 
 		public void Reset()
 		{
 			foreach (string p in _Participants)
 			{
-				_PreviusStateDescription = Resources.TalkTlfStateDescription + " " + p;
-				_StateDescription = "";
-
+                ResetDescription();
 				General.SafeLaunchEvent(TlfConfListChanged, this);
 			}
 
@@ -732,10 +708,8 @@ namespace HMI.Model.Module.BusinessEntities
 			{
 				if (!newParticipants.Contains(p))
 				{
-					_PreviusStateDescription = Resources.TalkTlfStateDescription + " " + p;
-					_StateDescription = "";
-
-					General.SafeLaunchEvent(TlfConfListChanged, this);
+                    ResetDescription();
+                    General.SafeLaunchEvent(TlfConfListChanged, this);
 					return true;
 				}
 
@@ -747,8 +721,7 @@ namespace HMI.Model.Module.BusinessEntities
 				{
 					_Participants.Add(p);
 
-					_PreviusStateDescription = "";
-					_StateDescription = Resources.TalkTlfStateDescription + " " + p;
+					StateDescription = Resources.TalkTlfStateDescription + " " + p;
 
 					General.SafeLaunchEvent(TlfConfListChanged, this);
 				}
@@ -756,16 +729,14 @@ namespace HMI.Model.Module.BusinessEntities
 		}
 	}
 
-	public sealed class Listen
+	public sealed class Listen: Description, IPublishingState
 	{
-		private ListenState _State = ListenState.Idle;
-		private string _StateDescription = "";
-		private string _PreviusStateDescription = "";
+		private FunctionState _State = FunctionState.Idle;
 
 		[EventPublication(EventTopicNames.TlfListenChanged, PublicationScope.Global)]
-		public event EventHandler TlfListenChanged;
+        public event EventHandler StateChangeEvent;
 
-		public ListenState State
+		public FunctionState State
 		{
 			get { return _State; }
 			set
@@ -773,51 +744,145 @@ namespace HMI.Model.Module.BusinessEntities
 				if (value != _State)
 				{
 					_State = value;
-					General.SafeLaunchEvent(TlfListenChanged, this);
+                    General.SafeLaunchEvent(StateChangeEvent, this);
 				}
 			}
 		}
 
-		public string StateDescription
-		{
-			get { return _StateDescription; }
-		}
-
-		public string PreviusStateDescription
-		{
-			get { return _PreviusStateDescription; }
-		}
-
 		public void Reset()
 		{
-			if (_State != ListenState.Idle)
+			if (_State != FunctionState.Idle)
 			{
-				_PreviusStateDescription = _StateDescription;
-				_StateDescription = "";
-				State = ListenState.Idle;
+                ResetDescription();
+                State = FunctionState.Idle;
 			}
 		}
 
-		public void Reset(ListenMsg msg)
+		public void Reset(ListenPickUpMsg msg)
 		{
 			if (_State != msg.State)
 			{
-				_PreviusStateDescription = _StateDescription;
-				_StateDescription = msg.State == ListenState.Executing ? Resources.ListenToStateDescription + " " + msg.Dst : "";
+				StateDescription = msg.State == FunctionState.Executing ? Resources.ListenToStateDescription + " " + msg.Dst : "";
 				State = msg.State;
 			}
 		}
-	}
 
-	public sealed class Transfer
+    }
+    public sealed class PickUp : Description, IPublishingState
+	{
+        private FunctionState _State = FunctionState.Idle;
+
+        [EventPublication(EventTopicNames.TlfPickUpChanged, PublicationScope.Global)]
+        public event EventHandler StateChangeEvent;
+
+        public FunctionState State
+        {
+            get { return _State; }
+            set
+            {
+                if (value != _State)
+                {
+                    _State = value;
+                    //Envia evento a la vista para cambiar el color
+                    General.SafeLaunchEvent(StateChangeEvent, this);
+                }
+            }
+        }
+
+		public void Reset()
+		{
+           if (_State != FunctionState.Idle)
+			{
+                ResetDescription();
+                State = FunctionState.Idle;
+			}
+		}
+
+		public void Reset(ListenPickUpMsg msg)
+		{
+			if (_State != msg.State)
+			{
+                StateDescription = (msg.State == FunctionState.Ready|| msg.State == FunctionState.Executing) ? 
+                    Resources.PickUpDescription + " " + msg.Dst : "";
+                State = msg.State;
+			}
+		}
+	}
+    public sealed class Forward : Description, IPublishingState
+    {
+        private FunctionState _State = FunctionState.Idle;
+
+        [EventPublication(EventTopicNames.TlfForwardChanged, PublicationScope.Global)]
+        public event EventHandler StateChangeEvent;
+
+        public FunctionState State
+        {
+            get { return _State; }
+            set
+            {
+                if (value != _State)
+                {
+                    _State = value;
+                }
+                //Envia evento a la vista para cambiar el color
+                General.SafeLaunchEvent(StateChangeEvent, this);
+            }
+        }
+
+        public void Reset()
+        {
+            if (_State != FunctionState.Idle)
+            {
+                ResetDescription();
+                State = FunctionState.Idle;
+            }
+        }
+
+        public void Reset(ListenPickUpMsg msg)
+        {
+            //if (_State != msg.State)
+            {
+                if (msg.State != FunctionState.Error)
+                {
+                    switch (msg.State)
+                    {
+                        case FunctionState.Executing:
+                            if (string.IsNullOrEmpty(msg.OtherDst))
+                                StateDescription =Resources.ForwardDescription + " " + msg.Dst;
+                            else
+                                StateDescription = Resources.ForwardDescription + " " + msg.OtherDst + " " +
+                                    Resources.From + " " + msg.Dst;
+                            break;
+                        case FunctionState.Idle:
+                        case FunctionState.Ready:
+                            if (!StateDescription.Contains(Resources.RemoteForwardDescription))
+                                StateDescription = "";
+                            break;
+                    }
+                }
+                State = msg.State;
+            }
+        }
+        public void Reset(string remoteName)
+        {
+            if (!String.IsNullOrEmpty(remoteName))
+                StateDescription = Resources.RemoteForwardDescription + " " + remoteName;
+            else
+                ResetDescription();
+            //Para publicar el mensaje del desvio remoto
+            General.SafeLaunchEvent(StateChangeEvent, this);
+        }
+    }
+
+    public sealed class Transfer
 	{
 		private bool _Direct = false;
-		private TransferState _State = TransferState.Idle;
+		private FunctionState _State = FunctionState.Idle;
 
 		[EventPublication(EventTopicNames.TlfTransferChanged, PublicationScope.Global)]
 		public event EventHandler TlfTransferChanged;
 
-		public TransferState State
+		public FunctionState State
 		{
 			get { return _State; }
 			set
@@ -838,10 +903,10 @@ namespace HMI.Model.Module.BusinessEntities
 
 		public void Reset()
 		{
-			State = TransferState.Idle;
+			State = FunctionState.Idle;
 		}
 
-		public void Reset(StateMsg<TransferState> msg)
+		public void Reset(StateMsg<FunctionState> msg)
 		{
 			State = msg.State;
 		}
@@ -982,7 +1047,9 @@ namespace HMI.Model.Module.BusinessEntities
 		private InterruptedBy _InterruptedBy;
 		private IntrudeTo _IntrudeTo;
 		private Listen _Listen;
-		private ListenBy _ListenBy;
+        private PickUp _PickUp;
+        private Forward _Forward;
+        private ListenBy _ListenBy;
 		private Transfer _Transfer;
 		private HangTone _HangTone;
 		private Unhang _Unhang;
@@ -1039,7 +1106,21 @@ namespace HMI.Model.Module.BusinessEntities
 			set { _ListenBy = value; }
 		}
 
-		[CreateNew]
+        [CreateNew]
+        public PickUp PickUp
+        {
+            get { return _PickUp; }
+            set { _PickUp = value; }
+        }
+
+        [CreateNew]
+        public Forward Forward
+        {
+            get { return _Forward; }
+            set { _Forward = value; }
+        }
+
+        [CreateNew]
 		public Transfer Transfer
 		{
 			get { return _Transfer; }
@@ -1137,6 +1218,7 @@ namespace HMI.Model.Module.BusinessEntities
 			_HangTone.Reset();
 			_Unhang.Reset();
 			_ConfList.Reset();
+            _PickUp.Reset();
 
 			for (int i = 0; i < NumDestinations + NumIaDestinations; i++)
 			{
@@ -1169,10 +1251,10 @@ namespace HMI.Model.Module.BusinessEntities
 
 			General.SafeLaunchEvent(TlfChanged, this, (RangeMsg)msg);
 
-			if ((_Transfer.State == TransferState.Ready) && 
+			if ((_Transfer.State == FunctionState.Ready) && 
 				(_NumDstInState[(int)TlfState.Set] + _NumDstInState[(int)TlfState.Conf] != 1))
 			{
-				_Transfer.State = TransferState.Idle;
+				_Transfer.State = FunctionState.Idle;
 			}
 		}
 
@@ -1199,10 +1281,10 @@ namespace HMI.Model.Module.BusinessEntities
 
 			General.SafeLaunchEvent(TlfChanged, this, (RangeMsg)msg);
 
-			if ((_Transfer.State == TransferState.Ready) &&
+			if ((_Transfer.State == FunctionState.Ready) &&
 				(_NumDstInState[(int)TlfState.Set] + _NumDstInState[(int)TlfState.Conf] != 1))
 			{
-				_Transfer.State = TransferState.Idle;
+				_Transfer.State = FunctionState.Idle;
 			}
 		}
 
@@ -1236,10 +1318,10 @@ namespace HMI.Model.Module.BusinessEntities
 
 			General.SafeLaunchEvent(TlfChanged, this, (RangeMsg)msg);
 
-			if ((_Transfer.State == TransferState.Ready) &&
+			if ((_Transfer.State == FunctionState.Ready) &&
 				(_NumDstInState[(int)TlfState.Set] + _NumDstInState[(int)TlfState.Conf] != 1))
 			{
-				_Transfer.State = TransferState.Idle;
+				_Transfer.State = FunctionState.Idle;
 			}
 		}
 
@@ -1275,10 +1357,10 @@ namespace HMI.Model.Module.BusinessEntities
 
 			General.SafeLaunchEvent(TlfChanged, this, (RangeMsg)msg);
 
-			if ((_Transfer.State == TransferState.Ready) &&
+			if ((_Transfer.State == FunctionState.Ready) &&
 				(_NumDstInState[(int)TlfState.Set] + _NumDstInState[(int)TlfState.Conf] != 1))
 			{
-				_Transfer.State = TransferState.Idle;
+				_Transfer.State = FunctionState.Idle;
 			}
 		}
 

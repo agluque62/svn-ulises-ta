@@ -1,7 +1,7 @@
 {
 	"cfg_activa":"16/11/2017 13:00:38",
-	"sw_version":"2.5.6.0",
-	"type":  "Radio",
+	"sw_version":"2.5.7.0",
+	"type":  "Mixed",
 	"level": "Master",
 	"rad":  {"std": "Disabled", "level": "Error"},
 	"mn":   {"std": "Disabled", "level": "Error"},

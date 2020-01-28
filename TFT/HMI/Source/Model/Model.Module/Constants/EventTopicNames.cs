@@ -45,7 +45,8 @@ namespace HMI.Model.Module.Constants
 		public const string TlfIntrudedByChanged = "TlfIntrudedByChanged";
 		public const string TlfInterruptedByChanged = "TlfInterruptedByChanged";
 		public const string TlfIntrudeToChanged = "TlfIntrudeToChanged";
-		public const string TlfListenChanged = "TlfListenChanged";
+        public const string TlfPickUpChanged = "TlfPickUpChanged";
+		public const string TlfListenChanged = "TlfListenChanged";        
 		public const string TlfListenByChanged = "TlfListenByChanged";
 		public const string TlfTransferChanged = "TlfTransferChanged";
 		public const string TlfHangToneChanged = "TlfHangToneChanged";
@@ -63,6 +64,8 @@ namespace HMI.Model.Module.Constants
         public const string SiteManagerChanged = "SiteManagerChanged";
         public const string SiteChanged = "SiteChanged";
         public const string ChangeTlfSpeaker = "ChangeTlfSpeaker";
+        public const string TlfForwardChanged = "TlfForwardChanged";
+        public const string TlfRemoteForwardChanged = "TlfRemoteForwardChanged";
         /** 20190205 */
         public const string TxInProgressError = "RtxInProgressError";
         #endregion
@@ -156,7 +159,11 @@ namespace HMI.Model.Module.Constants
 
         public const string HistoricalOfLocalCallsEngine = "HistoricalOfLocalCallsEngine";
         public const string DoubleRadioSpeaker = "DoubleRadioSpeaker";
-
+        public const string PickUpStateEngine = "PickUpStateEngine";
+        public const string ForwardStateEngine = "ForwardStateEngine";
+        public const string RemoteForwardStateEngine = "RemoteForwardStateEngine";
+        public const string RedirectedCallEngine = "RedirectedCallEngine";
+        
         #endregion
-	}
+    }
 }

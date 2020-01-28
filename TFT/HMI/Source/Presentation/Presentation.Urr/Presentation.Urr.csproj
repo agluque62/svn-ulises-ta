@@ -8,7 +8,7 @@
     <ProjectGuid>{AEE42959-5A7D-4DC7-B0EA-44002EFDBCD1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Presentation.Urr</RootNamespace>
+    <RootNamespace>HMI.Presentation.Urr</RootNamespace>
     <AssemblyName>Presentation.Urr</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -88,6 +88,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\VersionInfo.cs">
+      <Link>VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Constants\ViewNames.cs" />
     <Compile Include="Layout\ShellLayoutView.cs">
       <SubType>UserControl</SubType>
@@ -178,7 +181,6 @@
       <DependentUpon>UpDownButton.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\VisualStyle.cs" />
-    <Compile Include="VersionInfo.cs" />
     <Compile Include="Views\DependencesView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -484,24 +486,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\UrrBuzzer.gif">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\UrrBrigthness.gif">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\UrrJackOn.gif">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\UrrJackOff.gif">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\UrrHeadphones.gif">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\UrrSpeaker.gif">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Content Include="Resources\RxHeadPhonesBlack.gif" />
+    <Content Include="Resources\RxSpeakerBlack.gif" />
+    <None Include="Resources\UrrBuzzer.gif" />
+    <None Include="Resources\UrrBrigthness.gif" />
+    <None Include="Resources\UrrJackOn.gif" />
+    <None Include="Resources\UrrJackOff.gif" />
+    <None Include="Resources\UrrHeadphones.gif" />
+    <None Include="Resources\UrrSpeaker.gif" />
     <None Include="Resources\AnularFr.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

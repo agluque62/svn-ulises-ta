@@ -202,9 +202,9 @@ namespace HMI.Model.Module.UI
         public void setRtxErrorColor(bool error)
         {
             if (error)
-        {
-            _TxBtnInfo.SetBackColor(BtnState.Normal, VisualStyle.Colors.Red);
-            _TxBtnInfo.SetForeColor(BtnState.Normal, HMI.Presentation.AUrr.UI.VisualStyle.Colors.DarkRed);
+            {
+                _TxBtnInfo.SetBackColor(BtnState.Normal, VisualStyle.Colors.Red);
+                _TxBtnInfo.SetForeColor(BtnState.Normal, HMI.Presentation.AUrr.UI.VisualStyle.Colors.DarkRed);
             }
             else
             {

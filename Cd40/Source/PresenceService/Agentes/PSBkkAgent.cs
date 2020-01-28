@@ -59,7 +59,7 @@ namespace U5ki.PresenceService.Agentes
                 if (smpRsTableAccess.Acquire())
                 {
                     rsTable = new List<PresenceServerResource>(new_rsTable);
-                    name = ProxyEndpoint.ToString();
+                    name = ProxyEndpoint.Address.ToString();
                     smpRsTableAccess.Release();
                 }
 

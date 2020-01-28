@@ -1,6 +1,6 @@
 {
-	"Version" : "2.5.10",
-	"Fecha": "22/10/2018",
+	"Version" : "2.5.9.7a",
+	"Fecha": "17-12-2019",
 	"Components" : [
 		{
 			"Name": "UV5K-MCAST",
@@ -77,12 +77,6 @@
 				},
 				{
 					"Path": ".\\Services\\u5ki.RemoteControlService.dll",
-					"MD5": "",
-					"Date": "",
-					"Size": ""
-				},
-				{
-					"Path": ".\\Services\\u5ki.PhoneService.dll",
 					"MD5": "",
 					"Date": "",
 					"Size": ""

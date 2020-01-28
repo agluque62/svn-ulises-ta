@@ -13,13 +13,17 @@ using NLog;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
+#if DEBUG
+    public class TlfListen
+#else
 	class TlfListen
+#endif
 	{
-		public event GenericEventHandler<ListenMsg> ListenChanged;
-		public event GenericEventHandler<ListenMsg> RemoteListenChanged;
+		public event GenericEventHandler<ListenPickUpMsg> ListenChanged;
+		public event GenericEventHandler<ListenPickUpMsg> RemoteListenChanged;
 		public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
 
-		public ListenState State
+		public FunctionState State
 		{
 			get { return _State; }
 			private set
@@ -28,14 +32,14 @@ namespace HMI.CD40.Module.BusinessEntities
 				{
 					_State = value;
 
-					if (_State == ListenState.Executing)
+					if (_State == FunctionState.Executing)
 					{
 						Debug.Assert(_To != null);
-						General.SafeLaunchEvent(ListenChanged, this, new ListenMsg(_State, _To.Literal));
+						General.SafeLaunchEvent(ListenChanged, this, new ListenPickUpMsg(_State, _To.Literal));
 					}
 					else
 					{
-						General.SafeLaunchEvent(ListenChanged, this, new ListenMsg(_State));
+						General.SafeLaunchEvent(ListenChanged, this, new ListenPickUpMsg(_State));
 					}
 				}
 			}
@@ -51,12 +55,12 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public void To(int id)
 		{
-			if (_State == ListenState.Idle)
+			if (_State == FunctionState.Idle)
 			{
 				Debug.Assert(id < Tlf.NumDestinations);
 
 				TlfPosition to = Top.Tlf[id];
-				ListenState st = ListenState.Error;
+				FunctionState st = FunctionState.Error;
 
 				if (to.IsTop)
 				{
@@ -65,8 +69,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
 					if (_To.State == TlfState.Out)
 					{
-						_To.StateChanged += OnToMonitoringCallStateChanged;
-						st = ListenState.Executing;
+						_To.TlfPosStateChanged += OnToMonitoringCallStateChanged;
+						st = FunctionState.Executing;
 
 						Top.WorkingThread.Enqueue("SetSnmp", delegate()
 						{
@@ -82,9 +86,9 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public void To(uint prefix, string dst, string number)
 		{
-			if (_State == ListenState.Idle)
+			if (_State == FunctionState.Idle)
 			{
-				ListenState st = ListenState.Error;
+				FunctionState st = FunctionState.Error;
 
 				if (prefix == Cd40Cfg.INT_DST)
 				{
@@ -93,8 +97,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
 					if (_To.State == TlfState.Out)
 					{
-						_To.StateChanged += OnToMonitoringCallStateChanged;
-						st = ListenState.Executing;
+						_To.TlfPosStateChanged += OnToMonitoringCallStateChanged;
+						st = FunctionState.Executing;
 
 						Top.WorkingThread.Enqueue("SetSnmp", delegate()
 						{
@@ -124,13 +128,13 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				if (_To != null)
 				{
-					_To.StateChanged -= OnToMonitoringCallStateChanged;
+					_To.TlfPosStateChanged -= OnToMonitoringCallStateChanged;
 					_To.HangUp(0);
 					_To.Dispose();
 					_To = null;
 				}
 
-				State = ListenState.Idle;
+				State = FunctionState.Idle;
 			}
 			else
 			{
@@ -138,7 +142,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 				if (_Froms.TryGetValue(call, out from))
 				{
-					from.StateChanged -= OnFromMonitoringCallStateChanged;
+					from.TlfPosStateChanged -= OnFromMonitoringCallStateChanged;
 					from.Reject(SipAgent.SIP_NOT_ACCEPTABLE_HERE);
 					from.Dispose();
 
@@ -151,7 +155,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		private static Logger _Logger = LogManager.GetCurrentClassLogger();
 
-		private ListenState _State = ListenState.Idle;
+		private FunctionState _State = FunctionState.Idle;
 		private TlfIaPosition _To = null;
 		private Dictionary<int, TlfIaPosition> _Froms = new Dictionary<int, TlfIaPosition>();
 
@@ -183,10 +187,10 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 
 			answer.Value = 0;
-			from.StateChanged += OnFromMonitoringCallStateChanged;
+			from.TlfPosStateChanged += OnFromMonitoringCallStateChanged;
 			_Froms[call] = from;
 
-			General.SafeLaunchEvent(RemoteListenChanged, this, new ListenMsg(ListenState.Executing, from.Literal, call));
+			General.SafeLaunchEvent(RemoteListenChanged, this, new ListenPickUpMsg(FunctionState.Executing, from.Literal, call));
 		}
 
 		private void OnMonitoringCallStateChanged(object sender, int call, CORESIP_CallStateInfo info)
@@ -207,7 +211,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			if (_To.CallId == -1)
 			{
-				State = ListenState.Error;
+				State = FunctionState.Error;
 			}
 		}
 
@@ -221,11 +225,11 @@ namespace HMI.CD40.Module.BusinessEntities
 				{
 					if (p.Value == from)
 					{
-						from.StateChanged -= OnFromMonitoringCallStateChanged;
+						from.TlfPosStateChanged -= OnFromMonitoringCallStateChanged;
 						from.Dispose();
 
 						_Froms.Remove(p.Key);
-						General.SafeLaunchEvent(RemoteListenChanged, this, new ListenMsg(ListenState.Idle, from.Literal, p.Key));
+						General.SafeLaunchEvent(RemoteListenChanged, this, new ListenPickUpMsg(FunctionState.Idle, from.Literal, p.Key));
 
 						break;
 					}

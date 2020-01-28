@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="*" Name="Ulises5000I Audio Terminal HMI" Language="1033" Version="2.5.10" Manufacturer="NucleoCC" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
+  <Product Id="*" Name="Ulises5000I Audio Terminal HMI" Language="1033" Version="2.5.9" Manufacturer="DF Nucleo" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
 
     <PropertyRef Id="NETFRAMEWORK45"/>
@@ -40,8 +40,7 @@
     </Condition>
 
     <!-- Condicion para que este instalado MCAS/NODEBOX -->
-    <!--<Upgrade Id ="c17a4cae-94cf-4435-ada9-69eaefc872eb">-->
-    <Upgrade Id ="{9DE84BBF-F425-4262-AADA-F09A40603AB8}">
+    <Upgrade Id ="c17a4cae-94cf-4435-ada9-69eaefc872eb">
       <UpgradeVersion OnlyDetect="yes" Minimum="0.0.0.0"
                       Property="APPDETECTED" IncludeMinimum="yes" />
     </Upgrade>
@@ -56,7 +55,7 @@
     <Property Id="INSTALLFOLDER_NAME" Value="Ulises5000I-TA"></Property>
     <Property Id="CONFIG_FILE" Value="HMI.exe.config"></Property>
     <Property Id='RECDUAL' Value='0'></Property>
-    <Property Id="PVERSION" Value="2.5.10"></Property>
+    <Property Id="PVERSION" Value="2.5.9"></Property>
 
     <!--Propiedades a mantener cuando se reinstala -->
     <Property Id="ED137REC" Value="0">
@@ -101,7 +100,7 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='RECB_Property' Type='raw' />
     </Property>
-    <Property Id="LANG" Value="es">
+    <Property Id="LANG" Value="es-ES">
       <RegistrySearch Id='UV5KI_HMI_LANG' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='LANG_Property' Type='raw' />
@@ -176,6 +175,12 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='TIMESPRX_Property' Type='raw' />
     </Property>
+    <!-- -->
+    <Property Id="PTTFILTER" Value="0">
+      <RegistrySearch Id='UV5KI_HMI_PTTFILTER' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_HMI'
+                     Name='PTTFILTER_Property' Type='raw' />
+    </Property>
 
     <!---->
 
@@ -203,7 +208,7 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="COMPANYFOLDER" Name="NucleoCC">
+        <Directory Id="COMPANYFOLDER" Name="DF Nucleo">
           <Directory Id="INSTALLFOLDER" Name="Ulises5000I-TA">
             <Directory Id="EN" Name="en-GB" />
             <Directory Id="FR" Name="fr-FR" />
@@ -338,12 +343,21 @@
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='RdSquelchConfirmationTime'[\]]/value"
                         Value="[TIMESPRX]"/>
+        <!--  -->
+        <util:XmlFile Id="CwpPttFilterProperty" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='CwpPttFilterMsec'[\]]/value"
+                        Value="[PTTFILTER]"/>
         <!-- Idioma -->
         <util:XmlFile Id="Lang" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Infrastructure.Shell.Settings/setting[\[]@name='Idioma'[\]]/value"
                         Value="[LANG]"/>
-
+        <!-- MaxVolume=50 a partir de 2.5.9#6 -->
+        <util:XmlFile Id="MaxVolume" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='MaxVolume'[\]]/value"
+                Value="50"/>        
         <!-- Nuevos OIDs a partir de la version 2.5.2 -->
         <util:XmlFile Id="TopOid" Action="setValue"
                 File = "[#HMI.config]"
@@ -490,7 +504,7 @@
                   File = "[#HMI.config]"
                   ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='ECHandsFreeLC'[\]]/value"
                   Value="[ECLC]"/>
-
+        
         <!-- Tipo de TEAM de LAN -->
         <util:XmlFile Id="LanTypeSet" Action="setValue"
                   File = "[#HMI.config]"
@@ -563,6 +577,32 @@
                         Name="AssemblyFile"
                         Value="Presentation.AUrr.dll"/>
       </Component>
+      <Component Id='ConditionalUpdatesForKENIA' Guid='{7A3AAF79-ECF1-48B6-973B-B0CF39763259}' KeyPath='yes'>
+        <Condition >CLIENTE="KENIA"</Condition>
+        <util:XmlFile Id="LogoKENIA" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
+                        Value="Resources/logo_KENIA.png"/>
+        <util:XmlFile Id="AppsKENIA" Action="setValue"
+                        File = "[#ProfileCatalog]"
+                        ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
+                        Name="AssemblyFile"
+                        Value="Presentation.Asecna.dll"/>
+        <util:XmlFile Id="NoHFView" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.Presentation.Asecna.Properties.Settings/setting[\[]@name='HFView'[\]]/value"
+                        Value="False"/>
+        <util:XmlFile Id="GlpForKenia" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='GLP'[\]]/value"
+                        Value="True"/>
+        <!-- Forced because is not implemented -->
+        <util:XmlFile Id="SpeakerOnlyModeKenia" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='OnlySpeakerMode'[\]]/value"
+                        Value="False"/>
+      </Component>
+
       <!-- El doble altavoz condiciona la configuracion de HFSpeaker -->
       <Component Id='ConditionalUpdatesForDoubleRadioSpeaker' Guid='{54DAE262-4D25-49F7-8AD5-484150EFDAA4}' KeyPath='yes'>
         <Condition >DOUBLERDSPEAKER="True"</Condition>
@@ -677,6 +717,7 @@
           <RegistryValue Name='RDRTXREC_Property' Value='[RDRTXREC]' Type='string' />
           <RegistryValue Name='TIMESPTX_Property' Value='[TIMESPTX]' Type='string' />
           <RegistryValue Name='TIMESPRX_Property' Value='[TIMESPRX]' Type='string' />
+          <RegistryValue Name='PTTFILTER_Property' Value='[PTTFILTER]' Type='string' />
           <!--<RegistryValue Name='ECTLF_Property' Value='[ECTLF]' Type='string' />-->
           <RegistryValue Name='ECLC_Property' Value='[ECLC]' Type='string' />
           <RegistryValue Name='NICTEAM_Property' Value='[NICTEAM]' Type='string' />
@@ -735,6 +776,13 @@
     <ComponentGroup Id='HMI.TOOLS' Directory='INSTALLFOLDER' Source='.'>
       <Component Id ="sfk2" Guid="{E5BF02C6-D8C2-4B37-A9A2-8BBA34D7C98F}">
         <File Id="sfk.exe.2" Name="sfk.exe"></File>
+      </Component>
+      <!-- 20190217. SCRIPT de alto rendimiento. Copiar el fichero al directorio de trabajo -->
+      <Component Id ="script_install" Guid="*">
+        <File Id="script1" Name="uv5ki-scripts.cmd"></File>
+      </Component>
+      <Component Id ="script_uninstall" Guid="*">
+        <File Id="script2" Name="uv5ki-scripts-del.cmd"></File>
       </Component>
       <Component Id ="igmpquery" Guid="{3359AE86-1299-4303-BA59-B47FEB4C930F}">
         <File Id="igmpquery_exe" Name="igmpquery.exe"></File>
@@ -877,58 +925,56 @@
 
   <!-- UI y Acciones -->
   <Fragment>
-    <CustomAction Id='Md5Mark' Directory="INSTALLFOLDER"
+    <!--<CustomAction Id='Md5Mark' Directory="INSTALLFOLDER"
                   Execute='deferred'
                   Impersonate='no'
                   ExeCommand='"[INSTALLFOLDER]sfk.exe" select "[COMPANYFOLDER][INSTALLFOLDER_NAME]" .exe .dll +md5gento "[INSTALLFOLDER]md5mark_[PVERSION].md5" -rel'
-                  Return='ignore' />
-    
-    <CustomAction Id="CustomActionEd137Rec" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="Ed137RecVar" />
+                  Return='ignore' />-->
 
-    <!--<CustomAction Id="StartHMITask" Return="ignore" Impersonate="yes" Execute="immediate" Directory="INSTALLFOLDER"
-      ExeCommand='SCHTASKS.EXE /CREATE /F /SC ONLOGON /TN "UV5K-HMI-START" /DELAY 0000:15 /TR "\"[INSTALLFOLDER]HMI.exe\""'>      
-    </CustomAction>
-    <CustomAction Id="RepeatHMITask" Return="ignore" Impersonate="yes" Execute="deferred" Directory="INSTALLFOLDER"
-      ExeCommand='SCHTASKS.EXE /CHANGE /RI 1 /TN "UV5K-HMI-START"'>
-    </CustomAction>
-    <CustomAction Id="StartWATask" Return="ignore" Impersonate="yes" Execute="immediate" Directory="INSTALLFOLDER"
-      ExeCommand='SCHTASKS.EXE /CREATE /F /SC ONLOGON /TN "UV5K-WAUDIO-START" /DELAY 0000:25 /TR "\"[WINAUDIO]WinAudio.exe\"" /RU "NT Authority\System"'>      
-    </CustomAction>
-    <CustomAction Id="StartTeamViewerTask" Return="ignore" Impersonate="yes" Execute="immediate" Directory="INSTALLFOLDER"
-      ExeCommand='SCHTASKS.EXE /CREATE /F /SC ONLOGON /TN "TEAMVIEWER-START" /DELAY 0000:30 /TR "\"C:\Program Files\TeamViewer\Version9\TeamViewer.exe\""'>
-    </CustomAction>-->
-    
+    <!-- 20190217. SCRIPT-Instalacion.  Definicion de la Accion -->
+    <CustomAction Id='ScriptsRun' Directory="INSTALLFOLDER"
+                  Execute='deferred'
+                  Impersonate='no'
+                  ExeCommand='"[INSTALLFOLDER]uv5ki-scripts.cmd" "[COMPANYFOLDER]" "[INSTALLFOLDER]" [PVERSION]'
+                  Return='ignore' />
+    <CustomAction Id="CustomActionEd137Rec" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="Ed137RecVar" />
+   
     <!-- Programacion de las tareas desde un XML -->
-    <CustomAction Id="StartHMITaskV2" Return="check" Execute="deferred" Directory="TARGETDIR" Impersonate="no"
+    <!--<CustomAction Id="StartHMITaskV2" Return="check" Execute="deferred" Directory="TARGETDIR" Impersonate="no"
       ExeCommand="SCHTASKS.EXE /CREATE /TN &quot;UV5K-HMI-START&quot; /F /XML &quot;[INSTALLFOLDER]UV5K-HMI-START.XML&quot;" />
     <CustomAction Id="StartWATaskV2" Return="check" Execute="deferred" Directory="TARGETDIR" Impersonate="no"
       ExeCommand="SCHTASKS.EXE /CREATE /TN &quot;UV5K-WAUDIO-START&quot; /F /XML &quot;[INSTALLFOLDER]UV5K-WAUDIO-START.XML&quot; /RU SYSTEM /RP" />
     <CustomAction Id="StartTeamViewerTaskV2" Return="check" Execute="deferred" Directory="TARGETDIR" Impersonate="no"
-      ExeCommand="SCHTASKS.EXE /CREATE /TN &quot;TEAMVIEWER-START&quot; /F /XML &quot;[INSTALLFOLDER]TEAMVIEWER-START.xml&quot;" />
+      ExeCommand="SCHTASKS.EXE /CREATE /TN &quot;TEAMVIEWER-START&quot; /F /XML &quot;[INSTALLFOLDER]TEAMVIEWER-START.xml&quot;" />-->
 
     <!-- Borrado de Tareas -->
-    <CustomAction Id="DeleteHMITask" Return="ignore" Execute="deferred" 
+    <CustomAction Id='ScriptsRunDel' Directory="INSTALLFOLDER"
+                  Execute='deferred'
+                  Impersonate='no'
+                  ExeCommand='"[INSTALLFOLDER]uv5ki-scripts-del.cmd" "[INSTALLFOLDER]"'
+                  Return='ignore' />
+
+    <!--<CustomAction Id="DeleteHMITask" Return="ignore" Execute="deferred" 
                   Directory="TARGETDIR" Impersonate="no"  ExeCommand="schtasks.exe /delete /TN &quot;UV5K-HMI-START&quot; /F"/>
     <CustomAction Id="DeleteWATask" Return="ignore" Execute="deferred" 
                   Directory="TARGETDIR" Impersonate="no"  ExeCommand="schtasks.exe /delete /TN &quot;UV5K-WAUDIO-START&quot; /F"/>
     <CustomAction Id="DeleteTeamViewerTask" Return="ignore" Execute="deferred" 
-                  Directory="TARGETDIR" Impersonate="no"  ExeCommand="schtasks.exe /delete /TN &quot;TEAMVIEWER-START&quot; /F"/>
+                  Directory="TARGETDIR" Impersonate="no"  ExeCommand="schtasks.exe /delete /TN &quot;TEAMVIEWER-START&quot; /F"/>-->
     
     <InstallExecuteSequence>
-      <Custom Action="Md5Mark" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
-            
-      <!--<Custom Action="StartHMITask" Before="InstallFinalize">NOT Installed</Custom>
-      <Custom Action="RepeatHMITask" Before="InstallFinalize">NOT Installed</Custom>
-      <Custom Action="StartWATask" Before="InstallFinalize">NOT Installed</Custom>
-      <Custom Action="StartTeamViewerTask" Before="InstallFinalize">NOT Installed</Custom>-->
+      <!--<Custom Action="Md5Mark" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>-->
+      
+      <!-- 20190217. SCRIPT de alto rendimiento. Correr el Script -->
+      <Custom Action="ScriptsRun" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
 
-      <Custom Action="StartHMITaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
+      <!--<Custom Action="StartHMITaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
       <Custom Action="StartWATaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
-      <Custom Action="StartTeamViewerTaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
+      <Custom Action="StartTeamViewerTaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>-->
 
-      <Custom Action="DeleteHMITask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+      <Custom Action="ScriptsRunDel" After='InstallInitialize'>(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+      <!--<Custom Action="DeleteHMITask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
       <Custom Action="DeleteWATask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-      <Custom Action="DeleteTeamViewerTask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+      <Custom Action="DeleteTeamViewerTask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>-->
     
     </InstallExecuteSequence>
 
@@ -1003,7 +1049,8 @@
             <ListItem Value="ASECNA" Text="ASECNA" />
             <ListItem Value="ENNA" Text="ENNA" />
             <ListItem Value="URR" Text="URR" />
-          </ComboBox>
+            <ListItem Value="KENIA" Text="KENIA" />
+         </ComboBox>
         </Control>
         <Control Id="LangLabel"  Type="Text"     X="190" Y="92" Width="60" Height="18" TabSkip="no" Text="Idioma" />
         <Control Id="LangOption" Type="ComboBox" X="260" Y="90" Width="90" Height="18" Property="LANG" ComboList="yes" >
@@ -1189,24 +1236,37 @@
           </ComboBox>
         </Control>
 <!---->
-        <Control Id="TxConfirmTime_label" Type="Text"       X="10" Y="192" Width="105" Height="18" TabSkip="no" Text="Tiempo Confirmacion TX" />
+        <Control Id="TxConfirmTime_label" Type="Text"       X="10" Y="192" Width="105" Height="18" TabSkip="no" Text="Confirmacion TX" />
         <Control Id="TxConfirmTime_value" Type="ComboBox"   X="125" Y="190" Width="50" Height="18" Property="TIMESPTX" ComboList="yes" >
           <ComboBox Property="TIMESPTX">
             <ListItem Value="0"  Text="No" />
-            <ListItem Value="200" Text="200 ms" />
-            <ListItem Value="300" Text="300 ms" />
-            <ListItem Value="400" Text="400 seg." />
+            <ListItem Value="500"  Text="G. 0.5 s" />
+            <ListItem Value="1000" Text="G. 1   s" />
+            <ListItem Value="1500" Text="G. 1.5 s" />
+            <ListItem Value="2000" Text="G. 2   s" />
           </ComboBox>
         </Control>
 
-        <Control Id="SqConfirmTime_label"  Type="Text"     X="190" Y="192" Width="100" Height="18" TabSkip="no" Text="Tiempo Confirmacion RX" />
+        <Control Id="SqConfirmTime_label"  Type="Text"     X="190" Y="192" Width="100" Height="18" TabSkip="no" Text="Confirmacion RX" />
         <Control Id="SqConfirmTime_value"  Type="ComboBox" X="300" Y="190" Width="50"  Height="18" Property="TIMESPRX" ComboList="yes" >
           <ComboBox  Property="TIMESPRX">
             <ListItem Value="0"  Text="No" />
-            <ListItem Value="500"  Text="500 ms" />
-            <ListItem Value="1000" Text="1   seg." />
-            <ListItem Value="1500" Text="1.5 seg." />
-            <ListItem Value="2000" Text="2   seg." />
+            <ListItem Value="500"  Text="G. 0.5 s" />
+            <ListItem Value="1000" Text="G. 1   s" />
+            <ListItem Value="1500" Text="G. 1.5 s" />
+            <ListItem Value="2000" Text="G. 2   s" />
+          </ComboBox>
+        </Control>
+
+        <Control Id="FilterPtt_label" Type="Text"       X="10" Y="212"  Width="105" Height="18" TabSkip="no" Text="Filtro PTT" />
+        <Control Id="FilterPtt_value" Type="ComboBox"   X="125" Y="210" Width="50" Height="18" Property="PTTFILTER" ComboList="yes" >
+          <ComboBox Property="PTTFILTER">
+            <ListItem Value="0"  Text="No" />
+            <ListItem Value="100" Text="100 ms" />
+            <ListItem Value="200" Text="200 ms" />
+            <ListItem Value="300" Text="300 ms" />
+            <ListItem Value="400" Text="400 seg." />
+            <ListItem Value="500" Text="500 ms" />
           </ComboBox>
         </Control>
 

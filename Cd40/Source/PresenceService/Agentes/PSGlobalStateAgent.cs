@@ -32,7 +32,7 @@ namespace U5ki.PresenceService.Agentes
         /// <summary>
         /// 
         /// </summary>
-        public PSProxiesAgent()
+        public PSProxiesAgent(string serviceSite)
         {
             type = AgentType.ForProxies;
             name = "PROXIES";

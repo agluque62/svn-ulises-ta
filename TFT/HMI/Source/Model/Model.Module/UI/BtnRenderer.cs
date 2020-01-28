@@ -492,7 +492,7 @@ namespace HMI.Model.Module.UI
 			switch (imageAlign)
 			{
 				case ContentAlignment.TopCenter:
-					r = new Rectangle(rect.Width / 2 - image.Width / 2, 8, image.Width, image.Height);
+					r = new Rectangle(rect.Width / 2 - image.Width / 2, 0, image.Width, image.Height);
 					break;
 				case ContentAlignment.TopRight:
 					r = new Rectangle(rect.Width - 8 - image.Width, 8, image.Width, image.Height);

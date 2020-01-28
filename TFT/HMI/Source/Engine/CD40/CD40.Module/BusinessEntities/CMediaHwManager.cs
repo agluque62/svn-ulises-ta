@@ -68,19 +68,22 @@ namespace HMI.CD40.Module.BusinessEntities
         private bool _Ptt = false;
         public bool Ptt
         {
-            get { return _Ptt; }
+            get { 
+                return _Ptt; }
             set
             {
+                _MutexPTT.WaitOne();
                 if (value != _Ptt)
                 {
-                    _Logger.Debug("HidCMediaSndDev. PTT  <{0}> => {1}", Type, value);
                     _Ptt = value;
 #if DEBUG_TIME
                     if (Top.Registry.Channel.timeMeasure== null)
                         Top.Registry.Channel.timeMeasure = new TimeMeasurement("Ptt");
 #endif
                     General.SafeLaunchEvent(PttPulsed, this, _Ptt);
+                    _Logger.Debug("HidCMediaSndDev. PTT  <{0}> => {1}", Type, value);
                 }
+                _MutexPTT.ReleaseMutex();
             }
         }
 
@@ -148,7 +151,20 @@ namespace HMI.CD40.Module.BusinessEntities
             pos &= 0x01;
             return pos == 1 ? pos2 : pos1;
         }
-
+        /// <summary>
+        /// Reads two ls bits in Hid 
+        /// </summary>
+        /// <param name="pos0" less significant bit></param>
+        /// <param name="pos1" second less significant bit></param>
+        /// <returns></returns>
+        public void GetPresencia(out bool pos0, out bool pos1)
+        {
+            // Solo son significativos los 2 primeros bits.
+            byte leido = (byte)(GetGpio() & (byte)0x03);
+            _Logger.Trace("HID-REPORT {1}: {0:X}", leido, Type);
+            pos0 = (leido & (byte)0x01) == 1 ? true : false;
+            pos1 = (leido & (byte)0x02) == 2 ? true : false;
+        }
         /**  */
         public int SetGpio(int gpio, byte estado)
         {
@@ -276,7 +292,11 @@ namespace HMI.CD40.Module.BusinessEntities
         private SafeFileHandle hidHandle;
         private SafeFileHandle readHandle;
         private GenericHid.Hid MyHid = new GenericHid.Hid();
-
+        /// <summary>
+        /// Mutex to protect PTT publish from concurrent access 
+        /// (polling in CheckPresence and asyncrhonous read in ReadCompleted)
+        /// </summary>
+        private System.Threading.Mutex _MutexPTT = new System.Threading.Mutex(false, "CMediaMutex");
         /// <summary>
         /// 
         /// </summary>
@@ -330,8 +350,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 else
                     _Logger.Error("HID Callback...");
             }
-            catch (System.OperationCanceledException)
+            catch (System.OperationCanceledException x)
             {
+                _Logger.Warn("ReadCompleted OperationCanceledException " + x.Message);
             }
             catch (Exception x)
             {
@@ -473,6 +494,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 StopRead();
             }
             hidHandle.Close();
+            _MutexPTT.Dispose();
         }
 
         #endregion
@@ -678,10 +700,13 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         /// <summary>
-        /// 
+        /// Updates in polling mode, presence status of jacks and output devices
+        /// It also updates PTT status because sometimes PTT change events don't arrive
         /// </summary>
         protected void CheckPresencia()
         {
+            bool pos1;
+            bool pos0;
             if (_dev1_eje != null)
             {
                 /** Escribo un CERO en el control del MTX 
@@ -701,9 +726,15 @@ namespace HMI.CD40.Module.BusinessEntities
                     else
                     {
                         // EN BKP-IAU-B43A
-                        _dev1_eje.Jack = _dev1_eje.GetPresencia(1);            // Estoy leyendo GPI01
+                        _dev1_eje.GetPresencia(out pos0, out pos1);
+                        _dev1_eje.Jack = pos1;  // Estoy leyendo GPI01
+                        _dev1_eje.Ptt = pos0;
                         if (_dev2_ayu != null)
-                            _dev2_ayu.Jack = _dev2_ayu.GetPresencia(1);        // Estoy leyendo GPI01
+                        {
+                            _dev2_ayu.GetPresencia(out pos0, out pos1);
+                            _dev2_ayu.Jack = pos1; // Estoy leyendo GPI01
+                            _dev2_ayu.Ptt = pos0;
+                        }
                     }
                 }
 
@@ -727,12 +758,14 @@ namespace HMI.CD40.Module.BusinessEntities
                         // EN BKP-IAU-B43A
                         if (_dev3_alr != null)
                         {
-                            _dev3_alr.Jack = _dev3_alr.GetPresencia(0);     // Presencia de Altavoz Radio. Estoy Leyendo GPI00
-                            _dev3_alr.Ptt = _dev3_alr.GetPresencia(1);      // Presencia de Altavoz Radio HF.
+                            _dev3_alr.GetPresencia(out pos0, out pos1);
+                            _dev3_alr.Jack = pos0;     // Presencia de Altavoz Radio. Estoy Leyendo GPI00
+                            _dev3_alr.Ptt = pos1;      // Presencia de Altavoz Radio HF.
                         }
-                        _dev4_alt.Jack = _dev4_alt.GetPresencia(0);         // Presencia de Altavoz LC.
+                        _dev4_alt.GetPresencia(out pos0, out pos1);
+                        _dev4_alt.Jack = pos0;         // Presencia de Altavoz LC.
                     /** Presencia Cable Grabacion */
-                    _dev4_alt.Ptt = _dev4_alt.GetPresencia(1);          // Presencia Cable Grabacion. 
+                    _dev4_alt.Ptt = pos1;          // Presencia Cable Grabacion. 
                     }
                 }
             }

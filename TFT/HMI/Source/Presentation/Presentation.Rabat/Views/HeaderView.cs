@@ -140,7 +140,8 @@ namespace HMI.Presentation.Rabat.Views
         [EventSubscription(EventTopicNames.ProxyPresent, ThreadOption.Publisher)]
         public void OnProxyPresent(object sender, EventArgs e)
         {
-            BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : BackColor = System.Drawing.Color.Khaki;
+            if (Settings.Default.EmergencyModeWarn)
+                BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : BackColor = System.Drawing.Color.Khaki;
         }
 
 		[EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
@@ -295,7 +296,6 @@ namespace HMI.Presentation.Rabat.Views
 		public void OnTlfListenChanged(object sender, EventArgs e)
 		{
 			Listen listen = _StateManager.Tlf.Listen;
-
 			if (!string.IsNullOrEmpty(listen.PreviusStateDescription))
 			{
 				_MsgLB.Items.Remove(listen.PreviusStateDescription);

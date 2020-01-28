@@ -194,10 +194,10 @@ namespace U5ki.RdService.NM
         /// <param name="input"></param>
         public void UpdatePool(Cd40Cfg input)
         {
-            LogInfo<MNManager>("Nueva configuración recibida.", U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GENERIC_EVENT, "MNManager", CTranslate.translateResource("Configuracion Recibida"));
+            LogDebug<MNManager>("Nueva configuración recibida.", U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GENERIC_EVENT, "MNManager", CTranslate.translateResource("Configuracion Recibida"));
             if (Status != ServiceStatus.Running)
             {
-                LogWarn<MNManager>("Servicio parado al recibir una nueva configuracion.",
+                LogDebug<MNManager>("Servicio parado al recibir una nueva configuracion.",
                     U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GENERIC_EVENT, "MNManager", CTranslate.translateResource("Servicio parado al recibir una nueva configuración"));
             }
             
@@ -1323,13 +1323,65 @@ namespace U5ki.RdService.NM
         ///     Si se localiza uno vacio se utiliza. 
         ///     Si no hay vacios pero se ha localizado uno ocupado con menos prioridad, se desocupa y se asigna este.
         /// </remarks>
+        //private BaseGear NodeReplacementFind(BaseGear input)
+//        {
+//            if (null == input)
+//                return null;
+
+//            BaseGear foundButAssigned = null;
+
+//            // Buscar entre el pool de reservas validas.
+//            foreach (BaseGear gear in NodePoolSelect(input, Tipo_Formato_Trabajo.Reserva))
+//            {
+//                // JOI FREC_DES
+//                if (gear.IdEmplazamiento != input.IdEmplazamiento)
+//                    continue;
+//                // JOI FREC_DES FIN
+
+//                // Si equipo en fallo, siguiente.
+//                if (!gear.IsAvailable)
+//                    continue;
+
+//                // Distinto del padre
+//                if (gear.Id == input.Id)
+//                    continue;
+
+//                // Si el equipo no puede soportar esa frecuencia, sal.
+//                if (!String.IsNullOrEmpty(input.Frecuency) 
+//                        && !FrecuencyCheck(gear, Convert.ToInt32(input.Frecuency.Replace(".", ""))))
+//                    continue;
+//                if (gear.Status == GearStatus.Fail)
+//                {
+//                    continue;
+//                }
+
+//                // Si frecuencia valida y estado preparado, localizado.
+//                if (gear.Status == GearStatus.Ready || gear.Status == GearStatus.Initial)
+//                {
+//#if DEBUG
+//                    LogTrace<MNManager>("[REPLACEMENT FOUND] " + input.ToString() + ": " + gear.ToString());
+//#endif
+//                    return gear;
+//                }
+
+//                // Si hemos encontrado uno valido y esta asignado, pero es mas importante (recordamos que cuanto menos prioridad mas importante), seleccionar temporalmente.
+//                if (gear.Status == GearStatus.Assigned && input.Priority < gear.Priority)
+//                    foundButAssigned = gear;        
+//            }
+//#if DEBUG
+//            if (null != foundButAssigned)
+//                LogTrace<MNManager>("[REPLACEMENT FOUND] " + input.ToString() + ": " + foundButAssigned.ToString());
+//            else
+//                LogTrace<MNManager>("[REPLACEMENT NOT FOUND] " + input.ToString() + ".");
+//#endif
+//            return foundButAssigned;            
+//        }
         private BaseGear NodeReplacementFind(BaseGear input)
         {
             if (null == input)
                 return null;
 
             BaseGear foundButAssigned = null;
-
             // Buscar entre el pool de reservas validas.
             foreach (BaseGear gear in NodePoolSelect(input, Tipo_Formato_Trabajo.Reserva))
             {
@@ -1347,13 +1399,16 @@ namespace U5ki.RdService.NM
                     continue;
 
                 // Si el equipo no puede soportar esa frecuencia, sal.
-                if (!String.IsNullOrEmpty(input.Frecuency) 
+                if (!String.IsNullOrEmpty(input.Frecuency)
                         && !FrecuencyCheck(gear, Convert.ToInt32(input.Frecuency.Replace(".", ""))))
                     continue;
                 if (gear.Status == GearStatus.Fail)
                 {
                     continue;
                 }
+                // Si hemos encontrado uno valido y esta asignado, pero es mas importante (recordamos que cuanto menos prioridad mas importante), seleccionar temporalmente.
+                if ((gear.Status == GearStatus.Assigned || gear.ReplaceTo != null) && input.Priority < gear.Priority)
+                    foundButAssigned = gear;
 
                 // Si frecuencia valida y estado preparado, localizado.
                 // No se admite GearStatus.Initial porque no está bien gestionado casos 
@@ -1365,10 +1420,6 @@ namespace U5ki.RdService.NM
 #endif
                     return gear;
                 }
-
-                // Si hemos encontrado uno valido y esta asignado, pero es mas importante (recordamos que cuanto menos prioridad mas importante), seleccionar temporalmente.
-                if (gear.Status == GearStatus.Assigned && input.Priority < gear.Priority)
-                    foundButAssigned = gear;        
             }
 #if DEBUG
             if (null != foundButAssigned)
@@ -1376,7 +1427,7 @@ namespace U5ki.RdService.NM
             else
                 LogTrace<MNManager>("[REPLACEMENT NOT FOUND] " + input.ToString() + ".");
 #endif
-            return foundButAssigned;            
+            return foundButAssigned;
         }
 
         /// <summary>

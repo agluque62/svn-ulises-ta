@@ -139,8 +139,11 @@ namespace HMI.Presentation.Asecna.Views
         [EventSubscription(EventTopicNames.ProxyPresent, ThreadOption.Publisher)]
         public void OnProxyPresent(object sender, EventArgs e)
         {
-            pnlHora.BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : System.Drawing.Color.Khaki;
-            BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : System.Drawing.Color.Khaki;
+            if (Settings.Default.EmergencyModeWarn)
+            {
+                pnlHora.BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : System.Drawing.Color.Khaki;
+                BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : System.Drawing.Color.Khaki;
+            }
         }
 
         [EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]

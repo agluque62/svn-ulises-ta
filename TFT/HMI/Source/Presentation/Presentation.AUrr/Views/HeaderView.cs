@@ -54,7 +54,7 @@ namespace HMI.Presentation.AUrr.Views
         }
         private bool _InfoEnabled
         {
-            get { return _StateManager.Tft.Enabled && (_StateManager.Tlf.Listen.State == ListenState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
+            get { return _StateManager.Tft.Enabled && (_StateManager.Tlf.Listen.State == FunctionState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
         }
         private bool _BrightnessEnabled
         {

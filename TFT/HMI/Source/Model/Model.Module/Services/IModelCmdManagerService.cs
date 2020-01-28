@@ -29,8 +29,6 @@ namespace HMI.Model.Module.Services
         void RdForceTxOff(int id);
         void RdConfirmTxState(int id);
         void RdConfirmRxAudio(int id, RdRxAudioVia via);
-        void RdSwitchRxToSpeaker();
-        void RdSwitchRxToHeadphone();
         void RdSwitchRxState(int id, bool longClick);
 		void LcSet(int id, bool on);
 		void LcSetSpeakerLevel(int level);
@@ -55,5 +53,7 @@ namespace HMI.Model.Module.Services
         void SendCmdHistoricalEvent(string user, string frec);
         void RdSiteManagerClick();
         void ChangeSite(int id);
+        void PickUpClick();
+        void ForwardClick();
     }
 }

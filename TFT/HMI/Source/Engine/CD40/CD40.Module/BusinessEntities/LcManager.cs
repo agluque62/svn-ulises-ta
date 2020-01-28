@@ -13,8 +13,12 @@ using NLog;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
+#if DEBUG
+    public class LcManager
+#else
 	class LcManager
-	{
+#endif
+    {
 		public event GenericEventHandler ActivityChanged;
 		public event GenericEventHandler<RangeMsg<LcInfo>> NewPositions;
 		public event GenericEventHandler<RangeMsg<LcState>> PositionsChanged;
@@ -180,9 +184,9 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 			General.SafeLaunchEvent(NewPositions, this, lcPositions);
 		}
-            catch
+            catch (Exception exc)
             {
-                throw;
+                _Logger.Error(String.Format("LcManager:OnConfigChanged exception {0}, {1}", exc.Message, exc.StackTrace));
             }
             finally
             {

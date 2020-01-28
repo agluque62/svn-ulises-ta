@@ -207,4 +207,19 @@
   <data name="RtxActiveNoRemove" xml:space="preserve">
     <value>Squelch actif, il n'est pas possible enlever l'élément du groupe Rtx </value>
   </data>
+  <data name="MultidestinationCall" xml:space="preserve">
+    <value>Appel à groupe:</value>
+  </data>
+  <data name="PickUpDescription" xml:space="preserve">
+    <value>Capture appel de </value>
+  </data>
+  <data name="ForwardDescription" xml:space="preserve">
+    <value>Appels déviés vers</value>
+  </data>
+  <data name="RemoteForwardDescription" xml:space="preserve">
+    <value>Appels déviés depuis</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>depuis</value>
+  </data>
 </root>

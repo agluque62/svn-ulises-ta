@@ -129,14 +129,26 @@
   <data name="BadOperation" xml:space="preserve">
     <value>Bad operation</value>
   </data>
+  <data name="CaptureErrorCapacity" xml:space="preserve">
+    <value>Wrong capture because call capacity is exceeded or there is no network permission</value>
+  </data>
   <data name="DeviceError" xml:space="preserve">
     <value>Device error</value>
+  </data>
+  <data name="ForwardError" xml:space="preserve">
+    <value>Error in call forward. It is not allowed to call the source of he forward.</value>
   </data>
   <data name="FrecuencyRtxError" xml:space="preserve">
     <value>Frequency used in a retransmission group</value>
   </data>
+  <data name="HasCaptured" xml:space="preserve">
+    <value> has captured call from </value>
+  </data>
   <data name="Headphones" xml:space="preserve">
     <value>headphones</value>
+  </data>
+  <data name="Info" xml:space="preserve">
+    <value>Information</value>
   </data>
   <data name="LCSpeakerBusy" xml:space="preserve">
     <value>Speaker busy by hot line</value>

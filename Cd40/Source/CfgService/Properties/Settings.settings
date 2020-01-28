@@ -8,11 +8,11 @@
     <Setting Name="ConfigByte" Type="System.String" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="Cd40_CfgService_SoapCfg_InterfazSOAPConfiguracion" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://192.168.0.212/nucleodf/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx</Value>
-    </Setting>
     <Setting Name="MCastItf4Config" Type="System.String" Scope="Application">
       <Value Profile="(Default)">192.168.0.211</Value>
+    </Setting>
+    <Setting Name="Cd40_CfgService_SoapCfg_InterfazSOAPConfiguracion" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://192.168.2.3/nucleodf/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx</Value>
     </Setting>
   </Settings>
 </SettingsFile>

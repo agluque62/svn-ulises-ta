@@ -14,6 +14,8 @@ namespace HMI.Model.Module.BusinessEntities
 		Transfer = 0x8,
 		Intruded = 0x10,
         Conference = 0x20,
-        Replay = 0x40
+        Replay = 0x40,
+        Capture = 0x80,
+        Forward = 0x100,
     }
 }

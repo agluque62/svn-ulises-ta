@@ -1,11 +1,11 @@
 #define _HF_GLOBAL_STATUS_
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Timers;
 using System.Threading.Tasks;
-using System.Linq;
 
 using HMI.Model.Module.BusinessEntities;
 using HMI.Model.Module.Messages;
@@ -22,8 +22,12 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// 
     /// </summary>
+#if DEBUG
+    public class RdManager
+#else
 	class RdManager
-	{
+#endif
+    {
         /// <summary>
         /// 
         /// </summary>
@@ -80,7 +84,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         public bool AnySquelch
         {
-            get { return _AnySquelch; }
+            get { return DetectedAnySquech(); }
         }
 
         public bool ScreenSaverStatus
@@ -268,7 +272,15 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			Debug.Assert(src != PttSource.NoPtt);
 
-			if (on && ((int)src > (int)_PttSource))
+#if _PTT_FILTER_SIMPLE_
+            if (PttFilter.CanProcessEvent(on, src) == false)
+                return;
+#else
+            if (PttFilter.CanProcessEventMult(on, src) == false)
+                return;
+#endif
+
+            if (on && ((int)src > (int)_PttSource))
 			{
                 if ((_RdPositionsInTx.Count > 0) && (!Top.Lc.Activity || (Top.Mixer.SplitMode == SplitMode.LcTf)))
 				{
@@ -330,8 +342,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         }
 					}
 				}
-                //VMG Soltando el Ptt liberamos la lista de bloqueados
-                _RdBlocked.Clear();
+
 				BadOperation(false);
 				PttSource = PttSource.NoPtt;
 			}
@@ -488,7 +499,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     BadOperation(true);
                     if (durationInMsec > 0)
-                    Task.Delay(durationInMsec).Wait();
+                        Task.Delay(durationInMsec).Wait();
                     else
                     {
                         while (PttSource != PttSource.NoPtt)
@@ -502,7 +513,7 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
-		#region Private Members
+#region Private Members
 
         /// <summary>
         /// 
@@ -519,10 +530,8 @@ namespace HMI.CD40.Module.BusinessEntities
         private Timer _PttBadOpeTimer = new Timer(DELAY_BAD_OPERATION);
         private List<RdPosition> _RdPositionsInTx = new List<RdPosition>();
 		private List<RdPosition> _RdPositionsInPtt = new List<RdPosition>();
-        //VMG Lista de frecuencias bloqueadas con sus estados
-        private Dictionary<string, bool> _RdBlocked = new Dictionary<string, bool>();
 		private int _BadOperationTone = -1;
-		private int _Page = 0;
+        private int _Page = 0;
         private bool _HoldedByPtt = false;
         private bool _ScreenSaver = false;
         private bool _SiteManager = false;
@@ -619,9 +628,9 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 			General.SafeLaunchEvent(NewPositions, this, rdPositions);
 		}
-            catch
+            catch (Exception exc)
             {
-                throw;
+                _Logger.Error(String.Format("RdManager:OnConfigChanged exception {0}, {1}", exc.Message, exc.StackTrace));
             }
             finally
             {
@@ -813,8 +822,9 @@ namespace HMI.CD40.Module.BusinessEntities
 					_PttSource = PttSource.NoPtt;
 
 					SetPtt(src);
-					BadOperation(false);
-
+#if _BAD_OPERATION_OLD_
+                    BadOperation(false);
+#endif
 					_PttSource = src;
 				}
 			}
@@ -825,7 +835,9 @@ namespace HMI.CD40.Module.BusinessEntities
 
 				if (!Top.Lc.Activity)
 				{
+#if _BAD_OPERATION_OLD_
 					BadOperation(true);
+#endif
 				}
 			}
 
@@ -838,10 +850,12 @@ namespace HMI.CD40.Module.BusinessEntities
 					if ((_RdPositionsInPtt.Count == 1) && (_PttSource != PttSource.NoPtt) && 
 						(_RdPositionsInTx.Count > 0) && (!Top.Lc.Activity || (Top.Mixer.SplitMode == SplitMode.LcTf)))
 					{
-						//_PttTimer.Enabled = false;
-                        //VMG 19/09/2018 Test por ahora para bloqueados
-                        BadOperationBlocked(false, rd.KeyAlias);
-                        //BadOperation(false);
+                        //_PttTimer.Enabled = false;
+#if _BAD_OPERATION_OLD_
+                        /** 20190319. No veo la pertinencia de esto, por lo demas, en casos de transmision con bloqueos,
+                         aborta precipitadamente la señalizacion acustica de la falsa maniobra. */
+						BadOperation(false);
+#endif
 					}
 				}
 			}
@@ -851,25 +865,25 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				if (!Top.Lc.Activity)
 				{
+#if _BAD_OPERATION_OLD_
 					BadOperation(true);
+#endif
 				}
 			}
 			else if ((rd.Ptt == PttState.Blocked || rd.Ptt == PttState.Error) && _PttSource != PttSource.NoPtt)
 			{
 				if (!Top.Lc.Activity)
 				{
-                    //VMG 19/09/2018 Test por ahora para bloqueados
-                    BadOperationBlocked(true, rd.KeyAlias);
-					//BadOperation(true);
+#if _BAD_OPERATION_OLD_
+					BadOperation(true);
+#endif
 				}
 			}
-            //VMG 19/09/2018
-            //Esta es la salida de la falsa maniobra si detectamos 
-            //un PttOnlyPort despues de un bloqueado
-            if (rd.Ptt == PttState.PttOnlyPort)
-                BadOperationBlocked(false, rd.KeyAlias);
 
-			if (!_ChangingCfg)
+#if !_BAD_OPERATION_OLD_
+            BadOperationManagement();
+#endif
+            if (!_ChangingCfg)
 			{
 				RdState st = new RdState(rd.Tx, rd.Rx, rd.PttSrcId, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, 
                                             (FrequencyState)rd.Estado, rd.QidxMethod, rd.QidxValue, rd.QidxResource);
@@ -877,7 +891,7 @@ namespace HMI.CD40.Module.BusinessEntities
 				General.SafeLaunchEvent(PositionsChanged, this, state);
 
                 /* GRABACION VOIP START */
-                #region GRABACION VOIP START
+#region GRABACION VOIP START
 
                 bool IsPttRtx = rd.PttCausadoPorRetransmision();
                 if (rd.Tx && (rd.Ptt == PttState.PttOnlyPort || rd.Ptt == PttState.PttPortAndMod || IsPttRtx))
@@ -886,14 +900,14 @@ namespace HMI.CD40.Module.BusinessEntities
                     uint prior = IsPttRtx ? (uint)CORESIP_PttType.CORESIP_PTT_COUPLING : rd.GetPttPriority();
                     if (_PttSource == U5ki.Infrastructure.PttSource.Hmi)
                     {
-                        _Logger.Debug("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.AlumnDev);
+                        //_Logger.Trace("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.AlumnDev);
                         SipAgent.RdPttEvent(true, rd.Literal, Top.Mixer.AlumnDev, prior);
-                        _Logger.Debug("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.InstructorDev);
+                        //_Logger.Trace("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.InstructorDev);
                         SipAgent.RdPttEvent(true, rd.Literal, Top.Mixer.InstructorDev, prior);
                     }
                     else
                     {
-                        _Logger.Debug("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, (_PttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev));
+                        //_Logger.Trace("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, (_PttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev));
                         SipAgent.RdPttEvent(true, rd.Literal, (_PttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev), prior);
                     }
                 }
@@ -905,14 +919,14 @@ namespace HMI.CD40.Module.BusinessEntities
                     uint prior = (uint)CORESIP_PttType.CORESIP_PTT_OFF;
                     if (_OldPttSource == U5ki.Infrastructure.PttSource.Hmi)
                     {
-                        _Logger.Trace("Ending recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.AlumnDev);
+                        //_Logger.Trace("Ending recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.AlumnDev);
                         SipAgent.RdPttEvent(false, rd.Literal, Top.Mixer.AlumnDev, prior);
-                        _Logger.Trace("Ending recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.InstructorDev);
+                        //_Logger.Trace("Ending recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.InstructorDev);
                         SipAgent.RdPttEvent(false, rd.Literal, Top.Mixer.InstructorDev, prior);
                     }
                     else
                     {
-                        _Logger.Trace("Ending recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, (_OldPttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev));
+                        //_Logger.Trace("Ending recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, (_OldPttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev));
                         SipAgent.RdPttEvent(false, rd.Literal, (_OldPttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev), prior);
                     }
                 }
@@ -923,7 +937,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
                     // JCAM. 20170323
                     // Adaptación para tratamiento BSS
-                    _Logger.Trace("Starting recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal,rd.QidxResource,rd.QidxMethod,rd.QidxValue);
+                    //_Logger.Trace("Starting recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal,rd.QidxResource,rd.QidxMethod,rd.QidxValue);
                     if (rd.TipoFrecuencia == TipoFrecuencia_t.FD)  
                     {
                         //Es una frecuencia desplazada
@@ -962,7 +976,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
                     if (!rx_seleccionado || !squ_on)
                     {
-                        _Logger.Trace("Ending recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
+                        //_Logger.Trace("Ending recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
                         if (rd.TipoFrecuencia == TipoFrecuencia_t.FD)
                         {
                             //Es una frecuencia desplazada
@@ -974,7 +988,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         }
                     }
                 }
-                #endregion
+#endregion
                 /* GRABACION VOIP END */
 
 			}
@@ -994,14 +1008,14 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 // JCAM. 20170323
                 // Adaptación para tratamiento BSS
-                _Logger.Debug("Starting recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
+                //_Logger.Debug("Starting recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
                 SipAgent.RdSquEvent(true, rd.Literal,rd.QidxResource,rd.QidxMethod,rd.QidxValue);
             }
             else if (!rd.Rx)
             {
                 // JCAM. 20170323
                 // Adaptación para tratamiento BSS
-                _Logger.Debug("Ending recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
+                //_Logger.Debug("Ending recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
                 SipAgent.RdSquEvent(false, rd.Literal,rd.QidxResource,rd.QidxMethod,rd.QidxValue);
             }
         }
@@ -1221,12 +1235,14 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
         /// <param name="on"></param>
-        private void BadOperation(bool on)
+        private void BadOperation(bool on,
+            [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0, [System.Runtime.CompilerServices.CallerMemberName] string caller = null)
 		{
 			if (on && (_BadOperationTone == -1))
 			{
-				//Debug.Assert(!Top.Lc.Activity);
-				_BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/RdBadOperation.wav", true);
+                //Debug.Assert(!Top.Lc.Activity);
+                _Logger.Debug(String.Format("BadOperation TONE Start Playing From {0}:{1}.", caller, lineNumber));
+                _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/RdBadOperation.wav", true);
                 if (Top.Hw.RdSpeaker)
 				  Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
                 else if (HFSpeakerAvailable())
@@ -1237,34 +1253,31 @@ namespace HMI.CD40.Module.BusinessEntities
 				Top.Mixer.Unlink(_BadOperationTone);
 				SipAgent.DestroyWavPlayer(_BadOperationTone);
 				_BadOperationTone = -1;
-			}
-		}
-
-        ///VMG 19/09/2018
-        /// <summary>
-        /// Reproduce el tono de Falsa maniobra al entrar en bloqueo con alguna frecuencia
-        /// Si se liberan del bloqueo deja de rerpoducir el tono
-        /// </summary>
-        /// <param name="on"></param>
-        private void BadOperationBlocked(bool active, string fid = "")
-        {
-            _RdBlocked[fid] = active;
-            bool isRdBlocked = _RdBlocked.Where(par => par.Value == true).ToList().Count > 0;
-
-            if (isRdBlocked && (_BadOperationTone == -1))
-            {
-                //Debug.Assert(!Top.Lc.Activity);
-                _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/RdBadOperation.wav", true);
-                if (Top.Hw.RdSpeaker)
-                    Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
-                else if (HFSpeakerAvailable())
-                    Top.Mixer.Link(_BadOperationTone, MixerDev.SpkHf, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                _Logger.Debug(String.Format("BadOperation TONE End Playing From {0}:{1}.", caller, lineNumber));
             }
-            else if (!isRdBlocked && (_BadOperationTone >= 0))
+        }
+
+        private void BadOperationManagement()
+        {
+            /** Gestion de Falsa Maniobra*/
+            var pttencurso = _PttSource == PttSource.Hmi || _PttSource == PttSource.Instructor || _PttSource == PttSource.Alumn;
+            var bloqueados = _RdPositions.Where(p => p.Ptt == PttState.Blocked).Count();
+            var enerror = _RdPositions.Where(p => p.Ptt == PttState.CarrierError || p.Ptt == PttState.Error || p.Ptt == PttState.TxError).Count();
+            if (pttencurso)
             {
-                Top.Mixer.Unlink(_BadOperationTone);
-                SipAgent.DestroyWavPlayer(_BadOperationTone);
-                _BadOperationTone = -1;
+                if (bloqueados > 0 || enerror > 0)
+                {
+                    // El tono de falsa maniobra debe estar activo....
+                    if (!Top.Lc.Activity)
+                    {
+                        BadOperation(true);
+                    }
+                }
+                else
+                {
+                    // El tono de falsa maniobra no debe estar activo.
+                    BadOperation(false);
+                }
             }
         }
 
@@ -1315,6 +1328,122 @@ namespace HMI.CD40.Module.BusinessEntities
             return AnySquelchDetected;
         }
 
-		#endregion
+#endregion
 	}
+#region PTT-FILTER
+    /** */
+    /** 20180509. Para Filtrar Eventos PTT Rapidos */
+    class PttFilter
+    {
+#if _PTT_FILTER_SIMPLE_
+        static bool lastProcessedPttState = false;
+        static bool lastNotifiedPttState = false;
+        static PttSource lastNotifiedPttSource = PttSource.NoPtt;
+        static PttSource lastProcessedPttSource = PttSource.NoPtt;
+        static Task PttMinDelayTask = null;
+#endif
+        static int PttMinTime = Properties.Settings.Default.CwpPttFilterMsec;
+        static object Locker = new object();
+#if _PTT_FILTER_SIMPLE_
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ptt"></param>
+        /// <param name="src"></param>
+        /// <returns></returns>
+        public static bool CanProcessEvent(bool ptt, PttSource src)
+        {
+            if (PttMinTime <= 10)
+                return true;
+
+            lock (Locker)
+            {
+                lastNotifiedPttState = ptt;
+                lastNotifiedPttSource = src;
+
+                if (PttMinDelayTask == null)
+                {
+                    lastProcessedPttState = ptt;
+                    lastProcessedPttSource = src;
+                    PttMinDelayTask = Task.Factory.StartNew(() =>
+                    {
+                        Task.Delay(PttMinTime).Wait();
+                        lock (Locker)
+                        {
+                            var change = lastNotifiedPttState != lastProcessedPttState || lastNotifiedPttSource != lastProcessedPttSource;
+                            if (change)
+                            {
+                                Task.Factory.StartNew(() =>
+                                {
+                                    Task.Delay(10).Wait();
+                                    Top.WorkingThread.Enqueue("SetRdPtt", delegate ()
+                                    {
+                                        Top.Rd.SetPtt(lastNotifiedPttState, lastNotifiedPttSource);
+                                    });
+                                });
+                            }
+                            PttMinDelayTask = null;
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            }
+        }
+
+#endif
+
+        public class PttFilterEventData
+        {
+            public Task Task { get; set; }
+            public bool LastNotification { get; set; }
+            public bool LastProcessed { get; set; }
+        }
+        public static Dictionary<PttSource, PttFilterEventData> PttFilterControl = new Dictionary<PttSource, PttFilterEventData>()
+        {
+            {PttSource.Instructor, new PttFilterEventData(){ Task=null, LastNotification=false, LastProcessed=false } },
+            {PttSource.Alumn, new PttFilterEventData(){ Task=null, LastNotification=false, LastProcessed=false } },
+            {PttSource.Hmi, new PttFilterEventData(){ Task=null, LastNotification=false, LastProcessed=false } }
+        };
+        public static bool CanProcessEventMult(bool ptt, PttSource src)
+        {
+            if (PttMinTime <= 10)
+                return true;
+
+            if (src != PttSource.Alumn && src != PttSource.Instructor && src != PttSource.Hmi)
+                return true;
+
+            lock (Locker)
+            {
+                PttFilterControl[src].LastNotification = ptt;
+                if (PttFilterControl[src].Task == null)
+                {
+                    PttFilterControl[src].LastProcessed = ptt;
+                    PttFilterControl[src].Task = Task.Factory.StartNew(() =>
+                    {
+                        Task.Delay(PttMinTime).Wait();
+                        lock (Locker)
+                        {
+                            var change = PttFilterControl[src].LastNotification != PttFilterControl[src].LastProcessed;
+                            if (change)
+                            {
+                                Task.Factory.StartNew(() =>
+                                {
+                                    Task.Delay(10).Wait();
+                                    Top.WorkingThread.Enqueue("SetRdPtt", delegate ()
+                                    {
+                                        Top.Rd.SetPtt(PttFilterControl[src].LastNotification, src);
+                                    });
+                                });
+                            }
+                            PttFilterControl[src].Task = null;
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            }
+        }
+    }
+#endregion PTT-FILTER
 }

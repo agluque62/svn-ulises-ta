@@ -52,7 +52,6 @@ namespace HMI.Presentation.Twr.Views
             this._TlfButtonsTLP = new System.Windows.Forms.TableLayoutPanel();
             this._FastBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SlowBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            this._CallRingerTimer = new System.Windows.Forms.Timer(this.components);
             _TlfHeadP = new System.Windows.Forms.Panel();
             _TlfHeadP.SuspendLayout();
             this._TlfDaTLP.SuspendLayout();
@@ -75,7 +74,6 @@ namespace HMI.Presentation.Twr.Views
             // 
             this._TlfPageSecondBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPageSecondBT.DrawX = false;
             this._TlfPageSecondBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPageSecondBT.ImageNormal = global::HMI.Presentation.Twr.Properties.Resources.TlfPage;
             this._TlfPageSecondBT.Location = new System.Drawing.Point(374, 3);
@@ -90,7 +88,6 @@ namespace HMI.Presentation.Twr.Views
             // 
             this._TlfPageFirstBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._TlfPageFirstBT.DrawX = false;
             this._TlfPageFirstBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._TlfPageFirstBT.ImageNormal = global::HMI.Presentation.Twr.Properties.Resources.TlfPage;
             this._TlfPageFirstBT.Location = new System.Drawing.Point(313, 3);
@@ -107,7 +104,6 @@ namespace HMI.Presentation.Twr.Views
             | System.Windows.Forms.AnchorStyles.Left)));
             this._TlfHeadPhonesUDB.BackColor = System.Drawing.Color.Transparent;
             this._TlfHeadPhonesUDB.DownImage = global::HMI.Presentation.Twr.Properties.Resources.HeadPhonesDown;
-            this._TlfHeadPhonesUDB.DrawX = false;
             this._TlfHeadPhonesUDB.Enabled = false;
             this._TlfHeadPhonesUDB.Location = new System.Drawing.Point(94, 3);
             this._TlfHeadPhonesUDB.Name = "_TlfHeadPhonesUDB";
@@ -123,7 +119,6 @@ namespace HMI.Presentation.Twr.Views
             | System.Windows.Forms.AnchorStyles.Left)));
             this._LcSpeakerUDB.BackColor = System.Drawing.Color.Transparent;
             this._LcSpeakerUDB.DownImage = global::HMI.Presentation.Twr.Properties.Resources.SpeakerDown;
-            this._LcSpeakerUDB.DrawX = false;
             this._LcSpeakerUDB.Enabled = false;
             this._LcSpeakerUDB.Location = new System.Drawing.Point(3, 3);
             this._LcSpeakerUDB.Name = "_LcSpeakerUDB";
@@ -144,8 +139,8 @@ namespace HMI.Presentation.Twr.Views
             this._TlfDaTLP.Margin = new System.Windows.Forms.Padding(0);
             this._TlfDaTLP.Name = "_TlfDaTLP";
             this._TlfDaTLP.RowCount = 2;
-            this._TlfDaTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 23.52941F));
-            this._TlfDaTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 76.47059F));
+            this._TlfDaTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 24.0F));
+            this._TlfDaTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 76.0F));
             this._TlfDaTLP.Size = new System.Drawing.Size(440, 350);
             this._TlfDaTLP.TabIndex = 0;
             // 
@@ -179,10 +174,6 @@ namespace HMI.Presentation.Twr.Views
             this._SlowBlinkTimer.Interval = 500;
             this._SlowBlinkTimer.Tick += new System.EventHandler(this._SlowBlinkTimer_Tick);
             // 
-            // _CallRingerTimer
-            // 
-            this._CallRingerTimer.Tick += new System.EventHandler(this._CallRingerTimer_Tick);
-            // 
             // TlfDaView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -206,7 +197,6 @@ namespace HMI.Presentation.Twr.Views
 		private System.Windows.Forms.TableLayoutPanel _TlfDaTLP;
 		private System.Windows.Forms.Timer _FastBlinkTimer;
 		private System.Windows.Forms.Timer _SlowBlinkTimer;
-        private System.Windows.Forms.Timer _CallRingerTimer;
 
 
 	}

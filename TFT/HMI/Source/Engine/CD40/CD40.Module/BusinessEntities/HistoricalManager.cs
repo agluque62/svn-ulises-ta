@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using HMI.CD40.Module.Properties;
 using HMI.Model.Module.BusinessEntities;
+using NLog;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
@@ -88,10 +89,25 @@ namespace HMI.CD40.Module.BusinessEntities
             catch (System.IO.FileNotFoundException)
             {
                 XDocument doc = new XDocument(new XElement("HistoricoLocalDeLlamadas",
-                                                    new XElement("Puesto", new XAttribute("Valor", user),
-                                                        new XElement("Llamadas", new XAttribute("Tipo", "Entrantes"), new XAttribute("Ultima", "")),
-                                                        new XElement("Llamadas", new XAttribute("Tipo", "Salientes"), new XAttribute("Ultima", "")),
-                                                        new XElement("Llamadas", new XAttribute("Tipo", "NoAtendidas"), new XAttribute("Ultima", "")))));
+                                    new XElement("Puesto", new XAttribute("Valor", user),
+                                        new XElement("Llamadas", new XAttribute("Tipo", "Entrantes"), new XAttribute("Ultima", "")),
+                                        new XElement("Llamadas", new XAttribute("Tipo", "Salientes"), new XAttribute("Ultima", "")),
+                                        new XElement("Llamadas", new XAttribute("Tipo", "NoAtendidas"), new XAttribute("Ultima", "")))));
+                doc.Save(_Doc);
+
+                AddCall(callType, user, access, target);
+            }
+            catch (System.Xml.XmlException exc)
+            {
+                LogManager.GetCurrentClassLogger().Error("GetHistoricalCalls XmlException", exc);
+                System.IO.File.Delete(_Doc + ".error");
+                System.IO.File.Move(_Doc, _Doc + ".error");
+                LogManager.GetCurrentClassLogger().Error("GetHistoricalCalls XmlException", exc);
+                XDocument doc = new XDocument(new XElement("HistoricoLocalDeLlamadas",
+                                    new XElement("Puesto", new XAttribute("Valor", user),
+                                        new XElement("Llamadas", new XAttribute("Tipo", "Entrantes"), new XAttribute("Ultima", "")),
+                                        new XElement("Llamadas", new XAttribute("Tipo", "Salientes"), new XAttribute("Ultima", "")),
+                                        new XElement("Llamadas", new XAttribute("Tipo", "NoAtendidas"), new XAttribute("Ultima", "")))));
                 doc.Save(_Doc);
 
                 AddCall(callType, user, access, target);
@@ -127,8 +143,15 @@ namespace HMI.CD40.Module.BusinessEntities
                     }
                 }
             }
-            catch (System.IO.FileNotFoundException )
+            catch (System.IO.FileNotFoundException exc)
             {
+                LogManager.GetCurrentClassLogger().Error("GetHistoricalCalls FileNotFoundException", exc);
+            }
+            catch (System.Xml.XmlException exc)
+            {
+                System.IO.File.Delete(_Doc + ".error");
+                System.IO.File.Move(_Doc, _Doc+".error");
+                LogManager.GetCurrentClassLogger().Error("GetHistoricalCalls XmlException", exc);
             }
 
             return historyList;

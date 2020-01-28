@@ -2,18 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Presentation.AUrr.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="EnablePriority" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="EnableListen" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="EnableHold" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="EnableTransfer" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="ThemeButtonCornerRadius" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">4</Value>
     </Setting>
@@ -60,9 +48,6 @@
     <Setting Name="RdRows" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">3</Value>
     </Setting>
-    <Setting Name="RdColumns" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">5</Value>
-    </Setting>
     <Setting Name="LcRows" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">2</Value>
     </Setting>
@@ -90,13 +75,28 @@
     <Setting Name="IsTxErrorWait" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="TxConfirmationDetectionTimeOut" Type="System.Int32" Scope="Application">
+    <Setting Name="CarrierDetectionTimeOut" Type="System.String" Scope="Application">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="CarrierDetectionTimeOut" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="EmergencyModeWarn" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="RingerTimeOut" Type="System.Int32" Scope="Application">
+    <Setting Name="EnablePriority" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="EnableListen" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="EnableHold" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="EnableTransfer" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="RdColumns" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
+    <Setting Name="TxConfirmationDetectionTimeOut" Type="System.String" Scope="Application">
       <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>

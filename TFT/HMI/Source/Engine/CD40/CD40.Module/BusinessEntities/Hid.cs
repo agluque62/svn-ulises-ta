@@ -821,80 +821,82 @@ namespace GenericHid
                 //  True on success, False on failure.
                 //  ***
                 
-                success = HidD_GetPreparsedData( hidHandle, ref preparsedDataPointer ); 
-                
-                //  Copy the data at PreparsedDataPointer into a byte array.
-                
-                preparsedDataString = Convert.ToBase64String( preparsedDataBytes ); 
-                
-                //  ***
-                //  API function: HidP_GetCaps
-                
-                //  Purpose: find out a device's capabilities.
-                //  For standard devices such as joysticks, you can find out the specific
-                //  capabilities of the device.
-                //  For a custom device where the software knows what the device is capable of,
-                //  this call may be unneeded.
-                
-                //  Accepts:
-                //  A pointer returned by HidD_GetPreparsedData
-                //  A pointer to a HIDP_CAPS structure.
-                
-                //  Returns: True on success, False on failure.
-                //  ***
-                
-                result = HidP_GetCaps( preparsedDataPointer, ref Capabilities ); 
-                if ( ( result != 0 ) ) 
-                {                     
-                    Debug.WriteLine( "" );          
-                    Debug.WriteLine("  Usage: " + Convert.ToString(Capabilities.Usage, 16));
-                    Debug.WriteLine("  Usage Page: " + Convert.ToString(Capabilities.UsagePage, 16)); 
-                    Debug.WriteLine( "  Input Report Byte Length: " + Capabilities.InputReportByteLength ); 
-                    Debug.WriteLine( "  Output Report Byte Length: " + Capabilities.OutputReportByteLength ); 
-                    Debug.WriteLine( "  Feature Report Byte Length: " + Capabilities.FeatureReportByteLength ); 
-                    Debug.WriteLine( "  Number of Link Collection Nodes: " + Capabilities.NumberLinkCollectionNodes ); 
-                    Debug.WriteLine( "  Number of Input Button Caps: " + Capabilities.NumberInputButtonCaps ); 
-                    Debug.WriteLine( "  Number of Input Value Caps: " + Capabilities.NumberInputValueCaps ); 
-                    Debug.WriteLine( "  Number of Input Data Indices: " + Capabilities.NumberInputDataIndices ); 
-                    Debug.WriteLine( "  Number of Output Button Caps: " + Capabilities.NumberOutputButtonCaps ); 
-                    Debug.WriteLine( "  Number of Output Value Caps: " + Capabilities.NumberOutputValueCaps ); 
-                    Debug.WriteLine( "  Number of Output Data Indices: " + Capabilities.NumberOutputDataIndices ); 
-                    Debug.WriteLine( "  Number of Feature Button Caps: " + Capabilities.NumberFeatureButtonCaps ); 
-                    Debug.WriteLine( "  Number of Feature Value Caps: " + Capabilities.NumberFeatureValueCaps ); 
-                    Debug.WriteLine( "  Number of Feature Data Indices: " + Capabilities.NumberFeatureDataIndices ); 
-                    
+                success = HidD_GetPreparsedData( hidHandle, ref preparsedDataPointer );
+                if (success)
+                {
+                    //  Copy the data at PreparsedDataPointer into a byte array.
+
+                    preparsedDataString = Convert.ToBase64String(preparsedDataBytes);
+
                     //  ***
-                    //  API function: HidP_GetValueCaps
-                    
-                    //  Purpose: retrieves a buffer containing an array of HidP_ValueCaps structures.
-                    //  Each structure defines the capabilities of one value.
-                    //  This application doesn't use this data.
-                    
+                    //  API function: HidP_GetCaps
+
+                    //  Purpose: find out a device's capabilities.
+                    //  For standard devices such as joysticks, you can find out the specific
+                    //  capabilities of the device.
+                    //  For a custom device where the software knows what the device is capable of,
+                    //  this call may be unneeded.
+
                     //  Accepts:
-                    //  A report type enumerator from hidpi.h,
-                    //  A pointer to a buffer for the returned array,
-                    //  The NumberInputValueCaps member of the device's HidP_Caps structure,
-                    //  A pointer to the PreparsedData structure returned by HidD_GetPreparsedData.
-                    
-                    //  Returns: True on success, False on failure.
-                    //  ***                    
-                    
-                    result = HidP_GetValueCaps(HidP_Input, ref valueCaps[0], ref Capabilities.NumberInputValueCaps, preparsedDataPointer); 
-                    
-                    // (To use this data, copy the ValueCaps byte array into an array of structures.)
-                    
-                    //  ***
-                    //  API function: HidD_FreePreparsedData
-                    
-                    //  Purpose: frees the buffer reserved by HidD_GetPreparsedData.
-                    
-                    //  Accepts: A pointer to the PreparsedData structure returned by HidD_GetPreparsedData.
-                    
+                    //  A pointer returned by HidD_GetPreparsedData
+                    //  A pointer to a HIDP_CAPS structure.
+
                     //  Returns: True on success, False on failure.
                     //  ***
-                    
-                    success = HidD_FreePreparsedData( ref preparsedDataPointer );                     
-                }                 
+
+                    result = HidP_GetCaps(preparsedDataPointer, ref Capabilities);
+                    if ((result != 0))
+                    {
+                        Debug.WriteLine("");
+                        Debug.WriteLine("  Usage: " + Convert.ToString(Capabilities.Usage, 16));
+                        Debug.WriteLine("  Usage Page: " + Convert.ToString(Capabilities.UsagePage, 16));
+                        Debug.WriteLine("  Input Report Byte Length: " + Capabilities.InputReportByteLength);
+                        Debug.WriteLine("  Output Report Byte Length: " + Capabilities.OutputReportByteLength);
+                        Debug.WriteLine("  Feature Report Byte Length: " + Capabilities.FeatureReportByteLength);
+                        Debug.WriteLine("  Number of Link Collection Nodes: " + Capabilities.NumberLinkCollectionNodes);
+                        Debug.WriteLine("  Number of Input Button Caps: " + Capabilities.NumberInputButtonCaps);
+                        Debug.WriteLine("  Number of Input Value Caps: " + Capabilities.NumberInputValueCaps);
+                        Debug.WriteLine("  Number of Input Data Indices: " + Capabilities.NumberInputDataIndices);
+                        Debug.WriteLine("  Number of Output Button Caps: " + Capabilities.NumberOutputButtonCaps);
+                        Debug.WriteLine("  Number of Output Value Caps: " + Capabilities.NumberOutputValueCaps);
+                        Debug.WriteLine("  Number of Output Data Indices: " + Capabilities.NumberOutputDataIndices);
+                        Debug.WriteLine("  Number of Feature Button Caps: " + Capabilities.NumberFeatureButtonCaps);
+                        Debug.WriteLine("  Number of Feature Value Caps: " + Capabilities.NumberFeatureValueCaps);
+                        Debug.WriteLine("  Number of Feature Data Indices: " + Capabilities.NumberFeatureDataIndices);
+
+                        //  ***
+                        //  API function: HidP_GetValueCaps
+
+                        //  Purpose: retrieves a buffer containing an array of HidP_ValueCaps structures.
+                        //  Each structure defines the capabilities of one value.
+                        //  This application doesn't use this data.
+
+                        //  Accepts:
+                        //  A report type enumerator from hidpi.h,
+                        //  A pointer to a buffer for the returned array,
+                        //  The NumberInputValueCaps member of the device's HidP_Caps structure,
+                        //  A pointer to the PreparsedData structure returned by HidD_GetPreparsedData.
+
+                        //  Returns: True on success, False on failure.
+                        //  ***                    
+
+                        result = HidP_GetValueCaps(HidP_Input, ref valueCaps[0], ref Capabilities.NumberInputValueCaps, preparsedDataPointer);
+
+                        // (To use this data, copy the ValueCaps byte array into an array of structures.)
+
+                        //  ***
+                        //  API function: HidD_FreePreparsedData
+
+                        //  Purpose: frees the buffer reserved by HidD_GetPreparsedData.
+
+                        //  Accepts: A pointer to the PreparsedData structure returned by HidD_GetPreparsedData.
+
+                        //  Returns: True on success, False on failure.
+                        //  ***
+
+                        success = HidD_FreePreparsedData(ref preparsedDataPointer);
+                    }
+                }
             } 
             catch ( Exception ex ) 
             { 
@@ -1325,8 +1327,10 @@ namespace GenericHid
                     _dl.Add(dev);
                 }
                 device_count++;
-            }             
-
+                Marshal.FreeHGlobal(detailDataBuffer);
+                
+            }
+            SetupDiDestroyDeviceInfoList(hdev);
             return _dl;
         }
 

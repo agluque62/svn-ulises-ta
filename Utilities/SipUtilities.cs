@@ -4,82 +4,137 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using NLog;
 
 namespace Utilities
 {
     public class SipUtilities
     {
+        private static Logger _Logger = LogManager.GetCurrentClassLogger();
         public class SipUriParser
         {
+            private string _User = "";
+            private string _Host = "";
+            private string _Port = "5060";
+            private string _DisplayName = "";
+            private string _Resource = "";
+
             public SipUriParser(string uri_str)
             {
-                UriStr = uri_str.Replace("<", "").Replace(">", "").Split(':');
-            }
-            public string User
-            {
-                get
+                string[] UriStrUser = null;
+                string[] UriStrTmp = uri_str.Replace(">", "").Replace("<", "").Replace("sip:", "").Replace("tel:", "").Split(':');
+                if (UriStrTmp[0].Contains('@'))
                 {
-                    if (UriStr.Length > 1)
+                    UriStrUser = UriStrTmp[0].Split('@');
+                    if (UriStrTmp.Length > 1)
+                        _Port = UriStrTmp[1];                  
+                    UriStrTmp = UriStrUser[0].Split('"');
+                    _User = UriStrUser[0];
+                    if (UriStrTmp.Length == 3)
                     {
-                        string[] user_fields = UriStr[1].Split('@');
-                        if (user_fields.Length > 1)
-                            return user_fields[0];
-                        return "";
+                        _User = UriStrTmp[2];
+                        _DisplayName = UriStrTmp[1];
                     }
-
-                    return "????";
+                    _Host = UriStrUser[1].Split(';').First();
+                    _Resource = UriStrUser[1].Split(';').Last().Replace ("cd40rs=", "");
+                }
+                else if ((UriStrTmp.Length > 1) && (UriStrTmp[1].Contains('@')))
+                {
+                    UriStrUser = UriStrTmp[1].Split('@');
+                    if (UriStrTmp.Length > 2)
+                        _Port = UriStrTmp[2];
+                    _User = UriStrTmp[0];
+                    if (UriStrTmp.Length == 3)
+                    {
+                        _User = UriStrTmp[2];
+                        _DisplayName = UriStrTmp[1];
+                    }
+                    if (UriStrTmp.Length > 1)
+                        _Host = UriStrUser[1].Split(';').First();
+                }
+                else
+                {
+                    _Host = UriStrTmp[0];
+                    if (UriStrTmp.Length > 1)
+                        _Port = UriStrTmp[1];
                 }
             }
-            public string Dominio
+            public SipUriParser(string user, string ip, uint port)
+            {
+                _User = user;
+                _Host = ip;
+                _Port = port.ToString();
+            }
+            public SipUriParser(string user, string ip)
+            {
+                _User = user;
+                _Host = ip;
+                _Port = "5060";
+            }
+
+            public string User
+            {
+                get { return _User; }
+                set { _User = value; }
+            }
+
+            public string DisplayName
+            {
+                get { return _DisplayName; }
+                set { _DisplayName = value; }
+            }
+            public string Resource
+            {
+                get { return _Resource; }
+                set { _Resource = value; }
+            }
+            public string HostPort
             {
                 get
                 {
-                    if (UriStr.Length > 1)
-                    {
-                        string[] user_fields = UriStr[1].Split('@');
-                        if (user_fields.Length == 1)
-                        {
-                            return UriStr.Length > 2 ? user_fields[0] + ":" + UriStr[2] : user_fields[0];
-                        }
-                        else if (user_fields.Length == 2)
-                        {
-                            return UriStr.Length > 2 ? user_fields[1] + ":" + UriStr[2] : user_fields[1];
-                        }
-                        return "";
-                    }
-
-                    return "????";
+                    return Host + ":" + Port;
                 }
             }
 
             /** 20180625. AGL. */
             public string Host
             {
-                get
-                {
-                    string[] fields = Dominio.Split(':');
-                    return fields.Length >= 0 ? fields[0] : "???";
-                }
+                get { return _Host; }
+                set { _Host = value; }
             }
             public int Port
             {
                 get
                 {
-                    string[] fields = Dominio.Split(':');
-                    int port = 0;
-                    return (fields.Length > 1 && Int32.TryParse(fields[1], out port)) ? port : 5060;
+                    int port;
+                    Int32.TryParse(_Port, out port);
+                    return port;
                 }
+                set { _Port = value.ToString(); }
             }
             public string UlisesFormat
             {
                 get
                 {
-                    return String.Format("<sip:{0}@{1}:{2}>", User, Host, Port);
+                    if (User.Length > 0)
+                        return String.Format("<sip:{0}@{1}:{2}>", User, Host, Port);
+                    else
+                        return String.Format("<sip:{0}:{1}>", Host, Port);
                 }
             }
+        }
+        public static bool EqualSIPIPAddress (string ip1, string ip2)
+        {
+           string defaultSipPort = ":5060";
+           String[] ipFields1 = ip1.Split(':');
+           if (ipFields1.Count() == 1)
+               ip1 += defaultSipPort;
+           String[] ipFields2 = ip2.Split(':');
+           if (ipFields2.Count() == 1)
+               ip2 += defaultSipPort;
 
-
-            string[] UriStr { get; set; }
+            
+            return (String.Compare(ip1, ip2) == 0);
         }
         public class SipEndPoint
         {
@@ -117,6 +172,7 @@ namespace Utilities
                 }
                 catch (Exception exc)
                 {
+                    _Logger.Error(String.Format("Error SipUtilities EqualSipEndPoint {0} {1}", endPoint1, endPoint2));
                     return false;
                 }
             }

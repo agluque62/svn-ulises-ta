@@ -119,7 +119,8 @@ namespace HMI.Presentation.Asecna
 			ShowViewInWorkspace<TlfView>(ViewNames.Tlf, WorkspaceNames.TlfWorkspace);
 			ShowViewInWorkspace<TlfDaView>(ViewNames.TlfDa, WorkspaceNames.TlfNumbersWorkspace);
 			ShowViewInWorkspace<TlfFunctionsView>(ViewNames.TlfFunctions, WorkspaceNames.TlfFunctionsWorkspace);
-            ShowViewInWorkspace<HfView>(ViewNames.HfView, WorkspaceNames.SelCallWorkspace);
+            if (Settings.Default.HFView)
+                ShowViewInWorkspace<HfView>(ViewNames.HfView, WorkspaceNames.SelCallWorkspace);
 		}
 
 		//TODO: Add CommandHandlers and/or Event Subscriptions

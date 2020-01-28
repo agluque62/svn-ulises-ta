@@ -27,17 +27,36 @@ angular.module("Uv5kinbx")
         var txt = document.createElement("textarea");
         txt.innerHTML = html;
         return txt.value;
-    }
+    };
 
-    ctrl.RadioOptionsShow = function(){
+    ctrl.RadioOptionsShow = function () {
         var type = $lserv.globalType();
         return type === srvtypes.Radio || type === srvtypes.Mixed;
-    }
+    };
 
     ctrl.PhoneOptionsShow = function () {
         var type = $lserv.globalType();
         return ctrl.appver >= 1 && (type === srvtypes.Phone || type === srvtypes.Mixed);
+    };
+
+    // Paginado Incidencias
+    ctrl.inciPageSize = 4;
+    ctrl.inciCurrentPage = 1;
+    ctrl.inciPage = [];
+    ctrl.inciPages = 0;
+    function inciPaginate() {
+        var begin = ((ctrl.inciCurrentPage - 1) * ctrl.inciPageSize),
+            end = begin + ctrl.inciPageSize;
+        ctrl.inciPage = ctrl.listainci.slice(begin, end);
+        var item1 = Math.floor(ctrl.listainci.length / ctrl.inciPageSize);
+        var item2 = (ctrl.listainci.length % ctrl.inciPageSize) !== 0 ? 1 : 0;
+        ctrl.inciPages = ctrl.listainci.length === 0 ? 1 : item1 + item2;
     }
+    $scope.$watch('ctrl.inciCurrentPage', function () {
+
+        console.log(ctrl.inciCurrentPage);
+        inciPaginate();
+    });
 
     /** Funciones o servicios */
     function getInci() {
@@ -46,6 +65,7 @@ angular.module("Uv5kinbx")
                 if (ctrl.HashCode != response.data.hash) {
                     ctrl.listainci = response.data.li;
                     ctrl.HashCode = response.data.hash;
+                    inciPaginate();
                 }
                 // console.log(ctrl.listainci);
                 /** */

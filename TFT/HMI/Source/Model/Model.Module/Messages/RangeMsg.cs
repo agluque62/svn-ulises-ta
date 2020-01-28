@@ -85,19 +85,25 @@ namespace HMI.Model.Module.Messages
 		public readonly string Dst;
 		public readonly TlfState St;
         public readonly bool _PriorityAllowed;
+        public readonly TlfType _Type;
+        public readonly bool _IsTop;
+        public readonly bool _AllowsForward; //Point to point telephony destination CGW
 
-		public TlfInfo(string dst, TlfState st, bool priorityAllowed)
+		public TlfInfo(string dst, TlfState st, bool priorityAllowed, TlfType type, bool isTop, bool allowsForward)
 		{
 			Dst = dst;
 			St = st;
             _PriorityAllowed = priorityAllowed;
-		}
+            _Type = type;
+            _IsTop = isTop;
+            _AllowsForward = allowsForward;
+        }
 
-		public override string ToString()
+        public override string ToString()
 		{
-            return string.Format("[Dst={0}] [State={1}] [PrioAllowed={2}]", Dst, St, _PriorityAllowed);
-		}
-	}
+            return string.Format("[Dst={0}] [State={1}] [PrioAllowed={2}] [Type={3}] [IsTop={4}] [ForwAllowed={4}]", Dst, St, _PriorityAllowed, _Type, _IsTop, _AllowsForward);
+        }
+    }
 
 	public sealed class RdDestination
 	{
@@ -241,17 +247,21 @@ namespace HMI.Model.Module.Messages
 		public string Alias;
 		public string Number;
 		public TlfState State;
+        public readonly bool _IsTop;
+        public readonly bool _AllowsForward;
 
-		public TlfIaDestination(string alias, string number, TlfState state)
+        public TlfIaDestination(string alias, string number, TlfState state, bool isTop = true, bool allowsForward = true)
 		{
 			Alias = alias;
 			Number = number;
 			State = state;
-		}
+            _IsTop = isTop;
+            _AllowsForward = allowsForward;
+        }
 
-		public override string ToString()
+    public override string ToString()
 		{
-			return string.Format("[Alias={0}] [Number={1}] [State={2}]", Alias, Number, State);
+            return string.Format("[Alias={0}] [Number={1}] [State={2} [IsTop={3}]", Alias, Number, State, _IsTop);
 		}
 	}
 

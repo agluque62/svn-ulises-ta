@@ -96,13 +96,17 @@ namespace Utilities
                         string listaEventos = "";
                         if (_Queue.Count > _OverloadThreshold)
                         {
-                            LogManager.GetCurrentClassLogger().Info("Event Queue {1} overloaded {0} with {2}", _Queue.Count, _Name, id);
-                            foreach (Event evento in _Queue.ToArray())
+							//Do not print too much
+                            if (_Queue.Count % 100 == 0 && _Queue.Count < 1000)
                             {
-                                listaEventos += " ";
-                                listaEventos += evento.Id;
+                                LogManager.GetCurrentClassLogger().Info("Event Queue {1} overloaded {0} with {2}", _Queue.Count, _Name, id);
+                                foreach (Event evento in _Queue.ToArray())
+                                {
+                                    listaEventos += " ";
+                                    listaEventos += evento.Id;
+                                }
+                            //LogManager.GetCurrentClassLogger().Trace("ev:{0} ", listaEventos);                           
                             }
-                            LogManager.GetCurrentClassLogger().Trace("ev:{0} ", listaEventos);                           
                         }
 					}
 				}
@@ -133,7 +137,7 @@ namespace Utilities
 		private ManualResetEvent _StopEvent;
 		private Thread _WorkingThread;
         private string _Name = "NoName";
-        private int _OverloadThreshold = 100;
+        private int _OverloadThreshold = 200;
 		private void ProcessEvents()
 		{
 			WaitHandle[] waitHandles = new WaitHandle[] { _StopEvent, _NewEvent };
