@@ -884,6 +884,10 @@ namespace U5ki.Infrastructure
             /// Evita que el nodebox reciba falsos SQ de avion provocados por PTT propio
             /// </summary>
             public uint TimeToDiscardRdInfo;
+
+            public uint DIA_TxAttenuation_dB;		//Atenuacion de las llamadas DIA en Tx (Antes de transmistir por RTP). En dB
+            public uint IA_TxAttenuation_dB;		//Atenuacion de las llamadas IA en Tx (Antes de transmistir por RTP). En dB
+            public uint RD_TxAttenuation_dB;		//Atenuacion del Audio que se transmite hacia el multicas al hacer PTT en el HMI. En dB
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -1484,6 +1488,10 @@ namespace U5ki.Infrastructure
 
                 cfg.max_calls = max_calls;     // Maximo número de llamadas por defecto en el puesto
                 cfg.TimeToDiscardRdInfo = Settings.Default.SQSourceConfirmTime;
+
+                cfg.DIA_TxAttenuation_dB = Settings.Default.DIA_TxAttenuation_dB;
+                cfg.IA_TxAttenuation_dB = Settings.Default.IA_TxAttenuation_dB;
+                cfg.RD_TxAttenuation_dB = Settings.Default.RD_TxAttenuation_dB;
  
                 CORESIP_Error err;
                 if (CORESIP_Init(cfg, out err) != 0)
