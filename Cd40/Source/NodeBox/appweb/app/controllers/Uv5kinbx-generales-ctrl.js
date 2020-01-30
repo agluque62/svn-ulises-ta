@@ -39,6 +39,13 @@ angular.module("Uv5kinbx")
             std.level === levels.Master && std.std === states.Running ? "success" : "danger";
     };
 
+    ctrl.RowBg = function (std) {
+        return std === undefined || std.std === states.Disabled || std.level === levels.Error ? "row bg-danger" :
+            std.level === levels.Slave && std.std === states.Running ? "row bg-warning" :
+                std.level === levels.Master && std.std === states.Running ? "row bg-white" : "row bg-danger";
+
+    };
+
     /** */
     ctrl.txtEstado = function (std) {
         //return std == stdcodes.Error ? $lserv.translate("Parado") :
@@ -57,8 +64,9 @@ angular.module("Uv5kinbx")
     };
 
     ctrl.DisableRadioServiceComponent = function () {
-        var type = $lserv.globalType();
-        return (type != srvtypes.Radio && type != srvtypes.Mixed);
+        //var type = $lserv.globalType();
+        //return (type != srvtypes.Radio && type != srvtypes.Mixed);
+        return true;
     };
 
     ctrl.DisablePhoneServiceComponent = function (isfocus) {

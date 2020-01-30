@@ -10,7 +10,7 @@
     </ul>
 </section>
 <section id="_contenido">
-    <div id="stdGlobal" data-ng-show="ctrl.pagina==0">
+    <div id="stdGlobal" data-ng-show="ctrl.pagina==-1">
         <h1><strong translate>Estado Global</strong></h1>
         <table class="table table-bordered table-striped">
             <tr>
@@ -37,7 +37,7 @@
                 <tr data-ng-class="ctrl.colorEstado(ctrl.std.cfg)" ng-hide="ctrl.DisableRadioServiceComponent()">
                     <td class="text-primary"><strong translate>Configuracion Puestos</strong></td>
                     <td>{{ctrl.txtModo(ctrl.std.cfg)}}</td>
-					<td>{{ctrl.txtEstado(ctrl.std.cfg)}}</td>
+                    <td>{{ctrl.txtEstado(ctrl.std.cfg)}}</td>
                 </tr>
                 <tr data-ng-class="ctrl.colorEstado(ctrl.std.rad)" ng-hide="ctrl.DisableRadioServiceComponent()">
                     <td class="text-primary"><strong translate>Radio</strong></td>
@@ -75,6 +75,70 @@
         </table>
     </div>
 
+    <div id="stdGlobal" data-ng-show="ctrl.pagina==0">
+        <h1><strong translate>Estado Global</strong></h1>
+        <div style="width:80%; margin-left: 10%; padding: 1em; border: 1px solid lightgray; ">
+            <div class="row">
+                <div class="col-md-4 text-primary" translate>Version del Servicio</div>
+                <div class="col-md-4 text-success text-right">{{ctrl.std.sw_version}}</div>
+                <div class="col-md-4 text-right"><button type="button" class="btn btn-default" ng-click="ctrl.VersionDetailShow()" translate>Detalle</button></div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 text-primary" translate>Configuracion Activa</div>
+                <div class="col-md-4 text-success text-right">{{ctrl.std.cfg_activa}}</div>
+                <div class="col-md-4"></div>
+            </div>
+        </div>
+
+        <h1><strong translate>Estado de Servicios</strong></h1>
+        <div style="width:80%; margin: 1em; margin-left: 10%; padding: 2em; border: 1px solid lightgray; ">
+            <div ng-class="ctrl.RowBg(ctrl.std.cfg)" style="height: 3em; margin-bottom: 1em;">
+                <div class="col-md-4 text-primary btn" style="text-align: left;"><strong translate>Configuracion Puestos</strong></div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtModo(ctrl.std.cfg)}}</div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtEstado(ctrl.std.cfg)}}</div>
+            </div>
+            <div ng-class="ctrl.RowBg(ctrl.std.rad)" style="height: 3em;  margin-bottom: 1em;">
+                <div class="col-md-4 text-primary btn" style="text-align: left;"><strong translate>Radio</strong></div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtModo(ctrl.std.rad)}}</div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtEstado(ctrl.std.rad)}}</div>
+                <div class="col-md-4 text-right">
+                    <button class="btn btn-default " data-toggle="collapse" data-target="#demo" style="float:right;" translate>Modulos</button>
+                </div>
+            </div>
+            <div class="row collapse" id="demo" style="width:33%; margin-left:66%; border: 1px solid lightgray; padding: 1em;">
+                <div class="col-md4">
+                    <div class="row" data-ng-repeat="mod in ctrl.std.rad.modules | filter : {enable: 1}">
+                        <div class="col-md-8 text-primary">{{mod.id}}</div>
+                        <div class="col-md-4 text-success">{{ctrl.txtEstado(mod)}}</div>
+                    </div>
+                </div>
+            </div>
+            <div ng-class="ctrl.RowBg(ctrl.std.pho)" ng-hide="ctrl.DisableRadioServiceComponent()" style="height: 3em;  margin-bottom: 1em;">
+                <div class="col-md-4 text-primary btn" style="text-align: left;"><strong translate=" ">Telefonia (Focus)</strong></div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtModo(ctrl.std.pho)}}</div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtEstado(ctrl.std.pho)}}</div>
+            </div>
+            <div ng-class="ctrl.RowBg(ctrl.std.ifx)" style="height: 3em;  margin-bottom: 1em;">
+                <div class="col-md-4 text-primary btn" style="text-align: left;" style="text-align: left;"><strong translate>Interfaces Analogicas</strong></div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtModo(ctrl.std.ifx)}}</div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtEstado(ctrl.std.ifx)}}</div>
+            </div>
+            <div ng-class="ctrl.RowBg(ctrl.std.pre)" style="height: 3em;  margin-bottom: 1em;">
+                <div class="col-md-4 text-primary btn" style="text-align: left;"><strong translate>Servicio de Presencia</strong></div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtModo(ctrl.std.pre)}}</div>
+                <div class="col-md-2 btn" style="text-align: left;" translate>{{ctrl.txtEstado(ctrl.std.pre)}}</div>
+            </div>
+            <!--<div class="row" style="height: 3em;">
+                <div class="col-md-8 text-primary" translate></div>
+                <div class="col-md-4 text-right">
+                    <button class="btn btn-default" data-ng-click="ctrl.logs()">LOGS</button>
+                </div>
+            </div>-->
+        </div>
+        <div></div>
+
+    </div>
+
     <div id="cfConfiguracion" data-ng-show="ctrl.pagina==1">
         <h1><strong translate>Preconfiguraciones</strong></h1>
         <table class="table table-bordered table-striped">
@@ -90,8 +154,8 @@
                 <tr data-ng-repeat="pre in ctrl.preconf">
                     <td>{{pre.fecha}}</td>
                     <td>{{pre.nombre}}</td>
-                    <td ><button class="btn btn-default" data-ng-click="ctrl.activar_pre(pre)" translate>Activar</button></td>
-                    <td ><button class="btn btn-warning" data-ng-click="ctrl.eliminar_pre(pre)" translate>Eliminar</button></td>
+                    <td><button class="btn btn-default" data-ng-click="ctrl.activar_pre(pre)" translate>Activar</button></td>
+                    <td><button class="btn btn-warning" data-ng-click="ctrl.eliminar_pre(pre)" translate>Eliminar</button></td>
                 </tr>
             </tbody>
         </table>
@@ -99,7 +163,7 @@
     </div>
 
     <div id="VersionDetail" class="modal fade" role="dialog" tabindex='-1'>
-        <div class="modal-dialog modal-lg"">
+        <div class="modal-dialog modal-lg" ">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" translate>Detalle de Version Software Instalada</h4>
@@ -129,10 +193,10 @@
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default bhis"  ng_click="ctrl.versiones_export()" translate>Exportar</button>
+                    <button type="button" class="btn btn-default bhis" ng_click="ctrl.versiones_export()" translate>Exportar</button>
                 </div>
             </div>
         </div>
-        </div>
+    </div>
 
 </section>
