@@ -121,6 +121,7 @@ namespace HMI.Presentation.Twr.Views
             // 
             // _MoreBT
             // 
+            this._MoreBT.DataBindings.Add(new System.Windows.Forms.Binding("Visible", global::HMI.Presentation.Twr.Properties.Settings.Default, "EnableMore", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this._MoreBT.DrawX = false;
             this._MoreBT.Enabled = false;
             this._MoreBT.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -131,6 +132,7 @@ namespace HMI.Presentation.Twr.Views
             this._MoreBT.TabIndex = 7;
             this._MoreBT.Text = "Más";
             this._MoreBT.Click += new System.EventHandler(this._MoreBT_Click);
+            this._MoreBT.Visible =global::HMI.Presentation.Twr.Properties.Settings.Default.EnableMore;
             // 
             // _TlfSpeakerBT
             // 

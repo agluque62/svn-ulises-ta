@@ -26,9 +26,10 @@ namespace HMI.Model.Module.UI
 		private Rectangle _PttRect = new Rectangle();
 		private Rectangle _SquelchRect = new Rectangle();
 		private Font _SmallFont = new Font("Microsoft Sans Serif", 7.25F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
-        private Font _SmallFontBold = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
+        private Font _MediumFontBold = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
         private Font _SmallFontBold1 = new Font("Microsoft Sans Serif", 7.25F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
-		private Font _BigFont = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
+        private Font _MediumFontBold2 = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+        private Font _BigFont = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
 		private Image _PttImage = null;
 		private Image _SquelchImage = null;
 		private string _Frecuency = "";
@@ -166,7 +167,7 @@ namespace HMI.Model.Module.UI
 			_TxBtnInfo.Font = _BigFont;
 			_RxBtnInfo.Text = "Rx";
 			_RxBtnInfo.Font = _BigFont;
-		}
+        }
 
         public void Reset(string frecuency, string alias, bool drawX, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor, Color rxForeColor, Color titleForeColor, 
             string qidxResource, uint qidxValue, FrequencyState state)
@@ -412,7 +413,7 @@ namespace HMI.Model.Module.UI
                 {
                     Rectangle txtRect = ClientRectangle;
                     txtRect.Offset(32, 2);
-                    BtnRenderer.DrawString(e.Graphics, txtRect, Color.Transparent, st, _QidxValue.ToString(), _SmallFontBold, ContentAlignment.TopCenter, Color.Black);
+                    BtnRenderer.DrawString(e.Graphics, txtRect, Color.Transparent, st, _QidxValue.ToString(), _MediumFontBold, ContentAlignment.TopCenter, Color.Black);
                 }
 			}
 
@@ -433,24 +434,35 @@ namespace HMI.Model.Module.UI
 #if DEBUG1
             textRect.Offset(0, -5);
             //_Frecuency = _Frecuency=="125.200" ? "EMERGENCIA" : _Frecuency;
-            Font fontToUse = _Frecuency.Length > 7 ? _SmallFontBold1 : _SmallFontBold;
+            Font fontToUse = _Frecuency.Length > 7 ? _SmallFontBold1 : _MediumFontBold;
             BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Frecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
 #else
             textRect.Offset(0, -5);
-            Font fontToUse = _Frecuency.Length > 7 ? _SmallFontBold1 : _SmallFontBold;
-			BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Frecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
+            Font fontToUse = _Frecuency.Length > 7 ? _SmallFontBold1 : _MediumFontBold;
+            if (global::HMI.Model.Module.Properties.Settings.Default.BigFonts)
+                fontToUse = _BigFont;
+            BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Frecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
 #endif
-            textRect.Offset(0, 13);
-			BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Alias, _SmallFont, ContentAlignment.TopCenter, ForeColor);
-
-			if (_RtxGroup > 0)
+            if (global::HMI.Model.Module.Properties.Settings.Default.BigFonts)
+            {
+                fontToUse = _MediumFontBold2;
+                textRect.Offset(0, 20);
+            }
+            else
+            {
+                textRect.Offset(0, 13);
+                fontToUse = _SmallFont;
+            }
+            BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Alias, fontToUse, ContentAlignment.TopCenter, ForeColor);
+            
+            if (_RtxGroup > 0)
 			{
 				string rtxGroup = ((char)('G' + _RtxGroup - 1)).ToString();
-				e.Graphics.DrawString(rtxGroup, _SmallFontBold, Brushes.Black, 3, _TxBtnInfo.Rect.Top - 15);
+				e.Graphics.DrawString(rtxGroup, _MediumFontBold, Brushes.Black, 3, _TxBtnInfo.Rect.Top - 15);
 			}
 			else if (_RtxGroup == -1)
 			{
-				e.Graphics.DrawString("R", _SmallFontBold, Brushes.Black, Width - 15, _TxBtnInfo.Rect.Top - 15);
+				e.Graphics.DrawString("R", _MediumFontBold, Brushes.Black, Width - 15, _TxBtnInfo.Rect.Top - 15);
 			}
 
 			using (Pen linePen = new Pen(Enabled ? _BtnInfo.GetBorderColor(BtnState.Normal) : _BtnInfo.GetBorderColor(BtnState.Inactive), 2))

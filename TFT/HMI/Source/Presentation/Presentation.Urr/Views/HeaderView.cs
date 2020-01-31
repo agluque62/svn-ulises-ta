@@ -135,13 +135,6 @@ namespace HMI.Presentation.Urr.Views
             _InfoBT.Text = _Info;   // Miguel
         }
 
-        [EventSubscription(EventTopicNames.ProxyPresent, ThreadOption.Publisher)]
-        public void OnProxyPresent(object sender, EventArgs e)
-        {
-            if (Settings.Default.EmergencyModeWarn)
-                BackColor = _StateManager.Scv.ProxyState ? System.Drawing.Color.Gainsboro : BackColor = System.Drawing.Color.Khaki;
-        }
-
         [EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
         [EventSubscription(EventTopicNames.EngineStateChanged, ThreadOption.Publisher)]
         public void OnTftEnabledChanged(object sender, EventArgs e)

@@ -89,6 +89,7 @@
     <Compile Include="..\..\VersionInfo.cs">
       <Link>VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Constants\Enums.cs" />
     <Compile Include="Constants\ViewNames.cs" />
     <Compile Include="Layout\ShellLayoutView.cs">
       <SubType>UserControl</SubType>
@@ -222,10 +223,6 @@
     <ProjectReference Include="..\..\Model\Model.Module\Model.Module.csproj">
       <Project>{4E7FBF3D-731C-4ECB-97A3-9714F7D60CB6}</Project>
       <Name>Model.Module</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Presentation.Rabat\Presentation.Rabat.csproj">
-      <Project>{20e764fd-d9b5-4cfb-a21b-812c96f6d2d5}</Project>
-      <Name>Presentation.Rabat</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

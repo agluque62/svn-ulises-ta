@@ -161,7 +161,15 @@ namespace HMI.Presentation.Twr.Views
 		public TlfIaView([ServiceDependency] WorkItem workItem, [ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
 		{
 			InitializeComponent();
-			_IaToolsWS.Name = WorkspaceNames.IaToolsWorkspace;
+            if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
+            {
+                this._MemBT.Font = new System.Drawing.Font("Trebuchet MS", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                this._Num1BT.Font = new System.Drawing.Font("Trebuchet MS", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                this._Num2BT.Font = new System.Drawing.Font("Trebuchet MS", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                this._Num3BT.Font = new System.Drawing.Font("Trebuchet MS", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                this._Num4BT.Font = new System.Drawing.Font("Trebuchet MS", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            }
+            _IaToolsWS.Name = WorkspaceNames.IaToolsWorkspace;
 
 			_WorkItem = workItem;
 			_CmdManager = cmdManager;

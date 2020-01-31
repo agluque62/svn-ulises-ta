@@ -124,7 +124,7 @@
     <value>AD</value>
   </data>
   <data name="AGVN" xml:space="preserve">
-    <value>AGVN:</value>
+    <value>AGVN</value>
   </data>
   <data name="AI" xml:space="preserve">
     <value>AI</value>
@@ -142,7 +142,7 @@
     <value>Écoute</value>
   </data>
   <data name="Funcion" xml:space="preserve">
-    <value>Fonction :</value>
+    <value>Fonction</value>
   </data>
   <data name="GlobalDisconnected" xml:space="preserve">
     <value>Déconnecté</value>
@@ -190,13 +190,13 @@
     <value>Attente</value>
   </data>
   <data name="RTB" xml:space="preserve">
-    <value>RTCP:</value>
+    <value>RTCP</value>
   </data>
   <data name="Rtx" xml:space="preserve">
     <value>Rtx</value>
   </data>
   <data name="Tipo" xml:space="preserve">
-    <value>Type:</value>
+    <value>Type</value>
   </data>
   <data name="TlfNoOk" xml:space="preserve">
     <value>Système de Téléphonie déconnecté</value>

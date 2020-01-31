@@ -121,12 +121,19 @@ namespace HMI.Presentation.Twr.Views
 			_SplitUC.RightJackOn = _StateManager.Jacks.RightJack;
 			_SplitUC.Mode = _StateManager.Split.Mode;
 			_SplitUC.Enabled = _SplitEnabled;
-
-			_InfoBT.Enabled = _InfoEnabled;
+            if (global::HMI.Presentation.Twr.Properties.Settings.Default.JackUse != HMI.Presentation.Twr.Constants.JackUse.Both)
+            {
+                this._SplitUC.Size = new System.Drawing.Size(60, 79);
+                this._InfoBT.Location = new System.Drawing.Point(235, 17);
+                this._MsgLB.Location = new System.Drawing.Point(295, 3);
+                this._MsgLB.Size = new System.Drawing.Size(320, 66);
+                this._MsgLB.Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
+            }
+            _InfoBT.Enabled = _InfoEnabled;
 
             //_CmdManager.SetBrightnessLevel(100); 
             _BrightnessUDB.Level = _StateManager.Brightness.Level;
-			_BrightnessUDB.Enabled = _BrightnessEnabled;
+			_BrightnessUDB.Visible = _BrightnessEnabled;
 
 			_BuzzerUDB.Level = _StateManager.Buzzer.Level;
 			_BuzzerUDB.Enabled = _BuzzerEnabled;
@@ -148,7 +155,7 @@ namespace HMI.Presentation.Twr.Views
 			_TitleBT.Enabled = _TitleEnabled;
 			_SplitUC.Enabled = _SplitEnabled;
 			_InfoBT.Enabled = _InfoEnabled;
-			_BrightnessUDB.Enabled = _BrightnessEnabled;
+			_BrightnessUDB.Visible = _BrightnessEnabled;
 			_BuzzerUDB.Enabled = _BuzzerEnabled;
 			_TitleBT.DrawX = !_StateManager.Engine.Operative;
             if (sender.GetType() == typeof(Engine))

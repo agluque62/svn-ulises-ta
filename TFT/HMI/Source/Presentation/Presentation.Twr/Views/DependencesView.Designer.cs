@@ -160,9 +160,9 @@ namespace HMI.Presentation.Twr.Views
 			// _CloseBT
 			// 
 			this._CloseBT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this._CloseBT.Location = new System.Drawing.Point(355, 76);
+			this._CloseBT.Location = new System.Drawing.Point(355, 66);
 			this._CloseBT.Name = "_CloseBT";
-			this._CloseBT.Size = new System.Drawing.Size(70, 38);
+			this._CloseBT.Size = new System.Drawing.Size(70, 48);
 			this._CloseBT.TabIndex = 9;
 			this._CloseBT.Text = "Cerrar";
 			this._CloseBT.Click += new System.EventHandler(this._CloseBT_Click);
@@ -171,9 +171,9 @@ namespace HMI.Presentation.Twr.Views
 			// 
 			this._CallBT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this._CallBT.Enabled = false;
-			this._CallBT.Location = new System.Drawing.Point(355, 32);
+			this._CallBT.Location = new System.Drawing.Point(355, 15);
 			this._CallBT.Name = "_CallBT";
-			this._CallBT.Size = new System.Drawing.Size(70, 38);
+			this._CallBT.Size = new System.Drawing.Size(70, 48);
 			this._CallBT.TabIndex = 8;
 			this._CallBT.Text = "Llamar";
 			this._CallBT.Click += new System.EventHandler(this._CallBT_Click);
@@ -183,10 +183,10 @@ namespace HMI.Presentation.Twr.Views
 			this._RtbTB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this._RtbTB.BackColor = System.Drawing.SystemColors.Window;
 			this._RtbTB.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this._RtbTB.Location = new System.Drawing.Point(65, 94);
+			this._RtbTB.Location = new System.Drawing.Point(65, 92);
 			this._RtbTB.Name = "_RtbTB";
 			this._RtbTB.ReadOnly = true;
-			this._RtbTB.Size = new System.Drawing.Size(120, 20);
+			this._RtbTB.Size = new System.Drawing.Size(160, 20);
 			this._RtbTB.TabIndex = 7;
 			// 
 			// label4
@@ -194,21 +194,21 @@ namespace HMI.Presentation.Twr.Views
 			label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			label4.AutoSize = true;
 			label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			label4.Location = new System.Drawing.Point(3, 97);
+			label4.Location = new System.Drawing.Point(3, 95);
 			label4.Name = "label4";
 			label4.Size = new System.Drawing.Size(36, 13);
 			label4.TabIndex = 6;
-			label4.Text = "RTB:";
+			label4.Text = "RTB";
 			// 
 			// _AgvnTB
 			// 
 			this._AgvnTB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this._AgvnTB.BackColor = System.Drawing.SystemColors.Window;
 			this._AgvnTB.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this._AgvnTB.Location = new System.Drawing.Point(65, 72);
+			this._AgvnTB.Location = new System.Drawing.Point(65, 70);
 			this._AgvnTB.Name = "_AgvnTB";
 			this._AgvnTB.ReadOnly = true;
-			this._AgvnTB.Size = new System.Drawing.Size(120, 20);
+			this._AgvnTB.Size = new System.Drawing.Size(160, 20);
 			this._AgvnTB.TabIndex = 5;
 			// 
 			// label3
@@ -216,21 +216,21 @@ namespace HMI.Presentation.Twr.Views
 			label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			label3.AutoSize = true;
 			label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			label3.Location = new System.Drawing.Point(3, 75);
+			label3.Location = new System.Drawing.Point(3, 73);
 			label3.Name = "label3";
 			label3.Size = new System.Drawing.Size(45, 13);
 			label3.TabIndex = 4;
-			label3.Text = "AGVN:";
+			label3.Text = "AGVN";
 			// 
 			// _FunctionTB
 			// 
 			this._FunctionTB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this._FunctionTB.BackColor = System.Drawing.SystemColors.Window;
 			this._FunctionTB.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this._FunctionTB.Location = new System.Drawing.Point(65, 50);
+			this._FunctionTB.Location = new System.Drawing.Point(65, 48);
 			this._FunctionTB.Name = "_FunctionTB";
 			this._FunctionTB.ReadOnly = true;
-			this._FunctionTB.Size = new System.Drawing.Size(120, 20);
+			this._FunctionTB.Size = new System.Drawing.Size(160, 20);
 			this._FunctionTB.TabIndex = 3;
 			// 
 			// label2
@@ -238,21 +238,21 @@ namespace HMI.Presentation.Twr.Views
 			label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			label2.AutoSize = true;
 			label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			label2.Location = new System.Drawing.Point(3, 53);
+			label2.Location = new System.Drawing.Point(3, 51);
 			label2.Name = "label2";
 			label2.Size = new System.Drawing.Size(56, 13);
 			label2.TabIndex = 2;
-			label2.Text = "Función:";
+			label2.Text = "Función";
 			// 
 			// _TypeTB
 			// 
 			this._TypeTB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this._TypeTB.BackColor = System.Drawing.SystemColors.Window;
 			this._TypeTB.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this._TypeTB.Location = new System.Drawing.Point(65, 27);
+			this._TypeTB.Location = new System.Drawing.Point(65, 25);
 			this._TypeTB.Name = "_TypeTB";
 			this._TypeTB.ReadOnly = true;
-			this._TypeTB.Size = new System.Drawing.Size(120, 20);
+			this._TypeTB.Size = new System.Drawing.Size(160, 20);
 			this._TypeTB.TabIndex = 1;
 			// 
 			// label1
@@ -260,11 +260,11 @@ namespace HMI.Presentation.Twr.Views
 			label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			label1.AutoSize = true;
 			label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			label1.Location = new System.Drawing.Point(3, 27);
+			label1.Location = new System.Drawing.Point(3, 25);
 			label1.Name = "label1";
 			label1.Size = new System.Drawing.Size(36, 13);
 			label1.TabIndex = 0;
-			label1.Text = "Tipo:";
+			label1.Text = "Tipo";
 			// 
 			// DependencesView
 			// 

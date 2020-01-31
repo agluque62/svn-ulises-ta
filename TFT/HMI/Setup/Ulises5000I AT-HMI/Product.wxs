@@ -602,6 +602,82 @@
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='OnlySpeakerMode'[\]]/value"
                         Value="False"/>
       </Component>
+      <Component Id='ConditionalUpdatesForURV_7' Guid='{51A3B3A5-536D-477B-B3D1-9B318D29BD00}' KeyPath='yes'>
+        <Condition >CLIENTE="URV_7"</Condition>
+        <util:XmlFile Id="LogoURV_7" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
+                        Value="Resources/logo_AENA.PNG"/>
+        <util:XmlFile Id="GlpForURV_7" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='GLP'[\]]/value"
+                        Value="False"/>
+        <util:XmlFile Id="AppsURV" Action="setValue"
+                        File = "[#ProfileCatalog]"
+                        ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
+                        Name="AssemblyFile"
+                        Value="Presentation.Twr.dll"/>
+        <util:XmlFile Id="JackUseURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='JackUse'[\]]/value"
+                Value="ExecutiveOnly"/>
+        <util:XmlFile Id="EnableForwardURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='EnableForward'[\]]/value"
+                Value="False"/>
+        <util:XmlFile Id="EnableMoreURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='EnableMore'[\]]/value"
+                Value="False"/>
+        <util:XmlFile Id="EnablePickUpURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='EnablePickUp'[\]]/value"
+                Value="False"/>
+        <util:XmlFile Id="EnableTransferURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='EnableTransfer'[\]]/value"
+                Value="False"/>
+        <util:XmlFile Id="EnableListenURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='EnableListen'[\]]/value"
+                Value="False"/>
+        <util:XmlFile Id="EnablePriorityURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='EnablePriority'[\]]/value"
+                Value="False"/>
+        <util:XmlFile Id="RdRowsURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='RdRows'[\]]/value"
+                Value="3"/>
+        <util:XmlFile Id="RdColumnsURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='RdColumns'[\]]/value"
+                Value="3"/>
+        <util:XmlFile Id="LcRowsURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='LcRows'[\]]/value"
+                Value="1"/>
+        <util:XmlFile Id="LcColumnsURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='LcColumns'[\]]/value"
+                Value="9"/>
+        <util:XmlFile Id="TlfRowsURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='TlfRows'[\]]/value"
+                Value="3"/>
+        <util:XmlFile Id="TlfColumnsURV_7" Action="setValue"
+                File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='TlfColumns'[\]]/value"
+                Value="3"/>
+        <util:XmlFile Id="BigFontURV_7" Action="setValue"
+        File = "[#HMI.config]"
+        ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='BigFonts'[\]]/value"
+        Value="true"/>
+        <util:XmlFile Id="BigFontModelURV_7" Action="setValue"
+        File = "[#HMI.config]"
+        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='BigFonts'[\]]/value"
+        Value="true"/>
+      </Component>
 
       <!-- El doble altavoz condiciona la configuracion de HFSpeaker -->
       <Component Id='ConditionalUpdatesForDoubleRadioSpeaker' Guid='{54DAE262-4D25-49F7-8AD5-484150EFDAA4}' KeyPath='yes'>
@@ -1050,7 +1126,8 @@
             <ListItem Value="ENNA" Text="ENNA" />
             <ListItem Value="URR" Text="URR" />
             <ListItem Value="KENIA" Text="KENIA" />
-         </ComboBox>
+            <ListItem Value="URV_7" Text="URV-7&quot;" />
+          </ComboBox>
         </Control>
         <Control Id="LangLabel"  Type="Text"     X="190" Y="92" Width="60" Height="18" TabSkip="no" Text="Idioma" />
         <Control Id="LangOption" Type="ComboBox" X="260" Y="90" Width="90" Height="18" Property="LANG" ComboList="yes" >

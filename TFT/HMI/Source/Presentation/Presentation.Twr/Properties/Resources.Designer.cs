@@ -89,7 +89,7 @@ namespace HMI.Presentation.Twr.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AGVN:.
+        ///   Looks up a localized string similar to AGVN.
         /// </summary>
         internal static string AGVN {
             get {
@@ -260,7 +260,7 @@ namespace HMI.Presentation.Twr.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Función:.
+        ///   Looks up a localized string similar to Función.
         /// </summary>
         internal static string Funcion {
             get {
@@ -610,7 +610,7 @@ namespace HMI.Presentation.Twr.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to RTB:.
+        ///   Looks up a localized string similar to RTB.
         /// </summary>
         internal static string RTB {
             get {
@@ -756,7 +756,7 @@ namespace HMI.Presentation.Twr.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tipo:.
+        ///   Looks up a localized string similar to Tipo.
         /// </summary>
         internal static string Tipo {
             get {

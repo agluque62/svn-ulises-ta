@@ -61,7 +61,11 @@ namespace HMI.Presentation.Twr.Views
                 this.Size = new System.Drawing.Size(800, 85);
 
             }
-			_CmdManager = cmdManager;
+            if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
+            {
+                this._LcButtonsTLP.Font = new System.Drawing.Font("Trebuchet MS", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            }
+            _CmdManager = cmdManager;
 			_StateManager = stateManager;
 
 			_LcButtonsTLP.RowCount = Settings.Default.LcRows;

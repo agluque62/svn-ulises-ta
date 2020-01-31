@@ -128,7 +128,7 @@
     <value>..\Resources\Aena.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="AGVN" xml:space="preserve">
-    <value>AGVN:</value>
+    <value>AGVN</value>
   </data>
   <data name="AI" xml:space="preserve">
     <value>AI</value>
@@ -164,7 +164,7 @@
     <value>Escucha</value>
   </data>
   <data name="Funcion" xml:space="preserve">
-    <value>Función:</value>
+    <value>Función</value>
   </data>
   <data name="GlobalDisconnected" xml:space="preserve">
     <value>Desconectado</value>
@@ -248,7 +248,7 @@
     <value>Retener</value>
   </data>
   <data name="RTB" xml:space="preserve">
-    <value>RTB:</value>
+    <value>RTB</value>
   </data>
   <data name="Rtx" xml:space="preserve">
     <value>Rtx</value>
@@ -278,7 +278,7 @@
     <value>..\Resources\Squelch.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Tipo" xml:space="preserve">
-    <value>Tipo:</value>
+    <value>Tipo</value>
   </data>
   <data name="TlfNoOk" xml:space="preserve">
     <value>Desconectado sistema telefonía</value>

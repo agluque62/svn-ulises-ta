@@ -6,7 +6,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="EnableListen" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="EnableHold" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">True</Value>
@@ -98,6 +98,15 @@
     </Setting>
     <Setting Name="EnableForward" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="EnableMore" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="JackUse" Type="HMI.Presentation.Twr.Constants.JackUse" Scope="Application">
+      <Value Profile="(Default)">Both</Value>
+    </Setting>
+    <Setting Name="BigFonts" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -110,7 +110,7 @@ namespace HMI.Presentation.Twr.Views
 		{
 			InitializeComponent();
 
-			_CmdManager = cmdManager;
+            _CmdManager = cmdManager;
 			_StateManager = stateManager;
 
 			_RdButtonsTLP.RowCount = Settings.Default.RdRows;
@@ -158,8 +158,12 @@ namespace HMI.Presentation.Twr.Views
 					bt.TxClick += RdButton_TxClick;
 					bt.RxLongClick += RdButton_RxLongClick;
 					bt.RxShortClick += RdButton_RxShortClick;
-				}
-			}
+                    if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
+                    {
+                        this._RdButtonsTLP.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                    }
+                }
+            }
             if (_StateManager.Radio.DoubleRadioSpeaker)
                 if (!_StateManager.Tlf.SoloAltavoces)
                 {

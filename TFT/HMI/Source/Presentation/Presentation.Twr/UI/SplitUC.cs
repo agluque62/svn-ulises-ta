@@ -156,8 +156,32 @@ namespace HMI.Presentation.Twr.UI
 		public SplitUC()
 		{
 			InitializeComponent();
+            if (global::HMI.Presentation.Twr.Properties.Settings.Default.JackUse != HMI.Presentation.Twr.Constants.JackUse.Both)
+            {
+                this._SplitTLP.Controls.Clear();
+                this._SplitTLP.ColumnStyles.Clear();
+                this._SplitTLP.ColumnCount = 2;
+                this._SplitTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+                this._SplitTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+       
+                if (global::HMI.Presentation.Twr.Properties.Settings.Default.JackUse == HMI.Presentation.Twr.Constants.JackUse.ExecutiveOnly)
+                {
+                    this._SplitTLP.Controls.Add(this._Jack1PB, 0, 0);
+                    this._SplitTLP.Controls.Add(this._Jack2PB, 1, 0);
+                }
+                else
+                {
+                    this._SplitTLP.Controls.Add(this._Jack3PB, 0, 0);
+                    this._SplitTLP.Controls.Add(this._Jack4PB, 1, 0);
+                }
+            }
+            _Jack1PB.Visible = global::HMI.Presentation.Twr.Properties.Settings.Default.JackUse != HMI.Presentation.Twr.Constants.JackUse.AssistantOnly;
+            _Jack2PB.Visible = global::HMI.Presentation.Twr.Properties.Settings.Default.JackUse != HMI.Presentation.Twr.Constants.JackUse.AssistantOnly;
+            _Jack3PB.Visible = global::HMI.Presentation.Twr.Properties.Settings.Default.JackUse != HMI.Presentation.Twr.Constants.JackUse.ExecutiveOnly;
+            _Jack4PB.Visible = global::HMI.Presentation.Twr.Properties.Settings.Default.JackUse != HMI.Presentation.Twr.Constants.JackUse.ExecutiveOnly;
+            _SplitBT.Visible = global::HMI.Presentation.Twr.Properties.Settings.Default.JackUse == HMI.Presentation.Twr.Constants.JackUse.Both;
 
-			_ModeBt = _SplitOffBT;
+            _ModeBt = _SplitOffBT;
 			_ModeBt.ButtonColor = VisualStyle.Colors.Green;
 			_SplitBT.ImageNormal = _ModeBt.ImageNormal;
 
@@ -208,6 +232,6 @@ namespace HMI.Presentation.Twr.UI
 
 			HideModeSelection();
 		}
-	}
+    }
 }
 

@@ -121,7 +121,7 @@
     <value>Accept</value>
   </data>
   <data name="AGVN" xml:space="preserve">
-    <value>AGVN:</value>
+    <value>AGVN</value>
   </data>
   <data name="Cancelar" xml:space="preserve">
     <value>Cancel</value>
@@ -136,7 +136,7 @@
     <value>Listen</value>
   </data>
   <data name="Funcion" xml:space="preserve">
-    <value>Function:</value>
+    <value>Function</value>
   </data>
   <data name="GlobalDisconnected" xml:space="preserve">
     <value>Disconnected</value>
@@ -175,10 +175,10 @@
     <value>Hold</value>
   </data>
   <data name="RTB" xml:space="preserve">
-    <value>PSTN:</value>
+    <value>PSTN</value>
   </data>
   <data name="Tipo" xml:space="preserve">
-    <value>Type:</value>
+    <value>Type</value>
   </data>
   <data name="TlfNoOk" xml:space="preserve">
     <value>Telephone system disconnected</value>

@@ -54,8 +54,11 @@ namespace HMI.Presentation.Twr.Views
         public TlfDaView([ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
 		{
 			InitializeComponent();
-
-			_CmdManager = cmdManager;
+            if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
+            {
+                this._TlfButtonsTLP.Font = new System.Drawing.Font("Trebuchet MS", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            }
+            _CmdManager = cmdManager;
 			_StateManager = stateManager;
 
 			_TlfButtonsTLP.RowCount = Settings.Default.TlfRows;

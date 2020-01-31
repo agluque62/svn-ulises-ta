@@ -97,10 +97,10 @@ namespace HMI.Presentation.Twr.Views
             this._SplitUC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this._SplitUC.JackOff = global::HMI.Presentation.Twr.Properties.Resources.JackOff;
             this._SplitUC.JackOn = global::HMI.Presentation.Twr.Properties.Resources.JackOn;
-            this._SplitUC.Location = new System.Drawing.Point(160, 3);
+            this._SplitUC.Location = new System.Drawing.Point(160, 5);
             this._SplitUC.Margin = new System.Windows.Forms.Padding(5);
             this._SplitUC.Name = "_SplitUC";
-            this._SplitUC.Size = new System.Drawing.Size(190, 79);
+            this._SplitUC.Size = new System.Drawing.Size(190, 76);
             this._SplitUC.TabIndex = 3;
             this._SplitUC.SplitSelectionClick += new System.EventHandler(this._SplitUC_SplitSelectionClick);
             this._SplitUC.SplitModeChanging += new Utilities.GenericEventHandler<HMI.Model.Module.BusinessEntities.SplitMode>(this._SplitUC_SplitModeChanging);
@@ -139,6 +139,7 @@ namespace HMI.Presentation.Twr.Views
             // HeaderView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.Controls.Add(this._MsgLB);
             this.Controls.Add(this._SplitUC);
             this.Controls.Add(this._BrightnessUDB);

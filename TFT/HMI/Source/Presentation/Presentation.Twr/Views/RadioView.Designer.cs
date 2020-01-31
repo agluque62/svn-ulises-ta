@@ -56,9 +56,6 @@ namespace HMI.Presentation.Twr.Views
             this._PttBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SquelchBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._RtxBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            //this._RdHfSpeakerUDB = new HMI.Presentation.Twr.UI.UpDownButton();
-            //this._TxConfirmationDetectionTimer = new System.Windows.Forms.Timer(this.components);
-            //this._CarrierDetectionTimer = new System.Windows.Forms.Timer(this.components);
             _RadioTLP = new System.Windows.Forms.TableLayoutPanel();
             _RadioHeadP = new System.Windows.Forms.Panel();
             _RadioTLP.SuspendLayout();
@@ -234,14 +231,6 @@ namespace HMI.Presentation.Twr.Views
             // 
             this._RtxBlinkTimer.Interval = 500;
             this._RtxBlinkTimer.Tick += new System.EventHandler(this._RtxBlinkTimer_Tick);
-            // 
-            // _TxConfirmationDetectionTimer
-            // 
-            //this._TxConfirmationDetectionTimer.Tick += new System.EventHandler(this._TxConfirmationDetectionTimer_Tick);
-            // 
-            // _CarrierDetectionTimer
-            // 
-            //this._CarrierDetectionTimer.Tick += new System.EventHandler(this._CarrierDetectionTimer_Tick);
             // 
             // _RdHfSpeakerUDB
             // 
