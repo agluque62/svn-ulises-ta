@@ -21,8 +21,8 @@
             <div id="_contSupIzq">
                 <div id="_logo" style="width:90%;">
                     <!-- <img src="./images/nucleo-df-new.jpg" /> -->
-                    <img src="./images/corporativo-a.png" 
-						 style="width:100%; height: 100%; margin: 0;"/>
+                    <img src="./images/corporativo-a.png"
+                         style="width:100%; height: 100%; margin: 0;" />
                 </div>
             </div>
             <div id="_tit_ppal">{{ctrl.title}}</div>
@@ -61,7 +61,10 @@
             <table class="table table-striped" style="margin-bottom: 2px;">
                 <thead>
                     <tr>
-                        <th translate>Hora</th><th translate>Servicio</th><th translate>Incidencia</th><th translate>Parametros</th>
+                        <th translate>Hora</th>
+                        <th translate>Servicio</th>
+                        <th translate>Incidencia</th>
+                        <th translate>Parametros</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -99,22 +102,21 @@
                 </tfoot>-->
             </table>
             <div class="row">
-                <div class="col-md-9">
+                <div class="col-md-8">
                     <button class="btn btn-default" data-ng-click="ctrl.logs()" style="margin: 0.5em;">Logs</button>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="row">
                         <div class="col-md-6">
                             <uib-pager style="margin: 0.5em;" total-items="ctrl.listainci.length"
-                                       ng-model="ctrl.inciCurrentPage" items-per-page="ctrl.inciPageSize" next-text=">>" previous-text="<<"></uib-pager>
+                                       ng-model="ctrl.inciCurrentPage" items-per-page="ctrl.inciPageSize" align="false" next-text=">>" previous-text="<<"></uib-pager>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 text-right">
                             <p style="margin: 1em;">Pag. {{ctrl.inciCurrentPage}}-{{ctrl.inciPages}}</p>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
         <footer id="_pie" translate>Nucleo Copyright @ 2015-2020. Todos los Derechos Reservados.</footer>
     </div>
@@ -126,7 +128,7 @@
     <!-- Para las Traducciones -->
     <script src="./scripts/angular/angular-translate.min.js"></script>
     <script src="./scripts/angular/angular-translate-loader-static-files.min.js"></script>
-    <script src="./scripts/bootsstrap/bootstrap.min.js"></script>    
+    <script src="./scripts/bootsstrap/bootstrap.min.js"></script>
     <script src="./scripts/bootsstrap/ui-bootstrap-tpls-1.2.4.min.js"></script>
     <script src="./scripts/smart-table.js"></script>
     <!--    <script src="./scripts/ng-table.min.js"></script>-->
@@ -134,13 +136,14 @@
     <script type="text/javascript" src="./scripts/daterangepicker.js"></script>
     <script type="text/javascript" src="./scripts/alertify.min.js"></script>
     <script type="text/javascript" src="./scripts/FileSaver.min.js"></script>
-     <script type="text/javascript" src="./scripts/sprintf/sprintf.min.js"></script>
-<!--     <script type="text/javascript" src="./scripts/jquery-te-1.4.0.min.js"></script>
- -->
-     <script type="text/javascript" src="./scripts/cryptojs/core-min.js"></script>
-     <script type="text/javascript" src="./scripts/cryptojs/md5-min.js"></script>
-     <script type="text/javascript" src="./scripts/ace/src-min/ace.js"></script>
-     <script type="text/javascript" src="./scripts/ace/src-min/mode-xml.js"></script>
+    <script type="text/javascript" src="./scripts/sprintf/sprintf.min.js"></script>
+    <script type="text/javascript" src="./scripts/linq_3.2.1/linq.min.js"></script>
+    <!--     <script type="text/javascript" src="./scripts/jquery-te-1.4.0.min.js"></script>
+     -->
+    <script type="text/javascript" src="./scripts/cryptojs/core-min.js"></script>
+    <script type="text/javascript" src="./scripts/cryptojs/md5-min.js"></script>
+    <script type="text/javascript" src="./scripts/ace/src-min/ace.js"></script>
+    <script type="text/javascript" src="./scripts/ace/src-min/mode-xml.js"></script>
 
     <!-- inject-app:js -->
     <script src="./app/modules/Uv5kinbx.js"></script>

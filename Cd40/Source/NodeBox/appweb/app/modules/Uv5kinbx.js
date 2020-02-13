@@ -166,6 +166,31 @@ Uv5kinbx.directive('fileModel', ['$parse', function ($parse) {
     };
 }]);
 
+//**  Rutinas genéricas */
+function StringCut(str, maxlen) {
+    var retorno = str.length > maxlen ? str.substring(0, maxlen) + "..." : str;
+    return retorno;
+}
+// Para desordenar un Array en pruebas...
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // Mientras queden elementos a mezclar...
+    while (0 !== currentIndex) {
+
+        // Seleccionar un elemento sin mezclar...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // E intercambiarlo con el elemento actual
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}        
+
 
 
 /** Rutas de Aplicacion */
@@ -188,6 +213,7 @@ var rest_url_tlf_tifxinfo = "/tifxinfo";
 var rest_url_tlf_pbxinfo = "/pbxinfo";
 var rest_url_versiones = "/versiones";
 var rest_url_radio_hf = "/rdhf";
+var rest_url_radio_11 = "/rd11";
 var rest_url_ps = "/ps";
 
 /** */
