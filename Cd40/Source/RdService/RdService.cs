@@ -22,11 +22,31 @@ using Utilities;
 using U5ki.Infrastructure.Code;
 using U5ki.RdService.Helpers;
 using U5ki.Enums;
+using System.Runtime.CompilerServices;
 using U5ki.RdService;
 using Translate;
 
 namespace U5ki.RdService
 {
+    /// <summary>
+    /// 20200224. AGL
+    /// Clase Estática para extensiones de clases...
+    /// </summary>
+    static public class RdExtensions
+    {
+        private static readonly ConditionalWeakTable<RdResource, RdResourcePair> _pairs = new ConditionalWeakTable<RdResource, RdResourcePair>();
+        public static void SetContainerPair(this RdResource @this, RdResourcePair pair)
+        {
+            _pairs.Remove(@this);
+            _pairs.Add(@this, pair);
+        }
+        public static RdResourcePair GetContainerPair(this RdResource @this)
+        {
+            RdResourcePair pair;
+            if (_pairs.TryGetValue(@this, out pair)) return pair;
+            return default(RdResourcePair);
+        }
+    }
     /// <summary>
     /// 
     /// </summary>
@@ -226,6 +246,10 @@ namespace U5ki.RdService
 #endif
                         return true;
 
+                    /** 20200224. Mando 1+1 */
+                    case ServiceCommands.RdUnoMasUnoActivate:
+                        return SetData(ServiceCommands.RdUnoMasUnoActivate, par);
+
                     /** 20160928. AGL. Estado del Gestror para la Pagina WEB del NODEBOX. */
                     case ServiceCommands.RdMNStatus:
                         return MNStatus(par, ref err, resp);
@@ -271,14 +295,14 @@ namespace U5ki.RdService
                                         {
                                             frec = frec.Frecuency,
                                             // Tipo de Frecuencia 0: Normal, 1: 1+1, 2: FD, 3: EM
-                                            ftipo = (int)frec.getParam.FrequencyType,
+                                            ftipo = (int)frec.GetParam.FrequencyType,
                                             // Prioridad de session, 0: Normal, 1: Emergencia
-                                            prio = frec.getParam.Priority == CORESIP_Priority.CORESIP_PR_NORMAL ? 0
-                                                : frec.getParam.Priority == CORESIP_Priority.CORESIP_PR_EMERGENCY ? 1 : 2,
+                                            prio = frec.GetParam.Priority == CORESIP_Priority.CORESIP_PR_NORMAL ? 0
+                                                : frec.GetParam.Priority == CORESIP_Priority.CORESIP_PR_EMERGENCY ? 1 : 2,
                                             // Metodo de Calculo CLD. 0: Relativo, 1: Absoluto
-                                            fp_climax_mc = (int)frec.getParam.CLDCalculateMethod,
+                                            fp_climax_mc = (int)frec.GetParam.CLDCalculateMethod,
                                             // Ventana BSS
-                                            fp_bss_win = frec.getParam.BssWindows,
+                                            fp_bss_win = frec.GetParam.BssWindows,
                                             // Estado Frecuencia. 0: No Disponible. 1: Disponible, 2: Degradada.
                                             fstd = (int)frec.Status,
                                             // Emplazamiento Seleccionado y QIDX del seleccionado...
@@ -303,6 +327,9 @@ namespace U5ki.RdService
                                         local_rsp.Add(data);
                                     }
                                 }
+                                local_rsp = local_rsp
+                                    .OrderBy(o => ((GlobalTypes.radioSessionData)o).std)
+                                    .ThenBy(o => ((GlobalTypes.radioSessionData)o).frec).ToList();
                             }
                             retorno = true;
                             break;
@@ -355,6 +382,23 @@ namespace U5ki.RdService
                             retorno = true;
                             break;
 
+                        case ServiceCommands.RdUnoMasUnoData:
+                            var UnoMasUnoFreqs = MSResources.Select(r => new
+                                {
+                                    fr = r.Frecuency,
+                                    id = r.ID,
+                                    site = r.Site,
+                                    tx = r.isTx ? 1 : 0,
+                                    ab = 0,
+                                    sel = r.GetContainerPair().ActiveResource.Uri1 == r.Uri1 ? 1 : 0,
+                                    ses = r.Connected ? 1 : 0,
+                                    uri = r.Uri1
+                                })
+                                .ToList();
+                            UnoMasUnoFreqs.ForEach(item => local_rsp.Add(item));
+                            retorno = true;
+                            break;
+
                         case ServiceCommands.SrvDbg:
                             if (datain == null)
                             {
@@ -371,15 +415,15 @@ namespace U5ki.RdService
                                                       Status = f.Status,
                                                       NewParams = new
                                                       {
-                                                          cld_supervision_time = f.getParam.cld_supervision_time,
-                                                          Priority = f.getParam.Priority,
-                                                          FrequencyType = f.getParam.FrequencyType,
-                                                          CLDCalculateMethod = f.getParam.CLDCalculateMethod,
-                                                          BssWindows = f.getParam.BssWindows,
-                                                          AudioSync = f.getParam.AudioSync,
-                                                          AudioInBssWindow = f.getParam.AudioInBssWindow,
-                                                          NotUnassignable = f.getParam.NotUnassignable,
-                                                          MetodosBssOfrecidos = f.getParam.MetodosBssOfrecidos
+                                                          cld_supervision_time = f.GetParam.Cld_supervision_time,
+                                                          Priority = f.GetParam.Priority,
+                                                          FrequencyType = f.GetParam.FrequencyType,
+                                                          CLDCalculateMethod = f.GetParam.CLDCalculateMethod,
+                                                          BssWindows = f.GetParam.BssWindows,
+                                                          AudioSync = f.GetParam.AudioSync,
+                                                          AudioInBssWindow = f.GetParam.AudioInBssWindow,
+                                                          NotUnassignable = f.GetParam.NotUnassignable,
+                                                          MetodosBssOfrecidos = f.GetParam.MetodosBssOfrecidos
                                                       },
                                                       PublicData = f.PublicData,
                                                       PrivateData = f.PrivateData
@@ -413,15 +457,15 @@ namespace U5ki.RdService
                                         Status = fro.Status,
                                         NewParams = new
                                         {
-                                            cld_supervision_time = fro.getParam.cld_supervision_time,
-                                            Priority = fro.getParam.Priority,
-                                            FrequencyType = fro.getParam.FrequencyType,
-                                            CLDCalculateMethod = fro.getParam.CLDCalculateMethod,
-                                            BssWindows = fro.getParam.BssWindows,
-                                            AudioSync = fro.getParam.AudioSync,
-                                            AudioInBssWindow = fro.getParam.AudioInBssWindow,
-                                            NotUnassignable = fro.getParam.NotUnassignable,
-                                            MetodosBssOfrecidos = fro.getParam.MetodosBssOfrecidos
+                                            cld_supervision_time = fro.GetParam.Cld_supervision_time,
+                                            Priority = fro.GetParam.Priority,
+                                            FrequencyType = fro.GetParam.FrequencyType,
+                                            CLDCalculateMethod = fro.GetParam.CLDCalculateMethod,
+                                            BssWindows = fro.GetParam.BssWindows,
+                                            AudioSync = fro.GetParam.AudioSync,
+                                            AudioInBssWindow = fro.GetParam.AudioInBssWindow,
+                                            NotUnassignable = fro.GetParam.NotUnassignable,
+                                            MetodosBssOfrecidos = fro.GetParam.MetodosBssOfrecidos
                                         },
                                         PublicData = fro.PublicData,
                                         PrivateData = fro.PrivateData
@@ -454,26 +498,105 @@ namespace U5ki.RdService
             sync.WaitOne(10000);
             return retorno;
         }
+        /** 20200225. Estado de cada módulo adicional de Radio */
+        bool MNRadioModule = false;
+        bool HFRadioModule = false;
+        bool MSRadioModule = false;
+        public object AllDataGet()
+        {
+            var level = Status != ServiceStatus.Running ? "Error" : Master == true ? "Master" : "Slave";
+            return new
+            {
+                std = Status.ToString(),
+                level,
+                modules = new[]
+                        {
+                            new
+                            {
+                                id="M+N",
+                                enable = MNRadioModule ? 1 : 0,
+                                std = MNRadioModule ? Status.ToString() : "",
+                                level = MNRadioModule ? level : ""
+                            },
+                            new
+                            {
+                                id="HF",
+                                enable = HFRadioModule ? 1 : 0,
+                                std = HFRadioModule ? Status.ToString() : "",
+                                level = HFRadioModule ? level : ""
+                            },
+                            new
+                            {
+                                id="1+1",
+                                enable = MSRadioModule ? 1 : 0,
+                                std = MSRadioModule ? Status.ToString() : "",
+                                level = MSRadioModule ? level : ""
+                            }
+                        }
+            };
+        }
+        public IEnumerable<RdResource> MSResources
+        {
+            get
+            {
+                var ret = Frecuencies.Values
+                                .Where(f => f.RdRs.Values.Where(r => r is RdResourcePair).ToList().Count > 0)   // Son Frecuencias 1+1 las que tienen algun RdResourcePair
+                                .SelectMany(f => f.RdRs.Values)
+                                .Where(r => r is RdResourcePair)        // De todos los recursos selecciono los pareados.
+                                .SelectMany(rp =>
+                                {
+                                    var resources = (rp as RdResourcePair).GetListResources();
+                                    resources.ForEach(r => r.SetContainerPair((rp as RdResourcePair)));
+                                    return resources;                   // Por cada pareado selecciona ambos componentes y marca su container...
+                                });
+                return ret;
+            }
+        }
 
         public bool SetData(ServiceCommands cmd, object data)
         {
-            try
+            ManualResetEvent sync = new ManualResetEvent(false);
+            bool retorno = false;
+            _EventQueue.Enqueue("DataSet", () =>
             {
-                switch (cmd)
+                try
                 {
-                    case ServiceCommands.RdHFLiberaEquipo:
-                        if (data is GlobalTypes.txHF)
-                        {
-                            return _gestorHF.LiberaEquipo(((GlobalTypes.txHF)data).id);
-                        }
-                        throw new Exception(String.Format("El objeto {0} no es del tipo esperado (txHF)",data));
+                    switch (cmd)
+                    {
+                        case ServiceCommands.RdHFLiberaEquipo:
+                            if (data is GlobalTypes.txHF)
+                            {
+                                retorno = _gestorHF.LiberaEquipo(((GlobalTypes.txHF)data).id);
+                            }
+                            else
+                            {
+                                throw new Exception(String.Format("El objeto {0} no es del tipo esperado (txHF)", data));
+                            }
+                            break;
+                        case ServiceCommands.RdUnoMasUnoActivate:
+                            if (data is string)
+                            {
+                                string err = default(string);
+                                retorno = ActivateResource(data as string, ref err);
+                            }
+                            else
+                            {
+                                throw new Exception(String.Format("El objeto {0} no es del tipo esperado (string)", data));
+                            }
+                            break;
+                    }
                 }
-            }
-            catch (Exception x)
-            {
-                ExceptionManage<RdService>("SetData", x, "On SetData Exception: " + x.Message, false);
-            }
-            return false;
+                catch (Exception x)
+                {
+                    ExceptionManage<RdService>("SetData", x, "On SetData Exception: " + x.Message, false);
+                }
+                finally
+                {
+                    sync.Set();
+                }
+            });
+            sync.WaitOne(10000);
+            return retorno;
         }
 
         /** Fin de la Modificacion */
@@ -521,7 +644,7 @@ namespace U5ki.RdService
                 /* RdResource rec = frec.RdRs.Values.Where(r => (r.Type == RdRsType.Rx && gear.IsEmitter == false) ||
                                                               (r.Type == RdRsType.Tx && gear.IsEmitter == true)).FirstOrDefault();*/
                 // RdResource rec = frec.RdRs.Values.Where(r => r.ID == gear.Id).FirstOrDefault(); // JOI OJO 2017
-                RdResource rec = frec.RdRs.Values.Where(r => r.Uri1 == gear.SipUri).FirstOrDefault();
+                IRdResource rec = frec.RdRs.Values.Where(r => r.Uri1 == gear.SipUri).FirstOrDefault();
 
                 return rec == null ? 1 : rec.Connected ? 3 : 2;
             }
@@ -673,6 +796,29 @@ namespace U5ki.RdService
             err = MNManager != null ? MNManager.Status.ToString() : "ERROR";
             return true;
         }
+        /// <summary>
+        /// Manual command to make the resource become active. 
+        /// As a result, the resource may not become active if it has no SIP session.
+        /// </summary>
+        /// <param name="par">if of the resource</param>
+        /// <param name="err"></param>
+        /// <param name="resp"></param>
+        /// <returns>false if command not done because the resource hasn't been found</returns>
+        private bool ActivateResource(string par, ref string err, List<string> resp = null)
+        {
+            foreach (RdFrecuency freq in Frecuencies.Values)
+                if (freq.ActivateResource(par))
+                {
+                    LogInfo<RdService>("Equipo " + par + " conmutado manualmente", U5kiIncidencias.U5kiIncidencia.U5KI_NBX_COMMAND);
+                    return true;
+                }
+
+            LogInfo<RdService>("Equipo " + par + " no encontrado.", U5kiIncidencias.U5kiIncidencia.U5KI_NBX_COMMAND_ERROR, "RdService",
+                CTranslate.translateResource("Equipo " + par + " no encontrado."));
+            err = "Equipo " + par + " no encontrado.";
+            return false;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1297,6 +1443,7 @@ namespace U5ki.RdService
             /** 20161219. AGL. Comprobar que no es la misma config, generada por una entrada 'merge' de otro NBX. */
             if (LastVersion == cfg.Version)
                 return;
+
             LastVersion = cfg.Version;
             LogInfo<RdService>(String.Format("Procesando nueva configuracion ({0})", cfg.Version), U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
                 "RdService", CTranslate.translateResource("Procesando nueva configuración ( " + cfg.Version + " )"));
@@ -1354,11 +1501,11 @@ namespace U5ki.RdService
                                     RdFrecuency rF;
                                     if (Frecuencies.TryGetValue(rdLink.Literal.ToUpper(), out rF))
                                     {
-                                        foreach (KeyValuePair<string, RdResource> rdRs in rF.RdRs)
+                                        foreach (KeyValuePair<string, IRdResource> rdRs in rF.RdRs)
                                         {
                                             if (rdRs.Value.ID == rs.IdRecurso)
                                             {
-                                                rdRs.Value.Selected = (rs.Estado == "S");
+                                                rdRs.Value.SelectedSite = (rs.Estado == "S");
                                             }
                                         }
                                     }
@@ -1372,10 +1519,10 @@ namespace U5ki.RdService
                                     RdFrecuency rF;
                                     if (Frecuencies.TryGetValue(rdLink.Literal.ToUpper(), out rF))
                                     {
-                                        foreach (KeyValuePair<string, RdResource> rdRs in rF.RdRs)
+                                        foreach (KeyValuePair<string, IRdResource> rdRs in rF.RdRs)
                                         {
                                             if (rdRs.Value.ID == rs.IdRecurso)
-                                                rdRs.Value.Selected = (rs.Estado == "S");
+                                                rdRs.Value.SelectedSite = (rs.Estado == "S");
                                         }
                                     }
                                     selectedRs[rs.IdRecurso] = rs.Estado == "S";
@@ -1454,6 +1601,11 @@ namespace U5ki.RdService
 
                 MNManager.StartConfig();
 #endif
+                /** 20200225. Estado de cada módulo adicional de Radio */
+                MNRadioModule = cfg.Nodes.Count() > 0;
+                HFRadioModule = cfg.PoolHf.Count() > 0;
+                MSRadioModule = MSResources.Count() > 0;
+
             }
             catch (Exception ex)
             {
@@ -1728,8 +1880,10 @@ namespace U5ki.RdService
                         _SndRxPorts[ask.HostId] = sndRxPort;
                     }
 
-                    sndRxPorts = new List<int>(1);
-                    sndRxPorts.Add(sndRxPort);
+                    sndRxPorts = new List<int>(1)
+                    {
+                        sndRxPort
+                    };
                 }
 
                 foreach (RdFrecuency rdFr in Frecuencies.Values)
@@ -1811,6 +1965,7 @@ namespace U5ki.RdService
                     {
                         if (rdFr.PttSrc != string.Empty)
                         {
+                            //Las frecuencias HF son todas simples
                             foreach (RdResource rs in rdFr.RdRs.Values)
                             {
                                 if (rs.Connected && (rs.Type == RdRsType.Tx || rs.Type == RdRsType.Tx))
@@ -2011,7 +2166,7 @@ namespace U5ki.RdService
                         foreach (KeyValuePair<string, RdFrecuency> rdFr in Frecuencies)
                         {
                             /** 20170126. AGL. Identifico el Recurso para poder generar el Historico. */
-                            RdResource rdRes;
+                            IRdResource rdRes;
                             if (rdFr.Value.HandleChangeInCallState(call, stateInfo, out rdRes))
                             {
                                 if (rdFr.Value.TipoDeFrecuencia == "HF" && stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED)
@@ -2444,7 +2599,7 @@ namespace U5ki.RdService
                         return;
                     }
 
-                    RdFrecuency.NewRdFrequencyParams confParams = frecuency.getParam;
+                    RdFrecuency.NewRdFrequencyParams confParams = frecuency.GetParam;
                     //JOI FREC_DES
                     if (uriGearToReplace != "--")
                     {
