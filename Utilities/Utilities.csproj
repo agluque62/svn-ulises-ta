@@ -108,10 +108,12 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpHelper.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="CustomBinaryFormatter.cs" />
     <Compile Include="EventQueue.cs" />
