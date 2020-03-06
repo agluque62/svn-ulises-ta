@@ -194,8 +194,7 @@ namespace HMI.Model.Module.Services
                 /** 20190313. Desacoplo el evento para evitar los lazos de muerte */
                 Task.Factory.StartNew(() =>
                 {
-                    LogManager.GetLogger("RSFService")
-                        .Trace("TxInProgressControl EventError {0}", code);
+                    Log.Trace("TxInProgressControl EventError {0}", code);
 
                     if (code == 1 || code == 2)
                         EngineCmdManager.GenerateRadioBadOperationTone(-1);
@@ -214,7 +213,7 @@ namespace HMI.Model.Module.Services
         [EventSubscription(EventTopicNames.RdInfoEngine, ThreadOption.UserInterface)]
         public void OnRdInfoEngine(object sender, RangeMsg<RdInfo> msg)
         {
-            LogManager.GetLogger("RSFService").Trace("Processing Event {0}", EventTopicNames.RdInfoEngine, msg);
+            Log.Trace("Processing Event {0}", EventTopicNames.RdInfoEngine, msg);
 
             /** AGL. Notifica los cambios de configuracion. */
             EventInit = true;
@@ -228,7 +227,7 @@ namespace HMI.Model.Module.Services
         [EventSubscription(EventTopicNames.RdPosStateEngine, ThreadOption.UserInterface)]
         public void OnRdPosStateEngine(object sender, RangeMsg<RdState> msg)
         {
-            LogManager.GetLogger("RSFService").Trace("(2) Processing Event {0}: {1}", EventTopicNames.RdPosStateEngine, msg);
+            Log.Trace("(2) Processing Event {0}: {1}", EventTopicNames.RdPosStateEngine, msg);
             EventPos = true;
 
             /** AGL. Notifica cambios de estadp en posiciones radio, Tx, Tx, Ptt, sqh, ... */
@@ -255,7 +254,7 @@ namespace HMI.Model.Module.Services
         [EventSubscription(EventTopicNames.RtxChanged, ThreadOption.Publisher)]
         public void OnRtxChanged(object sender, EventArgs e)
         {
-            LogManager.GetLogger("RSFService").Trace("Processing Event {0}, Grp {1}",
+            Log.Trace("Processing Event {0}, Grp {1}",
                 EventTopicNames.RtxChanged, StateManager.Radio.Rtx);
 
             if (StateManager.Radio.Rtx == 0)
@@ -314,7 +313,7 @@ namespace HMI.Model.Module.Services
             {
                 RdDst onlinepos = StateManager.Radio[pos];
 
-                LogManager.GetLogger("RSFService").Trace("EventOnPos {0} (Frec={1}): Tx=>{2}, Rx=>{3}, Ad=>{4}, Available=>{5}, Restored=>{6}",
+                Log.Trace("EventOnPos {0} (Frec={1}): Tx=>{2}, Rx=>{3}, Ad=>{4}, Available=>{5}, Restored=>{6}",
                     pos, onlinepos.Frecuency, onlinepos.Tx, onlinepos.Rx, onlinepos.AudioVia, !onlinepos.Unavailable,
                     onlinepos.Restored);
 
@@ -326,14 +325,22 @@ namespace HMI.Model.Module.Services
 
                 if (OffOnTransition(onlinepos) == true)
                 {
-                    LogManager.GetLogger("RSFService").Trace("Restoring {0}", pos);
+                    Log.Trace("EventOnPos => Restoring {0}", pos);
                     Restore(pos);
                 }
                 else if (onlinepos.Unavailable == false)
                 {
-                    LogManager.GetLogger("RSFService").Trace("Saving {0}", pos);
+                    Log.Trace("EventOnPos => Saving {0}", pos);
                     Save(pos);
                 }
+                else
+                {
+                    Log.Trace("EventOnPos => Ignoring {0}", pos);
+                }
+            }
+            else
+            {
+                Log.Trace("EventOnPos => Not AssignEvent on {0}", pos);
             }
         }
         /// <summary>
@@ -344,8 +351,8 @@ namespace HMI.Model.Module.Services
             if (RdStatusRecoveryEnabled /*&& !RdStatusRecoveryWithoutPersistence */&& StateManager != null)
             {
                 /** Reconstruyo la lista */
-                if (RPS.LastRdStatus.Count == 0)
-                {
+                //if (RPS.LastRdStatus.Count == 0)
+                //{
                     RPS.LastRdStatus = StateManager.Radio.Destinations.Select(pos => new RdPositionStatus()
                     {
                         Position = pos.Id,
@@ -353,8 +360,10 @@ namespace HMI.Model.Module.Services
                         RxStatus = false,
                         AudioVia = RdRxAudioVia.NoAudio
                     }).ToList();
-                }
+                //}
                 RPS.PageSize = StateManager.Radio.PageSize;
+
+                Availability = new Dictionary<int, bool>();
 
                 if (!RdStatusRecoveryWithoutPersistence)
                 {
@@ -364,11 +373,11 @@ namespace HMI.Model.Module.Services
                         var laststatus = Newtonsoft.Json.JsonConvert.DeserializeObject<List<RdFrecStatus>>(
                             System.IO.File.ReadAllText("RadioFrecStatus.json"));
 
-                        /** Rellenar las posiciones que coincidan */
+                        /** Rellenar las posiciones que coincidan en la página activa. */
                         var affected = (from fr in laststatus
                                         join ds in StateManager.Radio.Destinations on fr.frec equals ds.Frecuency
                                         join ps in RPS.LastRdStatus on ds.Id equals ps.Position
-                                        where OnPage(ps.Position, 0, RPS.PageSize) == true
+                                        where OnPage(ps.Position, StateManager.Radio.Page, RPS.PageSize) == true
                                         select new { pos = ps.Position, Tx = fr.Tx, Rx = fr.Rx, Via = fr.Via }).ToList();
 
                         affected.ForEach(item =>
@@ -444,7 +453,7 @@ namespace HMI.Model.Module.Services
                              Newtonsoft.Json.JsonConvert.SerializeObject(output1, Newtonsoft.Json.Formatting.Indented));
 
                         /** Log de la Operacion */
-                        LogManager.GetLogger("RSFService").Trace("Radio Positions States saved...");
+                        Log.Trace("Radio Positions States saved...");
                     }
                     finally
                     {
@@ -511,7 +520,7 @@ namespace HMI.Model.Module.Services
                         s.RestoreTx(EngineCmdManager);
                     }
                     /** Log de Operacion */
-                    LogManager.GetLogger("RSFService").Trace("RadioStatusRecovery. Recuperado Estado de Posicion Radio {0}({1}) => Tx={2}, Rx={3}, Audio={4}.",
+                    Log.Trace("RadioStatusRecovery. Recuperado Estado de Posicion Radio {0}({1}) => Tx={2}, Rx={3}, Audio={4}.",
                         onlinepos.Id, onlinepos.Frecuency, s.TxStatus, s.RxStatus, s.AudioVia);
 
                     RtxRestoreFor(s.Position);
@@ -610,13 +619,13 @@ namespace HMI.Model.Module.Services
         {
             if (EventInit == false)
             {
-                LogManager.GetLogger("RSFService").Error("RestoreOnInitialEventsFails. INIT");
+                Log.Error("RestoreOnInitialEventsFails. INIT");
                 Init();
             }
 
             if (EventInit == false || EventPos == false)
             {
-                LogManager.GetLogger("RSFService").Error("RestoreOnInitialEventsFails. Generating Events.");
+                Log.Error("RestoreOnInitialEventsFails. Generating Events.");
                 for (int pos = 0; pos < 32; pos++)
                 {
                     EventOnPos(pos,
@@ -674,6 +683,8 @@ namespace HMI.Model.Module.Services
             int superior = (page + 1) * sizepage;
             return Position >= inferior && Position < superior;
         }
+
+        Logger Log { get => LogManager.GetLogger("RSFService"); }
 
         #endregion METODOS PRIVADOS
 
