@@ -1,0 +1,302 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLFOLDER">
+            <Directory Id="dirC142AAC0964B0B323DA41FCB5AFA837A" Name="Resources" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="U5ki.HMI.ResourcesComponents">
+            <Component Id="cmpCA9A294685FA10DF38CCABD6E9BFA311" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil4150FF640821D733F1D3B700F3B894F7" KeyPath="yes" Source="$(var.SourcePath)\Aena.gif" />
+            </Component>
+            <Component Id="cmpC16E8C12EF790AA9DC370ECEB0045321" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil2A1B7E3CE5A59A76BEF9FFF70C2B81B5" KeyPath="yes" Source="$(var.SourcePath)\AenaBN.gif" />
+            </Component>
+            <Component Id="cmp0908151157F12C670C0CBA851BFC3596" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil7591A5C7CADFED0C1016C33505A7F0C2" KeyPath="yes" Source="$(var.SourcePath)\AltavozLC.png" />
+            </Component>
+            <Component Id="cmp6A6B68C336E929D1326709396072897C" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil8E1641C853A5C4A0272A7311654080AF" KeyPath="yes" Source="$(var.SourcePath)\AltavozRadio.png" />
+            </Component>
+            <Component Id="cmp08C1EB687E268634519EA61B29A9E58E" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil8FFFA98E974F71D770FBE02897475E22" KeyPath="yes" Source="$(var.SourcePath)\Anular.gif" />
+            </Component>
+            <Component Id="cmp767DCA55A0333F2D9EC731F3795F2828" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filAC4D15AC3C26D9CF8150B9C742FEC641" KeyPath="yes" Source="$(var.SourcePath)\anular.png" />
+            </Component>
+            <Component Id="cmpCBA493C5700EA669CB792A52A9D4E4C1" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil07DEB463C905A94B57D397B2146A9A6D" KeyPath="yes" Source="$(var.SourcePath)\AnularEn.gif" />
+            </Component>
+            <Component Id="cmp54BFDB6677F4410C8AE921886584EB3A" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filAE3F0EBB6B74F08775928DDA88214B7B" KeyPath="yes" Source="$(var.SourcePath)\AnularFr.gif" />
+            </Component>
+            <Component Id="cmpB8F418BAC33F1BF39F8E4D8F31752432" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil5E0BD23F874CAA66B8E5038B377CC0C4" KeyPath="yes" Source="$(var.SourcePath)\AnularPeq.gif" />
+            </Component>
+            <Component Id="cmpDB67920BF6D40E426F46C50B16BF807A" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil09F12B164114C5755B1B59965674C500" KeyPath="yes" Source="$(var.SourcePath)\AnularPeqEn.gif" />
+            </Component>
+            <Component Id="cmpAD78188D9C648227AB9265EF86C7043D" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil84B074738541095AEB4A144E68E2DCCD" KeyPath="yes" Source="$(var.SourcePath)\AnularPeqFr.gif" />
+            </Component>
+            <Component Id="cmp60EA1ABB1CD95AA61715FAFA3C2705AF" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filBFC5703F61B3DB05532AE249B92C3247" KeyPath="yes" Source="$(var.SourcePath)\asecna_logo.gif" />
+            </Component>
+            <Component Id="cmp8F9111BDFCA150F4DB99A13FD11CC446" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil6E011C5694FB0902D72E4FCDF269E39C" KeyPath="yes" Source="$(var.SourcePath)\Betera.JPG" />
+            </Component>
+            <Component Id="cmpEE99A81F47C2BFF8E9D0574C95CB1633" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil73BE864A8318154499212229A7050398" KeyPath="yes" Source="$(var.SourcePath)\BHELEME.gif" />
+            </Component>
+            <Component Id="cmp17C26286D56855456702B95F817C4267" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filAA6BF03113835C650D3ABE8931092602" KeyPath="yes" Source="$(var.SourcePath)\BHELEME.JPG" />
+            </Component>
+            <Component Id="cmp1BD86FF6E1A1DAEF8F404483F16EA91B" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filD40F41FF190E46F78EE2088B4948F05A" KeyPath="yes" Source="$(var.SourcePath)\boton-de-grabacion.jpg" />
+            </Component>
+            <Component Id="cmp906E052EE80901C5B0571B900049D1DB" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil8D7F9786ACE70E468F1FDECA185C54F9" KeyPath="yes" Source="$(var.SourcePath)\boton_de_grabacion.gif" />
+            </Component>
+            <Component Id="cmp43A15127AC5E8447545F12FACE2A7B5F" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filF44B09536F1AB57398B5034FF75E5537" KeyPath="yes" Source="$(var.SourcePath)\boton_de_grabacion.png" />
+            </Component>
+            <Component Id="cmp42F525FAB45F09BB2DEAC7D6E546C507" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil62A4C512CE3418F030BE3D7A059ACE76" KeyPath="yes" Source="$(var.SourcePath)\BrightnessDown.gif" />
+            </Component>
+            <Component Id="cmp947329EC127B1B71CD92A25D82662B6E" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil42BE6F686FDFEFB9B7EEB504F80BBB72" KeyPath="yes" Source="$(var.SourcePath)\BrightnessUp.gif" />
+            </Component>
+            <Component Id="cmp100A3B55BA6BA7F3BEA2CED29158D43E" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil71AB5B4FA2DB5516C5239CAF9EE1B1E3" KeyPath="yes" Source="$(var.SourcePath)\Button.bmp" />
+            </Component>
+            <Component Id="cmp9FDCDBFDF8E93678353B147ABA8B1861" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filFB96C0842BE7BEE26F3A7BF2860C4805" KeyPath="yes" Source="$(var.SourcePath)\BuzzerDown.gif" />
+            </Component>
+            <Component Id="cmp3A1F9C14E6B494A221DBDE7906A1BB49" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil6EF53F58CA432969417200586BE5B997" KeyPath="yes" Source="$(var.SourcePath)\BuzzerUp.gif" />
+            </Component>
+            <Component Id="cmpCD5CCD96ACB52212B17C0FEDE1C4C4E3" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filF61CB5FEAEF562B14793F0A56C3F08DE" KeyPath="yes" Source="$(var.SourcePath)\CascosAlumno.gif" />
+            </Component>
+            <Component Id="cmp62A42DF7FD422B62977F038EB4CC03A2" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filFDC63E1CA89CF3F0B2C6B6EAB5485799" KeyPath="yes" Source="$(var.SourcePath)\CascosInstructor.gif" />
+            </Component>
+            <Component Id="cmpC901F4922460BD4ABAC4514187737862" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil906279B86953AD19AA77FA70F1F6269C" KeyPath="yes" Source="$(var.SourcePath)\DFNUCLEO.jpg" />
+            </Component>
+            <Component Id="cmp4C990AC40976890C98B99B89D650BB05" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil8B1901F09F4666D810E8C7B502C62020" KeyPath="yes" Source="$(var.SourcePath)\ENNA.jpg" />
+            </Component>
+            <Component Id="cmp2ADC653B1F130B88E1C4F6D9A181F110" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil31255F8F7A3EE8F4808B415319CCAC74" KeyPath="yes" Source="$(var.SourcePath)\erase.png" />
+            </Component>
+            <Component Id="cmpBE31D964A4D0A26777B66039CEEE1B94" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filC788690BB5542AAAEC0F23FE3B4D900A" KeyPath="yes" Source="$(var.SourcePath)\Error.ico" />
+            </Component>
+            <Component Id="cmp23AA1407C921BBACF575107A3EFAAC1B" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil4E75E2FBD87EF7C5CE5FB12023687B31" KeyPath="yes" Source="$(var.SourcePath)\Error.png" />
+            </Component>
+            <Component Id="cmp38FAC4F839FCA2FE72288C90FF36C76D" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filBC6C51FF12ABD25B6541EBA8AF8936E4" KeyPath="yes" Source="$(var.SourcePath)\ErrorIcon.ico" />
+            </Component>
+            <Component Id="cmpBCDC365348E74C306F73D0C656751321" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil44FA10BD5CDDC2B1D2027E47370037C4" KeyPath="yes" Source="$(var.SourcePath)\HeadPhonesDown.gif" />
+            </Component>
+            <Component Id="cmp730C6CF628F603664CE89BA50B499669" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil0FB7D208BD6C569BD6B0A8731A551BDA" KeyPath="yes" Source="$(var.SourcePath)\HeadPhonesTlf.gif" />
+            </Component>
+            <Component Id="cmp07941EC311B41490B06F48A5D6BD45FC" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil07DB91020EDBB3D136E4297C9BDB46F6" KeyPath="yes" Source="$(var.SourcePath)\HeadPhonesUp.gif" />
+            </Component>
+            <Component Id="cmpE88CA090B65C64CE3388E287257C3A64" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil572621F169DFD1DD59F503D6EA123B50" KeyPath="yes" Source="$(var.SourcePath)\HfSpeaker.gif" />
+            </Component>
+            <Component Id="cmpEAD84E183CCB4C93E692142AE9B3BD5C" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil89A149C8BD31A1935D97D83CBBBA9D09" KeyPath="yes" Source="$(var.SourcePath)\HFSpeakerDown.gif" />
+            </Component>
+            <Component Id="cmpC1D4A1260CD847750A11E7A449FA7F3F" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil312AB82E5B575250D1789BBD6D64BF56" KeyPath="yes" Source="$(var.SourcePath)\HFSpeakerUp.gif" />
+            </Component>
+            <Component Id="cmpFC97802A21477E5E409B8EF24A067A12" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil0F30FF8ACB8BD13BE0473D3A3EC89D42" KeyPath="yes" Source="$(var.SourcePath)\Info.ico" />
+            </Component>
+            <Component Id="cmp2BF7253B59FA60C320E706326EE98732" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil9DC436B8FEE5290470AD7B87FC6E6A6F" KeyPath="yes" Source="$(var.SourcePath)\Info.png" />
+            </Component>
+            <Component Id="cmp88CD8F18E0FD7A8442AB4616C522A3AA" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filC49400809CC324BA4525BE43E0D3A8CE" KeyPath="yes" Source="$(var.SourcePath)\JackOff.gif" />
+            </Component>
+            <Component Id="cmp1D1D861C0DA9957AB36B699A04F6D3DC" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil7260B282841D8C34690DB07804B7F7D6" KeyPath="yes" Source="$(var.SourcePath)\JackOn.gif" />
+            </Component>
+            <Component Id="cmp4158672DEE0373D434B10D062753FB8E" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil4F565A07E3584579BF951AD029E47A7C" KeyPath="yes" Source="$(var.SourcePath)\LcSpeaker.gif" />
+            </Component>
+            <Component Id="cmp2C2E0302B6882AAB6F7B108B794252C3" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil997EA72325FE49566D88A80962BCB894" KeyPath="yes" Source="$(var.SourcePath)\Logo Onda.bmp" />
+            </Component>
+            <Component Id="cmp6D1E665F91318D14F582AC3A8F460D94" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filBB5F43CE9B75046CCA0F50C04684968A" KeyPath="yes" Source="$(var.SourcePath)\Logo ONDA_Original.jpg" />
+            </Component>
+            <Component Id="cmpB3334F2C905BC7E0EF739D97E5D78A2F" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil54CCAD14DC5C04A7F9EC4B29614347E3" KeyPath="yes" Source="$(var.SourcePath)\logo_AENA.PNG" />
+            </Component>
+            <Component Id="cmp4840480EA3B1E925A9612D7727C795A0" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filE29BD01FFD74A9322D9233A7E6E39DD9" KeyPath="yes" Source="$(var.SourcePath)\logo_Kenia.png" />
+            </Component>
+            <Component Id="cmp1DAEB3DB26ABDD4CEB39700AE40C051A" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil6789D8DD0AEE90ABD4F9E23EEDCE6204" KeyPath="yes" Source="$(var.SourcePath)\nucleodf.bmp" />
+            </Component>
+            <Component Id="cmp1F554F2DC7D4D471596772C8EE6AFCCD" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil75C9AF17FC09A88C900B8173B8293EE7" KeyPath="yes" Source="$(var.SourcePath)\nucleodf.GIF" />
+            </Component>
+            <Component Id="cmp85BE2C9A3B43C7BCEF9F9E8F3518B96C" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil053CD00C3409F27CD6FE95E20C0FFFAF" KeyPath="yes" Source="$(var.SourcePath)\nucleodf__.50.JPG" />
+            </Component>
+            <Component Id="cmp46A1404DADC8541A9CA9B1BD753B6B21" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil30118FBC22B7307ACED27341F065F8FA" KeyPath="yes" Source="$(var.SourcePath)\Office-National-Des-Aeroports.gif" />
+            </Component>
+            <Component Id="cmpB0C54F647266A15CC30BC85B64DE6941" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filEC914771D20613C9F0F3FF9E7E92956F" KeyPath="yes" Source="$(var.SourcePath)\Office-National-Des-Aeroports.jpg" />
+            </Component>
+            <Component Id="cmpCC5E827C20370BC0CC5C738C0D4B6944" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil3A7CEE5D58C07F17C145E109D678810C" KeyPath="yes" Source="$(var.SourcePath)\play.png" />
+            </Component>
+            <Component Id="cmp515B18C4428E1E2AE4E768471136C989" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil2F47FC4170AF082F3BFE1FDCF80C2CDF" KeyPath="yes" Source="$(var.SourcePath)\Ptt.gif" />
+            </Component>
+            <Component Id="cmp83E25162277D9B87B2798B9F4E629F7F" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil1E887A623CBAD3D7207D79B6CFA7B08E" KeyPath="yes" Source="$(var.SourcePath)\PttBlocked.gif" />
+            </Component>
+            <Component Id="cmp98998C993B1FB809DF700092710DD9A5" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil1E0E26C6437FB6F41F83A00416856E43" KeyPath="yes" Source="$(var.SourcePath)\RdPageDown.gif" />
+            </Component>
+            <Component Id="cmp818B6BF44D3F8322DE28892B11857664" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filE0570E0CC91BF2526A39B9551B41BAFF" KeyPath="yes" Source="$(var.SourcePath)\RdPageDownDisabled.gif" />
+            </Component>
+            <Component Id="cmp8728A76ACAF911965D1B5963C8184D83" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filAF4FAD4C2F68BFF61248F3C9466B53C1" KeyPath="yes" Source="$(var.SourcePath)\RdPageUp.gif" />
+            </Component>
+            <Component Id="cmp8FA1BE5EE2F81B500C2CDCA444A58076" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filB8687E076C5EB9784C1141331C777E23" KeyPath="yes" Source="$(var.SourcePath)\RdPageUpDisabled.gif" />
+            </Component>
+            <Component Id="cmp75CE472F418983785C33C68072CB4E76" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filAFD1A38835BCB978EFFAACE922C9DECD" KeyPath="yes" Source="$(var.SourcePath)\RxHeadPhones.gif" />
+            </Component>
+            <Component Id="cmp757049E7DE06F390E21CD66451660320" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil630074A8C59C89263057C9307F5EED35" KeyPath="yes" Source="$(var.SourcePath)\RxNoDesasignable.gif" />
+            </Component>
+            <Component Id="cmpC4CEDD40EB227367C6B8EFBE4F575AA9" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil657FB334690F863FB577C894551CD3FA" KeyPath="yes" Source="$(var.SourcePath)\RxSpeaker.gif" />
+            </Component>
+            <Component Id="cmp51BBD62459F7177B3A51432E89D966D7" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil7928435BA9531B8AB19630131434A2CC" KeyPath="yes" Source="$(var.SourcePath)\Shell.ico" />
+            </Component>
+            <Component Id="cmp9DF6A940489ECA6681FAD190FE8DACE9" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filEAD5EBDDC4FF4E1DBD18C25453017A4A" KeyPath="yes" Source="$(var.SourcePath)\SpeakerDown.gif" />
+            </Component>
+            <Component Id="cmp2B1484B9758E3A8982CECF730F200AD3" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil213F605515599D49B5961C0D89A1AC02" KeyPath="yes" Source="$(var.SourcePath)\SpeakerDownTlf.gif" />
+            </Component>
+            <Component Id="cmpA0084D82EA0ED91D05DE587E564C54E3" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filBB04DB28FB5C4E3E2F18A352E12A0100" KeyPath="yes" Source="$(var.SourcePath)\SpeakerTlf.gif" />
+            </Component>
+            <Component Id="cmp170FC54EE5538B361E6DA243C1BFDE0F" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil328F1A3CF64CD19D7DEF66C0E1F3B3A2" KeyPath="yes" Source="$(var.SourcePath)\SpeakerUp.gif" />
+            </Component>
+            <Component Id="cmp98086D7FB23214CE30AB08BDD695A8CE" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filCB6F80893A63730CC1400013837B63DF" KeyPath="yes" Source="$(var.SourcePath)\SpeakerUpTlf.gif" />
+            </Component>
+            <Component Id="cmp8FA71BF9C13346A1177EA7612EF22EE4" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filB6E091D4349E24E046272D3F6F8167F6" KeyPath="yes" Source="$(var.SourcePath)\SplitLcTf.gif" />
+            </Component>
+            <Component Id="cmp316C1CCE2D9DAF9215C626F1F4CCEE5A" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filB9E9D9DC5B5FB5CA9CA68EF6BD4B0EA8" KeyPath="yes" Source="$(var.SourcePath)\SplitOff.gif" />
+            </Component>
+            <Component Id="cmpB0C6C88E04F287A6A9C44B1CFB5A8965" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil13D9537D7398C3DA5DF4B464CA26D162" KeyPath="yes" Source="$(var.SourcePath)\SplitRdLc.gif" />
+            </Component>
+            <Component Id="cmp73B6DB83C4EBEE811C719B3BC9CFFCC5" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil6E8832C35E7A1AD46F6CC64708A5B09F" KeyPath="yes" Source="$(var.SourcePath)\Squelch.gif" />
+            </Component>
+            <Component Id="cmp58CB27C99128A866740B0B14083E27B3" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil95866E81EE5C7C48A25305392AC370D8" KeyPath="yes" Source="$(var.SourcePath)\stop.png" />
+            </Component>
+            <Component Id="cmp931739161A4473EECEAF89274C657C1C" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil6BD7CDAF636CF2A70DCEDA3604BF1F05" KeyPath="yes" Source="$(var.SourcePath)\TlfPage.gif" />
+            </Component>
+            <Component Id="cmp8F65B8631E7837A850CBBFE10FD4E99C" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filD4F111AA295C6CF731FAC27D75EE70BD" KeyPath="yes" Source="$(var.SourcePath)\Unhang.gif" />
+            </Component>
+            <Component Id="cmpF048E1663FE89A593736104CCC96B0A4" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="filB22FDA07FFFFF4AEF6C40E0EABDEF0E7" KeyPath="yes" Source="$(var.SourcePath)\UnhangDisabled.gif" />
+            </Component>
+            <Component Id="cmp47C1E74D8E951B8253967C7888FCCF6C" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil25EA39EF4B1C3A97AA1E8FFC3860C31C" KeyPath="yes" Source="$(var.SourcePath)\Wait.ico" />
+            </Component>
+            <Component Id="cmp633AA2F8E477C829B0851941015F8201" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil7334E7EE7C117D31FF779EFD0A9D1D16" KeyPath="yes" Source="$(var.SourcePath)\Wait.png" />
+            </Component>
+            <Component Id="cmp0D29D1014C83CF95E0B672E4CC3FE107" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil21020587F61262E2139A5D617606F608" KeyPath="yes" Source="$(var.SourcePath)\Warning.ico" />
+            </Component>
+            <Component Id="cmp3E11057F64062E0D756AF36C65A09857" Directory="dirC142AAC0964B0B323DA41FCB5AFA837A" Guid="*">
+                <File Id="fil372372A22376C6A22D2B80DBA500606C" KeyPath="yes" Source="$(var.SourcePath)\Warning.png" />
+            </Component>
+            <Component Id="cmpD992AACBF3FBF5011A3725608C67B4E5" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="filF270DB0C2C0FF789FD4D9A19C482346E" KeyPath="yes" Source="$(var.SourcePath)\Tones\BadOperation.wav" />
+            </Component>
+            <Component Id="cmpEF2E0994739F404706836312F9660428" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil3F0FA18358BBC4E581EBD6015AE82827" KeyPath="yes" Source="$(var.SourcePath)\Tones\Busy.wav" />
+            </Component>
+            <Component Id="cmpE6F4E73DF721D64C859BA2559D653EA3" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="filA5CF32F01581027DDD4DBF745880FD41" KeyPath="yes" Source="$(var.SourcePath)\Tones\Calling.wav" />
+            </Component>
+            <Component Id="cmp1AB011678818BF5B44125904F1EA7219" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil5C17851D633C543E63BC249928E08A7A" KeyPath="yes" Source="$(var.SourcePath)\Tones\Congestion.wav" />
+            </Component>
+            <Component Id="cmpBBABED17146EE973E2FC8EC2F1B5166D" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil920A8B0380E782E4CEC7905972430895" KeyPath="yes" Source="$(var.SourcePath)\Tones\Falsa_Maniobra.wav" />
+            </Component>
+            <Component Id="cmp721737E7D21315A96AB9B1D2EC9D25C3" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil7AE90EC9742A0D17895EDC12CB6628E5" KeyPath="yes" Source="$(var.SourcePath)\Tones\HangUp.wav" />
+            </Component>
+            <Component Id="cmpD7897B9058415DB8F6ACF3A135EF5E8A" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil3501112F671AE4A9F0F2E5137EAE84B5" KeyPath="yes" Source="$(var.SourcePath)\Tones\Hold.wav" />
+            </Component>
+            <Component Id="cmp9AF76CBD39DA6E9AD3726116B4BEAAFA" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil69E6460503D7A62F2D3BAFF0DC29BCB9" KeyPath="yes" Source="$(var.SourcePath)\Tones\Interrupt_Warning.wav" />
+            </Component>
+            <Component Id="cmp1C496D0197891E83E6B63DBB6B51EC1C" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="filBC23608798E6122ED730713EC0256A37" KeyPath="yes" Source="$(var.SourcePath)\Tones\LcBadOperation.wav" />
+            </Component>
+            <Component Id="cmp280FA27E0AC858AF254E789C9C07675D" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil631E1C7C675414496AD3EAB04DA0A43B" KeyPath="yes" Source="$(var.SourcePath)\Tones\OutOfService.wav" />
+            </Component>
+            <Component Id="cmpCDBA0FAD772FCF20CB6243EEC8BADD9F" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil24EF4E8CAE8A1FAEC0F677CFF16E808F" KeyPath="yes" Source="$(var.SourcePath)\Tones\RdBadOperation.wav" />
+            </Component>
+            <Component Id="cmp6C9426B117D67FF02F8F081AFCADEDBC" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="filE8913D8449C0AF2BF9607FC99415D146" KeyPath="yes" Source="$(var.SourcePath)\Tones\Ready.wav" />
+            </Component>
+            <Component Id="cmpD9699E6F06A899383FC0DD9E9570DCC2" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil78820D819F6508F00CAF44B0D5124936" KeyPath="yes" Source="$(var.SourcePath)\Tones\ring.wav" />
+            </Component>
+            <Component Id="cmpDE5838E26F7552652CA39136E8CCED09" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil4B26C3DEF3F26537892AEDF6CD56D1AA" KeyPath="yes" Source="$(var.SourcePath)\Tones\RingPrio.wav" />
+            </Component>
+            <Component Id="cmp3023698DA0A79E49646A3CC125130976" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="filFFCDAB05C301195D33DAC5AC92B39928" KeyPath="yes" Source="$(var.SourcePath)\Tones\TlfBadOperation.wav" />
+            </Component>
+            <Component Id="cmp69BA23B7B6005C5F5DD35A732E18AE80" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil1E6AFEE18D0721A9E5E5AA8BC27BBB0A" KeyPath="yes" Source="$(var.SourcePath)\Tones\Warning_Operator_Intervening.wav" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirC142AAC0964B0B323DA41FCB5AFA837A">
+            <Directory Id="dirE98B07650B376F75E85124D5E1E267D6" Name="Tones" />
+        </DirectoryRef>
+    </Fragment>
+</Wix>

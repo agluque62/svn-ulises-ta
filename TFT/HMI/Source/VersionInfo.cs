@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: AssemblyCompany("DF Nucleo")]
 [assembly: AssemblyProduct("Ulises V 5000 I")]
-[assembly: AssemblyCopyright("Copyright © Nucleo 2016...2019")]
+[assembly: AssemblyCopyright("Copyright © Nucleo 2016...2020")]
 [assembly: AssemblyTrademark("Ulises V 5000")]
 [assembly: AssemblyCulture("")]
 
@@ -35,5 +35,5 @@ using System.Runtime.InteropServices;
 // Puede especificar todos los valores o establecer como predeterminados los números de compilación y de revisión 
 // mediante el carácter '*', como se muestra a continuación:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.5.9.7")]
-[assembly: AssemblyFileVersion("2.5.9.7")]
+[assembly: AssemblyVersion("2.6.0")]
+[assembly: AssemblyFileVersion("2.6.0")]

@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.8</ProductVersion>
+    <ProjectGuid>{92ca432e-c30e-4893-b1d9-7beebf471c83}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>Ulises5000I AT-HMILight</OutputName>
+    <OutputType>Package</OutputType>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug;SourcePath=$(SolutionDir)bin\$(Configuration)\Resources</DefineConstants>
+    <Cultures>es-ES</Cultures>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>SourcePath=$(SolutionDir)bin\$(Configuration)\Resources</DefineConstants>
+    <Cultures>es-ES</Cultures>
+    <VerboseOutput>True</VerboseOutput>
+    <SuppressAllWarnings>False</SuppressAllWarnings>
+    <Pedantic>False</Pedantic>
+  </PropertyGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Product.wxs" />
+    <Compile Include="resources.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="banner-image.jpg" />
+    <Content Include="bkg-image.jpg" />
+    <Content Include="License.rtf" />
+    <Content Include="PlanNumeracionEUROCONTROL.xls" />
+    <Content Include="sfk.exe" />
+    <Content Include="TEAMVIEWER-START.xml" />
+    <Content Include="UV5K-HMI-START.xml" />
+    <Content Include="UV5K-WAUDIO-START.xml" />
+    <Content Include="uv5ki-scripts-del.cmd" />
+    <Content Include="uv5ki-scripts.cmd">
+      <Link>
+      </Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UtilExtension_en-US.wxl" />
+    <EmbeddedResource Include="UtilExtension_es-es.wxl" />
+    <EmbeddedResource Include="UtilExtension_fr-FR.wxl" />
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+  <!--
+	To modify your build process, add your task inside one of the targets below and uncomment it.
+	Other similar extension points exist, see Wix.targets.
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+  <Target Name="BeforeBuild">
+    <HeatDirectory DirectoryRefId="INSTALLFOLDER" OutputFile="resources.wxs" Directory="..\..\bin\Release\Resources" ComponentGroupName="U5ki.HMI.ResourcesComponents" ToolPath="$(WixToolPath)" PreprocessorVariable="var.SourcePath" AutogenerateGuids="true">
+    </HeatDirectory>
+  </Target>
+</Project>

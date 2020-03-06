@@ -680,6 +680,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     for (int i = 0; i < nInChannels; i++)
                     {
                         _inchannels.Add((_drv.getChannelInfo(i, true)).name);
+                        
                     }
 
                     _outchannels.Clear();

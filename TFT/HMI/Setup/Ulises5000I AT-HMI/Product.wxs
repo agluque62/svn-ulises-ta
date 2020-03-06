@@ -208,7 +208,7 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="COMPANYFOLDER" Name="DF Nucleo">
+        <Directory Id="COMPANYFOLDER" Name="NucleoCC">
           <Directory Id="INSTALLFOLDER" Name="Ulises5000I-TA">
             <Directory Id="EN" Name="en-GB" />
             <Directory Id="FR" Name="fr-FR" />
@@ -228,7 +228,7 @@
     </Directory>
   </Fragment>
 
-  <Fragment>
+  <Fragment Id="InstallHMI">
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER" Source="..\..\bin\Release">
       <Component Id="MainExecutable" Guid="{4FE83C36-E5F9-42BD-8404-88CE547D7C05}">
         <File Id='HMI_EXE' Name='HMI.exe' KeyPath="yes">
@@ -1051,7 +1051,7 @@
       <!--<Custom Action="DeleteHMITask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
       <Custom Action="DeleteWATask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
       <Custom Action="DeleteTeamViewerTask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>-->
-    
+      <FindRelatedProducts > </FindRelatedProducts>
     </InstallExecuteSequence>
 
     <!-- Modelo de Visualizacion -->
@@ -1127,6 +1127,7 @@
             <ListItem Value="URR" Text="URR" />
             <ListItem Value="KENIA" Text="KENIA" />
             <ListItem Value="URV_7" Text="URV-7&quot;" />
+            <!--<ListItem Value="EscuchaRadio" Text="ESCUCHA RADIO" />  Debe instalarse con un instalador con Mcast sin nodebox, no desde aqui-->
           </ComboBox>
         </Control>
         <Control Id="LangLabel"  Type="Text"     X="190" Y="92" Width="60" Height="18" TabSkip="no" Text="Idioma" />

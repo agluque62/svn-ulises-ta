@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="*" Name="Ulises5000I Audio Terminal HMI" Language="1033" Version="2.5.9" Manufacturer="DF Nucleo" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
+  <Product Id="*" Name="Ulises5000I Audio Terminal HMI Light" Language="1033" Version="2.6.0" Manufacturer="NucleoCC" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
 
     <PropertyRef Id="NETFRAMEWORK45"/>
@@ -9,43 +9,8 @@
     </Property>
     <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
 
-    <!-- Estas propiedades se definen en la instalacion de MCAST/NBX y deben ser previas a la instalacion de este modulo -->
-    <Property Id="PICT" Value="PICT01" >
-      <RegistrySearch Id='UV5KI_MCAST_PICT' Root='HKLM'
-                     Key='SOFTWARE\Wix\UV5KI_MCAST'
-                     Name='PICT_Property' Type='raw' />
-    </Property>
-    <Property Id="DIRIP" Value="127.0.0.1" >
-      <RegistrySearch Id='UV5KI_NBX_DIRIP' Root='HKLM'
-                     Key='SOFTWARE\Wix\UV5KI_NBX'
-                     Name='DIRIP_Property' Type='raw' />
-    </Property>
-    <Property Id="SERVERIP" Value="127.0.0.1">
-      <RegistrySearch Id='UV5KI_NBX_SERVERIP' Root='HKLM'
-                     Key='SOFTWARE\Wix\UV5KI_NBX'
-                     Name='SERVERIP_Property' Type='raw' />
-    </Property>
-    <Property Id="PBX" Value="False">
-      <RegistrySearch Id='UV5KI_NBX_PBX' Root='HKLM'
-                     Key='SOFTWARE\Wix\UV5KI_NBX'
-                     Name='PBX_Property' Type='raw' />
-    </Property>
-
     <Condition Message="This application requires .NET Framework 4.5. Please install the .NET Framework then run this installer again." >
       <![CDATA[Installed OR NETFRAMEWORK45 OR NETFRAMEWORK451 = "#378758"]]>
-    </Condition>
-
-    <Condition Message="Se requiere la instalacion previa de MCAST/NBX." >
-      <![CDATA[Installed OR PICT OR DIRIP]]>
-    </Condition>
-
-    <!-- Condicion para que este instalado MCAS/NODEBOX -->
-    <Upgrade Id ="c17a4cae-94cf-4435-ada9-69eaefc872eb">
-      <UpgradeVersion OnlyDetect="yes" Minimum="0.0.0.0"
-                      Property="APPDETECTED" IncludeMinimum="yes" />
-    </Upgrade>
-    <Condition Message="Se requiere la instalacion previa de MCAST/NBX.">
-      <![CDATA[APPDETECTED OR Installed]]>
     </Condition>
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" />
@@ -56,8 +21,41 @@
     <Property Id="CONFIG_FILE" Value="HMI.exe.config"></Property>
     <Property Id='RECDUAL' Value='0'></Property>
     <Property Id="PVERSION" Value="2.5.9"></Property>
+    <Property Id="MCAST_INSTALLFOLDER_NAME" Value="Ulises5000I-MCast"></Property>
+    <!-- Propiedades para los directorios de Instalacion -->
+    <Property Id="MCAST_FOLDER">
+      <RegistrySearch Id="UV5KI_MCAST_FOLDER" Root="HKLM" Key='SOFTWARE\Wix\UV5KI_MCAST' Name='FOLDER_Property' Type='raw'  />
+    </Property>
 
     <!--Propiedades a mantener cuando se reinstala -->
+    <Property Id='SPREAD' Value='1'></Property>
+    <Property Id="PICT" Value="PICT01" >
+      <RegistrySearch Id='UV5KI_MCAST_PICT' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_MCAST'
+                     Name='PICT_Property' Type='raw' />
+    </Property>
+    <Property Id="SPREAD_NUMBER" Value="4">
+      <RegistrySearch Id='UV5KI_MCAST_SPREAD_NUMBER' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_MCAST'
+                     Name='SPREAD_NUMBER_Property' Type='raw' />
+    </Property>
+    <Property Id="SPREAD_IPBASE" Value="127.0.0.1">
+      <RegistrySearch Id='UV5KI_MCAST_SPREAD_IPBASE' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_MCAST'
+                     Name='SPREAD_IPBASE_Property' Type='raw' />
+    </Property>
+
+    <Property Id="DIRIP" Value="127.0.0.1" >
+      <RegistrySearch Id='UV5KI_HMI_DIRIP' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_HMI'
+                     Name='DIRIP_Property' Type='raw'/>
+    </Property>
+    <Property Id="SERVERIP" Value="127.0.0.1">
+      <RegistrySearch Id='UV5KI_HMI_SERVERIP' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_HMI'
+                     Name='SERVERIP_Property' Type='raw' />
+    </Property>
+
     <Property Id="ED137REC" Value="0">
       <RegistrySearch Id='UV5KI_HMI_ED137REC' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
@@ -100,7 +98,7 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='RECB_Property' Type='raw' />
     </Property>
-    <Property Id="LANG" Value="es">
+    <Property Id="LANG" Value="es-ES">
       <RegistrySearch Id='UV5KI_HMI_LANG' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='LANG_Property' Type='raw' />
@@ -175,17 +173,26 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='TIMESPRX_Property' Type='raw' />
     </Property>
+    <!-- -->
+    <Property Id="PTTFILTER" Value="0">
+      <RegistrySearch Id='UV5KI_HMI_PTTFILTER' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_HMI'
+                     Name='PTTFILTER_Property' Type='raw' />
+    </Property>
+
+
 
     <!---->
 
-    <Feature Id="ProductFeature" Title="Ulises5000I_TA" Level="1">
+    <Feature Id="ProductFeature" Title="Ulises5000I_TA_Light" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
       <ComponentGroupRef Id="EnComponents" />
       <ComponentGroupRef Id="FrComponents" />
       <ComponentGroupRef Id="U5ki.HMI.ResourcesComponents" />
       <ComponentGroupRef Id="HMI.TOOLS"/>
       <ComponentGroupRef Id="HMI.GRABADOR"/>
-      <ComponentGroupRef Id="HMI.WINAUDIO"/>      
+      <ComponentGroupRef Id="HMI.WINAUDIO"/>
+      <ComponentGroupRef Id="U5ki.MCast.ProductComponents" />
     </Feature>
     
     <UIRef Id="MyWixUI_Minimal"/>
@@ -195,14 +202,14 @@
 
     <!-- DLL Custom Actions -->
     <Binary Id="Ulises5000I_CustomActions" 
-            SourceFile="..\Ulises5000-AT-HMI-CustomActions\bin\$(var.Configuration)\Ulises5000-AT-HMI-CustomActions.CA.dll" />  
-
+            SourceFile="..\Ulises5000-AT-HMI-CustomActions\bin\$(var.Configuration)\Ulises5000-AT-HMI-CustomActions.CA.dll" />
   </Product>
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="COMPANYFOLDER" Name="DF Nucleo">
+        <Directory Id="COMPANYFOLDER" Name="NucleoCC">
+          <Directory Id="U5ki.MCast.INSTALLFOLDER" Name="Ulises5000I-MCast"/>
           <Directory Id="INSTALLFOLDER" Name="Ulises5000I-TA">
             <Directory Id="EN" Name="en-GB" />
             <Directory Id="FR" Name="fr-FR" />
@@ -222,7 +229,85 @@
     </Directory>
   </Fragment>
 
+
+  <!-- U5ki.MCast installation -->
   <Fragment>
+    <ComponentGroup Id="U5ki.MCast.ProductComponents" Directory="U5ki.MCast.INSTALLFOLDER" Source="..\..\..\..\Cd40\bin\Release">
+      <Component Id='spread_exe' Guid='{B386B60D-4413-4A23-A546-5E22629A457F}'>
+        <File Id='spread_exe' Name='spread.exe'/>
+      </Component>
+      <Component Id='MCast_utilities' Guid='{ECEDE307-7981-431A-B938-CFFF570B0A0C}'>
+        <File Id='MCast_utilities' Name='utilities.dll'/>
+      </Component>
+      <Component Id='MCast_nlog' Guid='{EFA3F270-1559-4E7B-8926-E668E892FED6}'>
+        <File Id='MCast_nlog' Name='nlog.dll'/>
+      </Component>
+      <Component Id='U5ki.MCast.cfg' Guid ='{156A5186-4A32-4FC1-9331-01CBA57DFA8A}' >
+        <File Id='U5ki.MCast.cfg' Name='U5ki.MCast.exe.config' />
+        <util:XmlFile Id="MCast_IdHost" Action="setValue"
+                        File = "[#U5ki.MCast.cfg]"
+                        ElementPath="/configuration/applicationSettings/U5ki.Mcast.Properties.Settings/setting[\[]@name='IdHost'[\]]/value"
+                        Value="[PICT]"/>
+      </Component>
+      <Component Id='nlog_config' Guid='{0F2E77DB-1429-4FDC-BBA9-084E3866DE4F}'>
+        <!-- Permanent='yes'> -->
+        <File Id='MCast_nlog_config' Name='nlog.config' />
+      </Component>
+      <Component Id="MCastExecutable" Guid="{4D24894F-92CD-4024-A1DD-4DEA4AC55297}">
+        <File Id="mcast" Name="U5ki.mcast.exe" KeyPath="yes" >
+          <Shortcut Id='desktopMcast' Directory='DesktopFolder' Name='Ulises5000I-MCast' WorkingDirectory='U5ki.MCast.INSTALLFOLDER' Advertise='yes' Arguments='-console' >
+          </Shortcut>
+        </File>
+        <ServiceInstall
+          Id="MCastInstaller"
+          Type="ownProcess"
+          Name="u5ki.Mcast"
+          DisplayName="U5kI.Mcast"
+          Description="Spread service for Ulises-5000I"
+          Start="auto"
+          Account="LocalSystem"
+          ErrorControl="ignore"
+          Interactive="no">
+          <ServiceConfig DelayedAutoStart="no" OnInstall="yes"  OnReinstall="yes" OnUninstall="no"></ServiceConfig>
+          <ServiceDependency Id="dot3svc"/>
+          <util:ServiceConfig
+                  FirstFailureActionType='restart'
+                  SecondFailureActionType='restart'
+                  ThirdFailureActionType='restart'
+                  RestartServiceDelayInSeconds='30'
+                  ResetPeriodInDays='1'/>
+        </ServiceInstall>
+        <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="u5ki.Mcast" Wait="yes" />
+      </Component>
+      <Component Id="mcast_registry" Guid="{9C50679C-B343-46E7-86B6-DA38743358D5}" Permanent="yes">
+        <RegistryKey Id="mcast_registry_entries" Root="HKLM" Key="SOFTWARE\Wix\UV5KI_MCAST" Action="create">
+          <RegistryValue Name='SPREAD_NUMBER_Property' Value='[SPREAD_NUMBER]' Type='string' />
+          <RegistryValue Name='SPREAD_IPBASE_Property' Value='[SPREAD_IPBASE]' Type='string' />
+          <RegistryValue Name='PICT_Property' Value='[PICT]' Type='string' />
+        </RegistryKey>
+      </Component>
+      <Component Id='MCast_protobuf_net' Guid='{03723FBC-98D8-4C2D-BEC6-682716C4002C}'>
+        <File Id='MCast_protobuf_net' Name='protobuf-net.dll'/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <!-- HMI installation -->
+  <Fragment>
+    <!-- propiedad que indica si hay NBX instalado, contiene el nombre del fichero con su path si lo encuentra -->
+    <Property Id="NBOXINSTALLED" Value="no">
+      <DirectorySearch Id="ProgramFilesFolder" Path ="[ProgramFilesFolder]" >
+        <DirectorySearch Id="CCFolder" Path ="[COMPANYFOLDER]">
+          <DirectorySearch Id="NbxFolder" Path ="Ulises5000I-NodeBox" Depth ="1">
+            <FileSearch Id ="NbxFile" Name="U5ki.NodeBox.exe"/>
+          </DirectorySearch>
+        </DirectorySearch>
+      </DirectorySearch>
+    </Property>
+    <!-- No permite instalar si hay un NBOX -->
+    <Condition Message='NBOX or Radio Service must be uninstalled first'>
+      <![CDATA[NBOXINSTALLED="no"]]>
+    </Condition>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER" Source="..\..\bin\Release">
       <Component Id="MainExecutable" Guid="{4FE83C36-E5F9-42BD-8404-88CE547D7C05}">
         <File Id='HMI_EXE' Name='HMI.exe' KeyPath="yes">
@@ -337,6 +422,11 @@
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='RdSquelchConfirmationTime'[\]]/value"
                         Value="[TIMESPRX]"/>
+        <!--  -->
+        <util:XmlFile Id="CwpPttFilterProperty" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='CwpPttFilterMsec'[\]]/value"
+                        Value="[PTTFILTER]"/>
         <!-- Idioma -->
         <util:XmlFile Id="Lang" Action="setValue"
                         File = "[#HMI.config]"
@@ -501,71 +591,27 @@
                   Value="[NICTEAM]"/>
       </Component>
       
-      <Component Id='ConditionalUpdatesForENAIRE' Guid='{D4F30EE1-F85F-4A5C-B233-8C63F6F1A74F}' KeyPath='yes'>
-        <Condition >CLIENTE="ENAIRE"</Condition>
-        <util:XmlFile Id="LogoEnaire" Action="setValue"
+      <Component Id='ConditionalUpdatesForEscuchaRadio' Guid='{ABA8BD84-D094-40E4-984E-2E981D781A17}' KeyPath='yes'>
+        <Condition >CLIENTE="EscuchaRadio"</Condition>
+        <util:XmlFile Id="LogoEnaireEscuchaRadio" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
                         Value="Resources/logo_AENA.PNG"/>
-        <util:XmlFile Id="GlpForAena" Action="setValue"
-                        File = "[#HMI.config]"
-                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='GLP'[\]]/value"
-                        Value="False"/>
-        <util:XmlFile Id="AppsEnaire" Action="setValue"
+        <util:XmlFile Id="AppsEscuchaRadio" Action="setValue"
                         File = "[#ProfileCatalog]"
                         ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
                         Name="AssemblyFile"
-                        Value="Presentation.Twr.dll"/>
-      </Component>
-      <Component Id='ConditionalUpdatesForASECNA' Guid='{E5EDC4B5-F751-4C1E-89FF-AAEE404367DE}' KeyPath='yes'>
-        <Condition >CLIENTE="ASECNA"</Condition>
-        <util:XmlFile Id="LogoAsecna" Action="setValue"
-                        File = "[#HMI.config]"
-                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
-                        Value="Resources/asecna_logo.gif"/>
-        <util:XmlFile Id="GlpForAsecna" Action="setValue"
-                        File = "[#HMI.config]"
-                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='GLP'[\]]/value"
-                        Value="True"/>
-        <util:XmlFile Id="AppsAsecna" Action="setValue"
-                        File = "[#ProfileCatalog]"
-                        ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
-                        Name="AssemblyFile"
-                        Value="Presentation.Asecna.dll"/>
-        <util:XmlFile Id="SpeakerTlfAsecna" Action="setValue"
-                        File = "[#HMI.config]"
-                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='SpeakerTlfEnable'[\]]/value"
-                        Value="False"/>
-        <!-- Forced because is not implemented -->
-        <util:XmlFile Id="SpeakerOnlyModeAsecna" Action="setValue"
+                        Value="Presentation.RadioLight.dll"/>
+        <util:XmlFile Id="SpeakerOnlyModeEscuchaRadio" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='OnlySpeakerMode'[\]]/value"
-                        Value="False"/>
-      </Component>
-      <Component Id='ConditionalUpdatesForENNA' Guid='{7A3AAF79-ECF1-48B6-973B-B0CF39763259}' KeyPath='yes'>
-        <Condition >CLIENTE="ENNA"</Condition>
-        <util:XmlFile Id="LogoEnna" Action="setValue"
+                        Value="True"/>
+        <util:XmlFile Id="TipoAudioEscuchaRadio" Action="setValue"
                         File = "[#HMI.config]"
-                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
-                        Value="Resources/ENNA.jpg"/>
-        <util:XmlFile Id="AppsEnna" Action="setValue"
-                        File = "[#ProfileCatalog]"
-                        ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
-                        Name="AssemblyFile"
-                        Value="Presentation.Twr.dll"/>
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='TipoAudioUsb'[\]]/value"
+                        Value="3"/>
       </Component>
-      <Component Id='ConditionalUpdatesForURR' Guid='{2682C805-2050-4400-B253-D6F2A6BC2931}' KeyPath='yes'>
-        <Condition >CLIENTE="URR"</Condition>
-        <util:XmlFile Id="LogoUrr" Action="setValue"
-                        File = "[#HMI.config]"
-                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
-                        Value="Resources/logo_AENA.PNG"/>
-        <util:XmlFile Id="AppsUrr" Action="setValue"
-                        File = "[#ProfileCatalog]"
-                        ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
-                        Name="AssemblyFile"
-                        Value="Presentation.AUrr.dll"/>
-      </Component>
+
       <!-- El doble altavoz condiciona la configuracion de HFSpeaker -->
       <Component Id='ConditionalUpdatesForDoubleRadioSpeaker' Guid='{54DAE262-4D25-49F7-8AD5-484150EFDAA4}' KeyPath='yes'>
         <Condition >DOUBLERDSPEAKER="True"</Condition>
@@ -623,17 +669,8 @@
       <Component Id='NLog.Config' Guid='{0840115A-8731-4164-91DA-B992D48C8C3C}'>
         <File Id='NLog.Config' Name='NLog.config'/>
       </Component>
-      <Component Id='Presentation.Asecna' Guid='{D063EE79-1617-448E-B8EB-6FEDBEB48D7D}'>
-        <File Id='Presentation.Asecna' Name='Presentation.Asecna.dll'/>
-      </Component>
-      <Component Id='Presentation.twr' Guid='{C52B1F34-F491-499B-97F9-658BA9F6E5F7}'>
-        <File Id='Presentation.twr' Name='Presentation.twr.dll'/>
-      </Component>
-      <Component Id='Presentation.Urr' Guid='{CE2CBB42-949A-45AF-B358-CAE745B25799}'>
-        <File Id='Presentation.Urr' Name='Presentation.Urr.dll'/>
-      </Component>
-      <Component Id='Presentation.AUrr' Guid='{3797292D-C3AB-483D-A2E3-00A0255E9C91}'>
-        <File Id='Presentation.AUrr' Name='Presentation.AUrr.dll'/>
+      <Component Id='Presentation.RadioLight' Guid='{CC62D8E4-3C20-40A9-927A-1C1BBD9191C5}'>
+        <File Id='Presentation.RadioLight' Name='Presentation.RadioLight.dll'/>
       </Component>
       <Component Id='ProfileCatalog' Guid='{0D45FA04-DDCA-4D7A-8DE2-97B38678F056}' >
         <File Id='ProfileCatalog' Name='ProfileCatalog.xml'/>
@@ -680,9 +717,12 @@
           <RegistryValue Name='RDRTXREC_Property' Value='[RDRTXREC]' Type='string' />
           <RegistryValue Name='TIMESPTX_Property' Value='[TIMESPTX]' Type='string' />
           <RegistryValue Name='TIMESPRX_Property' Value='[TIMESPRX]' Type='string' />
+          <RegistryValue Name='PTTFILTER_Property' Value='[PTTFILTER]' Type='string' />
           <!--<RegistryValue Name='ECTLF_Property' Value='[ECTLF]' Type='string' />-->
           <RegistryValue Name='ECLC_Property' Value='[ECLC]' Type='string' />
           <RegistryValue Name='NICTEAM_Property' Value='[NICTEAM]' Type='string' />
+          <RegistryValue Name='DIRIP_Property' Value='[DIRIP]' Type='string' />
+          <RegistryValue Name='SERVERIP_Property' Value='[SERVERIP]' Type='string' />
         </RegistryKey>
       </Component>      
     </ComponentGroup>
@@ -740,8 +780,11 @@
         <File Id="sfk.exe.2" Name="sfk.exe"></File>
       </Component>
       <!-- 20190217. SCRIPT de alto rendimiento. Copiar el fichero al directorio de trabajo -->
-      <Component Id ="scripts" Guid="{58DA6627-E6FC-4CD8-85BD-04FD46D2239C}">
+      <Component Id ="script_install" Guid="*">
         <File Id="script1" Name="uv5ki-scripts.cmd"></File>
+      </Component>
+      <Component Id ="script_uninstall" Guid="*">
+        <File Id="script2" Name="uv5ki-scripts-del.cmd"></File>
       </Component>
       <Component Id ="igmpquery" Guid="{3359AE86-1299-4303-BA59-B47FEB4C930F}">
         <File Id="igmpquery_exe" Name="igmpquery.exe"></File>
@@ -884,70 +927,71 @@
 
   <!-- UI y Acciones -->
   <Fragment>
-    <CustomAction Id='Md5Mark' Directory="INSTALLFOLDER"
+    <CustomAction Id='Md5McastMark' Directory="U5ki.MCast.INSTALLFOLDER"
+              Execute='deferred'
+              Impersonate='no'
+              ExeCommand='"[INSTALLFOLDER]sfk.exe" select "[COMPANYFOLDER][MCAST_INSTALLFOLDER_NAME]" .exe .dll +md5gento "[U5ki.MCast.INSTALLFOLDER]md5mark_[PVERSION].md5" -rel'
+              Return='check' />
+    <CustomAction Id="CustomActionTest" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="CustomActionTest" />
+    <CustomAction Id="GenerateSpreadConf" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="GenerateSpreadConf" />
+    <CustomAction Id="CustomActionPict2Ip" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="CustomActionPict2Ip" />
+
+    <!--<CustomAction Id='Md5Mark' Directory="INSTALLFOLDER"
                   Execute='deferred'
                   Impersonate='no'
                   ExeCommand='"[INSTALLFOLDER]sfk.exe" select "[COMPANYFOLDER][INSTALLFOLDER_NAME]" .exe .dll +md5gento "[INSTALLFOLDER]md5mark_[PVERSION].md5" -rel'
-                  Return='ignore' />
+                  Return='ignore' />-->
 
-    <!-- 20190217. SCRIPT de alto rendimiento. Definicion de la Accion -->
+    <!-- 20190217. SCRIPT-Instalacion.  Definicion de la Accion -->
     <CustomAction Id='ScriptsRun' Directory="INSTALLFOLDER"
                   Execute='deferred'
                   Impersonate='no'
-                  ExeCommand='"[INSTALLFOLDER]uv5ki-scripts.cmd"'
+                  ExeCommand='"[INSTALLFOLDER]uv5ki-scripts.cmd" "[COMPANYFOLDER]" "[INSTALLFOLDER]" [PVERSION]'
                   Return='ignore' />
-
     <CustomAction Id="CustomActionEd137Rec" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="Ed137RecVar" />
-
-    <!--<CustomAction Id="StartHMITask" Return="ignore" Impersonate="yes" Execute="immediate" Directory="INSTALLFOLDER"
-      ExeCommand='SCHTASKS.EXE /CREATE /F /SC ONLOGON /TN "UV5K-HMI-START" /DELAY 0000:15 /TR "\"[INSTALLFOLDER]HMI.exe\""'>      
-    </CustomAction>
-    <CustomAction Id="RepeatHMITask" Return="ignore" Impersonate="yes" Execute="deferred" Directory="INSTALLFOLDER"
-      ExeCommand='SCHTASKS.EXE /CHANGE /RI 1 /TN "UV5K-HMI-START"'>
-    </CustomAction>
-    <CustomAction Id="StartWATask" Return="ignore" Impersonate="yes" Execute="immediate" Directory="INSTALLFOLDER"
-      ExeCommand='SCHTASKS.EXE /CREATE /F /SC ONLOGON /TN "UV5K-WAUDIO-START" /DELAY 0000:25 /TR "\"[WINAUDIO]WinAudio.exe\"" /RU "NT Authority\System"'>      
-    </CustomAction>
-    <CustomAction Id="StartTeamViewerTask" Return="ignore" Impersonate="yes" Execute="immediate" Directory="INSTALLFOLDER"
-      ExeCommand='SCHTASKS.EXE /CREATE /F /SC ONLOGON /TN "TEAMVIEWER-START" /DELAY 0000:30 /TR "\"C:\Program Files\TeamViewer\Version9\TeamViewer.exe\""'>
-    </CustomAction>-->
-    
+   
     <!-- Programacion de las tareas desde un XML -->
-    <CustomAction Id="StartHMITaskV2" Return="check" Execute="deferred" Directory="TARGETDIR" Impersonate="no"
+    <!--<CustomAction Id="StartHMITaskV2" Return="check" Execute="deferred" Directory="TARGETDIR" Impersonate="no"
       ExeCommand="SCHTASKS.EXE /CREATE /TN &quot;UV5K-HMI-START&quot; /F /XML &quot;[INSTALLFOLDER]UV5K-HMI-START.XML&quot;" />
     <CustomAction Id="StartWATaskV2" Return="check" Execute="deferred" Directory="TARGETDIR" Impersonate="no"
       ExeCommand="SCHTASKS.EXE /CREATE /TN &quot;UV5K-WAUDIO-START&quot; /F /XML &quot;[INSTALLFOLDER]UV5K-WAUDIO-START.XML&quot; /RU SYSTEM /RP" />
     <CustomAction Id="StartTeamViewerTaskV2" Return="check" Execute="deferred" Directory="TARGETDIR" Impersonate="no"
-      ExeCommand="SCHTASKS.EXE /CREATE /TN &quot;TEAMVIEWER-START&quot; /F /XML &quot;[INSTALLFOLDER]TEAMVIEWER-START.xml&quot;" />
+      ExeCommand="SCHTASKS.EXE /CREATE /TN &quot;TEAMVIEWER-START&quot; /F /XML &quot;[INSTALLFOLDER]TEAMVIEWER-START.xml&quot;" />-->
 
     <!-- Borrado de Tareas -->
-    <CustomAction Id="DeleteHMITask" Return="ignore" Execute="deferred" 
+    <CustomAction Id='ScriptsRunDel' Directory="INSTALLFOLDER"
+                  Execute='deferred'
+                  Impersonate='no'
+                  ExeCommand='"[INSTALLFOLDER]uv5ki-scripts-del.cmd" "[INSTALLFOLDER]"'
+                  Return='ignore' />
+
+    <!--<CustomAction Id="DeleteHMITask" Return="ignore" Execute="deferred" 
                   Directory="TARGETDIR" Impersonate="no"  ExeCommand="schtasks.exe /delete /TN &quot;UV5K-HMI-START&quot; /F"/>
     <CustomAction Id="DeleteWATask" Return="ignore" Execute="deferred" 
                   Directory="TARGETDIR" Impersonate="no"  ExeCommand="schtasks.exe /delete /TN &quot;UV5K-WAUDIO-START&quot; /F"/>
     <CustomAction Id="DeleteTeamViewerTask" Return="ignore" Execute="deferred" 
-                  Directory="TARGETDIR" Impersonate="no"  ExeCommand="schtasks.exe /delete /TN &quot;TEAMVIEWER-START&quot; /F"/>
+                  Directory="TARGETDIR" Impersonate="no"  ExeCommand="schtasks.exe /delete /TN &quot;TEAMVIEWER-START&quot; /F"/>-->
     
     <InstallExecuteSequence>
-      <Custom Action="Md5Mark" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
+      <!--<Custom Action="Md5Mark" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>-->
+      
       <!-- 20190217. SCRIPT de alto rendimiento. Correr el Script -->
       <Custom Action="ScriptsRun" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
 
-      <!--<Custom Action="StartHMITask" Before="InstallFinalize">NOT Installed</Custom>
-      <Custom Action="RepeatHMITask" Before="InstallFinalize">NOT Installed</Custom>
-      <Custom Action="StartWATask" Before="InstallFinalize">NOT Installed</Custom>
-      <Custom Action="StartTeamViewerTask" Before="InstallFinalize">NOT Installed</Custom>-->
-
-      <Custom Action="StartHMITaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
+      <!--<Custom Action="StartHMITaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
       <Custom Action="StartWATaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
-      <Custom Action="StartTeamViewerTaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
+      <Custom Action="StartTeamViewerTaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>-->
 
-      <Custom Action="DeleteHMITask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+      <Custom Action="ScriptsRunDel" After='InstallInitialize'>(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+      <!--<Custom Action="DeleteHMITask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
       <Custom Action="DeleteWATask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-      <Custom Action="DeleteTeamViewerTask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-    
-    </InstallExecuteSequence>
+      <Custom Action="DeleteTeamViewerTask" Before="InstallFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>-->
 
+        <!-- Launch webpage during full uninstall, but not upgrade -->
+        <Custom Action="Md5McastMark" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
+       <RemoveRegistryValues> </RemoveRegistryValues>
+    </InstallExecuteSequence>
+ 
     <!-- Modelo de Visualizacion -->
     <UI Id="MyWixUI_Minimal">
 
@@ -973,7 +1017,7 @@
       <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">Installed AND PATCH</Publish>
 
       <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="OptionsDlg" Order="2">LicenseAccepted = "1"</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="SpreadConfDlg" Order="2">LicenseAccepted = "1"</Publish>
 
       <Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
       <Publish Dialog="SetupTypeDlg" Control="TypicalButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
@@ -984,7 +1028,7 @@
       <Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="SetupTypeDlg" Order="2">WixUI_InstallMode = "InstallCustom"</Publish>
       <Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
-      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="OptionsDlg" Order="3">1</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="SpreadConfDlg" Order="3">1</Publish>
 
       <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
 
@@ -993,7 +1037,11 @@
       <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
       <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
 
-      <Publish Dialog="OptionsDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="SpreadConfDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="SpreadConfDlg" Control="Next" Event="NewDialog" Value="OptionsDlg">1</Publish>
+      <Publish Dialog="SpreadConfDlg" Control="Cancel" Event="SpawnDialog" Value="CancelDlg">1</Publish>
+     
+      <Publish Dialog="OptionsDlg" Control="Back" Event="NewDialog" Value="SpreadConfDlg">1</Publish>
       <Publish Dialog="OptionsDlg" Control="Next" Event="NewDialog" Value="OptionsDlg2">1</Publish>
       <Publish Dialog="OptionsDlg" Control="Cancel" Event="SpawnDialog" Value="CancelDlg">1</Publish>
 
@@ -1001,24 +1049,44 @@
       <Publish Dialog="OptionsDlg2" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
       <Publish Dialog="OptionsDlg2" Control="Cancel" Event="SpawnDialog" Value="CancelDlg">1</Publish>
 
-      <!-- Dialogo de Opciones -->
+
+      <!-- Dialogo de generacion del spread.conf -->
+      <Dialog Id="SpreadConfDlg" Width="370" Height="270" Title="Spread.conf" NoMinimize="yes">
+        <Control Id="ElementsNumberLabel" Type="Text" X="45"  Y="63" Width="100" Height="18" TabSkip="no" Text="Numero de Elementos" />
+        <Control Id="ElementsNumberEdit"  Type="Edit" X="150" Y="60" Width="100" Height="18" Property="SPREAD_NUMBER" Text="{5}" />
+        <Control Id="IpBaseLabel"         Type="Text" X="45"  Y="83" Width="100" Height="18" TabSkip="no" Text="IP-Base" />
+        <Control Id="IpBaseEdit"          Type="Edit" X="150" Y="80" Width="100" Height="18" Property="SPREAD_IPBASE" Text="{20}" />
+
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)" />
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" Disabled="yes" >
+          <Condition Action="enable"><![CDATA[SPREAD_NUMBER > 1 AND SPREAD_IPBASE]]></Condition>
+          <Condition Action="disable"><![CDATA[NOT SPREAD_NUMBER OR SPREAD_NUMBER < 2 OR NOT SPREAD_IPBASE]]></Condition>
+          <Publish Event="DoAction" Value="GenerateSpreadConf"><![CDATA[SPREAD=1]]></Publish>
+        </Control>
+
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Introduzca informacion del fichero SPREAD.CONF</Text>
+        </Control>
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Fichero SPREAD.CONF</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+      </Dialog>
+      
       <Dialog Id="OptionsDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="yes">
-        <Control Id="PictLabel" Type="Text" X="10"  Y="52" Width="60" Height="18" TabSkip="no" Text="PICT" />
-        <Control Id="PictEdit"  Type="Edit" X="85"  Y="50" Width="90" Height="18" Property="PICT" Text="{20}" Disabled="yes" />
-        
-        <Control Id="IPLabel"   Type="Text" X="190" Y="52" Width="60" Height="18" TabSkip="no" Text="IP" />
-        <Control Id="IPEdit"    Type="Edit" X="260" Y="50" Width="90" Height="18" Property="DIRIP" Text="{80}" Disabled="yes" />
-        
+        <Control Id="PictLabel" Type="Text" X="10" Y="52" Width="60" Height="18" TabSkip="no" Text="PICT" />
+        <Control Id="PictCb" Type="ComboBox" X="85" Y="50" Width="160" Height="18" Property="PICT" ComboList="yes" />
+
         <Control Id="ServLabel"    Type="Text" X="10"  Y="70" Width="60" Height="18" TabSkip="no" Text="IP-Servidor" />
-        <Control Id="ServEdit"     Type="Edit" X="85"  Y="70" Width="90" Height="18" Property="SERVERIP" Text="{80}" Disabled="yes" />
+        <Control Id="ServEdit"     Type="Edit" X="85"  Y="72" Width="90" Height="18" Property="SERVERIP" Text="{80}"/>
 
         <Control Id="TipoInterfaz"        Type="Text"     X="10" Y="92" Width="60" Height="18" TabSkip="no" Text="Cliente" />
-        <Control Id="TipoInterfazOptions" Type="ComboBox" X="85" Y="90" Width="90" Height="18" Property="CLIENTE" ComboList="yes" >
+        <Control Id="TipoInterfazOptions" Type="ComboBox" X="85" Y="90" Width="90" Height="18" Property="CLIENTE" ComboList="yes">
           <ComboBox Property="CLIENTE">
-            <ListItem Value="ENAIRE" Text="ENAIRE" />
-            <ListItem Value="ASECNA" Text="ASECNA" />
-            <ListItem Value="ENNA" Text="ENNA" />
-            <ListItem Value="URR" Text="URR" />
+            <ListItem Value="EscuchaRadio" Text="ESCUCHA RADIO" />
           </ComboBox>
         </Control>
         <Control Id="LangLabel"  Type="Text"     X="190" Y="92" Width="60" Height="18" TabSkip="no" Text="Idioma" />
@@ -1046,13 +1114,6 @@
             <ListItem Value="2" Text="ASECNA+HF" />
           </ComboBox>
         </Control>
-        <Control Id="HwAudioLabel"        Type="Text"     X="190" Y="112" Width="60" Height="18" TabSkip="no" Text="IAO" />
-        <Control Id="HwAudioOptions"      Type="ComboBox" X="260" Y="110" Width="90" Height="18" Property="IAOVER" ComboList="yes" >
-          <ComboBox Property="IAOVER">
-            <ListItem Value="B41A" Text="B41A" />
-            <ListItem Value="B43A" Text="B43A" />
-          </ComboBox>
-        </Control>
         
         <Control Id="SpeakerOnlyModeLabel"  Type="Text" X="10" Y="132" Width="90" Height="18" TabSkip="no" Text="Tipo de jack" />
         <Control Id="SpeakerOnlyModeEdit"   Type="ComboBox" X="85" Y="130" Width="90" Height="18" Property="SPEAKERONLYMODE" ComboList="yes" >
@@ -1061,10 +1122,10 @@
             <ListItem Value="False" Text="Cascos" />
           </ComboBox>
           <Condition Action="disable">
-            <![CDATA[CLIENTE = "ASECNA"]]>
+            <![CDATA[CLIENTE = "ASECNA" OR CLIENTE = "EscuchaRadio"]]>
           </Condition>
           <Condition Action="enable">
-            <![CDATA[CLIENTE <> "ASECNA"]]>
+            <![CDATA[CLIENTE <> "ASECNA" OR CLIENTE = "EscuchaRadio"]]>
           </Condition>
         </Control>
         
@@ -1084,48 +1145,18 @@
             <ListItem Value="True" Text="Si" />
             <ListItem Value="False" Text="No" />
           </ComboBox>
-        </Control>
-
-        <Control Id="SpeakerTlfLabel"  Type="Text" X="190" Y="150" Width="90" Height="18" TabSkip="no" Text="Telefonía por" />
-        <Control Id="SpeakerTlfLabel2"  Type="Text" X="190" Y="159" Width="90" Height="18" TabSkip="no" Text="altavoz" />
-        <Control Id="SpeakerTlfEdit"   Type="ComboBox" X="260" Y="150" Width="90" Height="18"  Property="SPEAKERTLF" ComboList="yes">
-          <ComboBox Property="SPEAKERTLF" >
-            <ListItem Value="True" Text="Si" />
-            <ListItem Value="False" Text="No" />
-          </ComboBox>
           <Condition Action="enable">
-            <![CDATA[SPEAKERONLYMODE = "False" AND CLIENTE <> "ASECNA"]]>
+            <![CDATA[CLIENTE <> "EscuchaRadio"]]>
           </Condition>
           <Condition Action="disable">
-            <![CDATA[SPEAKERONLYMODE = "True" OR CLIENTE = "ASECNA"]]>
-          </Condition>
-        </Control>
-
-        <Control Id="ECLCLabel"  Type="Text"     X="190" Y="172" Width="100" Height="18" TabSkip="no" Text="Cancelador manos libres LC" />
-        <Control Id="ECLC_value"  Type="ComboBox" X="300" Y="170" Width="50"  Height="18" Property="ECLC" ComboList="yes" >
-          <ComboBox Property="ECLC" >
-            <ListItem Value="True"  Text="Si" />
-            <ListItem Value="False" Text="No" />
-          </ComboBox>
-        </Control>
-
-        <Control Id="ECTlfLabel"  Type="Text"     X="10" Y="172" Width="100" Height="18" TabSkip="no" Text="Cancelador manos libres Tlf" />
-        <Control Id="ECTlf_value"  Type="ComboBox" X="125" Y="170" Width="50"  Height="18" Property="ECTLF" ComboList="yes" >
-          <ComboBox Property="ECTLF" >
-            <ListItem Value="True"  Text="Si" />
-            <ListItem Value="False" Text="No" />
-          </ComboBox>
-          <Condition Action="enable">
-            <![CDATA[SPEAKERTLF = "True" OR SPEAKERONLYMODE = "True"]]>
-          </Condition>
-          <Condition Action="disable">
-            <![CDATA[SPEAKERTLF = "False" AND SPEAKERONLYMODE = "False"]]>
+            <![CDATA[CLIENTE = "EscuchaRadio"]]>
           </Condition>
         </Control>
 
         <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
         <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
           <Publish Event="DoAction" Value="CustomActionEd137Rec">1</Publish>
+          <Publish Event="DoAction" Value="CustomActionPict2Ip">1</Publish>
         </Control>
         <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)" />
 
@@ -1158,8 +1189,8 @@
         <Control Id="IPLabel"   Type="Text" X="190" Y="52" Width="60" Height="18" TabSkip="no" Text="IP" />
         <Control Id="IPEdit"    Type="Edit" X="260" Y="50" Width="90" Height="18" Property="DIRIP" Text="{80}" Disabled="yes" />
         
-        <Control Id="ServLabel" Type="Text" X="10"  Y="72" Width="60" Height="18" TabSkip="no" Text="IP-Servidor" />
-        <Control Id="ServEdit"  Type="Edit" X="85"  Y="70" Width="90" Height="18" Property="SERVERIP" Text="{80}" Disabled="yes" />
+        <Control Id="ServLabel"    Type="Text" X="10"  Y="70" Width="60" Height="18" TabSkip="no" Text="IP-Servidor" />
+        <Control Id="ServEdit"     Type="Edit" X="85"  Y="72" Width="90" Height="18" Property="SERVERIP" Text="{80}" Disabled="yes" />
 
         <Control Id="RadioAlias_label" Type="Text"       X="10" Y="92" Width="60" Height="18" TabSkip="no" Text="Alias Radio" />
         <Control Id="RadioAlias_value" Type="ComboBox"   X="85" Y="90" Width="90" Height="18" Property="RADIOALIAS" ComboList="yes" >
@@ -1205,24 +1236,37 @@
           </ComboBox>
         </Control>
 <!---->
-        <Control Id="TxConfirmTime_label" Type="Text"       X="10" Y="192" Width="105" Height="18" TabSkip="no" Text="Tiempo Confirmacion TX" />
+        <Control Id="TxConfirmTime_label" Type="Text"       X="10" Y="192" Width="105" Height="18" TabSkip="no" Text="Confirmacion TX" />
         <Control Id="TxConfirmTime_value" Type="ComboBox"   X="125" Y="190" Width="50" Height="18" Property="TIMESPTX" ComboList="yes" >
           <ComboBox Property="TIMESPTX">
             <ListItem Value="0"  Text="No" />
-            <ListItem Value="200" Text="200 ms" />
-            <ListItem Value="300" Text="300 ms" />
-            <ListItem Value="400" Text="400 seg." />
+            <ListItem Value="500"  Text="G. 0.5 s" />
+            <ListItem Value="1000" Text="G. 1   s" />
+            <ListItem Value="1500" Text="G. 1.5 s" />
+            <ListItem Value="2000" Text="G. 2   s" />
           </ComboBox>
         </Control>
 
-        <Control Id="SqConfirmTime_label"  Type="Text"     X="190" Y="192" Width="100" Height="18" TabSkip="no" Text="Tiempo Confirmacion RX" />
+        <Control Id="SqConfirmTime_label"  Type="Text"     X="190" Y="192" Width="100" Height="18" TabSkip="no" Text="Confirmacion RX" />
         <Control Id="SqConfirmTime_value"  Type="ComboBox" X="300" Y="190" Width="50"  Height="18" Property="TIMESPRX" ComboList="yes" >
           <ComboBox  Property="TIMESPRX">
             <ListItem Value="0"  Text="No" />
-            <ListItem Value="500"  Text="500 ms" />
-            <ListItem Value="1000" Text="1   seg." />
-            <ListItem Value="1500" Text="1.5 seg." />
-            <ListItem Value="2000" Text="2   seg." />
+            <ListItem Value="500"  Text="G. 0.5 s" />
+            <ListItem Value="1000" Text="G. 1   s" />
+            <ListItem Value="1500" Text="G. 1.5 s" />
+            <ListItem Value="2000" Text="G. 2   s" />
+          </ComboBox>
+        </Control>
+
+        <Control Id="FilterPtt_label" Type="Text"       X="10" Y="212"  Width="105" Height="18" TabSkip="no" Text="Filtro PTT" />
+        <Control Id="FilterPtt_value" Type="ComboBox"   X="125" Y="210" Width="50" Height="18" Property="PTTFILTER" ComboList="yes" >
+          <ComboBox Property="PTTFILTER">
+            <ListItem Value="0"  Text="No" />
+            <ListItem Value="100" Text="100 ms" />
+            <ListItem Value="200" Text="200 ms" />
+            <ListItem Value="300" Text="300 ms" />
+            <ListItem Value="400" Text="400 seg." />
+            <ListItem Value="500" Text="500 ms" />
           </ComboBox>
         </Control>
 
