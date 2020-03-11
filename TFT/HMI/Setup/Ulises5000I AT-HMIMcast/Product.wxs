@@ -180,7 +180,12 @@
                      Name='PTTFILTER_Property' Type='raw' />
     </Property>
 
-
+    <Property Id='RADIOSPEAKERDEV' Value='Unknown'>
+      <RegistrySearch Id='UV5KI_HMI_RDSPEAKERDEV' Root='HKLM'
+               Key='SOFTWARE\Wix\UV5KI_HMI'
+               Name='RDSPEAKERDEV_Property' Type='raw' />
+    </Property>
+    <Property Id='SAMPLERATE' Value='0'></Property>
 
     <!---->
 
@@ -610,6 +615,34 @@
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='TipoAudioUsb'[\]]/value"
                         Value="3"/>
+        <util:XmlFile Id="RadioSpeakerDev" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='RdSpkAsioId'[\]]/value"
+                        Value="[RADIOSPEAKERDEV]"/>        
+         <util:XmlFile Id="SampleRate" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/U5ki.Infrastructure.Properties.Settings/setting[\[]@name='SndSamplingRate'[\]]/value"
+                        Value="[SAMPLERATE]"/>        
+       <util:XmlFile Id="TipoAudioCardEscuchaRadio" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='AudioCardStandard'[\]]/value"
+                        Value="True"/>
+        <util:XmlFile Id="HFSpeakerEscuchaRadio" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='HfSpeaker'[\]]/value"
+                        Value="False"/>
+        <util:XmlFile Id="LCSpeakerEscuchaRadio" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='LcSpeaker'[\]]/value"
+                        Value="False"/>
+        <util:XmlFile Id="InstructorMPHEscuchaRadio" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='InstructorMHP'[\]]/value"
+                        Value="False"/>
+        <util:XmlFile Id="AlumnMPHEscuchaRadio" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='AlumnMHP'[\]]/value"
+                        Value="False"/>
       </Component>
 
       <!-- El doble altavoz condiciona la configuracion de HFSpeaker -->
@@ -723,6 +756,7 @@
           <RegistryValue Name='NICTEAM_Property' Value='[NICTEAM]' Type='string' />
           <RegistryValue Name='DIRIP_Property' Value='[DIRIP]' Type='string' />
           <RegistryValue Name='SERVERIP_Property' Value='[SERVERIP]' Type='string' />
+          <RegistryValue Name='RDSPEAKERDEV_Property' Value='[RADIOSPEAKERDEV]' Type='string' />
         </RegistryKey>
       </Component>      
     </ComponentGroup>
@@ -935,7 +969,9 @@
     <CustomAction Id="CustomActionTest" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="CustomActionTest" />
     <CustomAction Id="GenerateSpreadConf" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="GenerateSpreadConf" />
     <CustomAction Id="CustomActionPict2Ip" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="CustomActionPict2Ip" />
-
+    <CustomAction Id="LoadAsioChannels" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="LoadAsioChannels" />
+    <!--<CustomAction Id="SetSampleRate" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="SetSampleRate" />
+    -->
     <!--<CustomAction Id='Md5Mark' Directory="INSTALLFOLDER"
                   Execute='deferred'
                   Impersonate='no'
@@ -1063,6 +1099,7 @@
           <Condition Action="enable"><![CDATA[SPREAD_NUMBER > 1 AND SPREAD_IPBASE]]></Condition>
           <Condition Action="disable"><![CDATA[NOT SPREAD_NUMBER OR SPREAD_NUMBER < 2 OR NOT SPREAD_IPBASE]]></Condition>
           <Publish Event="DoAction" Value="GenerateSpreadConf"><![CDATA[SPREAD=1]]></Publish>
+          <Publish Event="DoAction" Value="LoadAsioChannels">1</Publish>
         </Control>
 
         <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
@@ -1078,10 +1115,14 @@
       
       <Dialog Id="OptionsDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="yes">
         <Control Id="PictLabel" Type="Text" X="10" Y="52" Width="60" Height="18" TabSkip="no" Text="PICT" />
-        <Control Id="PictCb" Type="ComboBox" X="85" Y="50" Width="160" Height="18" Property="PICT" ComboList="yes" />
+        <Control Id="PictCb" Type="ComboBox" X="85" Y="50" Width="160" Height="18" Property="PICT" ComboList="yes"  />
 
         <Control Id="ServLabel"    Type="Text" X="10"  Y="70" Width="60" Height="18" TabSkip="no" Text="IP-Servidor" />
         <Control Id="ServEdit"     Type="Edit" X="85"  Y="72" Width="90" Height="18" Property="SERVERIP" Text="{80}"/>
+
+        <Control Id="RdSpeakerLabel"    Type="Text" X="190"  Y="112" Width="60" Height="18" TabSkip="no" Text="Altavoz Radio" />
+        <Control Id="RdSepakerCtrl" Type="ComboBox" X="260" Y="110" Width="90" Height="18" Property="RADIOSPEAKERDEV" ComboList="yes" >
+        </Control>
 
         <Control Id="TipoInterfaz"        Type="Text"     X="10" Y="92" Width="60" Height="18" TabSkip="no" Text="Cliente" />
         <Control Id="TipoInterfazOptions" Type="ComboBox" X="85" Y="90" Width="90" Height="18" Property="CLIENTE" ComboList="yes">
@@ -1157,7 +1198,8 @@
         <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
           <Publish Event="DoAction" Value="CustomActionEd137Rec">1</Publish>
           <Publish Event="DoAction" Value="CustomActionPict2Ip">1</Publish>
-        </Control>
+          <!--<Publish Event="DoAction" Value="SetSampleRate">1</Publish> -->
+       </Control>
         <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)" />
 
         <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />

@@ -238,7 +238,7 @@ namespace HMI.CD40.Module.BusinessEntities
             CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, 
             CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, 
         };
-        public string SwVersion(int devIndex)
+        public virtual string SwVersion(int devIndex)
         {
             if (devIndex < 4)
             {
@@ -250,7 +250,7 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             return String.Format("SwVersion Audio Dev {0} ???", devIndex);
         }
-        public string SwDate(int devIndex)
+        public virtual string SwDate(int devIndex)
         {
             if (devIndex < 4)
             {
@@ -533,6 +533,17 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 		}
 
+        protected void SetPresenceRdSpeaker(bool stateRadioSpeaker)
+        {
+
+            _RadioSpeaker = stateRadioSpeaker;
+            Top.WorkingThread.Enqueue("SpeakerChanged", delegate ()
+            {
+                _Logger.Trace("HwManager. OnSpkConnected RdSpeaker {0} ", _RadioSpeaker);
+                General.SafeLaunchEvent(SpeakerChangedHw, this, new JacksStateMsg(stateRadioSpeaker, _LCSpeaker));
+            });
+
+        }
         /// <summary>
         /// 20160712. AGL. Para capturar los eventos de presencia de HF y presencia de cable grabacion
         /// </summary>

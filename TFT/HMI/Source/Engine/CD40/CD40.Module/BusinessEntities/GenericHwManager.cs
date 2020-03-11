@@ -17,6 +17,7 @@ using HMI.CD40.Module.Snmp;
 using U5ki.Infrastructure;
 using Utilities;
 using NLog;
+using System.Linq;
 //using Lextm.SharpSnmpLib;
 //using Lextm.SharpSnmpLib.Messaging;
 
@@ -602,7 +603,11 @@ namespace HMI.CD40.Module.BusinessEntities
         };
         protected List<GenericHid.HidDeviceManagement.DeviceDescription> _dev_desc = null;
         protected List<HidGenericSndDev> _devs = new List<HidGenericSndDev>();
-
+        public struct DevData
+        {
+            public CORESIP_SndDevType TipoDev;
+            public string AsioName;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -668,10 +673,19 @@ namespace HMI.CD40.Module.BusinessEntities
 
             /** 20180626. #3609. Se anidan eventos y no se tratan bien en la cola.*/
             HwSupervisor.Enabled = true;
+            /** Para Inicializar el estado de JACKS */
+            CheckPresencia();
+
         }
 
+        protected void CheckPresencia()
+        {
+            // Fuerza la presencia del altavoz radio
+            SetPresenceRdSpeaker(true);
+
+        }
         /// <summary>
-        /// 
+        /// Se llama desde HwManager de forma temporizada
         /// </summary>
         /// <returns></returns>
         public override bool CheckDevs()
@@ -681,7 +695,14 @@ namespace HMI.CD40.Module.BusinessEntities
                 return true;
             return true;
         }
-
+        public override string SwVersion(int devIndex)
+        {
+            return "Generic Device, Version not available. ";
+        }
+        public override string SwDate(int devIndex)
+        {
+            return " not available ";
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -716,7 +737,7 @@ namespace HMI.CD40.Module.BusinessEntities
             foreach (String name in AsioChannels.InChannels)
             {
                 CORESIP_SndDevType tipo = GetTipoIn(name);
-                _input_channels[_nchannel++] = tipo;
+                _input_channels[_nchannel++] = new DevData { TipoDev = tipo, AsioName = name };
                 _Logger.Info("Encontrado Canal de Audio. Entrada {0}: {1} = {2}", _nchannel, tipo, name);
             }
 
@@ -725,8 +746,8 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 /** Identificar el tipo por el nombre */
                 CORESIP_SndDevType tipo = GetTipoOut(name); // _tipos[_index_tipos++];
-                _output_channels[_nchannel++] = tipo;
-                _Logger.Info("Encontrado Canal de Audio. Salida {0}: {1} = {2}", _nchannel, tipo, name);
+                _output_channels[_nchannel++] = new DevData { TipoDev = tipo, AsioName = name };
+                _Logger.Info("Encontrado Canal de Audio. Salida {0}: {1} = {2} {3}", _nchannel, tipo, name, AsioChannels.SampleRate);
             }
 
         }
@@ -754,8 +775,8 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <summary>
         /// 
         /// </summary>
-        static Dictionary<int, CORESIP_SndDevType> _input_channels = new Dictionary<int, CORESIP_SndDevType>();
-        static Dictionary<int, CORESIP_SndDevType> _output_channels = new Dictionary<int, CORESIP_SndDevType>();
+        static Dictionary<int, DevData> _input_channels = new Dictionary<int, DevData>();
+        static Dictionary<int, DevData> _output_channels = new Dictionary<int, DevData>();
         static bool PTTDevice { get; set; }
 
         /// <summary>
@@ -799,9 +820,9 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <returns></returns>
         static private int GetInputChannelFor(CORESIP_SndDevType tipo)
         {
-            foreach (KeyValuePair<int, CORESIP_SndDevType> par in _input_channels)
+            foreach (KeyValuePair<int, DevData> par in _input_channels)
             {
-                if (par.Value == tipo)
+                if (par.Value.TipoDev == tipo)
                     return par.Key;
             }
 
@@ -816,9 +837,9 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <returns></returns>
         static private int GetOutputChannelFor(CORESIP_SndDevType tipo)
         {
-            foreach (KeyValuePair<int, CORESIP_SndDevType> par in _output_channels)
+            foreach (KeyValuePair<int, DevData> par in _output_channels)
             {
-                if (par.Value == tipo)
+                if (par.Value.TipoDev == tipo)
                     return par.Key;
             }
 

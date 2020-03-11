@@ -175,7 +175,7 @@ namespace HMI.Presentation.Twr.Views
 
 			if (!string.IsNullOrEmpty(jacks.PreviusStateDescription))
 			{
-				_MsgLB.Text.Replace(jacks.PreviusStateDescription, "");
+                _MsgLB.Text = _MsgLB.Text.Replace(jacks.PreviusStateDescription, "");
 			}
 
 			if (_StateManager.Engine.Operative)

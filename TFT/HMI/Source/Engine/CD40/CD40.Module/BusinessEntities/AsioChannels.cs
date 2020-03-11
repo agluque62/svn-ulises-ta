@@ -53,6 +53,7 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
+        public static double SampleRate;
         public enum AsioSampleType
         {
             /// <summary>
@@ -653,6 +654,8 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         static List<String> _inchannels = new List<string>();
         static List<String> _outchannels = new List<string>();
+        static List<ASIOChannelInfo> _inInfoChannels = new List<ASIOChannelInfo>();
+        static List<ASIOChannelInfo> _outInfoChannels = new List<ASIOChannelInfo>();
 
 
         #endregion
@@ -673,19 +676,54 @@ namespace HMI.CD40.Module.BusinessEntities
                     int nInChannels,nOutChannels;
 
                     _drv.init(IntPtr.Zero);
-
+                    SampleRate = _drv.getSampleRate();
                     _drv.getChannels(out nInChannels, out nOutChannels);
 
                     _inchannels.Clear();
                     for (int i = 0; i < nInChannels; i++)
                     {
                         _inchannels.Add((_drv.getChannelInfo(i, true)).name);
-                        
                     }
 
                     _outchannels.Clear();
                     for (int i = 0; i < nOutChannels; i++)
                     {
+                        _outchannels.Add((_drv.getChannelInfo(i, false)).name);
+                     }
+
+                    _drv.ReleaseComASIODriver();
+
+                }
+            }
+        }
+
+        static public void Check()
+        {
+            _drivers = InstalledDriver.Installed;
+            if (_drivers.Count > 0)
+            {
+                ASIODriver _drv = SelectDriver(_drivers[0]);
+                if (_drv != null)
+                {
+                    int nInChannels, nOutChannels;
+
+                    _drv.getChannels(out nInChannels, out nOutChannels);
+                    string message = _drv.getErrorMessage();
+
+                    _inInfoChannels.Clear();
+                    _inchannels.Clear();
+                    for (int i = 0; i < nInChannels; i++)
+                    {
+                        _inInfoChannels.Add((_drv.getChannelInfo(i, true)));
+                        _inchannels.Add((_drv.getChannelInfo(i, true)).name);
+                        
+                    }
+
+                    _outInfoChannels.Clear();
+                    _outchannels.Clear();
+                    for (int i = 0; i < nOutChannels; i++)
+                    {
+                        _outInfoChannels.Add((_drv.getChannelInfo(i, false)));
                         _outchannels.Add((_drv.getChannelInfo(i, false)).name);
                     }
 

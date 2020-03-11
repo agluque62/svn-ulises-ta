@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using Microsoft.Deployment.WindowsInstaller;
+using HMI.CD40.Module.BusinessEntities;
+using System.Threading;
+using NAudio.CoreAudioApi;
 
 namespace Ulises5000_AT_HMI_CustomActions
 {
@@ -16,7 +19,7 @@ namespace Ulises5000_AT_HMI_CustomActions
             int varInt = int.Parse(session["ED137REC"]);
 
             session["ED137REC"] = (varInt & 0x01).ToString();
-            session["RECDUAL"]  = (varInt & 0x02) != 0 ? "1" : "0";
+            session["RECDUAL"] = (varInt & 0x02) != 0 ? "1" : "0";
 
             return ActionResult.Success;
         }
@@ -132,5 +135,72 @@ namespace Ulises5000_AT_HMI_CustomActions
             return ActionResult.Failure;
         }
 
+        [CustomAction]
+        public static ActionResult LoadAsioChannels(Session session)
+        {
+            session.Log("Begin Custiom Action LoadAsioChannels");
+            try
+            {
+                Thread thread = new Thread(AsioChannels.Init);
+                thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+                thread.Start();
+                thread.Join(); //Wait for the thread to end
+                //AsioChannels.Init();
+                session.Log("Custiom Action LoadAsioChannels num out channels {0}", AsioChannels.OutChannels.Count);
+                /** */
+                View lView = session.Database.OpenView("DELETE FROM ComboBox WHERE ComboBox.Property='RADIOSPEAKERDEV'");
+                lView.Execute();
+                lView = session.Database.OpenView("SELECT * FROM ComboBox");
+                lView.Execute();
+                string speakers = session["RADIOSPEAKERDEV"];
+                int i = 0;
+                foreach (String name in AsioChannels.OutChannels)
+                {
+                    /** */
+                    Record lRecord = session.Database.CreateRecord(3);
+                    lRecord.SetString(1, "RADIOSPEAKERDEV");
+                    lRecord.SetInteger(2, i++);
+                    lRecord.SetString(3, name);
+
+                    lView.Modify(ViewModifyMode.InsertTemporary, lRecord);
+
+                    session.Log("Custiom Action LoadAsioChannels {0}", name);
+                }
+                session["SAMPLERATE"] = AsioChannels.SampleRate.ToString();
+            }
+            catch (Exception x)
+            {
+                session.Log("ERROR in custom action LoadAsioChannels {0}", x.ToString());
+                System.Windows.Forms.MessageBox.Show(String.Format("ERROR in custom action LoadAsioChannels {0}", x.ToString()));
+                return ActionResult.Failure;
+            }
+            return ActionResult.Success;
+        }
+        [CustomAction]
+        public static ActionResult SetSampleRate(Session session)
+        {
+            session.Log("Begin Custiom Action SetSampleRate");
+            try
+            {
+                string radioSepakerDevName = session["RADIOSPEAKERDEV"];
+                MMDeviceCollection DevCol = new MMDeviceEnumerator().EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active);
+                foreach (MMDevice dev in DevCol)
+                {
+                    if (dev.DeviceFriendlyName.Equals(radioSepakerDevName))
+                    {
+                        session["SAMPLERATE"] = dev.AudioClient.MixFormat.SampleRate.ToString();
+                        return ActionResult.Success;
+                    }
+                }
+
+            }
+            catch (Exception x)
+            {
+                session.Log("ERROR in custom action SetSampleRate {0}", x.ToString());
+                System.Windows.Forms.MessageBox.Show(String.Format("ERROR in custom action SetSampleRate {0}", x.ToString()));
+                return ActionResult.Failure;
+            }
+            return ActionResult.Success;
+        }
     }
-}
+    }
