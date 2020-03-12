@@ -425,6 +425,7 @@ namespace U5ki.RdService
                                     ses = r.Connected ? 1 : 0,
                                     uri = r.Uri1
                                 })
+                                .OrderBy(r=>r.fr).ThenBy(r=>r.id)
                                 .ToList();
                             UnoMasUnoFreqs.ForEach(item => local_rsp.Add(item));
                             retorno = true;
@@ -841,11 +842,14 @@ namespace U5ki.RdService
             foreach (RdFrecuency freq in Frecuencies.Values)
                 if (freq.ActivateResource(par))
                 {
-                    LogInfo<RdService>("Equipo " + par + " conmutado manualmente", U5kiIncidencias.U5kiIncidencia.U5KI_NBX_COMMAND);
+                    LogInfo<RdService>("Equipo " + par + " conmutado manualmente", 
+                        U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "RdService",                
+                        CTranslate.translateResource("Equipo " + par + " conmutado manualmente"));
                     return true;
                 }
 
-            LogInfo<RdService>("Equipo " + par + " no encontrado.", U5kiIncidencias.U5kiIncidencia.U5KI_NBX_COMMAND_ERROR, "RdService",
+            LogInfo<RdService>("Equipo " + par + " no encontrado.", 
+                U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR, "RdService",
                 CTranslate.translateResource("Equipo " + par + " no encontrado."));
             err = "Equipo " + par + " no encontrado.";
             return false;
