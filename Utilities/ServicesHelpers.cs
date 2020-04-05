@@ -121,6 +121,7 @@ namespace Utilities
         /// </summary>
         const string ficheroversiones = "versiones.json";
         const string oldName = "nodebox";
+
         public static void VersionsFileAdjust(string newModuleName, List<string> newServicesNamesList)
         {
             string ficheroversionesbackup = ficheroversiones + ".bkp";
@@ -178,5 +179,33 @@ namespace Utilities
                 File.WriteAllText("Errores.out.txt", "No encuentro el fichero de versiones...");
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public static bool UnitTestMode
+        {
+            get
+            {
+                string processName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+
+                //return processName == "VSTestHost"
+                //        || processName.StartsWith("vstest.executionengine") //it can be vstest.executionengine.x86 or vstest.executionengine.x86.clr20
+                //        || processName.StartsWith("QTAgent");   //QTAgent32 or QTAgent32_35
+                return processName.StartsWith("testhost");
+            }
+        }
+        public static bool IgnoreSpreadChannel
+        {
+            get
+            {
+#if DEBUG
+                return ignoreSpreadChannel;
+#else
+                return false;
+#endif
+            }
+            set => ignoreSpreadChannel = value;
+        }
+        private static bool ignoreSpreadChannel=false;
     }
 }
