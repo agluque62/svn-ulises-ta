@@ -682,14 +682,15 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             // Fuerza la presencia del altavoz radio
             SetPresenceRdSpeaker(true);
-
         }
+
         /// <summary>
         /// Se llama desde HwManager de forma temporizada
         /// </summary>
         /// <returns></returns>
         public override bool CheckDevs()
         {
+
             // TODO. Replantear la funcion....
             if (PTTDevice == true)
                 return true;

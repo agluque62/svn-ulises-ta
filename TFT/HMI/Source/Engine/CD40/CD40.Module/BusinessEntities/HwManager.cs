@@ -535,14 +535,15 @@ namespace HMI.CD40.Module.BusinessEntities
 
         protected void SetPresenceRdSpeaker(bool stateRadioSpeaker)
         {
-
-            _RadioSpeaker = stateRadioSpeaker;
-            Top.WorkingThread.Enqueue("SpeakerChanged", delegate ()
+            if (_RadioSpeaker != stateRadioSpeaker)
             {
-                _Logger.Trace("HwManager. OnSpkConnected RdSpeaker {0} ", _RadioSpeaker);
-                General.SafeLaunchEvent(SpeakerChangedHw, this, new JacksStateMsg(stateRadioSpeaker, _LCSpeaker));
-            });
-
+                _RadioSpeaker = stateRadioSpeaker;
+                Top.WorkingThread.Enqueue("SpeakerChanged", delegate ()
+                {
+                    _Logger.Trace("HwManager. OnSpkConnected RdSpeaker {0} ", _RadioSpeaker);
+                    General.SafeLaunchEvent(SpeakerChangedHw, this, new JacksStateMsg(stateRadioSpeaker, _LCSpeaker));
+                });
+            }
         }
         /// <summary>
         /// 20160712. AGL. Para capturar los eventos de presencia de HF y presencia de cable grabacion
@@ -782,9 +783,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 sndDev.PttPulsed += OnPttPulsed;
 
                 if (sndDev.Type == CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP)
-                    _InstructorJack = sndDev.Jack;
+                    _InstructorJack = sndDev.Jack || Settings.Default.JumpJacksState;
                 else
-                    _AlumnJack = sndDev.Jack;
+                    _AlumnJack = sndDev.Jack || Settings.Default.JumpJacksState;
 
                 Top.WorkingThread.Enqueue("JacksChanged", delegate()
                 {

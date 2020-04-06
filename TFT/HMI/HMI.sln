@@ -1877,7 +1877,6 @@ Global
 		{49537E20-8DCA-4025-A12E-E5765E62750A}.Release|x86.Build.0 = Release|Any CPU
 		{92CA432E-C30E-4893-B1D9-7BEEBF471C83}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{92CA432E-C30E-4893-B1D9-7BEEBF471C83}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{92CA432E-C30E-4893-B1D9-7BEEBF471C83}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{92CA432E-C30E-4893-B1D9-7BEEBF471C83}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|x86
 		{92CA432E-C30E-4893-B1D9-7BEEBF471C83}.Debug|Smartphone 2003 (ARMV4).ActiveCfg = Debug|x86
 		{92CA432E-C30E-4893-B1D9-7BEEBF471C83}.Debug|Win32.ActiveCfg = Debug|x86
@@ -2072,9 +2071,9 @@ Global
 		{47E41CF6-13A4-4E38-B318-A86586FEF0FD} = {80441FC6-56B1-4D5D-B3A6-9B918660E28E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {1B4B8C15-13DE-4B82-BD78-04D096308C24}
-		RootNamespace = HMI
-		CommonProjectGuid = c45ad2ca-b6bd-4e4a-8cc2-34c8f895ed46
 		ShellProjectGuid = e474bee1-dfef-439f-a15f-9b3cfc77589e
+		CommonProjectGuid = c45ad2ca-b6bd-4e4a-8cc2-34c8f895ed46
+		RootNamespace = HMI
+		SolutionGuid = {1B4B8C15-13DE-4B82-BD78-04D096308C24}
 	EndGlobalSection
 EndGlobal

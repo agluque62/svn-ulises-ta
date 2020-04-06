@@ -35,11 +35,11 @@ namespace HMI.Presentation.Twr.UI
             this._Jack2PB = new System.Windows.Forms.PictureBox();
             this._Jack3PB = new System.Windows.Forms.PictureBox();
             this._Jack4PB = new System.Windows.Forms.PictureBox();
+            this._SplitBT = new HMI.Model.Module.UI.HMIButton();
             this._SplitSelTLP = new System.Windows.Forms.TableLayoutPanel();
             this._SplitOffBT = new HMI.Model.Module.UI.HMIButton();
             this._SplitRdLcBT = new HMI.Model.Module.UI.HMIButton();
             this._SplitLcTfBT = new HMI.Model.Module.UI.HMIButton();
-            this._SplitBT = new HMI.Model.Module.UI.HMIButton();
             this._SplitTLP.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._Jack1PB)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._Jack2PB)).BeginInit();
@@ -50,8 +50,6 @@ namespace HMI.Presentation.Twr.UI
             // 
             // _SplitTLP
             // 
-            this._SplitTLP.AutoSize = true;
-            this._SplitTLP.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this._SplitTLP.BackColor = System.Drawing.SystemColors.Control;
             this._SplitTLP.ColumnCount = 5;
             this._SplitTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
@@ -124,6 +122,17 @@ namespace HMI.Presentation.Twr.UI
             this._Jack4PB.TabIndex = 3;
             this._Jack4PB.TabStop = false;
             // 
+            // _SplitBT
+            // 
+            this._SplitBT.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._SplitBT.DrawX = false;
+            this._SplitBT.Location = new System.Drawing.Point(84, 2);
+            this._SplitBT.Margin = new System.Windows.Forms.Padding(2);
+            this._SplitBT.Name = "_SplitBT";
+            this._SplitBT.Size = new System.Drawing.Size(106, 96);
+            this._SplitBT.TabIndex = 4;
+            this._SplitBT.Click += new System.EventHandler(this._SplitBT_Click);
+            // 
             // _SplitSelTLP
             // 
             this._SplitSelTLP.BackColor = System.Drawing.SystemColors.Control;
@@ -180,17 +189,6 @@ namespace HMI.Presentation.Twr.UI
             this._SplitLcTfBT.TabIndex = 2;
             this._SplitLcTfBT.Click += new System.EventHandler(this._SplitModeBT_Click);
             // 
-            // _SplitBT
-            // 
-            this._SplitBT.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._SplitBT.DrawX = false;
-            this._SplitBT.Location = new System.Drawing.Point(84, 2);
-            this._SplitBT.Margin = new System.Windows.Forms.Padding(2);
-            this._SplitBT.Name = "_SplitBT";
-            this._SplitBT.Size = new System.Drawing.Size(106, 96);
-            this._SplitBT.TabIndex = 4;
-            this._SplitBT.Click += new System.EventHandler(this._SplitBT_Click);
-            // 
             // SplitUC
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -206,7 +204,6 @@ namespace HMI.Presentation.Twr.UI
             ((System.ComponentModel.ISupportInitialize)(this._Jack4PB)).EndInit();
             this._SplitSelTLP.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
 		}
 

@@ -63,6 +63,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /** 20180409. Para obtener la version del FIRMWARE*/
         public string SwVersion { get { return "MICRONAS-VER-TODO"; } }
         public string SwDate { get { return "MICRONAS-SN-TODO"; } }
+        public void Reset()
+        {
+            throw (new NotImplementedException() );
+        }
 
         /// <summary>
         /// 

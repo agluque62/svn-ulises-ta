@@ -17,7 +17,7 @@
 			<Dependency Name="Model" />
 		</Dependencies>
 		<Modules>
-			<ModuleInfo AssemblyFile="Presentation.RadioLight.dll" />
+			<ModuleInfo AssemblyFile="Presentation.Twr.dll" />
 		</Modules>
 	</Section>
 </SolutionProfile>
