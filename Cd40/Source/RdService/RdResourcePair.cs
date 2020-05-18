@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Timers;
 using U5ki.Infrastructure;
 using U5ki.RdService.Gears;
 
@@ -32,6 +31,8 @@ namespace U5ki.RdService
             _ID = id;
         }
 
+        private System.Timers.Timer checkPairWhenNbxStarts_Timer = null;
+
         public RdResourcePair(RdResource ActiveResource, RdResource StandbyResource, List<Node> nodes)
         {
             //List<string> ids = new List<string>();
@@ -40,15 +41,35 @@ namespace U5ki.RdService
             //ids.Sort();
             //foreach (string id in ids)
             //    _ID = String.Concat(id);
+
+            checkPairWhenNbxStarts_Timer = null;
+
             _ActiveResource = ActiveResource;
             StandbyResource.TxMute = true;
             _StandbyResource = StandbyResource;
             //NodeSet(NodeParse(node));
+            _ActiveResource = ActiveResource;
+            MSTxPersistence.SelectMain(_ActiveResource, _StandbyResource);
+        }
+
+        public void SetActiveStandbyFromPersistence()
+        {
+            if (MSTxPersistence.IsMain(_ActiveResource) == false)
+            {
+                RdResource current_ActiveResource = _ActiveResource;
+                RdResource current_StandbyResource = _StandbyResource;
+
+                current_StandbyResource.TxMute = false;
+                _ActiveResource = current_StandbyResource;
+                current_ActiveResource.TxMute = true;
+                _StandbyResource = current_ActiveResource;
+            }            
         }
 
         public void SetActive(RdResource activeResource)
         {
             _ActiveResource = activeResource;
+            ActiveResource.TxMute = false;
         }
         public void SetStandby(RdResource standbyResource)
         {
@@ -58,7 +79,7 @@ namespace U5ki.RdService
         public bool Isconfigured()
         {
             return (_ActiveResource != null && _StandbyResource != null);
-        }
+        }        
 
         #region IRdResource Members
         public RdRsType Type
@@ -127,7 +148,18 @@ namespace U5ki.RdService
         }
 
         public bool Connected
-        { get { return _ActiveResource.Connected; } }
+        { get 
+            {
+                if (this.isTx)
+                {
+                    return _ActiveResource.Connected;
+                }
+                else 
+                {
+                    return (_ActiveResource.Connected || _StandbyResource.Connected);
+                }
+            } 
+        }
         public bool OldSelected
         {
             get { return _ActiveResource.OldSelected; }
@@ -156,16 +188,25 @@ namespace U5ki.RdService
         }
         #endregion
         #region IRdResource methods
+
+        /// <summary>
+        /// Retorna true si se ha conectado algun recurso
+        /// </summary>
         public bool Connect()
         {
-            bool res = false;
-            if (_ActiveResource.Connected == false)
-                res |= _ActiveResource.Connect();
-            if (_StandbyResource.Connected == false)
+            bool ret = false;
+            if (_ActiveResource.Connected == false && _ActiveResource.Connecting == false && MSTxPersistence.IsNodeDisabled(_ActiveResource) == false)
+            {
+                _ActiveResource.Connect();
+                ret = true;
+            }
+            if (_StandbyResource.Connected == false && _StandbyResource.Connecting == false && MSTxPersistence.IsNodeDisabled(_StandbyResource) == false)
+            {
                 _StandbyResource.Connect();
-            return true;
+                ret = true;
+            }
+            return ret;
         }
-
         public void PttOff()
         {
             _ActiveResource.PttOff();
@@ -193,11 +234,23 @@ namespace U5ki.RdService
         /// <returns></returns>
         public RdResource GetRxSelected()
         {
-            if (_ActiveResource.new_params.rx_selected)
+            if (_ActiveResource.Connected && _StandbyResource.Connected)
+            {
+                if (_ActiveResource.new_params.rx_selected)
+                    return _ActiveResource;
+                else if (_StandbyResource.new_params.rx_selected)
+                    return _StandbyResource;
+            }
+            else if (_ActiveResource.Connected && !_StandbyResource.Connected)
+            {
                 return _ActiveResource;
-            else if (_StandbyResource.new_params.rx_selected)
-                return _StandbyResource;
-            else return null;
+            }
+            else if (!_ActiveResource.Connected && _StandbyResource.Connected)
+            {
+                return _ActiveResource;
+            }
+
+            return null;
         }
 
         public List<RdResource> GetListResources()
@@ -207,29 +260,78 @@ namespace U5ki.RdService
             list.Add(_StandbyResource);
             return list;
         }
+
+        private void OncheckPairWhenNbxStarts_Timer_Event(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            RdService.evQueueRd.Enqueue("RdResourcePair:OncheckPairWhenNbxStarts_Timer_Event", delegate ()
+            {
+                if (!_ActiveResource.Connected && _StandbyResource.Connected)
+                {
+                    Switch();
+                }
+                else
+                {
+                    MSTxPersistence.SelectMain(_ActiveResource, _StandbyResource);
+                }
+            });
+        }
+
+        private const double CHECK_PAIR_TIMEOUT = 250;
+
         public bool HandleChangeInCallState(int sipCallId, CORESIP_CallStateInfo stateInfo)
         {
             RdResource resChange;
             if (_ActiveResource.SipCallId == sipCallId)
             {
-                resChange = _ActiveResource;
-                if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED)
-                {
-                    if (_StandbyResource.Connected)
-                        Switch();
-                }
+                resChange = _ActiveResource;                
             }
             else if (_StandbyResource.SipCallId == sipCallId)
             {
                 resChange = _StandbyResource;
-                if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED)
-                {
-                    if (_ActiveResource.Connected == false)
-                        Switch();
-                }
             }
             else 
                 return false;
+
+            if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED && checkPairWhenNbxStarts_Timer == null)
+            {
+                //The first session of the pair is established after Nodebox starts. Then checkPairWhenNbxStarts_Timer is started
+                //When it elapsed, then if only one of the session of the pair is established, then this is the main
+                checkPairWhenNbxStarts_Timer = new System.Timers.Timer();
+                checkPairWhenNbxStarts_Timer.Interval = CHECK_PAIR_TIMEOUT;
+                checkPairWhenNbxStarts_Timer.AutoReset = false;
+                checkPairWhenNbxStarts_Timer.Elapsed += this.OncheckPairWhenNbxStarts_Timer_Event;
+                checkPairWhenNbxStarts_Timer.Enabled = true;
+            }
+
+            if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED)
+            {
+                if ((_ActiveResource.SipCallId == sipCallId && _StandbyResource.Connected) ||
+                    (_StandbyResource.SipCallId == sipCallId && _ActiveResource.Connected))
+                {
+                    if (checkPairWhenNbxStarts_Timer != null && checkPairWhenNbxStarts_Timer.Enabled)
+                    {
+                        checkPairWhenNbxStarts_Timer.Stop();
+                        MSTxPersistence.SelectMain(_ActiveResource, _StandbyResource);
+                    }
+                    else if (checkPairWhenNbxStarts_Timer == null)
+                    {
+                        MSTxPersistence.SelectMain(_ActiveResource, _StandbyResource);
+                    }
+                }
+            }
+            else if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED)
+            {
+                if (checkPairWhenNbxStarts_Timer != null && checkPairWhenNbxStarts_Timer.Enabled == false)
+                {
+                    //The checkPairWhenNbxStarts_Timer finished
+                    if (resChange == _ActiveResource)
+                    {
+                        if (_StandbyResource.Connected)
+                            Switch();
+                    }
+                }
+            }
+
             resChange.HandleChangeInCallState(sipCallId, stateInfo);
             return true;
         }
@@ -242,9 +344,13 @@ namespace U5ki.RdService
         {
             if (_StandbyResource.ID == idResource)
             {
+#if !DEBUG
                 if (_StandbyResource.Connected) 
+#endif
+                {
                     Switch();
-                return true;
+                    return true;
+                }
             }
             return false;
         }
@@ -281,7 +387,7 @@ namespace U5ki.RdService
         #endregion
         /// <summary>
         /// Método para conmutar activo y standby mediante tx mute
-        /// </summary>
+        /// </summary> 
         private void Switch()
         {
             RdResource temp = _ActiveResource;
@@ -289,6 +395,41 @@ namespace U5ki.RdService
             _ActiveResource.TxMute = temp.TxMute;
             temp.TxMute = true;
             _StandbyResource = temp;
+
+            MSTxPersistence.SelectMain(_ActiveResource, _StandbyResource);
+        }
+
+        /// <summary>
+        /// Metodo que desconecta un recurso de recepcion que ha sido desactivado
+        /// Retorna tru si se ha desactivado alguno
+        /// </summary>
+        public bool Check_1mas1_Resources_Disabled()
+        {
+            bool ret = false;
+
+            RdResource current_active_resource = _ActiveResource;
+            RdResource current_standby_resource = _StandbyResource;
+
+            bool active_resource_disabled = MSTxPersistence.IsNodeDisabled(current_active_resource);
+            bool standby_resource_disabled = MSTxPersistence.IsNodeDisabled(current_standby_resource);
+
+            if (active_resource_disabled == true && standby_resource_disabled == false)
+            {
+                Switch();
+            }
+
+            if (current_active_resource.Connected == true && current_active_resource.Connecting == false && active_resource_disabled == true)
+            {
+                current_active_resource.Dispose();
+                ret = true;
+            }
+            if (current_standby_resource.Connected == true && current_standby_resource.Connecting == false && standby_resource_disabled == true)
+            {
+                current_standby_resource.Dispose();
+                ret = true;
+            }
+
+            return ret;
         }
     }
 }

@@ -397,6 +397,8 @@ namespace U5ki.RdService
             return true;
 		}
 
+        
+
         /// <summary>
         /// 
         /// </summary>
@@ -756,6 +758,7 @@ namespace U5ki.RdService
             _PttId = 0;
             _Ptt = RdRsPttType.NoPtt;
             _Squelch = false;
+            this.new_params.rx_selected = false;
 		}
 
         /// <summary>

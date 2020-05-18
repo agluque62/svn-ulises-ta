@@ -357,6 +357,8 @@ namespace U5ki.RdService
             {
                 foreach(RdResourcePair newPair in newPairs)
                 {
+                    newPair.SetActiveStandbyFromPersistence();
+
                     KeyValuePair <string,IRdResource> found = rdRsPairToRemove.FirstOrDefault(x => x.Value.ID.Equals(newPair.ID));
                     string rsKey = newPair.Uri1.ToUpper() + (int)newPair.Type;
                     IRdResource res;
@@ -377,7 +379,7 @@ namespace U5ki.RdService
                     }
                     else
                     {
-                        res = newPair;
+                        res = newPair;                        
                         res.Connect();
                     }
                     _RdRs[rsKey] = res;
@@ -745,6 +747,25 @@ namespace U5ki.RdService
             return _TxIds.FindIndex(delegate (string tx) { return (tx == host); }) < 0 ? false : true;
         }
 
+        public void Check_1mas1_Resources_Disabled()
+        {
+            foreach (IRdResource rdRs in _RdRs.Values)
+            {
+                try
+                {
+                    if (rdRs is RdResourcePair)
+                    {
+                        RdResourcePair rdRsPair = rdRs as RdResourcePair;
+                        rdRsPair.Check_1mas1_Resources_Disabled();                        
+                    }                    
+                }
+                catch (Exception exc)
+                {
+                    throw exc;
+                }
+            }
+        }
+
         public void RetryFailedConnections()
         {
             
@@ -752,12 +773,21 @@ namespace U5ki.RdService
             {
                 try
                 {
-                    foreach (RdResource simpleRes in rdRs.GetListResources())
-                        if ((!simpleRes.ToCheck) && !simpleRes.Connecting)
+                    if (rdRs is RdResourcePair)
+                    {
+                        if (!rdRs.ToCheck)
                         {
-                            simpleRes.Connect();
+                            rdRs.Connect();                            
                         }
-
+                    }
+                    else
+                    {
+                        foreach (RdResource simpleRes in rdRs.GetListResources())
+                            if ((!simpleRes.ToCheck) && !simpleRes.Connecting)
+                            {
+                                simpleRes.Connect();
+                            }
+                    }                   
                 }
                 catch (Exception exc)
                 {
@@ -900,6 +930,7 @@ namespace U5ki.RdService
         {
             bool changed = false;
             bool sendToHMI = false;
+            bool rx_selected_changed = false;
             foreach (IRdResource rdRs in _RdRs.Values)
             {
                 RdResource simpleRes = rdRs.GetSimpleResource(sipCallId);
@@ -913,6 +944,20 @@ namespace U5ki.RdService
                                             ". Seleccionado: " + info.rx_selected +
                                             ". info.rx_qidx: " + info.rx_qidx +
                                             ". en Site: " + rdRs.Site);
+
+                    if ((simpleRes.new_params.rx_selected != info.rx_selected) && (info.rx_selected == true))
+                    {
+                        //The rx_selected in the frequency is changed. An only one resource can be selected
+                        //Like Coresip does not notify when rx_selected is false, here we force 
+                        foreach (IRdResource rdrs in _RdRs.Values.Where(r => r.isRx && r.Connected))
+                        {
+                            if (rdrs != simpleRes)
+                            {
+                                (rdrs as RdResource).new_params.rx_selected = false;
+                            }
+                        }
+                        rx_selected_changed = true;
+                    }
 
                     if (simpleRes.HandleRdInfo(info) && (_FrRs != null))
                     {
@@ -1143,7 +1188,36 @@ namespace U5ki.RdService
                                     LogTrace<RdFrecuency>("Evento en Grupo RTX (" + _FrRs.RtxGroupOwner + "): Para timer _RtxSquelch porque ptt off y sq off");
                                 }
 
-                                SendPttToRtxGroup(false, false);
+                                SendPttToRtxGroup(false, false);                                
+                            }
+                            else if (_SendingPttToRtxGroup && ((_FrRs.Squelch != RdSrvFrRs.SquelchType.NoSquelch) ||
+                                ((_CurrentSrcPtt != null) && (_CurrentSrcPtt.SrcId == _FrRs.PttSrcId))) &&
+                                rx_selected_changed == true)
+                            {
+
+                                lock (_RtxGroups)
+                                {
+                                    List<RdFrecuency> rtxGroupFr = _RtxGroups[_FrRs.RtxGroupOwner.ToUpper() + _FrRs.RtxGroupId];
+                                    if ((_FrRs.RtxGroupId > 0) && (rtxGroupFr.Count > 1))
+                                    {
+                                        foreach (RdFrecuency rdFr in rtxGroupFr)
+                                        {
+                                            if (rdFr != this)
+                                            {
+                                                string topId = "Rtx_" + _FrRs.RtxGroupId + "_" + _Frecuency;
+                                                
+                                                PttInfo pttInfo = rdFr._SrcPtts.Find(delegate (PttInfo p) { return (p.SrcId == topId); });
+                                                if (pttInfo != null)
+                                                {
+                                                    
+
+                                                    pttInfo.Reset(pttInfo.SrcType, pttInfo.Type, SipRxCalls_with_rx_selected().Keys);
+                                                    ActualizePtt(pttInfo);     //Aquí hay que sustituir el audio.
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
@@ -1168,6 +1242,35 @@ namespace U5ki.RdService
                 if (res.GetType().Equals(typeof(RdResourcePair)))
                     if (res.ActivateResource(IdResource))
                         return true;
+            return false;
+        }
+        /// <summary>
+        /// 20200430. Para Activar, Desactivar Recursos (en principio en 1+1)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="enable"></param>
+        /// <returns></returns>
+        public bool EnableDisableResource(string id, bool enable)
+        {
+            foreach (IRdResource res in _RdRs.Values)
+            {
+                if (res.GetType().Equals(typeof(RdResourcePair)))
+                {
+                    var ids = res.ID.Split('#').Where(sid => sid == id).ToList();
+                    if (ids.Count > 0)
+                    {
+                        var rp = res as RdResourcePair;
+                        var sres = rp.ActiveResource.ID == id ? rp.ActiveResource : rp.StandbyResource;
+                        MSTxPersistence.DisableNode(sres, !enable);
+                        return true;
+                    }
+                }
+                else if (res.ID == id)
+                {
+                    MSTxPersistence.DisableNode(res, !enable);
+                    return true;
+                }
+            }
             return false;
         }
         /// <summary>
@@ -1774,6 +1877,52 @@ namespace U5ki.RdService
         }
 
         /// <summary>
+        /// Rx Active Calls with rx_selected active, if the frecuency has more than one rx resource
+        /// </summary>
+        private Dictionary<int, IRdResource> SipRxCalls_with_rx_selected()
+        {
+            Dictionary<int, IRdResource> sipCalls = new Dictionary<int, IRdResource>();
+
+            int count = 0;
+            foreach (IRdResource found in _RdRs.Values.Where(r => r.isRx && r.Connected))
+            {
+                count++;
+            }
+
+            if (count == 1)
+            {
+                //Only one resource. It is included regardless rx_selected
+                foreach (IRdResource found in _RdRs.Values.Where(r => r.isRx && r.Connected))
+                {
+                    sipCalls.Add(found.SipCallId, found);
+                }
+            }
+            else
+            {
+                foreach (IRdResource found in _RdRs.Values.Where(r => r.isRx && r.Connected))
+                {
+                    if (found is RdResourcePair)
+                    {
+                        RdResource r = (found as RdResourcePair).GetRxSelected();
+                        if (r != null)
+                        {
+                            sipCalls.Add(r.SipCallId, r);
+                        }                        
+                    }
+                    else
+                    {
+                        if ((found as RdResource).new_params.rx_selected)
+                        {
+                            sipCalls.Add(found.SipCallId, found);
+                        }
+                    }
+                }
+            }
+
+            return sipCalls;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         private List<CORESIP_PttType> _PttTypes = new List<CORESIP_PttType>();
@@ -2289,11 +2438,11 @@ namespace U5ki.RdService
                         {
                             if (rdFr != this)
                             {
-                                rdFr.ReceivePtt("Rtx_" + _FrRs.RtxGroupId + "_" + _Frecuency, PttSource.Avion, SipRxCalls().Keys);
+                                rdFr.ReceivePtt("Rtx_" + _FrRs.RtxGroupId + "_" + _Frecuency, PttSource.Avion, SipRxCalls_with_rx_selected().Keys);
                             }
                         }
                     }
-                }
+                }                
                 else if (!pttOn && (_SendingPttToRtxGroup || force))
                 {
                     Debug.Assert(_FrRs.RtxGroupId > 0);
