@@ -127,7 +127,7 @@
     </Property>
 
     <!-- Recuperacion de estados radio  -->
-    <Property Id="RDSTATUSREC" Value="20">
+    <Property Id="RDSTATUSREC" Value="2">
       <RegistrySearch Id='UV5KI_HMI_RDSTATUSREC' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='RDSTATUSREC_Property' Type='raw' />
@@ -1264,9 +1264,10 @@
           <ComboBox Property="RDSTATUSREC">
             <ListItem Value="0"  Text="No" />
             <ListItem Value="1"  Text="Sin Persistencia" />
+            <ListItem Value="2" Text="2 seg." />
+            <ListItem Value="5" Text="5 seg." />
             <ListItem Value="10" Text="10 seg." />
             <ListItem Value="20" Text="20 seg." />
-            <ListItem Value="30" Text="30 seg." />
           </ComboBox>
         </Control>
 

@@ -944,20 +944,33 @@ namespace U5ki.RdService
                                             ". Seleccionado: " + info.rx_selected +
                                             ". info.rx_qidx: " + info.rx_qidx +
                                             ". en Site: " + rdRs.Site);
-
+                    
+                    
                     if ((simpleRes.new_params.rx_selected != info.rx_selected) && (info.rx_selected == true))
                     {
-                        //The rx_selected in the frequency is changed. An only one resource can be selected
+                        //The rx_selected in the frequency is changed. And only one resource can be selected
                         //Like Coresip does not notify when rx_selected is false, here we force 
                         foreach (IRdResource rdrs in _RdRs.Values.Where(r => r.isRx && r.Connected))
                         {
-                            if (rdrs != simpleRes)
+                            if (rdrs is RdResourcePair)
+                            {
+                                if ((rdrs as RdResourcePair).ActiveResource != simpleRes)
+                                {
+                                    (rdrs as RdResourcePair).ActiveResource.new_params.rx_selected = false;
+                                }
+                                if ((rdrs as RdResourcePair).StandbyResource != simpleRes)
+                                {
+                                    (rdrs as RdResourcePair).StandbyResource.new_params.rx_selected = false;
+                                }
+                            }
+                            else if (rdrs != simpleRes)
                             {
                                 (rdrs as RdResource).new_params.rx_selected = false;
                             }
                         }
                         rx_selected_changed = true;
                     }
+                    
 
                     if (simpleRes.HandleRdInfo(info) && (_FrRs != null))
                     {
@@ -1194,30 +1207,8 @@ namespace U5ki.RdService
                                 ((_CurrentSrcPtt != null) && (_CurrentSrcPtt.SrcId == _FrRs.PttSrcId))) &&
                                 rx_selected_changed == true)
                             {
-
-                                lock (_RtxGroups)
-                                {
-                                    List<RdFrecuency> rtxGroupFr = _RtxGroups[_FrRs.RtxGroupOwner.ToUpper() + _FrRs.RtxGroupId];
-                                    if ((_FrRs.RtxGroupId > 0) && (rtxGroupFr.Count > 1))
-                                    {
-                                        foreach (RdFrecuency rdFr in rtxGroupFr)
-                                        {
-                                            if (rdFr != this)
-                                            {
-                                                string topId = "Rtx_" + _FrRs.RtxGroupId + "_" + _Frecuency;
-                                                
-                                                PttInfo pttInfo = rdFr._SrcPtts.Find(delegate (PttInfo p) { return (p.SrcId == topId); });
-                                                if (pttInfo != null)
-                                                {
-                                                    
-
-                                                    pttInfo.Reset(pttInfo.SrcType, pttInfo.Type, SipRxCalls_with_rx_selected().Keys);
-                                                    ActualizePtt(pttInfo);     //Aquí hay que sustituir el audio.
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                //PTT to RTX group is sending, but the receiver selected is changed, possibly by an end in de decision window
+                                SendPttToRtxGroup(true, false);                                
                             }
                             else
                             {
@@ -2370,6 +2361,7 @@ namespace U5ki.RdService
             List<int> currentPorts = new List<int>(_CurrentSrcPtt.SrcPorts);
             _CurrentSrcPtt.SrcPorts.Clear();
 
+            //New SrcPorts are connected
             foreach (int srcPort in p.SrcPorts)
             {
                 if (!currentPorts.Contains(srcPort))
@@ -2377,6 +2369,18 @@ namespace U5ki.RdService
                     RdMixer.Link(_CurrentSrcPtt.SrcType, srcPort, sipTxCalls.Keys);
                 }
                 _CurrentSrcPtt.SrcPorts.Add(srcPort);
+            }
+
+            if (_CurrentSrcPtt.SrcType == p.SrcType && p.SrcType == PttSource.Avion)
+            {
+                //Old SrcPorts are disconnected when SrcType is avion, It is a rtx when decision window has end
+                foreach (int srcPort in currentPorts)
+                {
+                    if (!_CurrentSrcPtt.SrcPorts.Contains(srcPort))
+                    {
+                        RdMixer.Unlink(_CurrentSrcPtt.SrcType, srcPort, sipTxCalls.Keys);
+                    }
+                }
             }
 
             if (_CurrentSrcPtt.SrcType != p.SrcType)
@@ -2442,7 +2446,17 @@ namespace U5ki.RdService
                             }
                         }
                     }
-                }                
+                }    
+                else if (pttOn && _SendingPttToRtxGroup && _FrRs.RtxGroupId > 0 && rtxGroupFr.Count > 1 && _SendingPttToRtxGroup)
+                {
+                    foreach (RdFrecuency rdFr in rtxGroupFr)
+                    {
+                        if (rdFr != this)
+                        {
+                            rdFr.ReceivePtt("Rtx_" + _FrRs.RtxGroupId + "_" + _Frecuency, PttSource.Avion, SipRxCalls_with_rx_selected().Keys);
+                        }
+                    }
+                }
                 else if (!pttOn && (_SendingPttToRtxGroup || force))
                 {
                     Debug.Assert(_FrRs.RtxGroupId > 0);
