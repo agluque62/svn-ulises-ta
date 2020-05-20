@@ -241,13 +241,13 @@ namespace U5ki.RdService
                 else if (_StandbyResource.new_params.rx_selected)
                     return _StandbyResource;
             }
-            else if (_ActiveResource.Connected && !_StandbyResource.Connected)
+            else if (_ActiveResource.Connected && !_StandbyResource.Connected && _ActiveResource.new_params.rx_selected)
             {
                 return _ActiveResource;
             }
-            else if (!_ActiveResource.Connected && _StandbyResource.Connected)
+            else if (!_ActiveResource.Connected && _StandbyResource.Connected && _StandbyResource.new_params.rx_selected)
             {
-                return _ActiveResource;
+                return _StandbyResource;
             }
 
             return null;

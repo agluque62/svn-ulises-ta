@@ -901,6 +901,30 @@ namespace U5ki.RdService
                 return "";
             }
         }
+        public string SelectedResource
+        {
+            get
+            {
+                switch (this.new_params.FrequencyType)
+                {
+                    case CORESIP_FREQUENCY_TYPE.Simple:
+                    case CORESIP_FREQUENCY_TYPE.FD:
+                        foreach (IRdResource rdr in RdRs.Values.Where(r => r.isRx &&
+                                    (r.Squelch)))
+                        {
+                            RdResource simpleResource = rdr.GetRxSelected();
+                            if (simpleResource != null)
+                                return simpleResource.ID;
+                        }
+                        break;
+                    case CORESIP_FREQUENCY_TYPE.Dual:
+                    case CORESIP_FREQUENCY_TYPE.ME:
+                        break;
+
+                }
+                return "";
+            }
+        }
         public int SelectedSiteQidx
         {
             get
@@ -1124,7 +1148,7 @@ namespace U5ki.RdService
                                     _FrRs.FrequencyStatus = this.Status;
                                     if (_FrRs.FrequencyStatus != _OldStatus)
                                         sendToHMI = true;
-                                    _FrRs.ResourceId = rdRs.ID;
+                                    _FrRs.ResourceId = simpleRes.ID;
                                     _FrRs.QidxMethod = new_params.MetodosBssOfrecidos.ToString();
                                     _FrRs.QidxValue = (UInt32)simpleRes.new_params.rx_qidx;
                                 }
@@ -2902,6 +2926,7 @@ namespace U5ki.RdService
                     PttSrc = PttSrc,
                     Picts = from pict in Picts select new { key = pict.Key, val = pict.Value },
                     SelectedSite = SelectedSite,
+                    SelectedResource = SelectedResource,
                     SelectedSiteQidx = SelectedSiteQidx,
                     SelectedTxSiteString = SelectedTxSiteString,
                     TipoDeFrecuencia = TipoDeFrecuencia,

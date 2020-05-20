@@ -347,6 +347,7 @@ namespace U5ki.RdService
                                                 fstd = (int)frec.Status,
                                                 // Emplazamiento Seleccionado y QIDX del seleccionado...
                                                 selected_site = frec.SelectedSite,
+                                                selected_resource = frec.SelectedResource,
                                                 selected_site_qidx = frec.SelectedSiteQidx,
                                                 /** 20180618. Funcion Transmisor seleccionado */
                                                 selected_tx = frec.SelectedTxSiteString,
