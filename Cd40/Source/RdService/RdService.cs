@@ -348,6 +348,7 @@ namespace U5ki.RdService
                                                 // Emplazamiento Seleccionado y QIDX del seleccionado...
                                                 selected_site = frec.SelectedSite,
                                                 selected_resource = frec.SelectedResource,
+                                                selected_BSS_method = frec.SelectedBSSMethod,
                                                 selected_site_qidx = frec.SelectedSiteQidx,
                                                 /** 20180618. Funcion Transmisor seleccionado */
                                                 selected_tx = frec.SelectedTxSiteString,
@@ -362,15 +363,14 @@ namespace U5ki.RdService
                                                 rx_rtp = rdr.new_params.rx_rtp_port,
                                                 rx_qidx = rdr.new_params.rx_qidx,
                                                 /** 20170807. */
-                                                site = rdr.new_params.site
+                                                site = rdr.new_params.site,
+                                                /** 20200522 */
+                                                UnoMasUno = frec.ContainsUnoMasUno,
                                             };
 
                                             local_rsp.Add(data);
                                         }
                                     }
-                                //local_rsp = local_rsp
-                                //    .OrderBy(o => ((GlobalTypes.radioSessionData)o).std)
-                                //    .ThenBy(o => ((GlobalTypes.radioSessionData)o).frec).ToList();
                                 }
                                 local_rsp = local_rsp
                                     .OrderBy(o => ((GlobalTypes.radioSessionData)o).std)

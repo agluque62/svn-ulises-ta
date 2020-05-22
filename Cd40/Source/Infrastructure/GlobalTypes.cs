@@ -20,6 +20,7 @@ namespace U5ki.Infrastructure
             public int fp_bss_win { get; set; }
             public string selected_site { get; set; }
             public string selected_resource { get; set; }
+            public string selected_BSS_method { get; set; }
             public int selected_site_qidx { get; set; }
             /** 20180618. Funcion Transmisor seleccionado */
             public string selected_tx { get; set; }
@@ -35,6 +36,8 @@ namespace U5ki.Infrastructure
             public int rx_qidx { get; set; }
             /** 20170807 */
             public string site { get; set; }
+            /** */
+            public bool UnoMasUno { get; set; }
         }
         public class equipoMNData
         {

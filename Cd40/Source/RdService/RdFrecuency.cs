@@ -925,6 +925,33 @@ namespace U5ki.RdService
                 return "";
             }
         }
+        public string SelectedBSSMethod
+        {
+            get
+            {
+                switch (this.new_params.FrequencyType)
+                {
+                    case CORESIP_FREQUENCY_TYPE.Simple:
+                    case CORESIP_FREQUENCY_TYPE.FD:
+                        foreach (IRdResource rdr in RdRs.Values.Where(r => r.isRx &&
+                                    (r.Squelch)))
+                        {
+                            RdResource simpleResource = rdr.GetRxSelected();
+                            if (simpleResource != null)
+                            {
+                                string method = ((RdResource.BssMethods)new_params.MetodosBssOfrecidos).ToString();
+                                return method;
+                            }
+                        }
+                        break;
+                    case CORESIP_FREQUENCY_TYPE.Dual:
+                    case CORESIP_FREQUENCY_TYPE.ME:
+                        break;
+
+                }
+                return "";
+            }
+        }
         public int SelectedSiteQidx
         {
             get
@@ -1768,6 +1795,15 @@ namespace U5ki.RdService
                         break;
                 }
                 return "---";
+            }
+        }
+        /** 20200522. AGL. Identifica si la frecuencia contiene recursos en 1+1 */
+        public bool ContainsUnoMasUno
+        {
+            get
+            {
+                var retorno = RdRs.Values.Where(r => r is RdResourcePair).ToList().Count > 0;
+                return retorno;
             }
         }
 

@@ -8,12 +8,12 @@
         "level": "Master",
         "modules": [{
                 "id": "M+N",
-                "enable": 0,
+                "enable": 1,
                 "std": "Disabled",
                 "level": "Error"
             }, {
                 "id": "HF",
-                "enable": 0,
+                "enable": 1,
                 "std": "Stopped",
                 "level": "Error"
             }, {

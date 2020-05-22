@@ -12,15 +12,10 @@ angular.module("Uv5kinbx")
 
         getInci();
 
-
         ctrl.user = "agl1";
         ctrl.date = (new Date()).toLocaleDateString();
         ctrl.hora = (new Date()).toLocaleTimeString();
         $location.path("/");
-
-
-        /** */
-        ctrl.appver = app_version;
 
         //** */
         ctrl.decodeHtml = function (html) {
