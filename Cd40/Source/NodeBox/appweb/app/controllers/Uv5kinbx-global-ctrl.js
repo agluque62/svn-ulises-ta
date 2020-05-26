@@ -31,7 +31,7 @@ angular.module("Uv5kinbx")
 
         ctrl.PhoneOptionsShow = function () {
             var type = $lserv.globalType();
-            return ctrl.appver >= 1 && (type === srvtypes.Phone || type === srvtypes.Mixed);
+            return (type === srvtypes.Phone || type === srvtypes.Mixed);
         };
 
         // Paginado Incidencias
