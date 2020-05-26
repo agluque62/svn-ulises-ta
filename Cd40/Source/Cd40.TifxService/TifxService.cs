@@ -645,19 +645,20 @@ namespace U5ki.TifxService
                                         gwInfo.GwIp = gwInfo.GwId;
                                         break;
                                     case 4:     // Informacion de Proxies...
-                                        if (IPAddress.Parse(Settings.Default.tifxMcastSrc).ToString().Equals(dg.Client.Address.ToString()))
-                                            gwInfo.GwIp = gwInfo.GwId;
-                                        else
-                                            //Descarto datos del servicio de presencia de otro NBX
-                                            return;
+                                        //if (IPAddress.Parse(Settings.Default.tifxMcastSrc).ToString().Equals(dg.Client.Address.ToString()))
+                                        //    gwInfo.GwIp = gwInfo.GwId;
+                                        //else
+                                        //    //Descarto datos del servicio de presencia de otro NBX
+                                        //    return;
+                                        gwInfo.GwIp = gwInfo.GwId;
                                         break;
 #if DEBUG1
                                         return;
 #endif
                                     case 3:     // Abonados Externos.
-                                        //Descarto datos del servicio de presencia de otro NBX
-                                        if (!IPAddress.Parse(Settings.Default.tifxMcastSrc).ToString().Equals(dg.Client.Address.ToString()))
-                                            return;
+                                        ////Descarto datos del servicio de presencia de otro NBX
+                                        //if (!IPAddress.Parse(Settings.Default.tifxMcastSrc).ToString().Equals(dg.Client.Address.ToString()))
+                                        //    return;
                                         break;
                                     case 1:     // De Pasarela.
                                         gwInfo.GwIp = dg.Client.Address.ToString();
