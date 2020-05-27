@@ -1170,7 +1170,10 @@ namespace U5ki.RdService
 
                                 // JCAM.
                                 // 27/02/2017. U5KI2.RQ.007.07
-                                if (this.new_params.FrequencyType == CORESIP_FREQUENCY_TYPE.FD)
+                                if (
+                                    (this.new_params.FrequencyType == CORESIP_FREQUENCY_TYPE.FD) ||
+                                    (rdRs is RdResourcePair)
+                                    )
                                 {
                                     _FrRs.FrequencyStatus = this.Status;
                                     if (_FrRs.FrequencyStatus != _OldStatus)
