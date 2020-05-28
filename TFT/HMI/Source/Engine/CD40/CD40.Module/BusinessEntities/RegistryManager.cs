@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Text;
 using HMI.CD40.Module.Properties;
@@ -69,11 +70,16 @@ namespace HMI.CD40.Module.BusinessEntities
 			string type = Identifiers.TypeId(typeof(T));
 			string rsUid = rsName + "_" + type;
 
-			if (!_Resources.TryGetValue(rsUid, out rs))
+			_Logger.Trace($"GetRs <{type}>: {rsName}");
+
+			//if (!_Resources.TryGetValue(rsUid, out rs))
+			if (!GetResource(rsUid, out rs))
 			{
 				rs = new Rs<T>(rsName);
 				_Resources[rsUid] = rs;
-                
+			
+				_Logger.Trace($"GetRs <{type}>: {rsName}. New Resource...");
+
 				if ((rs is Rs<GwTlfRs>) || (rs is Rs<GwLcRs>))
 				{
 					DireccionamientoIP hostInfo = Top.Cfg.GetGwRsHostInfo(rsName);
@@ -95,6 +101,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public void SetRx(string fr, bool rx)
 		{
+			_Logger.Trace($"SetRx <{fr}>: {rx}");
+
 			FrRxChangeAsk change = new FrRxChangeAsk();
 			change.HostId = Top.HostId;
 			change.Frecuency = fr;
@@ -105,6 +113,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public void SetTx(string fr, bool tx, uint pttType, bool checkAlreadyAssigned)
 		{
+			_Logger.Trace($"SetTx <{fr}>: {tx}, pttTupe {pttType}, AlreadyAssigned {checkAlreadyAssigned}");
+
 			FrTxChangeAsk change = new FrTxChangeAsk();
 			change.HostId = Top.HostId;
 			change.Frecuency = fr;
@@ -117,6 +127,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public void SetPtt(PttSource src)
 		{
+			_Logger.Trace($"SetPtt <{src}>");
+
 			PttChangeAsk change = new PttChangeAsk();
 			change.HostId = Top.HostId;
 			change.Src = src;
@@ -126,7 +138,9 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public void SetTxAssigned(string fr)
 		{
-		   FrTxAssigned notif = new FrTxAssigned();
+			_Logger.Trace($"SetTxAssigned <{fr}>");
+
+			FrTxAssigned notif = new FrTxAssigned();
 		   notif.Frecuency = fr;
 			notif.UserId = Top.Cfg.PositionId;
 
@@ -135,6 +149,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		public void ChangeRtxGroup(int rtxGroup, IEnumerable<string> frIds, IEnumerable<RtxGroupChangeAsk.ChangeType> changes)
 		{
+			_Logger.Trace($"ChangeRtxGroup <{rtxGroup}>");
+
 			RtxGroupChangeAsk rtx = new RtxGroupChangeAsk();
 			rtx.HostId = Top.HostId;
 			rtx.GroupId = (uint)rtxGroup;
@@ -150,7 +166,9 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         public void PrepareSelCal(bool onOff, string code)
         {
-            SelcalPrepareMsg msg = new SelcalPrepareMsg();
+			_Logger.Trace($"PrepareSelCal <{onOff}>: {code}");
+
+			SelcalPrepareMsg msg = new SelcalPrepareMsg();
 
             msg.HostId = Top.HostId;
             msg.OnOff = onOff;
@@ -165,7 +183,9 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="tones"></param>
         public void SendTonesSelCal(string tones)
         {
-            SelcalPrepareMsg msg = new SelcalPrepareMsg();
+			_Logger.Trace($"SendTonesSelCall <{tones}>");
+
+			SelcalPrepareMsg msg = new SelcalPrepareMsg();
             msg.HostId = Top.HostId;
             msg.Code = tones;
 
@@ -174,7 +194,9 @@ namespace HMI.CD40.Module.BusinessEntities
 
         public void ChangeSite(string frId, string frAlias)
         {
-            ChangeSiteMsg msg = new ChangeSiteMsg();
+			_Logger.Trace($"ChangeSite <{frId}> {frAlias}");
+
+			ChangeSiteMsg msg = new ChangeSiteMsg();
 
             msg.HostId = Top.HostId;
             msg.Frequency = frId;
@@ -185,7 +207,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
 		#region Private Members
 
-		private static Logger _Logger = LogManager.GetCurrentClassLogger();
+		private static Logger _Logger = LogManager.GetLogger("TopRegistry");
+		//private static Logger _Logger = LogManager.GetCurrentClassLogger();
 		private Dictionary<string, Resource> _Resources = new Dictionary<string, Resource>();
 
 		private T Deserialize<T>(byte[] data) where T : class
@@ -251,6 +274,10 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     TxChanged(change);
                 }
+				else
+				{
+					_Logger.Error($"OnRsChanged Error, Unkown Type <{change.Type}>");
+				}
 			}
 			catch (Exception ex)
 			{
@@ -262,6 +289,8 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			try
 			{
+				_Logger.Trace($"OnMsgReceived <{msg.Type}>");
+
 				if ((msg.Type == Identifiers.FR_TX_CHANGE_RESPONSE_MSG) ||
 					(msg.Type == Identifiers.FR_RX_CHANGE_RESPONSE_MSG))
 				{
@@ -269,12 +298,18 @@ namespace HMI.CD40.Module.BusinessEntities
 					string type = Identifiers.TypeId(typeof(RdSrvFrRs));
 					string rsUid = answer.Frecuency.ToUpper() + "_" + type;
 
+					_Logger.Trace($"OnMsg FR TX or RX Response <{answer.Frecuency}>: {rsUid}");
 					Top.WorkingThread.Enqueue("FrChangeAnswer", delegate()
 					{
 						Resource resource;
-						if (_Resources.TryGetValue(rsUid, out resource))
+						//if (_Resources.TryGetValue(rsUid, out resource))
+						if (GetResource(rsUid, out resource))
 						{
 							resource.NotifNewMsg(msg.Type, answer.Set);
+						}
+						else
+						{
+							_Logger.Error($"OnMsg FR TX or RX Response Error. Resource not Found <{rsUid}>");
 						}
 					});
 				}
@@ -284,12 +319,19 @@ namespace HMI.CD40.Module.BusinessEntities
 					string type = Identifiers.TypeId(typeof(RdSrvFrRs));
 					string rsUid = notif.Frecuency.ToUpper() + "_" + type;
 
+					_Logger.Trace($"OnMsg FR TX Assigned <{notif.Frecuency}>: {rsUid}");
+
 					Top.WorkingThread.Enqueue("FrTxAssignedNotif", delegate()
 					{
 						Resource resource;
-						if (_Resources.TryGetValue(rsUid, out resource))
+						//if (_Resources.TryGetValue(rsUid, out resource))
+						if (GetResource(rsUid, out resource))
 						{
 							resource.NotifNewMsg(msg.Type, notif.UserId);
+						}
+						else
+						{
+							_Logger.Error($"OnMsg FR TX Assigned Error. Resource not Found <{rsUid}>");
 						}
 					});
 				}
@@ -299,15 +341,22 @@ namespace HMI.CD40.Module.BusinessEntities
                     string type = Identifiers.TypeId(typeof(RdSrvFrRs));
                     string rsUid = answer.Frecuency.ToUpper() + "_" + type;
 
+					_Logger.Trace($"OnMsg HF TX Change Response <{answer.Frecuency}>: {rsUid}");
+
                     Top.WorkingThread.Enqueue("FrHfTxChangeAnswer", delegate()
-                    {
+					{
                         Resource resource;
-                        if (_Resources.TryGetValue(rsUid, out resource))
-                        {
-                            // resource.NotifNewMsg(msg.Type, answer.Set);
-                            resource.NotifNewMsg(msg.Type, answer.Estado);
+						//if (_Resources.TryGetValue(rsUid, out resource))
+						if (GetResource(rsUid, out resource))
+						{
+							// resource.NotifNewMsg(msg.Type, answer.Set);
+							resource.NotifNewMsg(msg.Type, answer.Estado);
                         }
-                    });
+						else
+						{
+							_Logger.Error($"OnMsg HF TX Change Response Error. Resource not Found <{rsUid}>");
+						}
+					});
                 }
                 else if (msg.Type == Identifiers.SELCAL_PREPARE_RSP)
                 {
@@ -315,14 +364,21 @@ namespace HMI.CD40.Module.BusinessEntities
                     string type = Identifiers.TypeId(typeof(RdSrvFrRs));
                     string rsUid = resp.Frecuency.ToUpper() + "_" + type;
 
+					_Logger.Trace($"OnMsg SelCal Prepare Response <{resp.Frecuency}>: {rsUid}");
+
                     Top.WorkingThread.Enqueue("SelCalPrepareAnswer", delegate()
-                    {
+					{
                         Resource resource;
-                        if (_Resources.TryGetValue(rsUid, out resource))
-                        {
-                            resource.NotifSelCal(msg.Type, resp.Code);
+						//if (_Resources.TryGetValue(rsUid, out resource))
+						if (GetResource(rsUid, out resource))
+						{
+							resource.NotifSelCal(msg.Type, resp.Code);
                         }
-                    });
+						else
+						{
+							_Logger.Error($"OnMsg SelCal Prepare Response Error. Resource not Found <{rsUid}>");
+						}
+					});
                 }
                 else if (msg.Type == Identifiers.SITE_CHANGING_RSP)
                 {
@@ -330,14 +386,21 @@ namespace HMI.CD40.Module.BusinessEntities
                     string type = Identifiers.TypeId(typeof(RdSrvFrRs));
                     string rsUid = resp.Frecuency.ToUpper() + "_" + type;
 
+					_Logger.Trace($"OnMsg Site Change Response <{resp.Frecuency}>: {rsUid}");
+
                     Top.WorkingThread.Enqueue("ChangingSiteResponse", delegate()
-                    {
+					{
                         Resource resource;
-                        if (_Resources.TryGetValue(rsUid, out resource))
-                        {
-                            resource.NotifSiteChanged(msg.Type, resp);
+						//if (_Resources.TryGetValue(rsUid, out resource))
+						if (GetResource(rsUid, out resource))
+						{
+							resource.NotifSiteChanged(msg.Type, resp);
                         }
-                    });
+						else
+						{
+							_Logger.Error($"OnMsg Site Change Response Error. Resource not Found <{rsUid}>");
+						}
+					});
                 }
 #if _HF_GLOBAL_STATUS_
                 else if (msg.Type == Identifiers.HF_STATUS)
@@ -358,8 +421,12 @@ namespace HMI.CD40.Module.BusinessEntities
                     }
                     );
                 }
+				else
+				{
+					_Logger.Error($"OnMsgReceived Error. Unknown type <{msg.Type}>");
+				}
 #endif
-            }
+			}
 			catch (Exception ex)
 			{
 				_Logger.Error("ERROR deserializando mensaje de tipo " + msg.Type, ex);
@@ -385,11 +452,14 @@ namespace HMI.CD40.Module.BusinessEntities
 
             if (cfg != null)
 			{
+				_Logger.Trace($"CfgChanged <{cfg.Version}>");
+
 				Top.WorkingThread.Enqueue("NewConfig", delegate()
 				{
 					foreach (Resource rs in _Resources.Values)
 					{
 						rs.ResetSubscribers();
+						_Logger.Trace($"CfgChanged. Resource {rs.Id} => ResetSubscribers");
 					}
 
 					General.SafeLaunchEvent(NewConfig, this, cfg);
@@ -402,8 +472,14 @@ namespace HMI.CD40.Module.BusinessEntities
 						if (!p.Value.IsUnreferenced)
 						{
 							_Resources.Add(p.Key, p.Value);
+							_Logger.Trace($"CfgChanged. Resource {p.Key} => Added..");
+						}
+						else
+						{
+							_Logger.Error($"CfgChanged. Adding Resource Error. {p.Value.Id} is Unreferenced");
 						}
 					}
+					LogResourcesConfig();
 				});
 			}
 		}
@@ -412,7 +488,13 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			T rs = Deserialize<T>(change.Content);
             string id = change.Id;
-            if (rs is GwTlfRs) 
+
+			string type = Identifiers.TypeId(typeof(T));
+			string rsUid = id + "_" + type;
+
+			_Logger.Trace($"RsChanged <{type} {rsUid}>");
+
+			if (rs is GwTlfRs) 
             {
                 object rsTlf = rs;
                 // No trato los eventos de proxies externos
@@ -428,21 +510,39 @@ namespace HMI.CD40.Module.BusinessEntities
                         rs = null;
                }
             }
-            string type = Identifiers.TypeId(typeof(T));
 
-            string rsUid = id + "_" + type;
             Top.WorkingThread.Enqueue("RsChanged", delegate()
             {
                 Resource resource;
-                if (!_Resources.TryGetValue(rsUid, out resource))
-                {
-                    resource = new Rs<T>(change.Id);
+				//if (!_Resources.TryGetValue(rsUid, out resource))
+				if (!GetResource(rsUid, out resource))
+				{
+					resource = new Rs<T>(change.Id);
                     _Resources[rsUid] = resource;
-                }
 
-                resource.Reset(change.ContainerId, rs);
+					_Logger.Trace($"RsChanged. Resource Added <{type} {rsUid}>");
+				}
+
+				resource.Reset(change.ContainerId, rs);
+				_Logger.Trace($"RsChanged. Resource Reset <{type} {rsUid}>");
             });
-        }
+		}
+
+		private bool GetResource(string key, out Resource rs)
+		{
+			var key_found = _Resources.Keys.Where(k => k.ToUpper().Equals(key.ToUpper())).FirstOrDefault();
+			rs = key_found == null ? null : _Resources[key_found];
+			return key_found == null ? false : true;
+		}
+
+		private void LogResourcesConfig()
+		{
+			_Logger.Trace("Resources List");
+			foreach(var rs in _Resources)
+			{
+				_Logger.Trace($"{rs.Key} => {rs.Value.Id}");
+			}
+		}
 
 		#endregion
 	}
