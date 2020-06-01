@@ -158,7 +158,7 @@ namespace HMI.Model.Module.Services
         Int32 CountdownToSave = 0;
         object locker = new object();
         RdPositionsStatus RPS = new RdPositionsStatus();
-        Dictionary<int, bool> Availability = new Dictionary<int, bool>();
+        Dictionary<string, bool> Availability = new Dictionary<string, bool>();
 
         bool EventInit = false;
         bool EventPos = false;
@@ -363,7 +363,7 @@ namespace HMI.Model.Module.Services
                 //}
                 RPS.PageSize = StateManager.Radio.PageSize;
 
-                Availability = new Dictionary<int, bool>();
+                //Availability = new Dictionary<int, bool>();
 
                 if (!RdStatusRecoveryWithoutPersistence)
                 {
@@ -534,9 +534,9 @@ namespace HMI.Model.Module.Services
         /// <returns></returns>
         bool OffOnTransition(RdDst onlinepos)
         {
-            bool lastAvailable = Availability.ContainsKey(onlinepos.Id) ? Availability[onlinepos.Id] : false;
+            bool lastAvailable = Availability.ContainsKey(onlinepos.Frecuency) ? Availability[onlinepos.Frecuency] : false;
             bool currAvailable = onlinepos.Unavailable == false;
-            Availability[onlinepos.Id] = currAvailable;
+            Availability[onlinepos.Frecuency] = currAvailable;
             return (lastAvailable == false && currAvailable == true);
         }
 
