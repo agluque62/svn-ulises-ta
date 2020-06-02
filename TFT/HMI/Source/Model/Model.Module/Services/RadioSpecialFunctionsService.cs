@@ -163,6 +163,8 @@ namespace HMI.Model.Module.Services
         bool EventInit = false;
         bool EventPos = false;
 
+        int CurrentConfigHasCode = default(int);
+
 #if _RDPAGESTIMING_
         private Task RdPageChangeDeallocationTask = null;
         private PageSetMsg PageSetPending = null;
@@ -213,11 +215,26 @@ namespace HMI.Model.Module.Services
         [EventSubscription(EventTopicNames.RdInfoEngine, ThreadOption.UserInterface)]
         public void OnRdInfoEngine(object sender, RangeMsg<RdInfo> msg)
         {
-            Log.Trace("Processing Event {0}", EventTopicNames.RdInfoEngine, msg);
+            var configData = msg.Info.ToList().Select(i => new { i.Dst, i.Alias });
+            var newConfig = Newtonsoft.Json.JsonConvert.SerializeObject(configData);
+            var newConfigHashCode = newConfig.GetHashCode();
 
-            /** AGL. Notifica los cambios de configuracion. */
-            EventInit = true;
-            Init();
+            Log.Trace("Processing Event {0} Config Hash Code {1}", EventTopicNames.RdInfoEngine, newConfigHashCode);
+
+            if (newConfigHashCode != CurrentConfigHasCode)
+            {
+                CurrentConfigHasCode = newConfigHashCode;
+                /** AGL. Notifica los cambios de configuracion. */
+                EventInit = true;
+                Init();
+                Log.Trace($"Cambio de Configuracion recibida...");
+                System.IO.File.WriteAllText("logs\\LastConfig.json",
+                                  Newtonsoft.Json.JsonConvert.SerializeObject(msg, Newtonsoft.Json.Formatting.Indented));
+            }
+            else
+            {
+                Log.Trace($"Configuracion Identica recibida...");
+            }
         }
         /// <summary>
         /// 
@@ -363,7 +380,7 @@ namespace HMI.Model.Module.Services
                 //}
                 RPS.PageSize = StateManager.Radio.PageSize;
 
-                //Availability = new Dictionary<int, bool>();
+                Availability = new Dictionary<string, bool>();
 
                 if (!RdStatusRecoveryWithoutPersistence)
                 {
