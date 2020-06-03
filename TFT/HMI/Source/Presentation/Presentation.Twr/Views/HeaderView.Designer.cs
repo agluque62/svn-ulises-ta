@@ -86,6 +86,7 @@ namespace HMI.Presentation.Twr.Views
             this._MsgLB.MaxLength = 8276;
             this._MsgLB.Multiline = true;
             this._MsgLB.Name = "_MsgLB";
+            this._MsgLB.ReadOnly = true;
             this._MsgLB.Size = new System.Drawing.Size(200, 66);
             this._MsgLB.TabIndex = 5;
             // 
