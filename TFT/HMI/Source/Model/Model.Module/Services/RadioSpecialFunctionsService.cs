@@ -164,6 +164,7 @@ namespace HMI.Model.Module.Services
         bool EventPos = false;
 
         int CurrentConfigHasCode = default(int);
+        bool InitWindow = false;
 
 #if _RDPAGESTIMING_
         private Task RdPageChangeDeallocationTask = null;
@@ -228,13 +229,23 @@ namespace HMI.Model.Module.Services
                 EventInit = true;
                 Init();
                 Log.Trace($"Cambio de Configuracion recibida...");
-                System.IO.File.WriteAllText("logs\\LastConfig.json",
-                                  Newtonsoft.Json.JsonConvert.SerializeObject(msg, Newtonsoft.Json.Formatting.Indented));
             }
             else
             {
-                Log.Trace($"Configuracion Identica recibida...");
+                Log.Trace($"Configuracion Identica recibida. Arrancando Ventana de Inicializacion");
+                InitWindow = true;
+                Task.Factory.StartNew(() =>
+                {
+                    Task.Delay(TimeSpan.FromMilliseconds(150)).Wait();
+                    InitWindow = false;
+                    Log.Trace($"Ventana de Inicializacion cerrada por tiempo.");
+                });
             }
+#if DEBUG
+            var path = $"logs\\{DateTime.Now.ToString("yyyyMMdd_HHmmss")}_ReceivedConfig.json";
+            System.IO.File.WriteAllText(path,
+                              Newtonsoft.Json.JsonConvert.SerializeObject(configData, Newtonsoft.Json.Formatting.Indented));
+#endif
         }
         /// <summary>
         /// 
@@ -247,6 +258,12 @@ namespace HMI.Model.Module.Services
             Log.Trace("(2) Processing Event {0}: {1}", EventTopicNames.RdPosStateEngine, msg);
             EventPos = true;
 
+            if (InitWindow == true)
+            {
+                InitWindow = false;
+                Init();
+                Log.Trace($"Ventana de Inicializacion cerrada por Evento.");
+            }
             /** AGL. Notifica cambios de estadp en posiciones radio, Tx, Tx, Ptt, sqh, ... */
             int pos = msg.From;
             msg.Info.ToList().ForEach(item =>
@@ -307,12 +324,12 @@ namespace HMI.Model.Module.Services
             General.SafeLaunchEvent(RdPageEngine, this,
                 new PageMsg(e.NewPage, Properties.Settings.Default.RdPageChangeDeallocationDelay));
         }
-#endif        
-        #endregion CONSTRUCTOR y EVENTOS SUBSCRITOS
+#endif
+#endregion CONSTRUCTOR y EVENTOS SUBSCRITOS
 
-        #region METODOS PRIVADOS
+#region METODOS PRIVADOS
 
-        #region ESTADOS TX-RX
+#region ESTADOS TX-RX
 
         /// <summary>
         /// Gestiona un evento de Asignacion / Desasignacion.
@@ -557,9 +574,9 @@ namespace HMI.Model.Module.Services
             return (lastAvailable == false && currAvailable == true);
         }
 
-        #endregion
+#endregion
 
-        #region ESTADOS RTX
+#region ESTADOS RTX
         /// <summary>
         /// 
         /// </summary>
@@ -628,7 +645,7 @@ namespace HMI.Model.Module.Services
                 });
             }
         }
-        #endregion
+#endregion
         /// <summary>
         /// 
         /// </summary>
@@ -654,7 +671,7 @@ namespace HMI.Model.Module.Services
         }
 
 #if _RDPAGESTIMING_
-        #region DELAYED RDPAGES CHANGES
+#region DELAYED RDPAGES CHANGES
         void DelayRdPageChange(PageSetMsg e)
         {
             RdPageChangeDeallocationTimer = Properties.Settings.Default.RdPageChangeDeallocationDelay;
@@ -685,7 +702,7 @@ namespace HMI.Model.Module.Services
                 });
             }
         }
-        #endregion
+#endregion
 #endif
         /// <summary>
         /// 
@@ -703,9 +720,9 @@ namespace HMI.Model.Module.Services
 
         Logger Log { get => LogManager.GetLogger("RSFService"); }
 
-        #endregion METODOS PRIVADOS
+#endregion METODOS PRIVADOS
 
-        #region SUPERVISION ERRORES EN TX RADIO
+#region SUPERVISION ERRORES EN TX RADIO
 
         /** 20180205. AGl. Control de los Grupos RTX */
         [EventSubscription(EventTopicNames.PttOnChanged, ThreadOption.Publisher)]
@@ -1131,7 +1148,7 @@ namespace HMI.Model.Module.Services
         }
 
         protected TxInProgressControl txInProgressControl = null;
-        #endregion
+#endregion
 
     }
 }
