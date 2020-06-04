@@ -219,28 +219,36 @@ namespace HMI.Model.Module.Services
             var configData = msg.Info.ToList().Select(i => new { i.Dst, i.Alias });
             var newConfig = Newtonsoft.Json.JsonConvert.SerializeObject(configData);
             var newConfigHashCode = newConfig.GetHashCode();
-
             Log.Trace("Processing Event {0} Config Hash Code {1}", EventTopicNames.RdInfoEngine, newConfigHashCode);
 
-            if (newConfigHashCode != CurrentConfigHasCode)
+            //if (newConfigHashCode != CurrentConfigHasCode)
+            //{
+            //    CurrentConfigHasCode = newConfigHashCode;
+            //    /** AGL. Notifica los cambios de configuracion. */
+            //    EventInit = true;
+            //    Init();
+            //    Log.Trace($"Cambio de Configuracion recibida...");
+            //}
+            //else
+            //{
+            //    Log.Trace($"Configuracion Identica recibida. Arrancando Ventana de Inicializacion");
+            //    InitWindow = true;
+            //    Task.Factory.StartNew(() =>
+            //    {
+            //        Task.Delay(TimeSpan.FromMilliseconds(150)).Wait();
+            //        InitWindow = false;
+            //        Log.Trace($"Ventana de Inicializacion cerrada por tiempo.");
+            //    });
+            //}
+            EventInit = true;
+            Init();
+            InitWindow = true;
+            Task.Factory.StartNew(() =>
             {
-                CurrentConfigHasCode = newConfigHashCode;
-                /** AGL. Notifica los cambios de configuracion. */
-                EventInit = true;
-                Init();
-                Log.Trace($"Cambio de Configuracion recibida...");
-            }
-            else
-            {
-                Log.Trace($"Configuracion Identica recibida. Arrancando Ventana de Inicializacion");
-                InitWindow = true;
-                Task.Factory.StartNew(() =>
-                {
-                    Task.Delay(TimeSpan.FromMilliseconds(150)).Wait();
-                    InitWindow = false;
-                    Log.Trace($"Ventana de Inicializacion cerrada por tiempo.");
-                });
-            }
+                Task.Delay(TimeSpan.FromMilliseconds(150)).Wait();
+                InitWindow = false;
+                Log.Trace($"Ventana de Inicializacion cerrada por tiempo.");
+            });
 #if DEBUG
             var path = $"logs\\{DateTime.Now.ToString("yyyyMMdd_HHmmss")}_ReceivedConfig.json";
             System.IO.File.WriteAllText(path,
@@ -258,12 +266,12 @@ namespace HMI.Model.Module.Services
             Log.Trace("(2) Processing Event {0}: {1}", EventTopicNames.RdPosStateEngine, msg);
             EventPos = true;
 
-            if (InitWindow == true)
-            {
-                InitWindow = false;
-                Init();
-                Log.Trace($"Ventana de Inicializacion cerrada por Evento.");
-            }
+            //if (InitWindow == true)
+            //{
+            //    InitWindow = false;
+            //    Init();
+            //    Log.Trace($"Ventana de Inicializacion cerrada por Evento.");
+            //}
             /** AGL. Notifica cambios de estadp en posiciones radio, Tx, Tx, Ptt, sqh, ... */
             int pos = msg.From;
             msg.Info.ToList().ForEach(item =>
@@ -347,6 +355,11 @@ namespace HMI.Model.Module.Services
             {
                 RdDst onlinepos = StateManager.Radio[pos];
 
+                if (InitWindow == true)
+                {
+                    Availability[onlinepos.Frecuency] = false;
+                }
+
                 Log.Trace("EventOnPos {0} (Frec={1}): Tx=>{2}, Rx=>{3}, Ad=>{4}, Available=>{5}, Restored=>{6}",
                     pos, onlinepos.Frecuency, onlinepos.Tx, onlinepos.Rx, onlinepos.AudioVia, !onlinepos.Unavailable,
                     onlinepos.Restored);
@@ -397,7 +410,7 @@ namespace HMI.Model.Module.Services
                 //}
                 RPS.PageSize = StateManager.Radio.PageSize;
 
-                Availability = new Dictionary<string, bool>();
+                //Availability = new Dictionary<string, bool>();
 
                 if (!RdStatusRecoveryWithoutPersistence)
                 {
@@ -437,6 +450,7 @@ namespace HMI.Model.Module.Services
                 }
             }
         }
+
         /// <summary>
         /// 
         /// </summary>
