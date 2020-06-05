@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 
 using NLog;
 using Utilities;
+using U5ki;
 
 namespace U5ki.Infrastructure
 {
@@ -150,6 +151,14 @@ namespace U5ki.Infrastructure
 				host += "@localhost";
 			}
 
+            int _Connect_tries_max = 6;
+            Process currentProcess = Process.GetCurrentProcess();
+            if (currentProcess.ProcessName.ToLower().Contains("nodebox"))
+            {
+                //The tries number of Nodebox is different to other proccess (HMI) in order not to have collisions
+                _Connect_tries_max = 3;
+            }
+
             group_name id;
 			sp_time tm = new sp_time(1, 0);
 
@@ -158,7 +167,27 @@ namespace U5ki.Infrastructure
                 int res = SP_connect_timeout(host, name, 0, 1, out _SpreadHandle, out id, tm);
                 if (ACCEPT_SESSION != res)
                 {
-                    throw new Exception(string.Format("ERROR {0} conectando al servidor spread. {1}##{2}", res, host, name));
+                    _Connect_tries = 0;                    
+                    string mcast_service_name = "u5ki.Mcast";
+                    try
+                    {                        
+                        ServiceController scMast = new ServiceController(mcast_service_name);
+                        try {
+                            scMast.Stop();
+                        }
+                        catch (InvalidOperationException x)
+                        {
+                            _Logger.Trace("ServiceController para el servicio {0}, excepcion {1}", mcast_service_name, x.ToString());
+                        }
+                        TimeSpan timeout = new TimeSpan(0, 0, 20);  //Timeout de 20 seg
+                        scMast.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                        scMast.Start();
+                        scMast.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                    }
+                    catch (Exception x)
+                    {
+                        _Logger.Error("ServiceController para el servicio {0}, excepcion {1}", mcast_service_name, x.ToString());
+                    }
                 }
             }
             else
@@ -565,6 +594,10 @@ namespace U5ki.Infrastructure
         /// 
         /// </summary>
 		private bool _Connected = false;
+        /// <summary>
+        /// 
+        /// </summary>
+		private static int _Connect_tries = 0;        
         /// <summary>
         /// 
         /// </summary>

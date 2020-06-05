@@ -355,20 +355,31 @@ namespace U5ki.RdService
 
             try
             {
-                foreach(RdResourcePair newPair in newPairs)
+                foreach (RdResourcePair newPair in newPairs)
                 {
                     newPair.SetActiveStandbyFromPersistence();
 
                     KeyValuePair <string,IRdResource> found = rdRsPairToRemove.FirstOrDefault(x => x.Value.ID.Equals(newPair.ID));
                     string rsKey = newPair.Uri1.ToUpper() + (int)newPair.Type;
-                    IRdResource res;
+                    IRdResource res;                    
                     if (found.Value != null)
                     {
                         if (EqualPairResources((RdResourcePair)found.Value, newPair))
                         {
-                            res = (RdResourcePair)found.Value;
+                            res = found.Value;
                             rsKey = found.Key;
-                         }
+                            (res as RdResourcePair).SetActiveStandbyFromPersistence();
+
+                            if (hayCambiosEnFrecuencia)
+                            {
+                                //En este punto la frecuencia ya esta establecida pero hay cambios en la configuracion
+                                //Se elimina res y se añade newpair
+
+                                (res as RdResourcePair).Dispose();
+                                res = (IRdResource) newPair;
+                                (res as RdResourcePair).Connect();
+                            }
+                        }
                         else
                         {
                             res = newPair;
@@ -382,9 +393,8 @@ namespace U5ki.RdService
                         res = newPair;                        
                         res.Connect();
                     }
-                    _RdRs[rsKey] = res;
+                    _RdRs[rsKey] = res;                    
                 }
-
             }
             catch (Exception exc)
             {
@@ -503,6 +513,10 @@ namespace U5ki.RdService
             {
                 LogError<RdFrecuency>(String.Format("Excepcion ", exc.StackTrace));
             }
+
+
+
+
             try
             {
                 foreach (IRdResource rdRs in rdRsToRemove.Values)
