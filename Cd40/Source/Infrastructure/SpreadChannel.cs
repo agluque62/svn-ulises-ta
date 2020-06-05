@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.ServiceProcess;
 
 using NLog;
 using Utilities;
