@@ -523,7 +523,9 @@ angular.module("Uv5kinbx")
                     if (rdUnoMasUnoChanged(normalizedData) == true) {
                         console.log("Cambio en tabla de 1+1");
                         ctrl.dtUnoMasUno = normalizedData;
-                        ctrl.dtUnoMasUnoSelectedFrec = ctrl.dtUnoMasUno.length > 0 ? ctrl.dtUnoMasUno[0].fr : "";
+                        ctrl.dtUnoMasUnoSelectedFrec = ctrl.dtUnoMasUnoSelectedFrec == "" ?
+                            ctrl.dtUnoMasUno.length > 0 ? ctrl.dtUnoMasUno[0].fr : "" :
+                            ctrl.dtUnoMasUnoSelectedFrec;
                     }
                 }, function (response) {
                     console.log(response);

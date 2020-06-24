@@ -342,6 +342,7 @@ namespace U5ki.RdService
             }
 
             resChange.HandleChangeInCallState(sipCallId, stateInfo);
+            LastRdResourceChanged = resChange;
             return true;
         }
         /// <summary>
@@ -445,11 +446,13 @@ namespace U5ki.RdService
         }
         void NotifyAutomaticSelection(string cause)
         {
-            var msg = $"Equipo {_ActiveResource.ID} seleccionado automaticamente en grupo 1+1 {ID}. {cause}";
+            var msg = $"Equipo {_ActiveResource.ID} seleccionado automaticamente en grupo 1+1 {ID}. Motivo: {cause}";
             LogInfo<RdService>(msg,
                 U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
                 FrequencyId,
                 Translate.CTranslate.translateResource(msg));
         }
+
+        public RdResource LastRdResourceChanged { get; set; }
     }
 }

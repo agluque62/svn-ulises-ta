@@ -2278,24 +2278,34 @@ namespace U5ki.RdService
                                 if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED)
                                 {
                                     /** 20170126. AGL. Control de Eventos de Conexion / Desconexion */
+                                    /** 20200624. AGL. Adaptacion a grupos 1+1 */
                                     if (_sessions_sip_control.Event(rdRes.ID, CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED) == true)
                                     {
-                                        LogWarn<RdService>(String.Format("Desconexion SIP. Causa: {0}. Frecuencia {1}, Equipo {2}", stateInfo.LastCode, rdFr.Value.Frecuency, rdRes.ID),
+                                        var msg = rdRes is RdResourcePair ?
+                                        $"Desconexion Sip. Grupo 1+1: {rdRes.ID} Recurso {(rdRes as RdResourcePair).LastRdResourceChanged.ID}. Causa: {stateInfo.LastCode}" :
+                                        $"Desconexion Sip. Recurso: {rdRes.ID}. Causa: {stateInfo.LastCode}";
+                                        LogWarn<RdService>(
+                                            rdFr.Value.Frecuency + " " + msg,
                                             U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR,
                                             rdFr.Value.Frecuency,
-                                            CTranslate.translateResource("Recurso: " + rdRes.ID +". Desconexion SIP. Causa: "+ stateInfo.LastCode.ToString() + "." ));
+                                            CTranslate.translateResource(msg));
                                     }
                                     /**********************************/
                                 }
                                 else
                                 {
                                     /** 20170126. AGL. Control de Eventos de Conexion / Desconexion */
+                                    /** 20200624. AGL. Adaptacion a grupos 1+1 */
                                     if (_sessions_sip_control.Event(rdRes.ID, CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED) == true)
                                     {
-                                        LogInfo<RdService>(String.Format("Conexion SIP. Frecuencia {0}, Equipo {1}", rdFr.Value.Frecuency, rdRes.ID),
+                                        var msg = rdRes is RdResourcePair ?
+                                        $"Conexion Sip. Grupo 1+1: {rdRes.ID} Recurso {(rdRes as RdResourcePair).LastRdResourceChanged.ID}" :
+                                        $"Conexion Sip. Recurso: {rdRes.ID}";
+                                        LogInfo<RdService>(
+                                            rdFr.Value.Frecuency + " " + msg,
                                             U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
                                             rdFr.Value.Frecuency,
-                                            CTranslate.translateResource("Recurso:"+ rdRes.ID +". Conexion SIP."));
+                                            CTranslate.translateResource(msg));
                                     }
                                     /**********************************/
                                 }
