@@ -867,11 +867,15 @@ namespace U5ki.RdService
         private bool ActivateResource(string par, ref string err, List<string> resp = null)
         {
             foreach (RdFrecuency freq in Frecuencies.Values)
-                if (freq.ActivateResource(par))
+                if (freq.ActivateResource(par, (res)=>
                 {
-                    LogInfo<RdService>("Equipo " + par + " conmutado manualmente", 
-                        U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "RdService",                
-                        CTranslate.translateResource("Equipo " + par + " conmutado manualmente"));
+                    var msg = $"Equipo {par} seleccionado manualmente en grupo 1+1 {res.ID}";
+                    LogInfo<RdService>(msg,
+                        U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, 
+                        freq.Frecuency,
+                        CTranslate.translateResource(msg));
+                }))
+                {
                     return true;
                 }
 
@@ -892,11 +896,16 @@ namespace U5ki.RdService
         {
             bool enable = err == "enable";
             foreach (RdFrecuency freq in Frecuencies.Values)
-                if (freq.EnableDisableResource(par, enable))
+                if (freq.EnableDisableResource(par, enable, (res)=>
                 {
-                    LogInfo<RdService>($"Equipo {par} Habilitado manualmente a {enable}",
-                        U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "RdService",
-                        CTranslate.translateResource($"Equipo {par} Habilitado manualmente a {enable}"));
+                    var ope = enable ? "Habilitado" : "Deshabilitado";
+                    var msg = $"Equipo {par} del grupo 1+1 {res.ID} {ope} Manualmente";
+                    LogInfo<RdService>(msg,
+                        U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, 
+                        freq.Frecuency,
+                        CTranslate.translateResource(msg));
+                }))
+                {
                     return true;
                 }
             LogInfo<RdService>("Equipo " + par + " no encontrado.",

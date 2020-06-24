@@ -340,7 +340,7 @@ namespace U5ki.RdService
                     rdRsToRemove.Remove(res.Uri1.ToUpper() + (int)res.Type);
                     if (foundPair == null)
                     {
-                        foundPair = new RdResourcePair(rsCfg.RedundanciaIdPareja);
+                        foundPair = new RdResourcePair(rsCfg.RedundanciaIdPareja, _Frecuency);
                         newPairs.Add(foundPair);
                     }
 
@@ -1295,12 +1295,15 @@ namespace U5ki.RdService
         /// </summary>
         /// <param name="IdResource"></param>
         /// <returns>false if the resource does not belongs to the frequency </returns>
-        public bool ActivateResource (string IdResource)
+        public bool ActivateResource (string IdResource, Action<IRdResource> notify)
         {
             foreach (IRdResource res in _RdRs.Values)
                 if (res.GetType().Equals(typeof(RdResourcePair)))
                     if (res.ActivateResource(IdResource))
+                    {
+                        notify(res);
                         return true;
+                    }
             return false;
         }
         /// <summary>
@@ -1309,7 +1312,7 @@ namespace U5ki.RdService
         /// <param name="id"></param>
         /// <param name="enable"></param>
         /// <returns></returns>
-        public bool EnableDisableResource(string id, bool enable)
+        public bool EnableDisableResource(string id, bool enable, Action<IRdResource> notifiy)
         {
             foreach (IRdResource res in _RdRs.Values)
             {
@@ -1321,14 +1324,15 @@ namespace U5ki.RdService
                         var rp = res as RdResourcePair;
                         var sres = rp.ActiveResource.ID == id ? rp.ActiveResource : rp.StandbyResource;
                         MSTxPersistence.DisableNode(sres, !enable);
+                        notifiy(res);
                         return true;
                     }
                 }
-                else if (res.ID == id)
-                {
-                    MSTxPersistence.DisableNode(res, !enable);
-                    return true;
-                }
+                //else if (res.ID == id)
+                //{
+                //    MSTxPersistence.DisableNode(res, !enable);
+                //    return true;
+                //}
             }
             return false;
         }

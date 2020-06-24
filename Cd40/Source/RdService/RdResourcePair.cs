@@ -26,9 +26,11 @@ namespace U5ki.RdService
         public string _ID
         { get; set; } = "";
 
-        public RdResourcePair(string id)
+        private string FrequencyId { get; set; }
+        public RdResourcePair(string id, string Frequency)
         {
             _ID = id;
+            FrequencyId = Frequency;
         }
 
         private System.Timers.Timer checkPairWhenNbxStarts_Timer = null;
@@ -41,6 +43,7 @@ namespace U5ki.RdService
             //ids.Sort();
             //foreach (string id in ids)
             //    _ID = String.Concat(id);
+            FrequencyId = "TEST-FQ";
 
             checkPairWhenNbxStarts_Timer = null;
 
@@ -267,7 +270,9 @@ namespace U5ki.RdService
             {
                 if (!_ActiveResource.Connected && _StandbyResource.Connected)
                 {
+                    // Seleccion por Inactividad al Arrancar.
                     Switch();
+                    NotifyAutomaticSelection("Inactividad Inicial de Recurso Seleccionado");
                 }
                 else
                 {
@@ -327,7 +332,11 @@ namespace U5ki.RdService
                     if (resChange == _ActiveResource)
                     {
                         if (_StandbyResource.Connected)
+                        {
+                            // Seleccion por Caida del Seleccionado.
                             Switch();
+                            NotifyAutomaticSelection("Caida de Recurso Seleccionado");
+                        }
                     }
                 }
             }
@@ -348,6 +357,7 @@ namespace U5ki.RdService
                 if (_StandbyResource.Connected) 
 #endif
                 {
+                    // Seleccion Manual.
                     Switch();
                     return true;
                 }
@@ -415,7 +425,9 @@ namespace U5ki.RdService
 
             if (active_resource_disabled == true && standby_resource_disabled == false)
             {
+                // Seleccion por haber deshabilitado el recurso.
                 Switch();
+                NotifyAutomaticSelection("Deshabilitacion de Recurso Seleccionado");
             }
 
             if (current_active_resource.Connected == true && current_active_resource.Connecting == false && active_resource_disabled == true)
@@ -430,6 +442,14 @@ namespace U5ki.RdService
             }
 
             return ret;
+        }
+        void NotifyAutomaticSelection(string cause)
+        {
+            var msg = $"Equipo {_ActiveResource.ID} seleccionado automaticamente en grupo 1+1 {ID}. {cause}";
+            LogInfo<RdService>(msg,
+                U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
+                FrequencyId,
+                Translate.CTranslate.translateResource(msg));
         }
     }
 }
