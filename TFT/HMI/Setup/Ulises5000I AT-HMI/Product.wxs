@@ -344,6 +344,11 @@
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='RdSquelchConfirmationTime'[\]]/value"
                         Value="[TIMESPRX]"/>
         <!--  -->
+        <util:XmlFile Id="LcMemNotifSgProperty" Action="setValue"
+                        File = "[#HMI.config]"
+                        ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='LcMemNotifSg'[\]]/value"
+                        Value="0"/>
+        <!--  -->
         <util:XmlFile Id="CwpPttFilterProperty" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='CwpPttFilterMsec'[\]]/value"
