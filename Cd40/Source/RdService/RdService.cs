@@ -1412,9 +1412,9 @@ namespace U5ki.RdService
                 foreach (RdFrecuency rdFr in Frecuencies.Values)
                 {
                     try
-                    {
-                        rdFr.Check_1mas1_Resources_Disabled();
+                    {                        
                         rdFr.RetryFailedConnections();
+                        rdFr.Check_1mas1_Resources_Disabled();
                         rdFr.CheckFrequency();
                         //if (rdFr.SanityCheckCalls())
                         //    rdFr.LimpiaLlamadaDeRecurso();
@@ -2195,7 +2195,7 @@ namespace U5ki.RdService
                             "Recurso: " + rdRes.ID + " KeepAlive Timeout.");
                         break;
                     }
-                }
+                }               
             });
         }
         /// <summary>
@@ -2235,6 +2235,38 @@ namespace U5ki.RdService
             }
             return false;
         }
+
+        private void Clean_sessions_sip_control()
+        {
+            List<string> ses_states_to_remove = new List<string>();
+            //Al encontrar un recurso que no esta en ninguna frecuencia procedemos a limpiar _sessions_sip_control._sessions_states                            
+            foreach (KeyValuePair<string, CORESIP_CallState> ses_states in _sessions_sip_control._sessions_states)
+            {
+                bool found = false;
+                foreach (KeyValuePair<string, RdFrecuency> rdFr in Frecuencies)
+                {
+                    foreach (KeyValuePair<string, IRdResource> res in rdFr.Value.RdRs)
+                    {
+                        if (res.Value.ID == ses_states.Key)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found == true) break;
+                }
+                if (found == false)
+                {
+                    ses_states_to_remove.Add(ses_states.Key);
+                }
+            }
+
+            foreach (string ses_state_key in ses_states_to_remove)
+            {
+                _sessions_sip_control._sessions_states.Remove(ses_state_key);
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -2265,6 +2297,7 @@ namespace U5ki.RdService
                         foreach (KeyValuePair<string, RdFrecuency> rdFr in Frecuencies)
                         {
                             /** 20170126. AGL. Identifico el Recurso para poder generar el Historico. */
+
                             IRdResource rdRes;
                             if (rdFr.Value.HandleChangeInCallState(call, stateInfo, out rdRes))
                             {
@@ -2317,10 +2350,12 @@ namespace U5ki.RdService
                                 break;
                             }
                         }
-
+                        
                         /** */
                         if (eventZombie == true)
                         {
+                            Clean_sessions_sip_control();
+
                             /** AGL. */
                             LogDebug<RdService>(String.Format("OnCallState: Recibido Evento de Sesion ZOMBI {0:X} estado {1}", call, stateInfo.State));
                         }
@@ -2438,7 +2473,7 @@ namespace U5ki.RdService
         SessionSipLogControl _sessions_sip_control = new SessionSipLogControl();
         class SessionSipLogControl
         {
-            Dictionary<string, CORESIP_CallState> _sessions_states = new Dictionary<string, CORESIP_CallState>();
+            public Dictionary<string, CORESIP_CallState> _sessions_states = new Dictionary<string, CORESIP_CallState>();
             public void Init()
             {
                 _sessions_states.Clear();
@@ -2453,7 +2488,7 @@ namespace U5ki.RdService
                 }
                 _sessions_states[idres] = current;
                 return true;
-            }
+            }            
         }
 
 

@@ -97,7 +97,17 @@ namespace U5ki.RdService
         /// Active SipCallId
         /// </summary>
         public int SipCallId
-        { get { return _ActiveResource.SipCallId; }}
+        { 
+            get 
+            {
+                if (_ActiveResource.Connected)
+                    return _ActiveResource.SipCallId;
+                else if (_StandbyResource.Connected)
+                    return _StandbyResource.SipCallId;
+                else
+                    return -1;
+            } 
+        }        
 
         public RdRsPttType Ptt
         { get { return _ActiveResource.Ptt; }}
@@ -153,14 +163,7 @@ namespace U5ki.RdService
         public bool Connected
         { get 
             {
-                if (this.isTx)
-                {
-                    return _ActiveResource.Connected;
-                }
-                else 
-                {
-                    return (_ActiveResource.Connected || _StandbyResource.Connected);
-                }
+                return (_ActiveResource.Connected || _StandbyResource.Connected);
             } 
         }
         public bool OldSelected
@@ -440,7 +443,7 @@ namespace U5ki.RdService
             {
                 current_standby_resource.Dispose();
                 ret = true;
-            }
+            }                      
 
             return ret;
         }
