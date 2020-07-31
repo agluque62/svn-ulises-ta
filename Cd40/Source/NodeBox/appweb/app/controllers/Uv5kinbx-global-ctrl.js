@@ -26,12 +26,14 @@ angular.module("Uv5kinbx")
 
         ctrl.RadioOptionsShow = function () {
             var type = $lserv.globalType();
-            return type === srvtypes.Radio || type === srvtypes.Mixed;
+            var mode = $lserv.GlobalStd().rad.level;
+            return (type === srvtypes.Radio || type === srvtypes.Mixed) && (mode==='Master');
         };
 
         ctrl.PhoneOptionsShow = function () {
             var type = $lserv.globalType();
-            return (type === srvtypes.Phone || type === srvtypes.Mixed);
+            var mode = $lserv.GlobalStd().pre.level;
+            return (type === srvtypes.Phone || type === srvtypes.Mixed) && (mode==='Master');
         };
 
         // Paginado Incidencias
