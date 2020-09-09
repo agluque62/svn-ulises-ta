@@ -1468,15 +1468,16 @@ namespace HMI.CD40.Module.Services
 			});
 
 			// Eliminar grupos de RTX si los hubiera
-			if (Top.Cfg.ResetUsuario)
-			{
-				SetRdPtt(false);
+            // 20200909. Eliminar esta función.
+			//if (Top.Cfg.ResetUsuario)
+			//{
+			//	SetRdPtt(false);
 
-				Top.PublisherThread.Enqueue(EventTopicNames.RemoveRtxGroup, delegate()
-				{
-					General.SafeLaunchEvent(RemoveRtxGroup, this);
-				});
-			}
+			//	Top.PublisherThread.Enqueue(EventTopicNames.RemoveRtxGroup, delegate()
+			//	{
+			//		General.SafeLaunchEvent(RemoveRtxGroup, this);
+			//	});
+			//}
 
 		}
 
