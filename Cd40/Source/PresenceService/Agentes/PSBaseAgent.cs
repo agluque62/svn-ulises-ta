@@ -220,6 +220,8 @@ namespace U5ki.PresenceService.Agentes
             }
         }
 
+        public int Order { get; set; } = 0;
+
         #endregion
 
         #region Binario
