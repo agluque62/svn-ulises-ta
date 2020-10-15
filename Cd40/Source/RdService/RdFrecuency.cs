@@ -1104,9 +1104,17 @@ namespace U5ki.RdService
                         }
                         rx_selected_changed = true;
                     }
-                    
 
-                    if (simpleRes.HandleRdInfo(info) && (_FrRs != null))
+                    bool info_changed = simpleRes.HandleRdInfo(info);
+
+                    //Despues de tratar la info del recurso. Si el recurso es del tipo 1+1 se chequea si 
+                    //el activo confirma su PTT para conmutar si no es asi
+                    if (rdRs is RdResourcePair)
+                    {
+                        (rdRs as RdResourcePair).CheckPttConfirmed(sipCallId);
+                    }
+
+                    if (info_changed && (_FrRs != null))
                     {
                         bool confirmaPortadora = SupervisionPortadora;
 
@@ -1624,17 +1632,39 @@ namespace U5ki.RdService
             {
                 if (_FrRs.FrequencyStatus == RdSrvFrRs.FrequencyStatusType.NotAvailable)
                 {
-                    //Forzamos a quitar el PTT que se publica si la frecuencia pasa a no disponible y por tanto a aspa
+                    //Forzamos a quitar el PTT que se publica si la frecuencia ya esta con aspa
                     if (_FrRs.PttSrcId != null)
                     {
                         _FrRs.PttSrcId = null;
                         hayCambio = true;
                     }
                 }
+
+                RdSrvFrRs.FrequencyStatusType st = this.Status;
+                if (st != RdSrvFrRs.FrequencyStatusType.NotAvailable)
+                {
+                    //Pasamos un estado en el que se quita el aspa
+                    //Actualizamos el estado del squelch
+                    RdSrvFrRs.SquelchType FrRs_Squelch_old = _FrRs.Squelch;
+                    _FrRs.Squelch = RdSrvFrRs.SquelchType.NoSquelch;
+                    foreach (IRdResource res in _RdRs.Values.Where(x => x.isRx && x.Connected))
+                    {
+                        foreach (RdResource rdSimpleRes in res.GetListResources().
+                            Where(x => x.Squelch && x.new_params.rx_selected))
+                        {
+                            _FrRs.Squelch = RdSrvFrRs.SquelchType.SquelchOnlyPort;                            
+                            break;
+                        }
+                    }
+                    if (FrRs_Squelch_old != _FrRs.Squelch)
+                    {
+                        hayCambio = true;
+                    }
+                }
             }
 
             //Actualiza el squelch si es un recurso de rx
-            else if (rdRs.isRx &&
+            if (rdRs.isRx &&
                 (((TipoDeFrecuencia == "FD") && (rdRs.ID == _FrRs.ResourceId)) ||
                    TipoDeFrecuencia != "FD"))
             {

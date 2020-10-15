@@ -46,6 +46,7 @@ namespace U5ki.RdService
             FrequencyId = "TEST-FQ";
 
             checkPairWhenNbxStarts_Timer = null;
+            checkPttConfirmed_Timer = null;
 
             _ActiveResource = ActiveResource;
             StandbyResource.TxMute = true;
@@ -187,6 +188,16 @@ namespace U5ki.RdService
         /// </summary>
         public void Dispose()
         {
+            if (checkPairWhenNbxStarts_Timer != null)
+            {
+                checkPairWhenNbxStarts_Timer.Stop();
+            }
+            if (checkPttConfirmed_Timer != null)
+            {
+                checkPttConfirmed_Timer.Stop();
+                checkPttConfirmed_Timer.Enabled = false;
+            }
+
             _StandbyResource.Dispose();
             _StandbyResource = null;
             _ActiveResource.Dispose();
@@ -213,14 +224,26 @@ namespace U5ki.RdService
             }
             return ret;
         }
+
+        private CORESIP_PttType Last_CORESIP_PttType_sent = CORESIP_PttType.CORESIP_PTT_OFF;
+
         public void PttOff()
         {
+            Last_CORESIP_PttType_sent = CORESIP_PttType.CORESIP_PTT_OFF;
             _ActiveResource.PttOff();
             _StandbyResource.PttOff();
+
+            //Paramos el timer de confirmarcion de ptt si se envia un PTT off
+            if (checkPttConfirmed_Timer != null && checkPttConfirmed_Timer.Enabled == true)
+            {
+                checkPttConfirmed_Timer.Stop();
+                checkPttConfirmed_Timer.Enabled = false;
+            }
         }
 
         public void PttOn(CORESIP_PttType srcPtt)
         {
+            Last_CORESIP_PttType_sent = srcPtt;
             _ActiveResource.PttOn(srcPtt);
             _StandbyResource.PttOn(srcPtt);
         }
@@ -348,6 +371,7 @@ namespace U5ki.RdService
             LastRdResourceChanged = resChange;
             return true;
         }
+
         /// <summary>
         /// Performs a switch if the resource is the standby one.
         /// </summary>
@@ -457,5 +481,107 @@ namespace U5ki.RdService
         }
 
         public RdResource LastRdResourceChanged { get; set; }
+
+
+        private System.Timers.Timer checkPttConfirmed_Timer = null;
+
+        /// <summary>
+        /// Checks PTT is confirmed. When standby resource comfirms PTT, it starts a timer. When the timer ends, if selected resource has not confirmed PTT, a switch is done
+        /// </summary>
+        /// <returns>
+        public void CheckPttConfirmed(int sipCallId)
+        {
+            if ((_ActiveResource.SipCallId != sipCallId) && (_StandbyResource.SipCallId != sipCallId))
+            {
+                return;
+            }
+
+            //La info recibida corresponde a un recurso de este par 1+1
+
+            if (isTx == false || Last_CORESIP_PttType_sent == CORESIP_PttType.CORESIP_PTT_OFF)
+            {
+                //Si no se esta transmitiendo PTT entonces paramos el timer si estaba corriendo y no hacemos nada
+                if (checkPttConfirmed_Timer != null)
+                {
+                    if (checkPttConfirmed_Timer.Enabled == true)
+                    {
+                        checkPttConfirmed_Timer.Stop();
+                        checkPttConfirmed_Timer.Enabled = false;
+                    }
+                }
+                return;
+            }
+
+            if (_ActiveResource.Connected == false || _StandbyResource.Connected == false)
+            {
+                //Si uno de los dos recursos no esta conectado, entonces no podra haber conmutacion. 
+                //No se hace nada y se para el timer si estaba corriendo
+                if (checkPttConfirmed_Timer != null && checkPttConfirmed_Timer.Enabled == true)
+                {
+                    checkPttConfirmed_Timer.Stop();
+                    checkPttConfirmed_Timer.Enabled = false;
+                }
+            }
+            else if (_ActiveResource.Ptt == RdRsPttType.OwnedPtt)
+            {
+                //Si el recurso que tiene el PTT confirmado es el Activo entonces paramos el timer y no hacemos nada mas
+                if (checkPttConfirmed_Timer != null && checkPttConfirmed_Timer.Enabled == true)
+                {
+                    checkPttConfirmed_Timer.Stop();
+                    checkPttConfirmed_Timer.Enabled = false;
+                }
+            }
+            else if (_StandbyResource.Ptt == RdRsPttType.OwnedPtt && _ActiveResource.Ptt != RdRsPttType.OwnedPtt)
+            {
+                //la confirmacion de Ptt es del standby y el activo no tiene PTT confirmado, entonces arrancamos un timer
+                //Si cuando vence el timer el activo no ha confirmado el PTT entonces conmutamos
+
+                if (checkPttConfirmed_Timer == null)
+                {
+                    checkPttConfirmed_Timer = new System.Timers.Timer();
+                    checkPttConfirmed_Timer.Interval = U5ki.Infrastructure.SipAgent._KAPeriod + 50;                        ;
+                    checkPttConfirmed_Timer.AutoReset = false;
+                    checkPttConfirmed_Timer.Elapsed += this.OncheckPTTIsConfirmed_Timer_Event;
+                    checkPttConfirmed_Timer.Start();
+                }
+                else if (checkPttConfirmed_Timer.Enabled == false)
+                {
+                    checkPttConfirmed_Timer.Start();
+                }
+            }    
+            else if (_StandbyResource.Ptt != RdRsPttType.OwnedPtt)
+            {
+                //Si el standby deja de confirmar el PTT cuando el timer esta corriendo, entonces se para el timer
+                if (checkPttConfirmed_Timer != null && checkPttConfirmed_Timer.Enabled == true)
+                {
+                    checkPttConfirmed_Timer.Stop();
+                    checkPttConfirmed_Timer.Enabled = false;
+                }
+            }
+        }
+
+        private void OncheckPTTIsConfirmed_Timer_Event(Object source, System.Timers.ElapsedEventArgs e)
+        {            
+            RdService.evQueueRd.Enqueue("RdResourcePair:OncheckPTTIsConfirmed_Timer_Event", delegate ()
+            {
+                if (_ActiveResource.Connected && _StandbyResource.Connected && 
+                    _ActiveResource.Ptt == RdRsPttType.NoPtt && _StandbyResource.Ptt != RdRsPttType.NoPtt)
+                {
+                    // Se conmuta porque el recurso activo no confirma el PTT y el standby si
+                    Switch();
+                    if (Last_CORESIP_PttType_sent == CORESIP_PttType.CORESIP_PTT_OFF)
+                    {
+                        this.PttOff();
+                    }
+                    else
+                    {
+                        this.PttOn(Last_CORESIP_PttType_sent);
+                    }
+                    NotifyAutomaticSelection("El Recurso Seleccionado no confirma PTT");
+                }                
+            });
+        }
+
+
     }
 }
