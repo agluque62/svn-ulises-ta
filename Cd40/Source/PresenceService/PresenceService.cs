@@ -81,8 +81,7 @@ namespace U5ki.PresenceService
                                   type = p.type,
                                   endp = p.name,
                                   status = p.Status,
-                                  ver = p.version,
-                                  order = p.prio_cpipl
+                                  ver = p.version
                               },
                     internals = from i in agents
                                 where i.Type == Interfaces.AgentType.ForInternalSub
@@ -172,8 +171,7 @@ namespace U5ki.PresenceService
                                   type = p.type,
                                   endp = p.name,
                                   status = p.Status,
-                                  ver = p.version,
-                                  order = p.prio_cpipl
+                                  ver = p.version
                               },
                     internals = from i in agents
                                 where i.Type == Interfaces.AgentType.ForInternalSub
@@ -700,22 +698,19 @@ namespace U5ki.PresenceService
                         {
                             Name = d.IdHost, IsInterno = d.Interno, IsMain = true,
                             ProxyEP = PSHelper.SipEndPointFrom(d.IpRed1),
-                            PresenceEP = PSHelper.SipEndPointFrom(d.SrvPresenciaIpRed1),
-                            Order = 1
+                            PresenceEP = PSHelper.SipEndPointFrom(d.SrvPresenciaIpRed1)
                         },
                         new 
                         {
                             Name = d.IdHost, IsInterno = d.Interno, IsMain = false,
                             ProxyEP = PSHelper.SipEndPointFrom(d.IpRed2),
-                            PresenceEP = PSHelper.SipEndPointFrom(d.SrvPresenciaIpRed2),
-                            Order = 2
+                            PresenceEP = PSHelper.SipEndPointFrom(d.SrvPresenciaIpRed2)
                         },
                         new 
                         {
                             Name = d.IdHost, IsInterno = d.Interno, IsMain = false,
                             ProxyEP = PSHelper.SipEndPointFrom(d.IpRed3),
-                            PresenceEP = PSHelper.SipEndPointFrom(d.SrvPresenciaIpRed3),
-                            Order = 3
+                            PresenceEP = PSHelper.SipEndPointFrom(d.SrvPresenciaIpRed3)
                         }
                     }
                 }).
@@ -735,8 +730,7 @@ namespace U5ki.PresenceService
                             ProxyEndpoint = a.ProxyEP,
                             PresenceEndpoint = a.PresenceEP,
                             DependencyName = a.Name,
-                            MainService = a.IsMain,
-                            Order = a.Order
+                            MainService = a.IsMain
                         };
                     }
                     else if (a.ProxyEP != null)
@@ -747,8 +741,7 @@ namespace U5ki.PresenceService
                             ProxyEndpoint = a.ProxyEP,
                             PresenceEndpoint = a.PresenceEP,
                             DependencyName = a.Name,
-                            MainService = a.IsMain,
-                            Order = a.Order
+                            MainService = a.IsMain
                         };
                     }
                     else
@@ -989,7 +982,7 @@ namespace U5ki.PresenceService
                 {
                     SendingControl[typeof(PSBkkAgent).Name] = true;
                     SendingControl[typeof(PSProxiesAgent).Name] = true;
-                    SendingControl[typeof(PSProxiesAgent).Name] = true;
+                    SendingControl[typeof(PSExternalAgent).Name] = true;
 #if _ACTIVATE_EXRES_
                     /** EXRES Activar el Envio de la información de recursos externos de telefonía */
                     SendingControl[typeof(PSExternalResourcesAgent).Name] = true;

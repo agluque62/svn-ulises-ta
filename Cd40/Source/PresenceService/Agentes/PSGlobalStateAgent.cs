@@ -64,8 +64,7 @@ namespace U5ki.PresenceService.Agentes
                         //    (ag.MainService ? U5ki.Infrastructure.RsChangeInfo.RsTypeInfo.InternalProxy : U5ki.Infrastructure.RsChangeInfo.RsTypeInfo.InternalAltProxy) :
                         //    (ag.MainService ? U5ki.Infrastructure.RsChangeInfo.RsTypeInfo.ExternalProxy : U5ki.Infrastructure.RsChangeInfo.RsTypeInfo.ExternalAltProxy),
                         KeyOfPersistence = KeyOfPersistence(ag),
-                        Status = PresenceServerResource.PersistenceOfStates.Get(KeyOfPersistence(ag), RsStatus.NotAvailable),
-                        prio_cpipl = ag.Order
+                        Status = PresenceServerResource.PersistenceOfStates.Get(KeyOfPersistence(ag), RsStatus.NotAvailable)
                     }).ToList();
 
                 if (smpRsTableAccess.Acquire())
