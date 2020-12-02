@@ -126,6 +126,7 @@ namespace HMI.Model.Module.BusinessEntities
                                 _Logger.Error(String.Format("Set brightness ManagementException Error. Max {0}, Min{1}, Val {2}, Percent {3}. ERROR: {4}",
                                     Properties.Settings.Default.BrightnessMin,
                                     Properties.Settings.Default.BrightnessMax, value, LevelToPercent(value), x1.Message));
+                                _Logger.Trace("Set brightness ManagementException", x1);
                             }
                             catch (Exception x)
                             {
@@ -221,7 +222,7 @@ namespace HMI.Model.Module.BusinessEntities
                     }
                     else if (Settings.Default.BrightnessVersion == 2)
                     {
-                        _controlBrillo = new ControlBrillo();
+                        _controlBrillo = new ControlBrillo((msg)=> _Logger.Trace(msg) );
                         _Open = true;
                     }
                     else if (Settings.Default.BrightnessVersion == 1000)
