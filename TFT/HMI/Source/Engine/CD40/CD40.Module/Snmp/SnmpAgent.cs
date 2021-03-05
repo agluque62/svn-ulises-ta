@@ -266,6 +266,29 @@ namespace HMI.CD40.Module.Snmp
 			});
 		}
 
+		/** 20210305. Para poder seleccionar la fuente del TRAP... */
+		public static void TrapFromTo(string ipFrom, ObjectIdentifier oid, ISnmpData data, params IPEndPoint[] eps)
+		{
+			using (var sender = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+			{
+				var variables = new List<Variable>() { new Variable(oid, data) };
+				var endPointLocal = new IPEndPoint(IPAddress.Parse(ipFrom), 0);
+
+				sender.Bind(endPointLocal);
+				foreach (IPEndPoint ep in eps)
+				{
+					TrapV2Message message = new TrapV2Message(0,
+						VersionCode.V2,
+						new OctetString("public"),oid,
+						0,
+						variables);
+
+					message.Send(ep, sender);
+				}
+
+			}
+		}
+
 		#region Private Members
 
 		private static Logger _logger = LogManager.GetCurrentClassLogger();

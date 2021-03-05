@@ -18,18 +18,22 @@ namespace HMI.CD40.Module.Snmp
 					_data = new OctetString(value);
 				}
 
-					if ((_trapsEps != null) && (_trapsEps.Length > 0))
-					{
-						SnmpAgent.Trap(Variable.Id, _data, _trapsEps);
-					}
+				if ((_trapsEps != null) && (_trapsEps.Length > 0))
+				{
+					// SnmpAgent.Trap(Variable.Id, _data, _trapsEps);
+					SnmpAgent.TrapFromTo(Properties.Settings.Default.SipIp, Variable.Id, _data, _trapsEps);
 				}
 			}
+		}
 		public void SendTrap(string value)
 		{
 			OctetString data = new OctetString(value);
 
 			if ((_trapsEps != null) && (_trapsEps.Length > 0))
-				SnmpAgent.Trap(Variable.Id, data, _trapsEps);
+            {
+				SnmpAgent.TrapFromTo(Properties.Settings.Default.SipIp, Variable.Id, _data, _trapsEps);
+				//SnmpAgent.Trap(Variable.Id, data, _trapsEps);
+			}
 		}
 
 		public override ISnmpData Data
