@@ -999,5 +999,25 @@ namespace U5ki.PresenceService
             }
             LogInfo<U5kPresService>(String.Format("FrameSenderTask Ended"));
         }
+
+#if DEBUG
+        public void ForTesting(Cd40Cfg cfg)
+        {
+            this.Start();
+            this.ConfigureService(cfg);
+            _Master = true;
+
+            for (int i=0; i<20; i++)
+            {
+                SendingControl[typeof(PSProxiesAgent).Name] = true;
+                Task.Delay(500).Wait();
+            }
+
+            var status = this.AllDataGet();
+
+            this.UnconfigureService();
+            this.Stop();
+        }
+#endif
     }
 }

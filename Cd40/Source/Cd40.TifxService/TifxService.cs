@@ -948,9 +948,19 @@ namespace U5ki.TifxService
                 .Select(dep => new DepInfo4Proxy()
                 {
                     name = dep.IdHost,
-                    prio = dominio.Contains(dep.IpRed1) ? 1 : dominio.Contains(dep.IpRed2) ? 2 : 3
+                    prio = (dep.IpRed1 != "" && dominio.Contains(dep.IpRed1)) ? 1 : (dep.IpRed2 != "" && dominio.Contains(dep.IpRed2)) ? 2 : 3
                 });
             DepsNotify(deps);
+        }
+#endif
+        #endregion
+
+        #region TESTING
+#if DEBUG
+        public void RM4763_Test(Cd40Cfg cfg, GwInfo prxInfo)
+        {
+            last_cfg = cfg;
+            var itemInfo = NormalizeForProxies(prxInfo);
         }
 #endif
 #endregion

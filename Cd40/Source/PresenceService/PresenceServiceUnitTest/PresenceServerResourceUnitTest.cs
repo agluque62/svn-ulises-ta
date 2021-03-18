@@ -6,6 +6,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Windows.Forms;
 using System.Diagnostics;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
+
 using U5ki.PresenceService;
 using U5ki.PresenceService.Interfaces;
 using U5ki.PresenceService.Engines;
@@ -17,6 +21,67 @@ using Utilities;
 
 namespace PresenceServiceUnitTest
 {
+    public class JsonHelper
+    {
+        public static dynamic SafeDynamicObjectParse(string s)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<dynamic>(s);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        public static JArray SafeJArrayParse(string s)
+        {
+            try
+            {
+                return JArray.Parse(s);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        public static string ToString(object obj, bool format = true)
+        {
+            return JsonConvert.SerializeObject(obj, format ? Formatting.Indented : Formatting.None);
+        }
+        public static T Parse<T>(string s)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(s);
+            }
+            catch
+            {
+                return default(T);
+            }
+        }
+        //public static string Md5(object s)
+        //{
+        //    return EncryptionHelper.StringMd5Hash(ToString(s));
+        //}
+        public static T ArrayConvert<T>(object arr)
+        {
+            try
+            {
+                if (arr is JArray)
+                    return (arr as JArray).ToObject<T>();
+            }
+            catch (Exception)
+            {
+            }
+            return default(T);
+        }
+        public static bool JObjectPropertyExist(JObject obj, string prop)
+        {
+            return obj != null && obj[prop] != null;
+        }
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -72,7 +137,7 @@ namespace PresenceServiceUnitTest
                 uint sipPort = 6060;
                 SipAgent.Init(
                     "TESTING",
-                    "192.168.0.129",
+                    "127.0.0.1",
                     sipPort, 128);
                 SipAgent.Start();
             }
@@ -215,7 +280,20 @@ namespace PresenceServiceUnitTest
             var res = SendingControlClass.DoSend<PSProxiesAgent>();
         }
 
+        [TestMethod]
+        public void PresenceServiceReadingCfgTest()
+        {
+            var jcfg = File.ReadAllText("u5ki.LastCfg.json");
+            var cfg = JsonHelper.Parse<Cd40Cfg>(jcfg);
 
+            var service = new U5kPresService();
+            SipAgentStart();
+#if DEBUG
+            service.ForTesting(cfg);
+#endif
+            SipAgentStop();
+
+        }
     }
 
 }
