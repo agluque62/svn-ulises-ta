@@ -1008,33 +1008,37 @@ namespace U5ki.RdService
                 return "";
             }
         }
-        public string SelectedBSSMethod
-        {
-            get
-            {
-                switch (this.new_params.FrequencyType)
-                {
-                    case CORESIP_FREQUENCY_TYPE.Simple:
-                    case CORESIP_FREQUENCY_TYPE.FD:
-                        foreach (IRdResource rdr in RdRs.Values.Where(r => r.isRx &&
-                                    (r.Squelch)))
-                        {
-                            RdResource simpleResource = rdr.GetRxSelected();
-                            if (simpleResource != null)
-                            {
-                                string method = ((RdResource.BssMethods)new_params.MetodosBssOfrecidos).ToString();
-                                return method;
-                            }
-                        }
-                        break;
-                    case CORESIP_FREQUENCY_TYPE.Dual:
-                    case CORESIP_FREQUENCY_TYPE.ME:
-                        break;
+        /// <summary>
+        /// 20210322. RM4569. Solo mostraba el método si habia un SQH en recursos FD...
+        /// </summary>
+        //public string SelectedBSSMethod
+        //{
+        //    get
+        //    {
+        //        switch (this.new_params.FrequencyType)
+        //        {
+        //            case CORESIP_FREQUENCY_TYPE.Simple:
+        //            case CORESIP_FREQUENCY_TYPE.FD:
+        //                foreach (IRdResource rdr in RdRs.Values.Where(r => r.isRx &&
+        //                            (r.Squelch)))
+        //                {
+        //                    RdResource simpleResource = rdr.GetRxSelected();
+        //                    if (simpleResource != null)
+        //                    {
+        //                        string method = ((RdResource.BssMethods)new_params.MetodosBssOfrecidos).ToString();
+        //                        return method;
+        //                    }
+        //                }
+        //                break;
+        //            case CORESIP_FREQUENCY_TYPE.Dual:
+        //            case CORESIP_FREQUENCY_TYPE.ME:
+        //                break;
 
-                }
-                return "";
-            }
-        }
+        //        }
+        //        return "";
+        //    }
+        //}
+        public string SelectedBSSMethod => ((RdResource.BssMethods)new_params.MetodosBssOfrecidos).ToString();
         public int SelectedSiteQidx
         {
             get
