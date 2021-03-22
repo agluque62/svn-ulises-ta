@@ -121,6 +121,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation.RadioLight", "Source\Presentation\Presentation.RadioLight\Presentation.RadioLight.csproj", "{49537E20-8DCA-4025-A12E-E5765E62750A}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Ulises5000I AT-HMIMCast", "Setup\Ulises5000I AT-HMIMcast\Ulises5000I AT-HMIMCast.wixproj", "{92CA432E-C30E-4893-B1D9-7BEEBF471C83}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E474BEE1-DFEF-439F-A15F-9B3CFC77589E} = {E474BEE1-DFEF-439F-A15F-9B3CFC77589E}
+		{541D99E5-CACE-46D1-A931-6CDAF976B64D} = {541D99E5-CACE-46D1-A931-6CDAF976B64D}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "u5ki.Mcast", "..\..\Cd40\Source\MCast\u5ki.Mcast.csproj", "{47E41CF6-13A4-4E38-B318-A86586FEF0FD}"
 EndProject
@@ -2071,9 +2075,9 @@ Global
 		{47E41CF6-13A4-4E38-B318-A86586FEF0FD} = {80441FC6-56B1-4D5D-B3A6-9B918660E28E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		ShellProjectGuid = e474bee1-dfef-439f-a15f-9b3cfc77589e
-		CommonProjectGuid = c45ad2ca-b6bd-4e4a-8cc2-34c8f895ed46
-		RootNamespace = HMI
 		SolutionGuid = {1B4B8C15-13DE-4B82-BD78-04D096308C24}
+		RootNamespace = HMI
+		CommonProjectGuid = c45ad2ca-b6bd-4e4a-8cc2-34c8f895ed46
+		ShellProjectGuid = e474bee1-dfef-439f-a15f-9b3cfc77589e
 	EndGlobalSection
 EndGlobal

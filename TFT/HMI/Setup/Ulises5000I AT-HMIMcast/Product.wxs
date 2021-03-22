@@ -56,10 +56,11 @@
                      Name='SERVERIP_Property' Type='raw' />
     </Property>
 
+    <!-- 20210322. AGL -->
     <Property Id="ED137REC" Value="0">
-      <RegistrySearch Id='UV5KI_HMI_ED137REC' Root='HKLM'
+      <!--<RegistrySearch Id='UV5KI_HMI_ED137REC' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
-                     Name='ED137REC_Property' Type='raw' />
+                     Name='ED137REC_Property' Type='raw' />-->
     </Property>        
     <Property Id="IAOVER" Value="B43A">
       <RegistrySearch Id='UV5KI_HMI_IAOVER' Root='HKLM'
@@ -67,14 +68,16 @@
                      Name='IAOVER_Property' Type='raw' />
     </Property>
     <Property Id="RECMODE" Value="0">
-      <RegistrySearch Id='UV5KI_HMI_RECMODE' Root='HKLM'
+      <!-- 20210322. AGL -->
+      <!--<RegistrySearch Id='UV5KI_HMI_RECMODE' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
-                     Name='RECMODE_Property' Type='raw' />
+                     Name='RECMODE_Property' Type='raw' />-->
     </Property>
-    <Property Id="CLIENTE" Value="AENA">
-      <RegistrySearch Id='UV5KI_HMI_CLIENTE' Root='HKLM'
+    <!-- 20210322. AGL -->
+    <Property Id="CLIENTE" Value="EscuchaRadio">
+      <!--<RegistrySearch Id='UV5KI_HMI_CLIENTE' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
-                     Name='HMICLIENTE_Property' Type='raw' />
+                     Name='HMICLIENTE_Property' Type='raw' />-->
     </Property>
     <Property Id="RADIOALIAS" Value="True">
       <RegistrySearch Id='UV5KI_HMI_RADIOALIAS' Root='HKLM'
@@ -82,22 +85,24 @@
                      Name='RADIOALIAS_Property' Type='raw' />
     </Property>
 
-    <Property Id="GLPDIR" Value="Recorder">
+    <!-- 20210322. AGL -->
+    <!--<Property Id="GLPDIR" Value="">
       <RegistrySearch Id='UV5KI_HMI_GLPDIR' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='GLPDIR_Property' Type='raw' />
-    </Property>
+    </Property>-->
     <!-- Para la Grabacion ED137 -->
-    <Property Id="RECA" Value="127.0.0.1">
+    <!-- 20210322. AGL -->
+    <!--<Property Id="RECA" Value="">
       <RegistrySearch Id='UV5KI_HMI_RECA' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='RECA_Property' Type='raw' />
-    </Property>
-    <Property Id="RECB" Value="127.0.0.1">
+    </Property>-->
+    <!--<Property Id="RECB" Value="">
       <RegistrySearch Id='UV5KI_HMI_RECB' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='RECB_Property' Type='raw' />
-    </Property>
+    </Property>-->
     <Property Id="LANG" Value="es-ES">
       <RegistrySearch Id='UV5KI_HMI_LANG' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
@@ -120,10 +125,11 @@
     </Property>
 
     <!-- Instalación con doble altavoz radio para todas las frecuencias -->
+    <!-- 20210322. AGL -->
     <Property Id="DOUBLERDSPEAKER" Value="False">
-      <RegistrySearch Id='UV5KI_HMI_DOUBLERDSPEAKER' Root='HKLM'
+      <!--<RegistrySearch Id='UV5KI_HMI_DOUBLERDSPEAKER' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
-                     Name='DOUBLERDSPEAKER_Property' Type='raw' />
+                     Name='DOUBLERDSPEAKER_Property' Type='raw' />-->
     </Property>
 
     <!-- Recuperacion de estados radio  -->
@@ -133,10 +139,11 @@
                      Name='RDSTATUSREC_Property' Type='raw' />
     </Property>
     <!-- Recuperacion de grupos de RTX  -->
+    <!-- 20210322. AGL -->
     <Property Id="RDRTXREC" Value="False">
-      <RegistrySearch Id='UV5KI_HMI_RDRTXREC' Root='HKLM'
+      <!--<RegistrySearch Id='UV5KI_HMI_RDRTXREC' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
-                     Name='RDRTXREC_Property' Type='raw' />
+                     Name='RDRTXREC_Property' Type='raw' />-->
     </Property>
     <!-- Habilitación Cancelador Manos Libres para Tlf  -->
     <Property Id="ECTLF" Value="False">
@@ -154,30 +161,32 @@
                      Name='ECLC_Property' Type='raw' />
     </Property>
     <!-- 20181107. Tipo de TEAM para Supervision -->
-    <Property Id="NICTEAM" Value="0">
-      <RegistrySearch Id='UV5KI_HMI_NICTEAM' Root='HKLM'
+    <!-- 20210322. AGL -->
+    <Property Id="NICTEAM" Value="1">
+      <!--<RegistrySearch Id='UV5KI_HMI_NICTEAM' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
-                     Name='NICTEAM_Property' Type='raw' />
+                     Name='NICTEAM_Property' Type='raw' />-->
     </Property>
 
 <!---->
     <!-- Tiempo para Supervisar la Confirmacion TX  -->
+    <!-- 20210322. AGL -->
     <Property Id="TIMESPTX" Value="0">
-      <RegistrySearch Id='UV5KI_HMI_TIMESPTX' Root='HKLM'
+      <!--<RegistrySearch Id='UV5KI_HMI_TIMESPTX' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
-                     Name='TIMESPTX_Property' Type='raw' />
+                     Name='TIMESPTX_Property' Type='raw' />-->
     </Property>
     <!-- Tiempo para supervision de SQUELCH tras TX   -->
     <Property Id="TIMESPRX" Value="0">
-      <RegistrySearch Id='UV5KI_HMI_TIMESPRX' Root='HKLM'
+      <!--<RegistrySearch Id='UV5KI_HMI_TIMESPRX' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
-                     Name='TIMESPRX_Property' Type='raw' />
+                     Name='TIMESPRX_Property' Type='raw' />-->
     </Property>
     <!-- -->
     <Property Id="PTTFILTER" Value="0">
-      <RegistrySearch Id='UV5KI_HMI_PTTFILTER' Root='HKLM'
+      <!--<RegistrySearch Id='UV5KI_HMI_PTTFILTER' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
-                     Name='PTTFILTER_Property' Type='raw' />
+                     Name='PTTFILTER_Property' Type='raw' />-->
     </Property>
 
     <Property Id='RADIOSPEAKERDEV' Value='Unknown'>
@@ -1078,7 +1087,7 @@
       <Publish Dialog="SpreadConfDlg" Control="Cancel" Event="SpawnDialog" Value="CancelDlg">1</Publish>
      
       <Publish Dialog="OptionsDlg" Control="Back" Event="NewDialog" Value="SpreadConfDlg">1</Publish>
-      <Publish Dialog="OptionsDlg" Control="Next" Event="NewDialog" Value="OptionsDlg2">1</Publish>
+      <Publish Dialog="OptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
       <Publish Dialog="OptionsDlg" Control="Cancel" Event="SpawnDialog" Value="CancelDlg">1</Publish>
 
       <Publish Dialog="OptionsDlg2" Control="Back" Event="NewDialog" Value="OptionsDlg">1</Publish>
@@ -1120,12 +1129,10 @@
         <Control Id="ServLabel"    Type="Text" X="10"  Y="70" Width="60" Height="18" TabSkip="no" Text="IP-Servidor" />
         <Control Id="ServEdit"     Type="Edit" X="85"  Y="72" Width="90" Height="18" Property="SERVERIP" Text="{80}"/>
 
-        <Control Id="RdSpeakerLabel"    Type="Text" X="190"  Y="112" Width="60" Height="18" TabSkip="no" Text="Altavoz Radio" />
-        <Control Id="RdSepakerCtrl" Type="ComboBox" X="260" Y="110" Width="90" Height="18" Property="RADIOSPEAKERDEV" ComboList="yes" >
-        </Control>
 
-        <Control Id="TipoInterfaz"        Type="Text"     X="10" Y="92" Width="60" Height="18" TabSkip="no" Text="Cliente" />
-        <Control Id="TipoInterfazOptions" Type="ComboBox" X="85" Y="90" Width="90" Height="18" Property="CLIENTE" ComboList="yes">
+        <!-- 20210322 AGL -->
+        <Control Id="TipoInterfaz"        Type="Text"     X="10" Y="92" Width="60" Height="18" TabSkip="no" Text="Cliente" Disabled="yes" />
+        <Control Id="TipoInterfazOptions" Type="ComboBox" X="85" Y="90" Width="90" Height="18" Property="CLIENTE" ComboList="yes" Disabled="yes">
           <ComboBox Property="CLIENTE">
             <ListItem Value="EscuchaRadio" Text="ESCUCHA RADIO" />
           </ComboBox>
@@ -1138,7 +1145,30 @@
             <ListItem Value="fr-FR" Text="Francés" />
           </ComboBox>
         </Control>
-        
+
+        <Control Id="RdSpeakerLabel"    Type="Text" X="190"  Y="112" Width="60" Height="18" TabSkip="no" Text="Altavoz Radio" />
+        <Control Id="RdSepakerCtrl" Type="ComboBox" X="260" Y="110" Width="90" Height="18" Property="RADIOSPEAKERDEV" ComboList="yes" >
+        </Control>
+
+        <Control Id="RadioAlias_label" Type="Text"       X="10" Y="112" Width="60" Height="18" TabSkip="no" Text="Alias Radio" />
+        <Control Id="RadioAlias_value" Type="ComboBox"   X="85" Y="110" Width="90" Height="18" Property="RADIOALIAS" ComboList="yes" >
+          <ComboBox Property="RADIOALIAS">
+            <ListItem Value="True" Text="Si" />
+            <ListItem Value="False" Text="No" />
+          </ComboBox>
+        </Control>
+        <Control Id="RadioStatusRecovery_label" Type="Text"       X="10" Y="132" Width="105" Height="18" TabSkip="no" Text="Recuperación Estados Radio" />
+        <Control Id="RadioStatusRecovery_value" Type="ComboBox"   X="125" Y="130" Width="50" Height="18" Property="RDSTATUSREC" ComboList="yes" >
+          <ComboBox Property="RDSTATUSREC">
+            <ListItem Value="0"  Text="No" />
+            <ListItem Value="1"  Text="Sin Persistencia" />
+            <ListItem Value="2" Text="2 seg." />
+            <ListItem Value="5" Text="5 seg." />
+            <ListItem Value="10" Text="10 seg." />
+            <ListItem Value="20" Text="20 seg." />
+          </ComboBox>
+        </Control>
+
         <!--<Control Id="RadioAlias_label" Type="Text"       X="190" Y="90" Width="60" Height="18" TabSkip="no" Text="Alias Radio" />
         <Control Id="RadioAlias_value" Type="ComboBox"   X="260" Y="90" Width="90" Height="18" Property="RADIOALIAS" ComboList="yes" >
           <ComboBox Property="RADIOALIAS">
@@ -1147,16 +1177,18 @@
           </ComboBox>
         </Control>-->
 
-        <Control Id="TipoLabel"           Type="Text"     X="10" Y="112" Width="60" Height="18" TabSkip="no" Text="Tipo grabación" />
+        <!-- AGL -->
+        <!--<Control Id="TipoLabel"           Type="Text"     X="10" Y="112" Width="60" Height="18" TabSkip="no" Text="Tipo grabación" />
         <Control Id="TipoOptions"         Type="ComboBox" X="85" Y="110" Width="90" Height="18" Property="RECMODE" ComboList="yes" >
           <ComboBox Property="RECMODE">
             <ListItem Value="0" Text="ENAIRE" />
             <ListItem Value="1" Text="ASECNA" />
             <ListItem Value="2" Text="ASECNA+HF" />
           </ComboBox>
-        </Control>
-        
-        <Control Id="SpeakerOnlyModeLabel"  Type="Text" X="10" Y="132" Width="90" Height="18" TabSkip="no" Text="Tipo de jack" />
+        </Control>-->
+
+        <!-- 20210322. AGL -->
+        <!--<Control Id="SpeakerOnlyModeLabel"  Type="Text" X="10" Y="132" Width="90" Height="18" TabSkip="no" Text="Tipo de jack" />
         <Control Id="SpeakerOnlyModeEdit"   Type="ComboBox" X="85" Y="130" Width="90" Height="18" Property="SPEAKERONLYMODE" ComboList="yes" >
           <ComboBox Property="SPEAKERONLYMODE" >
             <ListItem Value="True" Text="Micro-Mano"/>
@@ -1168,18 +1200,20 @@
           <Condition Action="enable">
             <![CDATA[CLIENTE <> "ASECNA" OR CLIENTE = "EscuchaRadio"]]>
           </Condition>
-        </Control>
-        
+        </Control>-->
+
+        <!-- 20210322. AGL -->
         <!-- LAN Team Type -->
-        <Control Id="LanTeamTypeLabel"       Type="Text"     X="10" Y="192" Width="90" Height="18" TabSkip="no" Text="Team de Red" />
+        <!--<Control Id="LanTeamTypeLabel"       Type="Text"     X="10" Y="192" Width="90" Height="18" TabSkip="no" Text="Team de Red" />
         <Control Id="LanTeamTypeOptions"     Type="ComboBox" X="85" Y="190" Width="90" Height="18" Property="NICTEAM" ComboList="yes" >
           <ComboBox Property="NICTEAM">
             <ListItem Value="0" Text="Marvell" />
             <ListItem Value="1" Text="Intel" />
           </ComboBox>
-        </Control>
+        </Control>-->
 
-        <Control Id="DoubleRadioSpeakerLabel"  Type="Text" X="10" Y="150" Width="60" Height="18" TabSkip="no" Text="Doble altavoz" />
+        <!-- 20210322. AGL -->
+        <!--<Control Id="DoubleRadioSpeakerLabel"  Type="Text" X="10" Y="150" Width="60" Height="18" TabSkip="no" Text="Doble altavoz" />
         <Control Id="DoubleRadioSpeakerLabel2"  Type="Text" X="10" Y="159" Width="60" Height="18" TabSkip="no" Text="radio general" />
         <Control Id="DoubleRadioSpeakerEdit"   Type="ComboBox" X="85" Y="150" Width="90" Height="18" Property="DOUBLERDSPEAKER" ComboList="yes">
           <ComboBox Property="DOUBLERDSPEAKER" >
@@ -1192,7 +1226,7 @@
           <Condition Action="disable">
             <![CDATA[CLIENTE = "EscuchaRadio"]]>
           </Condition>
-        </Control>
+        </Control>-->
 
         <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
         <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
@@ -1234,15 +1268,16 @@
         <Control Id="ServLabel"    Type="Text" X="10"  Y="70" Width="60" Height="18" TabSkip="no" Text="IP-Servidor" />
         <Control Id="ServEdit"     Type="Edit" X="85"  Y="72" Width="90" Height="18" Property="SERVERIP" Text="{80}" Disabled="yes" />
 
-        <Control Id="RadioAlias_label" Type="Text"       X="10" Y="92" Width="60" Height="18" TabSkip="no" Text="Alias Radio" />
+        <!--<Control Id="RadioAlias_label" Type="Text"       X="10" Y="92" Width="60" Height="18" TabSkip="no" Text="Alias Radio" />
         <Control Id="RadioAlias_value" Type="ComboBox"   X="85" Y="90" Width="90" Height="18" Property="RADIOALIAS" ComboList="yes" >
           <ComboBox Property="RADIOALIAS">
             <ListItem Value="True" Text="Si" />
             <ListItem Value="False" Text="No" />
           </ComboBox>
-        </Control>
+        </Control>-->
 
-        <Control Id="Ed137RecLabel"       Type="Text"     X="10" Y="112" Width="90" Height="18" TabSkip="no" Text="Grabación ED137" />
+        <!-- 20210322. AGL -->
+        <!--<Control Id="Ed137RecLabel"       Type="Text"     X="10" Y="112" Width="90" Height="18" TabSkip="no" Text="Grabación ED137" />
         <Control Id="Ed137RecOptions"     Type="ComboBox" X="85" Y="110" Width="90" Height="18" Property="ED137REC" ComboList="yes" >
           <ComboBox Property="ED137REC">
             <ListItem Value="0" Text="No" />
@@ -1257,9 +1292,9 @@
         <Control Id="REC2Edit"    Type="Edit" X="260" Y="130" Width="90" Height="18" Property="RECB" Text="{80}"/>
 
         <Control Id="GLPLabel"   Type="Text" X="10" Y="152" Width="60" Height="18" TabSkip="no" Text="GLP-Dir." />
-        <Control Id="GLPEdit"    Type="Edit" X="85" Y="150" Width="90" Height="18" Property="GLPDIR" Text="{40}"/>
+        <Control Id="GLPEdit"    Type="Edit" X="85" Y="150" Width="90" Height="18" Property="GLPDIR" Text="{40}"/>-->
 
-        <Control Id="RadioStatusRecovery_label" Type="Text"       X="10" Y="172" Width="105" Height="18" TabSkip="no" Text="Recuperación Estados Radio" />
+        <!--<Control Id="RadioStatusRecovery_label" Type="Text"       X="10" Y="172" Width="105" Height="18" TabSkip="no" Text="Recuperación Estados Radio" />
         <Control Id="RadioStatusRecovery_value" Type="ComboBox"   X="125" Y="170" Width="50" Height="18" Property="RDSTATUSREC" ComboList="yes" >
           <ComboBox Property="RDSTATUSREC">
             <ListItem Value="0"  Text="No" />
@@ -1269,17 +1304,19 @@
             <ListItem Value="10" Text="10 seg." />
             <ListItem Value="20" Text="20 seg." />
           </ComboBox>
-        </Control>
+        </Control>-->
 
-        <Control Id="RadioRtxRecovery_label"  Type="Text"     X="190" Y="172" Width="100" Height="18" TabSkip="no" Text="Recupera Estado RTX" />
+        <!-- 20210322. AGL -->
+        <!--<Control Id="RadioRtxRecovery_label"  Type="Text"     X="190" Y="172" Width="100" Height="18" TabSkip="no" Text="Recupera Estado RTX" />
         <Control Id="RadioRtxRecovery_value"  Type="ComboBox" X="300" Y="170" Width="50"  Height="18" Property="RDRTXREC" ComboList="yes" >
           <ComboBox Property="RDRTXREC" >
             <ListItem Value="True"  Text="Si" />
             <ListItem Value="False" Text="No" />
           </ComboBox>
-        </Control>
-<!---->
-        <Control Id="TxConfirmTime_label" Type="Text"       X="10" Y="192" Width="105" Height="18" TabSkip="no" Text="Confirmacion TX" />
+        </Control>-->
+
+        <!-- 20210322. AGL -->
+        <!--<Control Id="TxConfirmTime_label" Type="Text"       X="10" Y="192" Width="105" Height="18" TabSkip="no" Text="Confirmacion TX" />
         <Control Id="TxConfirmTime_value" Type="ComboBox"   X="125" Y="190" Width="50" Height="18" Property="TIMESPTX" ComboList="yes" >
           <ComboBox Property="TIMESPTX">
             <ListItem Value="0"  Text="No" />
@@ -1288,9 +1325,10 @@
             <ListItem Value="1500" Text="G. 1.5 s" />
             <ListItem Value="2000" Text="G. 2   s" />
           </ComboBox>
-        </Control>
+        </Control>-->
 
-        <Control Id="SqConfirmTime_label"  Type="Text"     X="190" Y="192" Width="100" Height="18" TabSkip="no" Text="Confirmacion RX" />
+        <!-- 20210322. AGL -->
+        <!--<Control Id="SqConfirmTime_label"  Type="Text"     X="190" Y="192" Width="100" Height="18" TabSkip="no" Text="Confirmacion RX" />
         <Control Id="SqConfirmTime_value"  Type="ComboBox" X="300" Y="190" Width="50"  Height="18" Property="TIMESPRX" ComboList="yes" >
           <ComboBox  Property="TIMESPRX">
             <ListItem Value="0"  Text="No" />
@@ -1299,9 +1337,10 @@
             <ListItem Value="1500" Text="G. 1.5 s" />
             <ListItem Value="2000" Text="G. 2   s" />
           </ComboBox>
-        </Control>
+        </Control>-->
 
-        <Control Id="FilterPtt_label" Type="Text"       X="10" Y="212"  Width="105" Height="18" TabSkip="no" Text="Filtro PTT" />
+        <!-- 20210322. AGL -->
+        <!--<Control Id="FilterPtt_label" Type="Text"       X="10" Y="212"  Width="105" Height="18" TabSkip="no" Text="Filtro PTT" />
         <Control Id="FilterPtt_value" Type="ComboBox"   X="125" Y="210" Width="50" Height="18" Property="PTTFILTER" ComboList="yes" >
           <ComboBox Property="PTTFILTER">
             <ListItem Value="0"  Text="No" />
@@ -1311,7 +1350,7 @@
             <ListItem Value="400" Text="400 seg." />
             <ListItem Value="500" Text="500 ms" />
           </ComboBox>
-        </Control>
+        </Control>-->
 
         <!---->
         <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
