@@ -236,8 +236,8 @@ angular.module("Uv5kinbx")
         };
         //** */
         ctrl.gearAsignarText = function (eq) {
-            return (eq.std == 1) ? $lserv.translate("Asignar") :
-                (eq.std == 2) ? $lserv.translate("Desasignar") : "???_" + eq.std;
+            return (eq.std == 1) ? $lserv.translate("Sintonizar") :
+                (eq.std == 2) ? $lserv.translate("Liberar") : "???_" + eq.std;
         };
         //** */
         ctrl.Asignar = function (item) {
