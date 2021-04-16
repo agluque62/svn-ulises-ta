@@ -118,11 +118,15 @@ namespace U5ki.RdService
 
         /// <summary>
         /// Devuelve el recurso que tiene SQ
-        /// El SQ puede llegar indiferentemente del activo o del standby
+        /// El SQ puede llegar indiferentemente del activo o del standby, pero solo es valido si es el recurso seleccionado
         /// </summary>
         /// <returns></returns>
         public bool Squelch
-        { get { return (_ActiveResource.Squelch || _StandbyResource.Squelch); } }
+        { get 
+            { return ((_ActiveResource.Squelch && _ActiveResource.new_params.rx_selected) || 
+                    (_StandbyResource.Squelch && _StandbyResource.new_params.rx_selected)); 
+            } 
+        }
 
         public bool TxMute
         { get { return _ActiveResource.TxMute; }
@@ -226,10 +230,12 @@ namespace U5ki.RdService
         }
 
         private CORESIP_PttType Last_CORESIP_PttType_sent = CORESIP_PttType.CORESIP_PTT_OFF;
+        private bool Waiting_PTT_Confirmed_by_ActiveResource = false;
 
         public void PttOff()
         {
             Last_CORESIP_PttType_sent = CORESIP_PttType.CORESIP_PTT_OFF;
+            Waiting_PTT_Confirmed_by_ActiveResource = false;
             _ActiveResource.PttOff();
             _StandbyResource.PttOff();
 
@@ -243,6 +249,10 @@ namespace U5ki.RdService
 
         public void PttOn(CORESIP_PttType srcPtt)
         {
+            if (Last_CORESIP_PttType_sent == CORESIP_PttType.CORESIP_PTT_OFF && srcPtt != CORESIP_PttType.CORESIP_PTT_OFF)
+            {
+                Waiting_PTT_Confirmed_by_ActiveResource = true;
+            }
             Last_CORESIP_PttType_sent = srcPtt;
             _ActiveResource.PttOn(srcPtt);
             _StandbyResource.PttOn(srcPtt);
@@ -307,8 +317,6 @@ namespace U5ki.RdService
             });
         }
 
-        private const double CHECK_PAIR_TIMEOUT = 250;
-
         public bool HandleChangeInCallState(int sipCallId, CORESIP_CallStateInfo stateInfo)
         {
             RdResource resChange;
@@ -328,7 +336,8 @@ namespace U5ki.RdService
                 //The first session of the pair is established after Nodebox starts. Then checkPairWhenNbxStarts_Timer is started
                 //When it elapsed, then if only one of the session of the pair is established, then this is the main
                 checkPairWhenNbxStarts_Timer = new System.Timers.Timer();
-                checkPairWhenNbxStarts_Timer.Interval = CHECK_PAIR_TIMEOUT;
+                checkPairWhenNbxStarts_Timer.Interval = U5ki.RdService.Properties.Settings.Default.ConectionRetryTimer * 1000 + 500;         
+                    //Le pongo un intervalo mayor al que se producen los reintentos por parte del NBX. Se ha visto que en la pasarela a veces hay que esperarse ese tiempo.
                 checkPairWhenNbxStarts_Timer.AutoReset = false;
                 checkPairWhenNbxStarts_Timer.Elapsed += this.OncheckPairWhenNbxStarts_Timer_Event;
                 checkPairWhenNbxStarts_Timer.Enabled = true;
@@ -496,9 +505,13 @@ namespace U5ki.RdService
                 return;
             }
 
-            //La info recibida corresponde a un recurso de este par 1+1
+            if (isTx == false)
+            {
+                return;
+            }
 
-            if (isTx == false || Last_CORESIP_PttType_sent == CORESIP_PttType.CORESIP_PTT_OFF)
+            //La info recibida corresponde a un recurso de este par 1+1
+            if (Last_CORESIP_PttType_sent == CORESIP_PttType.CORESIP_PTT_OFF)
             {
                 //Si no se esta transmitiendo PTT entonces paramos el timer si estaba corriendo y no hacemos nada
                 if (checkPttConfirmed_Timer != null)
@@ -509,18 +522,18 @@ namespace U5ki.RdService
                         checkPttConfirmed_Timer.Enabled = false;
                     }
                 }
-                return;
+                Waiting_PTT_Confirmed_by_ActiveResource = false;
             }
-
-            if (_ActiveResource.Connected == false || _StandbyResource.Connected == false)
+            else if (_ActiveResource.Connected == false || _StandbyResource.Connected == false)
             {
-                //Si uno de los dos recursos no esta conectado, entonces no podra haber conmutacion. 
-                //No se hace nada y se para el timer si estaba corriendo
+                //Si alguno de los dos no esta conectado no hay espera a la confirmacion del PTT. Es inposible un cambio de seleccionada
                 if (checkPttConfirmed_Timer != null && checkPttConfirmed_Timer.Enabled == true)
                 {
                     checkPttConfirmed_Timer.Stop();
                     checkPttConfirmed_Timer.Enabled = false;
                 }
+
+                Waiting_PTT_Confirmed_by_ActiveResource = false;
             }
             else if (_ActiveResource.Ptt == RdRsPttType.OwnedPtt)
             {
@@ -530,16 +543,19 @@ namespace U5ki.RdService
                     checkPttConfirmed_Timer.Stop();
                     checkPttConfirmed_Timer.Enabled = false;
                 }
+
+                Waiting_PTT_Confirmed_by_ActiveResource = false;
             }
-            else if (_StandbyResource.Ptt == RdRsPttType.OwnedPtt && _ActiveResource.Ptt != RdRsPttType.OwnedPtt)
+            else if (Waiting_PTT_Confirmed_by_ActiveResource && _StandbyResource.Ptt == RdRsPttType.OwnedPtt && _ActiveResource.Ptt != RdRsPttType.OwnedPtt)
             {
-                //la confirmacion de Ptt es del standby y el activo no tiene PTT confirmado, entonces arrancamos un timer
+                //El ptt del standby ha cambiado de estado a confirmado
+                //y el activo no tiene PTT confirmado, entonces arrancamos un timer
                 //Si cuando vence el timer el activo no ha confirmado el PTT entonces conmutamos
 
                 if (checkPttConfirmed_Timer == null)
                 {
                     checkPttConfirmed_Timer = new System.Timers.Timer();
-                    checkPttConfirmed_Timer.Interval = U5ki.Infrastructure.SipAgent._KAPeriod + 50;                        ;
+                    checkPttConfirmed_Timer.Interval = U5ki.Infrastructure.SipAgent._KAPeriod + 50; 
                     checkPttConfirmed_Timer.AutoReset = false;
                     checkPttConfirmed_Timer.Elapsed += this.OncheckPTTIsConfirmed_Timer_Event;
                     checkPttConfirmed_Timer.Start();
@@ -548,23 +564,14 @@ namespace U5ki.RdService
                 {
                     checkPttConfirmed_Timer.Start();
                 }
-            }    
-            else if (_StandbyResource.Ptt != RdRsPttType.OwnedPtt)
-            {
-                //Si el standby deja de confirmar el PTT cuando el timer esta corriendo, entonces se para el timer
-                if (checkPttConfirmed_Timer != null && checkPttConfirmed_Timer.Enabled == true)
-                {
-                    checkPttConfirmed_Timer.Stop();
-                    checkPttConfirmed_Timer.Enabled = false;
-                }
-            }
+            }       
         }
 
         private void OncheckPTTIsConfirmed_Timer_Event(Object source, System.Timers.ElapsedEventArgs e)
         {            
             RdService.evQueueRd.Enqueue("RdResourcePair:OncheckPTTIsConfirmed_Timer_Event", delegate ()
             {
-                if (_ActiveResource.Connected && _StandbyResource.Connected && 
+                if (Waiting_PTT_Confirmed_by_ActiveResource && _ActiveResource.Connected && _StandbyResource.Connected && 
                     _ActiveResource.Ptt == RdRsPttType.NoPtt && _StandbyResource.Ptt != RdRsPttType.NoPtt)
                 {
                     // Se conmuta porque el recurso activo no confirma el PTT y el standby si
@@ -578,7 +585,8 @@ namespace U5ki.RdService
                         this.PttOn(Last_CORESIP_PttType_sent);
                     }
                     NotifyAutomaticSelection("El Recurso Seleccionado no confirma PTT");
-                }                
+                }
+                Waiting_PTT_Confirmed_by_ActiveResource = false;
             });
         }
 

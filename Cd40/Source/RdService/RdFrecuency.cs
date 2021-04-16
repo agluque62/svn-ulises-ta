@@ -182,6 +182,7 @@ namespace U5ki.RdService
         /// Sirve para gestionar el atributo txSeleccionado de sus recursos
         /// </summary>
         private Tipo_ModoTransmision _ModoTransmision = Tipo_ModoTransmision.Ninguno;
+        private string _EmplazamientoDefecto = null;
         /// <summary>
         /// Guarda el tx con el emplazamiento configurado por defecto
         /// </summary> 
@@ -1504,6 +1505,7 @@ namespace U5ki.RdService
         /// </summary>
         /// <param name="sipCallId"></param>
         /// <param name="stateInfo"></param>
+        /// <param name="rdResOut"> Es el recurso (RdResource o RdResourcePair) correspondiente al sipcallID</param>
         /// <returns></returns>
         public bool HandleChangeInCallState(int sipCallId, CORESIP_CallStateInfo stateInfo, out IRdResource rdResOut)
         {            
@@ -1514,6 +1516,7 @@ namespace U5ki.RdService
                 {
                     bool publish = false;
                     bool previousSq = rdRs.Squelch;
+
                     if (rdRs.HandleChangeInCallState(sipCallId, stateInfo))
                     {
                         if (rdRs.Connected)
@@ -1580,7 +1583,9 @@ namespace U5ki.RdService
                         //Se protege con este semáforo para evitar la excepcion cuando se borra _FrRs desde otro hilo
                         _CurrentPttSemaphore.WaitOne();
                         if (_FrRs != null)
+                        {
                             publish |= ActualizaFrecuenciaConRecurso(rdRs);
+                        }
                         _CurrentPttSemaphore.Release();
                         if (publish == true || _PublishFreqChanges == true)
                         {
@@ -1668,22 +1673,41 @@ namespace U5ki.RdService
             }
 
             //Actualiza el squelch si es un recurso de rx
-            if (rdRs.isRx &&
-                (((TipoDeFrecuencia == "FD") && (rdRs.ID == _FrRs.ResourceId)) ||
-                   TipoDeFrecuencia != "FD"))
+            if (rdRs.isRx)
             {
-                if (rdRs.Squelch == false && _FrRs.Squelch != RdSrvFrRs.SquelchType.NoSquelch)
+                string rdRs_ID_aux = rdRs.ID;
+                if (rdRs is RdResourcePair)
                 {
-                    _FrRs.Squelch = RdSrvFrRs.SquelchType.NoSquelch;
-                    hayCambio = true;
-                    LogTrace<RdService>("ActualizaFrecuenciaConRecurso SQ:" + _FrRs.Squelch);
+                    RdResourcePair rdRsPair = rdRs as RdResourcePair;
+                    if (rdRsPair.ActiveResource.ID == _FrRs.ResourceId)
+                    {
+                        rdRs_ID_aux = rdRsPair.ActiveResource.ID;
+                    }
+                    else if (rdRsPair.StandbyResource.ID == _FrRs.ResourceId)
+                    {
+                        rdRs_ID_aux = rdRsPair.StandbyResource.ID;
+                    }
                 }
-                else if (rdRs.Squelch == true && _FrRs.Squelch == RdSrvFrRs.SquelchType.NoSquelch)
+
+                if (
+                    ((TipoDeFrecuencia == "FD") && (rdRs_ID_aux == _FrRs.ResourceId)) ||
+                    (TipoDeFrecuencia != "FD")
+                    )
                 {
-                    hayCambio = true;
-                    LogTrace<RdService>("ActualizaFrecuenciaConRecurso SQ:" + _FrRs.Squelch);
+                    if (rdRs.Squelch == false && _FrRs.Squelch != RdSrvFrRs.SquelchType.NoSquelch)
+                    {
+                        _FrRs.Squelch = RdSrvFrRs.SquelchType.NoSquelch;
+                        hayCambio = true;
+                        LogTrace<RdService>("ActualizaFrecuenciaConRecurso SQ:" + _FrRs.Squelch);
+                    }
+                    else if (rdRs.Squelch == true && _FrRs.Squelch == RdSrvFrRs.SquelchType.NoSquelch)
+                    {
+                        hayCambio = true;
+                        LogTrace<RdService>("ActualizaFrecuenciaConRecurso SQ:" + _FrRs.Squelch);
+                    }
                 }
-            }           
+
+            }
 
             return hayCambio;
         }
@@ -1963,6 +1987,18 @@ namespace U5ki.RdService
                 return "---";
             }
         }
+
+        public IRdResource GetSimpleResource(int sipCallId)
+        {
+            IRdResource rdResOut = null;
+            foreach (IRdResource rdRs in _RdRs.Values)
+            {
+                rdResOut = rdRs.GetSimpleResource(sipCallId);
+                if (rdResOut != null) break;
+            }
+            return rdResOut;
+        }
+
         /** 20200522. AGL. Identifica si la frecuencia contiene recursos en 1+1 */
         public bool ContainsUnoMasUno
         {
@@ -2996,9 +3032,13 @@ namespace U5ki.RdService
             }
             if (cfg.TipoFrecuencia == Tipo_Frecuencia.FD)
             {
-                if (_ModoTransmision != cfg.ModoTransmision)
+                if (
+                    (_ModoTransmision != cfg.ModoTransmision) ||
+                    (cfg.ModoTransmision == Tipo_ModoTransmision.UltimoReceptor && _EmplazamientoDefecto != cfg.EmplazamientoDefecto)
+                   )
                 {
                     _ModoTransmision = cfg.ModoTransmision;
+                    _EmplazamientoDefecto = cfg.EmplazamientoDefecto;
                     //Sólo a los TX o TXRX
                     foreach (IRdResource rdRs in _RdRs.Values.Where(x => x.isTx))
                         rdRs.TxMute = _ModoTransmision == Tipo_ModoTransmision.UltimoReceptor ? true : false;
@@ -3031,6 +3071,11 @@ namespace U5ki.RdService
                     _LastSelectedSite = "";
                 }
                 _ModoTransmision = Tipo_ModoTransmision.Ninguno;
+            }
+
+            if (cfg.TipoFrecuencia != Tipo_Frecuencia.FD || cfg.ModoTransmision != Tipo_ModoTransmision.UltimoReceptor)
+            {
+                _EmplazamientoDefecto = null;
             }
         }
 
@@ -3109,6 +3154,19 @@ namespace U5ki.RdService
                         _TxIDSelected = null;
                         LogDebug<RdFrecuency>(String.Format("tx deseleccionado por SQ mejor{0}", txSelected.Site));
                         txSelected = null;
+                    }
+                    else if (hayTxEnSite && !string.IsNullOrEmpty(PttSrc) && txConnected != null && txConnected.Site == _LastSelectedSite &&
+                        txConnected != TxRsDefault)
+                    {
+                        //Durante el PTT se ha vuelto a conectar el recurso seleccionado que no es el de por defecto
+                        txSelected.TxMute = true;
+                        _TxIDSelected = null;
+                        LogDebug<RdFrecuency>(String.Format("tx deseleccionado porque el seleccionado vuelve a estar activo durante un PTT{0}", txSelected.Site));
+
+                        txSelected.PttOn(_CurrentSrcPtt.Type);
+
+                        txSelected = null;
+
                     }
                     //else no hay cambio de seleccionado
                 }

@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using U5ki.Infrastructure;
 using U5ki.RdService.Gears;
@@ -2247,11 +2248,23 @@ namespace U5ki.RdService
                 {
                     foreach (KeyValuePair<string, IRdResource> res in rdFr.Value.RdRs)
                     {
-                        if (res.Value.ID == ses_states.Key)
+                        if (res.Value is RdResourcePair)
                         {
-                            found = true;
-                            break;
+                            RdResourcePair resPair = res.Value as RdResourcePair;
+                            if (resPair.ActiveResource.ID == ses_states.Key || resPair.StandbyResource.ID == ses_states.Key)
+                            {
+                                found = true;
+                                break;
+                            }
                         }
+                        else
+                        {
+                            if (res.Value.ID == ses_states.Key)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }                                               
                     }
                     if (found == true) break;
                 }
@@ -2298,6 +2311,7 @@ namespace U5ki.RdService
                         {
                             /** 20170126. AGL. Identifico el Recurso para poder generar el Historico. */
 
+                            IRdResource simpleRdRes = rdFr.Value.GetSimpleResource(call);
                             IRdResource rdRes;
                             if (rdFr.Value.HandleChangeInCallState(call, stateInfo, out rdRes))
                             {
@@ -2307,21 +2321,43 @@ namespace U5ki.RdService
                                     keyFr = rdFr.Key;
                                 }
 
+                                string resourceID = "";
+                                if (simpleRdRes != null)
+                                {                                    
+                                    //Tomamos el usuario de la uri del recurso para visualizarlo en el historico. Ya que se ha visto que en M+N
+                                    //no coincide el ID del recurso con el recurso real
+                                    string uri_user_pattern = @":(.+)@";
+                                    resourceID = simpleRdRes.ID;
+                                    try
+                                    {
+                                        Match uri_user_match = Regex.Match(simpleRdRes.Uri1, uri_user_pattern);
+                                        if (uri_user_match.Success)
+                                        {
+                                            resourceID = uri_user_match.Groups[1].Value;
+                                        }
+                                    }
+                                    catch
+                                    {}
+                                }
+
                                 /** 20170126. AGL. Generar Historico Apertura / Cierre Session Radio */
                                 if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED)
                                 {
                                     /** 20170126. AGL. Control de Eventos de Conexion / Desconexion */
                                     /** 20200624. AGL. Adaptacion a grupos 1+1 */
-                                    if (_sessions_sip_control.Event(rdRes.ID, CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED) == true)
+                                    if (simpleRdRes != null)
                                     {
-                                        var msg = rdRes is RdResourcePair ?
-                                        $"Desconexion Sip. Grupo 1+1: {rdRes.ID} Recurso {(rdRes as RdResourcePair).LastRdResourceChanged.ID}. Causa: {stateInfo.LastCode}" :
-                                        $"Desconexion Sip. Recurso: {rdRes.ID}. Causa: {stateInfo.LastCode}";
-                                        LogWarn<RdService>(
-                                            rdFr.Value.Frecuency + " " + msg,
-                                            U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR,
-                                            rdFr.Value.Frecuency,
-                                            CTranslate.translateResource(msg));
+                                        if (_sessions_sip_control.Event(simpleRdRes.ID, CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED) == true)
+                                        {                                            
+                                            var msg = rdRes is RdResourcePair ?
+                                            $"Desconexion Sip. Grupo 1+1: {rdRes.ID} Recurso {resourceID}. Causa: {stateInfo.LastCode}." :
+                                            $"Desconexion Sip. Recurso: {resourceID}. Causa: {stateInfo.LastCode}";
+                                            LogWarn<RdService>(
+                                                rdFr.Value.Frecuency + " " + msg,
+                                                U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR,
+                                                rdFr.Value.Frecuency,
+                                                CTranslate.translateResource(msg));
+                                        }
                                     }
                                     /**********************************/
                                 }
@@ -2329,16 +2365,19 @@ namespace U5ki.RdService
                                 {
                                     /** 20170126. AGL. Control de Eventos de Conexion / Desconexion */
                                     /** 20200624. AGL. Adaptacion a grupos 1+1 */
-                                    if (_sessions_sip_control.Event(rdRes.ID, CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED) == true)
+                                    if (simpleRdRes != null)
                                     {
-                                        var msg = rdRes is RdResourcePair ?
-                                        $"Conexion Sip. Grupo 1+1: {rdRes.ID} Recurso {(rdRes as RdResourcePair).LastRdResourceChanged.ID}" :
-                                        $"Conexion Sip. Recurso: {rdRes.ID}";
-                                        LogInfo<RdService>(
-                                            rdFr.Value.Frecuency + " " + msg,
-                                            U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
-                                            rdFr.Value.Frecuency,
-                                            CTranslate.translateResource(msg));
+                                        if (_sessions_sip_control.Event(simpleRdRes.ID, CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED) == true)
+                                        {
+                                            var msg = rdRes is RdResourcePair ?
+                                            $"Conexion Sip. Grupo 1+1: {rdRes.ID} Recurso {resourceID}" :
+                                            $"Conexion Sip. Recurso: {resourceID}";
+                                            LogInfo<RdService>(
+                                                rdFr.Value.Frecuency + " " + msg,
+                                                U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
+                                                rdFr.Value.Frecuency,
+                                                CTranslate.translateResource(msg));
+                                        }
                                     }
                                     /**********************************/
                                 }

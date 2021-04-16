@@ -457,9 +457,9 @@ namespace U5ki.RdService
 				{
 					_Ptt = RdRsPttType.OwnedPtt;
 				}
-			//}
+            //}
 
-			return ((oldSquelch != _Squelch) || (oldPtt != _Ptt) || oldSelected != info.rx_selected || 
+            return ((oldSquelch != _Squelch) || (oldPtt != _Ptt) || oldSelected != info.rx_selected || 
                 oldQidxValue != info.rx_qidx || info.tx_ptt_mute_changed != 0);
 		}
 
