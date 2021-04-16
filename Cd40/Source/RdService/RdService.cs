@@ -430,17 +430,18 @@ namespace U5ki.RdService
 
                         case ServiceCommands.RdUnoMasUnoData:
                             var UnoMasUnoFreqs = MSResources.Select(r => new
-                                {
-                                    fr = r.Frecuency,
-                                    id = r.ID,
-                                    site = r.Site,
-                                    tx = r.isTx ? 1 : 0,
-                                    ab = MSTxPersistence.IsNodeDisabled(r) ? 0 : 1,
-                                    sel = r.GetContainerPair().ActiveResource.Uri1 == r.Uri1 ? 1 : 0,
-                                    ses = r.Connected ? 1 : 0,
-                                    uri = r.Uri1
-                                })
-                                .OrderBy(r=>r.fr).ThenBy(r=>r.id)
+                            {
+                                fr = r.Frecuency,
+                                id = r.ID,
+                                site = r.Site,
+                                tx = r.isTx ? 1 : 0,
+                                ab = MSTxPersistence.IsNodeDisabled(r) ? 0 : 1,
+                                sel = r.GetContainerPair().ActiveResource.Uri1 == r.Uri1 ? 1 : 0,
+                                ses = r.Connected ? 1 : 0,
+                                uri = r.Uri1,
+                                selected_tx = Frecuencies.Values.Where(f => f.Frecuency == r.Frecuency).FirstOrDefault()?.SelectedTxSiteString,
+                            })
+                                .OrderBy(r => r.fr).ThenBy(r => r.id)
                                 .ToList();
                             UnoMasUnoFreqs.ForEach(item => local_rsp.Add(item));
                             retorno = true;
