@@ -417,7 +417,7 @@
                 <!-- Seleccion de la Frecuencia  -->
                 <li class="list-group-item">
                     <div class="row text-primary">
-                        <div class="col-md-10"><label class="form-control">Seleccione la Frecuencia</label></div>
+                        <div class="col-md-10"><label class="form-control">{{ctrl.translate("Seleccione la Frecuencia")}}</label></div>
                         <div class="col-sm-2">
                             <select class="form-control" data-ng-model="ctrl.dtUnoMasUnoSelectedFrec">
                                 <option data-ng-repeat="fr in ctrl.dtUnoMasUno" value="{{fr.fr}}">
@@ -430,10 +430,10 @@
 
                 <li class="list-group-item">
                     <div class="row bg-primary">
-                        <div class="col-md-1 level-1" translate>Frecuencia</div>
-                        <div class="col-md-2 level-1" translate>Emplazamiento</div>
-                        <div class="col-md-5 level-1" translate>Transmisores/Transceptores</div>
-                        <div class="col-md-4 level-1" translate>Receptores</div>
+                        <div class="col-md-1 level-1">{{ctrl.translate("Frecuencia")}}</div>
+                        <div class="col-md-2 level-1">{{ctrl.translate("Emplazamiento")}}</div>
+                        <div class="col-md-5 level-1">{{ctrl.translate("Transmisores/Transceptores")}}</div>
+                        <div class="col-md-4 level-1">{{ctrl.translate("Receptores")}}</div>
                     </div>
                 </li>
                 <li class="list-group-item text-primary" ng_repeat="fr in ctrl.dtUnoMasUno | filter: {fr: ctrl.dtUnoMasUnoSelectedFrec}" ng-init="ifrec = $index">
@@ -455,7 +455,7 @@
                                                             <button class="btn btn-sm btn-info" style="font-size:90%; padding-right:5px;"
                                                                     ng-click="ctrl.rdUnoMasUnoSelectMain(tx)"
                                                                     ng-show="{{tx.sel==0}}">
-                                                                {{"Reserva=>Sel"}}
+                                                                {{ctrl.translate("Reserva=>Sel")}}
                                                             </button>
                                                             <label class="btn btn-sm text-success" style="font-size:90%; padding-right:5px;" ng-show="{{tx.sel==1}}"><strong>Seleccionado</strong></label>
                                                         </div>
@@ -476,7 +476,7 @@
                                                         <div class="col-md-5" style="padding-left:5px; padding-right:5px;">
                                                             <button class="btn btn-sm btn-info" style="font-size:90%; padding-right:5px;"
                                                                     ng-click="ctrl.rdUnoMasUnoEnable(rx)">
-                                                                {{rx.ab==0 ? "Habilitar" : "Deshabilitar"}}
+                                                                {{rx.ab==0 ? ctrl.translate("Habilitar") : ctrl.translate("Deshabilitar")}}
                                                             </button>
                                                         </div>
                                                     </div>
@@ -493,7 +493,7 @@
 
         </div>
         <div style="width:98%;margin-left:1%;font-size:80%;" ng-show="ctrl.dtUnoMasUno.lenght == 0">
-            <h1 class="text-center">No existen frecuencias con recursos 1+1</h1>
+            <h1 class="text-center">{{ctrl.translate("No existen frecuencias con recursos 1+1")}}</h1>
         </div>
     </div>
 

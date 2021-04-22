@@ -2,6 +2,8 @@ angular.module("Uv5kinbx")
     .controller("uv5kiRadioCtrl", function ($scope, $interval, $serv, $lserv) {
         /** Inicializacion */
         var ctrl = this;
+        ctrl.translate = (str) => { return $lserv.translate(str); }
+
         var session_stdcodes = { Desconectado: 0, Conectado: 1, Deshabilitado: 2 };
         var session_types = { RX: "Rx", TX: "Tx", RXTX: "RxTx" };
         var equ_types = { Main: 0, Reserva: 1 };
@@ -583,12 +585,12 @@ angular.module("Uv5kinbx")
         };
         ctrl.rdUnoMasUnoSelectMain = function (equ) {
             if ($lserv.RdModuleExist('1+1')) {
-                var strQuestion = equ.id + $lserv.translate(" ¿Desea Seleccionar el equipo como Principal?");
+                var strQuestion = equ.id + $lserv.translate(" ¿Desea Elegir el equipo como Seleccionado?");
                 alertify.confirm(strQuestion,
                     function () {
                         $serv.radio_11_select(equ.id).then(function (response) {
                             console.log("RD1+1 Post Response => ", response.data);
-                            alertify.success($lserv.translate("Operacion Ejecutada."));
+                            alertify.success($lserv.translate("Operacion Efectuada"));
                         }, function (response) {
                                 console.log("RD1+1 Post Error => ", response);
                                 alertify.error($lserv.translate(response.data.res));
