@@ -38,6 +38,7 @@ namespace U5ki.Infrastructure
             public string site { get; set; }
             /** */
             public bool UnoMasUno { get; set; }
+            public bool UnoMasUnoDisabled { get; set; }
         }
         public class equipoMNData
         {

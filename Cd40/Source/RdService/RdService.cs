@@ -367,6 +367,8 @@ namespace U5ki.RdService
                                                 site = rdr.new_params.site,
                                                 /** 20200522 */
                                                 UnoMasUno = frec.ContainsUnoMasUno,
+                                                /** 20210422. Recurso 1+1 inhabilitado */
+                                                UnoMasUnoDisabled = MSTxPersistence.IsNodeDisabled(rdr)
                                             };
 
                                             local_rsp.Add(data);

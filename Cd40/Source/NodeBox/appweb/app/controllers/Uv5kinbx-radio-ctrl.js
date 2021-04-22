@@ -42,10 +42,10 @@ angular.module("Uv5kinbx")
         /** Servicios Pagina de Sesiones*/
         //** Version 1 */
         ctrl.colorEstadoFrecuencia = function (std) {
-            return (std == frec_stdcodes.NoDisponible ? "bg-warning text-danger" :
-                std == frec_stdcodes.Disponible ? "text-info" :
-                    std == frec_stdcodes.Degradada ? "bg-warning text-warning" : "text-danger bg-danger");
-};
+            return (std == frec_stdcodes.NoDisponible ? "freqNotAvailable" :
+                std == frec_stdcodes.Disponible ? "freqAvailable" :
+                    std == frec_stdcodes.Degradada ? "freqDegraded" : "text-danger bg-danger");
+        };
         ctrl.textTipoPrio = function (tp, pr) {
             var txtTipo = tp == frec_tipos.Normal ? $lserv.translate("Simple") :
                 tp == frec_tipos.UnoMasUno ? $lserv.translate("Dual") :
@@ -56,11 +56,18 @@ angular.module("Uv5kinbx")
             //return txtTipo + "/" + txtPrio;
             return { txtTipo, txtPrio };
         };
-        ctrl.colorEstadoSesion = function (std) {
-            return std == session_stdcodes.Desconectado ? "bg-warning text-danger" :
-                std == session_stdcodes.Conectado ? "text-info" :
-                    std == session_stdcodes.Deshabilitado ? "text-muted" : "text-danger bg-danger";
+        ctrl.colorBotonSesion = function (std, dis) {
+            return dis == true ? "btn-default" :
+                std == session_stdcodes.Desconectado ? "btn-danger" :
+                    std == session_stdcodes.Conectado ? "btn-success" :
+                        std == session_stdcodes.Deshabilitado ? "btn-default" : "btn-danger";
         };
+        //ctrl.colorEstadoSesion = (std, dis) => {
+        //    return dis == true ? "text-muted" :
+        //        std == session_stdcodes.Desconectado ? "bg-warning text-danger" :
+        //            std == session_stdcodes.Conectado ? "text-info" :
+        //                std == session_stdcodes.Deshabilitado ? "text-muted" : "text-danger bg-danger";
+        //}
         ctrl.txtCClimax = function (md) {
             return md == frec_cclimax.Absoluto ? "A" :
                 md == frec_cclimax.Realtivo ? "R" : "?";
@@ -202,7 +209,7 @@ angular.module("Uv5kinbx")
             }
             if (item.selected_site == "")
                 return "";
-            return StringCut(item.selected_site, 10) + "/" + StringCut(item.selected_rx,10) + "/" + item.selected_site_qidx.toString();
+            return StringCut(item.selected_site, 10) + "/" + StringCut(item.selected_rx, 10) + "/" + item.selected_site_qidx.toString();
         };
         ctrl.TxSelected = function (item) {
             switch (item.ftipo) {
@@ -418,6 +425,7 @@ angular.module("Uv5kinbx")
                     site: session.site,
                     tipo: session.tipo,
                     std: session.std,
+                    dis: session.UnoMasUnoDisabled,
                     tx_rtp: session.tx_rtp,
                     tx_cld: session.tx_cld,
                     tx_owd: session.tx_owd,
@@ -592,8 +600,8 @@ angular.module("Uv5kinbx")
                             console.log("RD1+1 Post Response => ", response.data);
                             alertify.success($lserv.translate("Operacion Efectuada"));
                         }, function (response) {
-                                console.log("RD1+1 Post Error => ", response);
-                                alertify.error($lserv.translate(response.data.res));
+                            console.log("RD1+1 Post Error => ", response);
+                            alertify.error($lserv.translate(response.data.res));
                         });
                     },
                     function () {

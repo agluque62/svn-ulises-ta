@@ -557,15 +557,13 @@ figcaption {
         font-size: 11pt;
     }
 
-.mv-0 {
-    margin-top: 0;
-    margin-bottom: 0;
-}
+    .mnman table tr td button.btn {
+        padding-top: 1px;
+        padding-bottom: 1px;
+        margin-left: 5px;
+        font-size: 8pt;
+    }
 
-.pv-0 {
-    padding-top: 0;
-    padding-bottom: 0;
-}
 /** Clases para depurar */
 .dbg {
     border: 2px solid var(--main-color);
@@ -590,3 +588,35 @@ figcaption {
     height: 30em;
     border: 1px solid blue;
 }
+
+/** Colores para las Frecuencias */
+.freqAvailable {
+    /*    background-color: white;*/
+    color: #31708f;
+}
+
+.freqDegraded {
+    background-color: #fcf8a0;
+    color: #663d00;
+}
+
+.freqNotAvailable {
+    background-color: #e4b9b9;
+    color: #663d00;
+}
+
+.mv-0 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.pv-0 {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.pv-1 {
+    padding: 1px;
+}
+
+
