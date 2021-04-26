@@ -441,7 +441,15 @@ namespace U5ki.RdService
                                 sel = r.GetContainerPair().ActiveResource.Uri1 == r.Uri1 ? 1 : 0,
                                 ses = r.Connected ? 1 : 0,
                                 uri = r.Uri1,
-                                selected_tx = Frecuencies.Values.Where(f => f.Frecuency == r.Frecuency).FirstOrDefault()?.SelectedTxSiteString,
+                                //selected_tx = Frecuencies.Values.Where(f => f.Frecuency == r.Frecuency).FirstOrDefault()?.SelectedTxSiteString,
+                                fdata = new
+                                {
+                                    // Tipo de Frecuencia => 0: Normal, 1: 1+1, 2: FD, 3: EM
+                                    tp = this[r.Frecuency]?.GetParam.FrequencyType,
+                                    // Modo de TX para FD => 0: Climax, 1: Ultimo RX, 2: Manual, 3: Ninguno.
+                                    txm = this[r.Frecuency]?.TxMode,
+                                    txs = this[r.Frecuency]?.SelectedTxSiteString
+                                }
                             })
                                 .OrderBy(r => r.fr).ThenBy(r => r.id)
                                 .ToList();
@@ -603,6 +611,15 @@ namespace U5ki.RdService
                                     return resources;                   // Por cada pareado selecciona ambos componentes y marca su container...
                                 });
                 return ret;
+            }
+        }
+
+        public RdFrecuency this[string fid]
+        {
+            get
+            {
+                var fitem = Frecuencies.Where(f => fid == f.Key).FirstOrDefault();
+                return fitem.Value;
             }
         }
 

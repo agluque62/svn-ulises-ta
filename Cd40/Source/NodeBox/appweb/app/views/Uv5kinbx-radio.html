@@ -544,20 +544,22 @@
 
                 <li class="list-group-item">
                     <div class="row bg-primary">
-                        <div class="col-md-1 level-1">{{ctrl.translate("Frecuencia")}}</div>
+                        <div class="col-md-2 level-1">{{ctrl.translate("Frecuencia")}}</div>
                         <div class="col-md-2 level-1">{{ctrl.translate("Emplazamiento")}}</div>
-                        <div class="col-md-5 level-1">{{ctrl.translate("Transmisores/Transceptores")}}</div>
+                        <div class="col-md-4 level-1">{{ctrl.translate("Transmisores/Transceptores")}}</div>
                         <div class="col-md-4 level-1">{{ctrl.translate("Receptores")}}</div>
                     </div>
                 </li>
                 <li class="list-group-item text-primary" ng_repeat="fr in ctrl.dtUnoMasUno | filter: {fr: ctrl.dtUnoMasUnoSelectedFrec}" ng-init="ifrec = $index">
                     <div class="row">
-                        <div class="col-md-1">{{fr.fr}}</div>
-                        <div class="col-md-11">
+                        <div class="col-md-2">{{fr.fr}}<br />
+                                                       <label>{{ctrl.rdUnoMasUnoFrMode(fr)}}</label><br />
+                                                                                                    <label ng-class="ctrl.rdUnoMasUnoFrTxMode(fr).clx">{{ctrl.rdUnoMasUnoFrTxMode(fr).txt}}</label></div>
+                        <div class="col-md-10">
                             <ul class="list-group">
                                 <li class="list-group-item" ng-repeat="site in fr.sites">
                                     <div class="row">
-                                        <div class="col-md-2">{{site.site}}</div>
+                                        <div class="col-md-2"><label ng-class="ctrl.rdUnoMasUnoFrSelectedSiteClass(fr,site.site)">{{site.site}}</label></div>
                                         <div class="col-md-5">
                                             <ul class="list-group">
                                                 <li class="list-group-item" ng-repeat="tx in site.txs" style="padding:5px;">
@@ -577,8 +579,6 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                        >
-
                                         <div class="col-md-5">
                                             <!--<label>{{site.rxs}}</label>-->
                                             <ul class="list-group">

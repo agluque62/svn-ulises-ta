@@ -183,6 +183,7 @@ namespace U5ki.RdService
         /// </summary>
         private Tipo_ModoTransmision _ModoTransmision = Tipo_ModoTransmision.Ninguno;
         private string _EmplazamientoDefecto = null;
+        public Tipo_ModoTransmision TxMode => _ModoTransmision;
         /// <summary>
         /// Guarda el tx con el emplazamiento configurado por defecto
         /// </summary> 

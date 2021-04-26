@@ -560,7 +560,8 @@ angular.module("Uv5kinbx")
                     '$.fr', '$',
                     function (fr, grp) {
                         //console.log("grp =>", grp);
-                        var res1 = Enumerable.from(grp.getSource())
+                        var tmp = Enumerable.from(grp.getSource()).select(t => t).toArray();
+                        var res1 = Enumerable.from(/*grp.getSource()*/tmp)
                             .orderBy('$.site')
                             .groupBy('$.site', '$', function (site, grp1) {
                                 var en = Enumerable.from(grp1.getSource());
@@ -569,7 +570,7 @@ angular.module("Uv5kinbx")
                                 return { site: site, txs: txs, rxs: rxs };
                             })
                             .toArray();
-                        return { fr: fr, sites: res1 };
+                        return { fr: fr, fdata: tmp[0].fdata, sites: res1 };
                     }
                 )
                 .toArray();
@@ -633,6 +634,25 @@ angular.module("Uv5kinbx")
             } else {
                 // Meter un Mensaje.
             }
+        };
+        ctrl.rdUnoMasUnoFrMode = (fr) => {
+            return (!fr || !fr.fdata ) ? "Error" : fr.fdata.tp == 0 ? $lserv.translate("Simple") : fr.fdata.tp == 2 ? $lserv.translate("Multiemplazamiento") : "??" + fr.fdata.tp + "??";
+        };
+        ctrl.rdUnoMasUnoFrTxMode = (fr) => {
+            if (!fr || !fr.fdata)
+                return { txt: $lserv.translate("Error"), clx: "" };
+            if (fr.fdata.tp == 0)
+                return { txt: "", clx: "" };
+            var txt = fr.fdata.txm == 0 ? $lserv.translate("CLX") : fr.fdata.txm == 1 ? $lserv.translate("Ultimo RX") : "??" + fr.fdata.txm + "??";
+            var clx = fr.fdata.txm == 1 ? "freqDegraded" : "";
+            return { txt: txt, clx: clx};
+        };
+        ctrl.rdUnoMasUnoFrSelectedSiteClass = (fr, site) => {
+            if (!fr || !fr.fdata)
+                return "";
+            if (fr.fdata.tp == 0)
+                return "";
+            return fr.fdata.txs == site ? "bg-warning" : "";
         };
 
 

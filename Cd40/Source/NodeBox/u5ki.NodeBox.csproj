@@ -202,6 +202,7 @@
     <None Include="appweb\simulate\lconfig.json" />
     <None Include="appweb\simulate\preconf.json" />
     <None Include="appweb\simulate\ps.json" />
+    <None Include="appweb\simulate\rd11.json" />
     <None Include="appweb\simulate\rdhf.json" />
     <None Include="appweb\simulate\rdsessions.json" />
     <None Include="appweb\simulate\std.json" />
