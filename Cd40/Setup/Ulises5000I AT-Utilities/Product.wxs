@@ -292,7 +292,7 @@
         <util:XmlFile Id="Cd40_CfgService_SoapCfg_InterfazSOAPConfiguracion" Action="setValue"
                         File = "[#U5ki.NodeBox.cfg]"
                         ElementPath="/configuration/applicationSettings/U5ki.CfgService.Properties.Settings/setting[\[]@name='Cd40_CfgService_SoapCfg_InterfazSOAPConfiguracion'[\]]/value"
-                        Value="http://[SERVERIP]/nucleodf/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx"/>
+                        Value="http://[SERVERIP]/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx"/>
         <util:XmlFile Id="MCastItf4Config" Action="setValue"
                         File = "[#U5ki.NodeBox.cfg]"
                         ElementPath="/configuration/applicationSettings/U5ki.CfgService.Properties.Settings/setting[\[]@name='MCastItf4Config'[\]]/value"
