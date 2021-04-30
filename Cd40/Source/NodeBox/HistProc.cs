@@ -242,7 +242,7 @@ namespace U5ki.NodeBox
 
                 last_inci.Enqueue(new nbxEvent()
                 {
-                    fh = dlog.ToString("HH:mm:ss.fff"),
+                    fh = dlog.ToLocalTime().ToString("HH:mm:ss.fff"),
                     ev = his_ids.ContainsKey(hist.id) ? his_ids[hist.id] : hist.id.ToString(),
                     ser = service,
                     par = descripcion
