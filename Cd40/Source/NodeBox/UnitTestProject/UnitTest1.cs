@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Windows.Forms;
 
@@ -40,7 +42,7 @@ namespace UnitTestProject
         {
             SipUtilities.SipUriParser sipuri = new SipUtilities.SipUriParser("<sip:\"pp\"192.168.0.129:7060>");
             string stdf = sipuri.UlisesFormat;
-            
+
             sipuri = new SipUtilities.SipUriParser("<sip:\"pp\"bb@192.168.0.129:7060>");
             Assert.AreEqual(sipuri.User, "bb");
             Assert.AreEqual(sipuri.Port, 7060);
@@ -102,7 +104,7 @@ namespace UnitTestProject
             string json = "[{\"nombre\": \"arturo\", \"entero\": 22 }]";
 
             var json_object = JsonConvert.DeserializeObject(json) as JObject;
-            
+
             var json_array = JsonConvert.DeserializeObject(json) as JArray;
 
 
@@ -114,14 +116,32 @@ namespace UnitTestProject
             NLog.LogManager.GetCurrentClassLogger().Info("Prueba....");
 
             var config = NLog.LogManager.Configuration;
-            foreach(var target in config.AllTargets)
+            foreach (var target in config.AllTargets)
             {
-                if (target.Name== "csvfile")
+                if (target.Name == "csvfile")
                 {
                     var found = target;
                 }
             }
 
+        }
+    }
+
+    [TestClass]
+    public class GenericTest
+    {
+        [TestMethod]
+        public void DictionaryFind()
+        {
+            Dictionary<string, string> Frecuencies = new Dictionary<string, string>()
+            {
+                {"Uno","Uno" },
+                {"Dos","Dos" }
+            };
+
+            var fid = "Dos";
+            var fitem = Frecuencies.Where(f => fid == f.Key).FirstOrDefault();
+            Debug.WriteLine(fitem.Key == null ? "Not found" : fitem.Value);
         }
     }
 

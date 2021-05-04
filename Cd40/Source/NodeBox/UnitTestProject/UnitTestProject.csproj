@@ -97,9 +97,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Utilities\Utilities.csproj">
+      <Project>{822f500d-adb8-4bb1-8a1c-e9feaff369b0}</Project>
+      <Name>Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Infrastructure\u5ki.Infrastructure.csproj">
       <Project>{bbae4626-c51c-4946-acd1-832e92d73d8b}</Project>
       <Name>u5ki.Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\RdService\RdServiceTests\RdServiceTests.csproj">
+      <Project>{e5987f9d-f8f4-40bb-92b0-a849ec801a20}</Project>
+      <Name>RdServiceTests</Name>
     </ProjectReference>
     <ProjectReference Include="..\u5ki.NodeBox.csproj">
       <Project>{7bc5a180-21c5-4a4a-a131-6bdf65d4287a}</Project>
