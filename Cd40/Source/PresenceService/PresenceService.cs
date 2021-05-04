@@ -1,5 +1,4 @@
 ﻿//#define _WITH_EVENTQUEUE_
-//#define _ACTIVATE_EXRES_
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -12,9 +11,8 @@ using System.Net.Sockets;
 using System.Net.NetworkInformation;
 
 using System.Diagnostics;
-using Newtonsoft.Json;
 
-using U5ki.PresenceService.Agentes;
+using Newtonsoft.Json;
 
 using U5ki.Infrastructure;
 using ProtoBuf;
@@ -62,7 +60,6 @@ namespace U5ki.PresenceService
             }
             return false;
         }
-
         public object AllDataGet()
         {
             return new
@@ -122,27 +119,25 @@ namespace U5ki.PresenceService
                                                ver = s.version
                                            }
                                 },
-#if _ACTIVATE_EXRES_
-                    externals_res = from i in agents
-                                    where i.Type == Interfaces.AgentType.ForExternalResources
-                                    select new
-                                    {
-                                        id = i.DependencyName,
-                                        type = i.Type,
-                                        main = i.MainService,
-                                        connected = i.State == Interfaces.AgentStates.Connected,
-                                        endp = i.ProxyEndpoint?.ToString(),
-                                        pres = i.PresenceEndpoint?.ToString(),
-                                        res = from s in i.RsTable
-                                              select new
-                                              {
-                                                  id = s.name,
-                                                  uri = s.Uri,
-                                                  status = s.Status,
-                                                  ver = s.version
-                                              }
-                                    },
-#endif
+                    //externals_res = from i in agents
+                    //                where i.Type == Interfaces.AgentType.ForExternalResources
+                    //                select new
+                    //                {
+                    //                    id = i.DependencyName,
+                    //                    type = i.Type,
+                    //                    main = i.MainService,
+                    //                    connected = i.State == Interfaces.AgentStates.Connected,
+                    //                    endp = i.ProxyEndpoint?.ToString(),
+                    //                    pres = i.PresenceEndpoint?.ToString(),
+                    //                    res = from s in i.RsTable
+                    //                          select new
+                    //                          {
+                    //                              id = s.name,
+                    //                              uri = s.Uri,
+                    //                              status = s.Status,
+                    //                              ver = s.version
+                    //                          }
+                    //                },
                     PersistenceOfStates = from s in PresenceServerResource.PersistenceOfStates.LastStates
                                           select new
                                           {
@@ -165,7 +160,7 @@ namespace U5ki.PresenceService
                     id = Name,
                     mode = Master ? "Master" : "Slave",
                     conf = LastVersion,
-                    proxies = from p in global_agent?.RsTable
+                    proxies = from p in global_agent.RsTable
                               select new
                               {
                                   id = p.Dependency,
@@ -213,27 +208,6 @@ namespace U5ki.PresenceService
                                                ver = s.version
                                            }
                                 },
-#if _ACTIVATE_EXRES_
-                    externals_res = from i in agents
-                                where i.Type == Interfaces.AgentType.ForExternalResources
-                                select new
-                                {
-                                    id = i.DependencyName,
-                                    type = i.Type,
-                                    main = i.MainService,
-                                    connected = i.State == Interfaces.AgentStates.Connected,
-                                    endp = i.ProxyEndpoint?.ToString(),
-                                    pres = i.PresenceEndpoint?.ToString(),
-                                    res = from s in i.RsTable
-                                           select new
-                                           {
-                                               id = s.name,
-                                               uri = s.Uri,
-                                               status = s.Status,
-                                               ver = s.version
-                                           }
-                                },
-#endif
                     PersistenceOfStates = from s in PresenceServerResource.PersistenceOfStates.LastStates
                                           select new
                                           {
@@ -242,7 +216,7 @@ namespace U5ki.PresenceService
                                           }
 
                 };
-                return JsonConvert.SerializeObject(data, Formatting.Indented);
+                return JsonConvert.SerializeObject(data);
             }
         }
         /// <summary>
@@ -318,13 +292,13 @@ namespace U5ki.PresenceService
             }
         }
 
-#endregion
+        #endregion
 
         /** Para evitar reconfiguraciones ociosas... */
         protected string LastVersion { get; set; }
         /** Lista de Agentes de Presencia */
         protected List<Interfaces.IAgent> agents = new List<Interfaces.IAgent>();
-        protected Interfaces.IAgent global_agent = new PSProxiesAgent("");
+        protected Interfaces.IAgent global_agent = new Agentes.PSProxiesAgent("");
         /** */
         InterProcessEvent _ipcService = null;
         /** */
@@ -460,13 +434,6 @@ namespace U5ki.PresenceService
                             e.agent.Name, e.ev, e.p1));
                         switch (e.ev)
                         {
-                            case Interfaces.AgentEvents.ResourceOptions:
-                                if (ServiceConfigured)
-                                {
-                                    e.retorno(PSHelper.ControlledSipAgent.SendOptionsMsg(e.p1));
-                                }
-                                break;
-
                             case Interfaces.AgentEvents.Ping:
                                 // PresenceServiceHelper.AsyncPing(e.p1, true, OnAsyncPingCompleted);
                                 if (ServiceConfigured)
@@ -575,7 +542,7 @@ namespace U5ki.PresenceService
                         agents.ForEach(agent =>
                         {
                             agent.PingResponse(from, callid,
-                                (code == 200 || code == 404) ? Interfaces.AgentStates.Connected : Interfaces.AgentStates.NotConnected, code);
+                                (code == 200 || code == 404) ? Interfaces.AgentStates.Connected : Interfaces.AgentStates.NotConnected);
                         });
                     }
                     smpAccesMain.Release();
@@ -764,13 +731,6 @@ namespace U5ki.PresenceService
                 });
             });
 
-#if _ACTIVATE_EXRES_
-            /** EXRES. Crear el Agente de Equipos Externos */
-            var extAgent = new Agentes.PSExternalResourcesAgent();
-            extAgent.Init(OnAgentEventOccurred, cfg);
-            extAgent.Start();
-            agents.Add(extAgent);
-#endif
             /** Activar el Agente de Agentes */
             global_agent = new Agentes.PSProxiesAgent( ServiceSite);
             global_agent.Init(OnAgentEventOccurred, agents);
@@ -795,7 +755,7 @@ namespace U5ki.PresenceService
             /** Desactivar los Agentes */
             if (global_agent != null)
                 global_agent.Dispose();
-            global_agent = new PSProxiesAgent("");
+            global_agent = new Agentes.PSProxiesAgent("");
 
             agents.ForEach(agent =>
             {
@@ -854,16 +814,10 @@ namespace U5ki.PresenceService
         /// </summary>
         protected Dictionary<string, bool> SendingControl = new Dictionary<string, bool>()
         {
-            {typeof(PSBkkAgent).Name,false},
-            {typeof(PSExternalAgent).Name, false},
-            {typeof(PSProxiesAgent).Name, false},
-#if _ACTIVATE_EXRES_
-            /** EXRES Incluir el control de envio del agente de recursos externos de telefonía. */
-            {typeof(PSExternalResourcesAgent).Name, false},
-#endif
+            {"PSBkkAgent",false},
+            {"PSExternalAgent", false},
+            {"PSProxiesAgent", false}
         };
-
-
         private void FrameSenderTaskRoutine()
         {
             IPEndPoint mcastTifx = new IPEndPoint(
@@ -892,7 +846,7 @@ namespace U5ki.PresenceService
                     {
                         try
                         {
-                            if (SendingControl[typeof(PSBkkAgent).Name] == true)
+                            if (SendingControl["PSBkkAgent"] == true)
                             {
                                 /** Fusionar y Enviar Trama Internos...  Priorizando el activo y despues el PPAL ... */
                                 Interfaces.IAgent IntAgent =
@@ -908,10 +862,10 @@ namespace U5ki.PresenceService
                                     LogTrace<U5kPresService>(String.Format("FrameSenderTask Sending Internal Subs ({0})",
                                         ((Agentes.PSBaseAgent)IntAgent).rsCount));
                                 }
-                                SendingControl[typeof(PSBkkAgent).Name] = false;
+                                SendingControl["PSBkkAgent"] = false;
                             }
 
-                            if (SendingControl[typeof(PSExternalAgent).Name] == true)
+                            if (SendingControl["PSExternalAgent"] == true)
                             {
                                 /** Fusionar y Enviar Tramas Externos... */
                                 /** 1. Obtengo la lista, priorizando a los activos y despues principales */
@@ -941,34 +895,17 @@ namespace U5ki.PresenceService
                                     mtrama = ExtAgent.Frame;
                                     _udpClient.Send(mtrama, mtrama.Count(), mcastTifx);
                                 }
-                                SendingControl[typeof(PSExternalAgent).Name] = false;
+                                SendingControl["PSExternalAgent"] = false;
                             }
 
-                            if (SendingControl[typeof(PSProxiesAgent).Name] == true)
+                            if (SendingControl["PSProxiesAgent"] == true)
                             {
                                 PSHelper.LOGGER.Trace<U5kPresService>(String.Format("FrameSenderTask Sending Global Proxies ({0})", ((Agentes.PSBaseAgent)global_agent).rsCount));
                                 /** Enviar Trama Global */
                                 mtrama = global_agent.Frame;
                                 _udpClient.Send(mtrama, mtrama.Count(), mcastTifx);
-                                SendingControl[typeof(PSProxiesAgent).Name] = false;
+                                SendingControl["PSProxiesAgent"] = false;
                             }
-#if _ACTIVATE_EXRES_
-                            /** EXRES Gestionar el envío de la informacion de recursos de telefonía externos */
-                            if (SendingControl[typeof(PSExternalResourcesAgent).Name] == true)
-                            {
-                                Interfaces.IAgent agent =
-                                    agents.Where(a => a.Type == Interfaces.AgentType.ForExternalResources)
-                                    .FirstOrDefault();
-                                if (agent != null)
-                                {
-                                    mtrama = agent.Frame;
-                                    _udpClient.Send(mtrama, mtrama.Count(), mcastTifx);
-                                    LogTrace<U5kPresService>(String.Format("FrameSenderTask Sending External Resources ({0})",
-                                        ((Agentes.PSBaseAgent)agent).rsCount));
-                                }
-                                SendingControl[typeof(PSExternalResourcesAgent).Name] = false;
-                            }
-#endif
                         }
                         catch (Exception x)
                         {
@@ -987,37 +924,14 @@ namespace U5ki.PresenceService
                 /** Control de puesta en hora (SYNC NTP) hacia atras... */
                 if (elapsed < TimeSpan.Zero || elapsed >= tick)
                 {
-                    SendingControl[typeof(PSBkkAgent).Name] = true;
-                    SendingControl[typeof(PSProxiesAgent).Name] = true;
-                    SendingControl[typeof(PSExternalAgent).Name] = true;
-#if _ACTIVATE_EXRES_
-                    /** EXRES Activar el Envio de la información de recursos externos de telefonía */
-                    SendingControl[typeof(PSExternalResourcesAgent).Name] = true;
-#endif
+                    SendingControl["PSBkkAgent"] = true;
+                    SendingControl["PSExternalAgent"] = true;
+                    SendingControl["PSProxiesAgent"] = true;
                     last = DateTime.Now;
                 }
             }
             LogInfo<U5kPresService>(String.Format("FrameSenderTask Ended"));
         }
 
-#if DEBUG
-        public void ForTesting(Cd40Cfg cfg)
-        {
-            this.Start();
-            this.ConfigureService(cfg);
-            _Master = true;
-
-            for (int i=0; i<20; i++)
-            {
-                SendingControl[typeof(PSProxiesAgent).Name] = true;
-                Task.Delay(500).Wait();
-            }
-
-            var status = this.AllDataGet();
-
-            this.UnconfigureService();
-            this.Stop();
-        }
-#endif
     }
 }

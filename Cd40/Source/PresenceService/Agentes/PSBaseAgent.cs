@@ -39,7 +39,6 @@ namespace U5ki.PresenceService.Agentes
 
             TimeoutNotConnected = new TimeSpan(0, 0, PSHelper.LocalParameters.TimeoutOnDisconnected);
             TimeoutConnected = new TimeSpan(0, 0, PSHelper.LocalParameters.TimeoutOnConnected);
-            TimeoutOnInactiveResource = PSHelper.LocalParameters.TimeoutOnInactiveResource;
 
             wkTimer = new Timer();
             wkTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
@@ -53,7 +52,7 @@ namespace U5ki.PresenceService.Agentes
 
             wkTimer.Interval = 100;
             wkTimer.Enabled = true;
-            LastTickProccesed = DateTime.MinValue;
+            last = DateTime.MinValue;
 #if DEBUG1
             tm = new PresenceServiceHelper.TimeMeasurement(Name + ": TimeToStart");
 #endif
@@ -150,7 +149,7 @@ namespace U5ki.PresenceService.Agentes
         /// <param name="res"></param>
         protected PingingState pingState = PingingState.Fail;
         public string callIdOptions { get; set; }
-        public virtual void PingResponse(string from, string callid, AgentStates res, int code=200)
+        public virtual void PingResponse(string from, string callid, AgentStates res)
         {
             try
             {
@@ -423,7 +422,7 @@ namespace U5ki.PresenceService.Agentes
                 }
                 else
                 {
-                    UsersStatusSupervision(TimeoutOnInactiveResource);
+                    UsersStatusSupervision(PSHelper.LocalParameters.TimeoutOnInactiveResource);
                 }
                 State = AgentStates.Connected;
             }
@@ -514,14 +513,13 @@ namespace U5ki.PresenceService.Agentes
         /// </summary>
         protected TimeSpan TimeoutNotConnected { get; set; }
         protected TimeSpan TimeoutConnected { get; set; }
-        protected int TimeoutOnInactiveResource { get; set; }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
         Timer wkTimer;
-        protected DateTime LastTickProccesed = DateTime.MinValue;
+        DateTime last = DateTime.MinValue;
 #if DEBUG1
         PresenceServiceHelper.TimeMeasurement tm = null;
 #endif
@@ -535,7 +533,7 @@ namespace U5ki.PresenceService.Agentes
                     ((System.Timers.Timer)source).Enabled = false;
 
                     TimeSpan control = State == AgentStates.NotConnected ? TimeoutNotConnected : TimeoutConnected;
-                    TimeSpan transcurrido = DateTime.Now - LastTickProccesed;
+                    TimeSpan transcurrido = DateTime.Now - last;
 #if DEBUG1
             if (tm != null)
             {
@@ -546,7 +544,7 @@ namespace U5ki.PresenceService.Agentes
                     pingCount++;
                     if (transcurrido >= control)
                     {
-                        LastTickProccesed = DateTime.Now;
+                        last = DateTime.Now;
                         if (State == AgentStates.NotConnected)
                         {
                             TickOnDisconnected();

@@ -101,7 +101,6 @@
     <Compile Include="Agentes\PSBaseAgent.cs" />
     <Compile Include="Agentes\PSBkkAgent.cs" />
     <Compile Include="Agentes\PSExternalAgent.cs" />
-    <Compile Include="Agentes\PSExternalResourcesAgent.cs" />
     <Compile Include="Agentes\PSGlobalStateAgent.cs" />
     <Compile Include="BinaryResource.cs" />
     <Compile Include="Engines\BkkEngine.cs" />
@@ -119,7 +118,7 @@
     <Compile Include="Simulation\SimulatedProxiesScenario.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\utilities\Utilities.csproj">
+    <ProjectReference Include="..\..\..\Utilities\Utilities.csproj">
       <Project>{822f500d-adb8-4bb1-8a1c-e9feaff369b0}</Project>
       <Name>Utilities</Name>
     </ProjectReference>
