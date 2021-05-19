@@ -689,6 +689,9 @@ namespace U5ki.CfgService
                         return;
                     }
 
+                    /** Parámetros Multicast*/
+                    SoapCfg.ParametrosMulticast mcp = soapSrv.GetParametrosMulticast(systemId);
+
                     /** Obtiene una copia de la configuracion en el formato SOAP del servicio */
                     SoapCfg.ConfiguracionSistema soapSysCfg = soapSrv.GetConfigSistema(systemId);
                     if (_StopCfgThread) return;
@@ -736,6 +739,9 @@ namespace U5ki.CfgService
                     /** Nueva configuracion en formato 'nodebox' */
                     Cd40Cfg cfg = new Cd40Cfg();
                     cfg.Version = soapVersion;
+                    cfg.CfgMcastGroup = mcp.GrupoMulticastConfiguracion;
+                    cfg.CfgMcastPort = (int)mcp.PuertoMulticastConfiguracion;
+
                     cfg.ConfiguracionGeneral = new ConfiguracionSistema();
 
                     /** Carga la configuracion 'nodebox' desde la configuracion SOAP. */

@@ -2118,6 +2118,24 @@ namespace U5ki.Infrastructure
       get { return _NodesEE; }
     }
   
+
+    private string _CfgMcastGroup = "";
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"CfgMcastGroup", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string CfgMcastGroup
+    {
+      get { return _CfgMcastGroup; }
+      set { _CfgMcastGroup = value; }
+    }
+
+    private int _CfgMcastPort = default(int);
+    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"CfgMcastPort", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int CfgMcastPort
+    {
+      get { return _CfgMcastPort; }
+      set { _CfgMcastPort = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
