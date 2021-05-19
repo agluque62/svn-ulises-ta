@@ -104,7 +104,7 @@ namespace U5ki.PresenceService
                 Properties.Settings settings = Properties.Settings.Default;
 
                 MulticastGroupIp = (config as Cd40Cfg).CfgMcastGroup;   // settings.MulticastGroupIp;
-                MulticastGroupPort = (config as Cd40Cfg).CfgMcastPort;  // settings.MulticastGroupPort;
+                MulticastGroupPort = settings.MulticastGroupPort;
 
                 /** TODO. Leer Preferentemente de Base de Datos o Fichero de Configuracion */
                 TimeoutOnConnected = settings.TimeoutOnConnected;

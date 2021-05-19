@@ -29,5 +29,8 @@
     <Setting Name="MonitorAllUsersOfDependencies" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="MulticastGroupPort" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">1001</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

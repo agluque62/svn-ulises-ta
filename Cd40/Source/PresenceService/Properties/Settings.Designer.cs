@@ -103,5 +103,14 @@ namespace U5ki.PresenceService.Properties {
                 return ((bool)(this["MonitorAllUsersOfDependencies"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1001")]
+        public int MulticastGroupPort {
+            get {
+                return ((int)(this["MulticastGroupPort"]));
+            }
+        }
     }
 }

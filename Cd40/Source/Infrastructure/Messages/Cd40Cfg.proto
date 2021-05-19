@@ -450,6 +450,6 @@ message Cd40Cfg
 	repeated PoolHfElement PoolHf = 4;
 	repeated Node NodesMN = 5;
 	repeated Node NodesEE = 6;
-	optional string CfgMcastGroup = 7;
-	optional int32 CfgMcastPort = 8;
+	optional string CfgMcastGroup = 7 [default = "224.100.10.1"];
+	optional int32 CfgMcastPort = 8 [default = 1000];
 }
