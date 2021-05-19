@@ -165,13 +165,13 @@ namespace U5ki.TifxService
                 _Timer.Enabled = true;
 
                 /** 20180220. Abro el puerto con la propiedad de comparticion */
-                _GwChangesListener = new UdpSocket(Settings.Default.tifxMcastPort, true);
-                _GwChangesListener.MaxReceiveThreads = 1;
-                _GwChangesListener.NewDataEvent += OnNewData;
+                //_GwChangesListener = new UdpSocket(Settings.Default.tifxMcastPort, true);
+                //_GwChangesListener.MaxReceiveThreads = 1;
+                //_GwChangesListener.NewDataEvent += OnNewData;
 
                 /** AGL2014. Seleccion Fuente de Multicast */
                 // _GwChangesListener.Base.JoinMulticastGroup(IPAddress.Parse(Settings.Default.tifxMcastIp));
-                _GwChangesListener.Base.JoinMulticastGroup(IPAddress.Parse(Settings.Default.tifxMcastIp), IPAddress.Parse(Settings.Default.tifxMcastSrc));
+                //_GwChangesListener.Base.JoinMulticastGroup(IPAddress.Parse(Settings.Default.tifxMcastIp), IPAddress.Parse(Settings.Default.tifxMcastSrc));
                 /** Fin de Modificacion */
 
                 /** 20180709. Notifico el estado al Servicio de presencia antes de inicializar el registro ya que hay veces que los mensajes 
@@ -180,7 +180,7 @@ namespace U5ki.TifxService
                 /************************/
 
                 InitRegistry();
-                _GwChangesListener.BeginReceive();
+                //_GwChangesListener.BeginReceive();
                 _Timer.Enabled = true;
 
                 LogInfo<TifxService>("Servicio Iniciado.", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "TifxService", CTranslate.translateResource("Servicio iniciado"));
@@ -747,10 +747,11 @@ namespace U5ki.TifxService
                     {
                         MemoryStream ms = new MemoryStream(Tools.Decompress(e.Content));
                         last_cfg = ProtoBuf.Serializer.Deserialize<Cd40Cfg>(ms);
+                        LogDebug<TifxService>(String.Format("OnResourceChanged: Carga de Configuracion {0}", last_cfg.Version));
                         /** */
                         Dependencias = last_cfg.ConfiguracionGeneral.PlanDireccionamientoIP.Where(d =>
                             d.EsCentralIP == true).ToList();
-                        LogDebug<TifxService>(String.Format("OnResourceChanged: Carga de Configuracion {0}", last_cfg.Version));
+                        StartListen(last_cfg);
                     }
                 }
                 catch (Exception x)
@@ -953,6 +954,35 @@ namespace U5ki.TifxService
             DepsNotify(deps);
         }
 #endif
+        string ListenMcastGroup = "";
+        int ListenMcastPort = 0;
+        protected void StartListen(Cd40Cfg cfg)
+        {
+            if (ListenMcastGroup != cfg.CfgMcastGroup)
+            {
+                if (_GwChangesListener != null)
+                {
+                    LogDebug<TifxService>($"StartListen (Master={_Master}): Cambia la configuración del Socket. Cierro el anterior");
+
+                    _GwChangesListener.Dispose();
+                    _GwChangesListener = null;
+                }
+            }
+
+            if (_GwChangesListener == null)
+            {
+                ListenMcastGroup = cfg.CfgMcastGroup;
+                ListenMcastPort = Settings.Default.tifxMcastPort;
+
+                LogDebug<TifxService>($"StartListen (Master={_Master}): Inicio escucha en Socket ({ListenMcastGroup}:{ListenMcastPort})");
+
+                _GwChangesListener = new UdpSocket(ListenMcastPort, true);
+                _GwChangesListener.MaxReceiveThreads = 1;
+                _GwChangesListener.NewDataEvent += OnNewData;
+                _GwChangesListener.Base.JoinMulticastGroup(IPAddress.Parse(ListenMcastGroup), IPAddress.Parse(Settings.Default.tifxMcastSrc));
+                _GwChangesListener.BeginReceive();
+            }
+        }
         #endregion
 
         #region TESTING
