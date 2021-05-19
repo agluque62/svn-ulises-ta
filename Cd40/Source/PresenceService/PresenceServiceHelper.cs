@@ -103,10 +103,10 @@ namespace U5ki.PresenceService
             {
                 Properties.Settings settings = Properties.Settings.Default;
 
-                /** TODO. Leer Preferentemente de Base de Datos o Fichero de Configuracion */
-                MulticastGroupIp = settings.MulticastGroupIp;
-                MulticastGroupPort = settings.MulticastGroupPort;
+                MulticastGroupIp = (config as Cd40Cfg).CfgMcastGroup;   // settings.MulticastGroupIp;
+                MulticastGroupPort = (config as Cd40Cfg).CfgMcastPort;  // settings.MulticastGroupPort;
 
+                /** TODO. Leer Preferentemente de Base de Datos o Fichero de Configuracion */
                 TimeoutOnConnected = settings.TimeoutOnConnected;
                 TimeoutOnDisconnected = settings.TimeoutOnDisconnected;
                 TimeoutOnInactiveResource = settings.TimeoutOnInactiveResource;
