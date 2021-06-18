@@ -76,6 +76,7 @@
     <Compile Include="ConfigTlfPositionTest.cs" />
     <Compile Include="ForwardUnitTest.cs" />
     <Compile Include="GeneralUnitTest.cs" />
+    <Compile Include="FormatStrings.cs" />
     <Compile Include="UnitTestMDConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

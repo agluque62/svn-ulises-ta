@@ -144,7 +144,8 @@ namespace HMI.CD40.Module.BusinessEntities
                         SipAgent.CreateAccount(data.NumeroAbonado);
                     else
                     {
-                        SipAgent.CreateAccountAndRegisterInProxy(data.NumeroAbonado, _ProxyIP, Settings.Default.ExpireInProxy, data.NumeroAbonado, data.NumeroAbonado, data.IdAgrupacion);
+                        SipAgent.CreateAccountAndRegisterInProxy(data.NumeroAbonado, _ProxyIP, Settings.Default.ExpireInProxy,
+                            data.NumeroAbonado, data.NumeroAbonado, GenIdAgrupacion(data.IdAgrupacion));
                     }
                 }
             }
@@ -187,9 +188,10 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 AccDataList.Add(newData);
                 if ((_ProxyIP == null) || (_ProxyIP.Length == 0))
-                        SipAgent.CreateAccount(newData.NumeroAbonado);
+                    SipAgent.CreateAccount(newData.NumeroAbonado);
                 else
-                    SipAgent.CreateAccountAndRegisterInProxy(newData.NumeroAbonado, _ProxyIP, Settings.Default.ExpireInProxy,newData.NumeroAbonado, newData.NumeroAbonado, newData.IdAgrupacion);
+                    SipAgent.CreateAccountAndRegisterInProxy(newData.NumeroAbonado, _ProxyIP, Settings.Default.ExpireInProxy,
+                        newData.NumeroAbonado, newData.NumeroAbonado, GenIdAgrupacion(newData.IdAgrupacion));
             }
         }
 
@@ -407,5 +409,19 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         #endregion
+        //LALM 210618
+        // Funcion Que limita el numero maximo de caracteres de una agrupacion a 16.
+        private String GenIdAgrupacion(String agrupacion)
+        {
+            int longmax = 16;
+            String IdAgrupacion = agrupacion;
+            int len = agrupacion.Length;
+            if (len > longmax)
+            {
+                int mitad = longmax / 2;
+                IdAgrupacion = agrupacion.Substring(0, mitad - 1) + ".." + agrupacion.Substring(len - (mitad - 1), mitad - 1);
+            }
+            return IdAgrupacion;
+        }
     }
 }
