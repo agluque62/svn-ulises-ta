@@ -182,6 +182,13 @@
                      Name='PTTFILTER_Property' Type='raw' />
     </Property>
 
+    <!-- Tipo de Control de Brillo -->
+    <Property Id="BRILLO" Value="2">
+      <RegistrySearch Id='UV5KI_BRILLO' Root='HKLM'
+                     Key='SOFTWARE\Wix\UV5KI_HMI'
+                     Name='BRILLO_Property' Type='raw' />
+    </Property>
+
     <!---->
 
     <Feature Id="ProductFeature" Title="Ulises5000I_TA" Level="1">
@@ -317,7 +324,7 @@
         <util:XmlFile Id="Brillo" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='BrightnessVersion'[\]]/value"
-                        Value="2"/>
+                        Value="[BRILLO]"/>
         <!-- Radio Alias-->
         <util:XmlFile Id="RadioAliasProperty" Action="setValue"
                         File = "[#HMI.config]"
@@ -802,6 +809,7 @@
           <!--<RegistryValue Name='ECTLF_Property' Value='[ECTLF]' Type='string' />-->
           <RegistryValue Name='ECLC_Property' Value='[ECLC]' Type='string' />
           <RegistryValue Name='NICTEAM_Property' Value='[NICTEAM]' Type='string' />
+          <RegistryValue Name='BRILLO_Property' Value='[BRILLO]' Type='string' />
         </RegistryKey>
       </Component>      
     </ComponentGroup>
@@ -1181,7 +1189,16 @@
             <![CDATA[CLIENTE <> "ASECNA"]]>
           </Condition>
         </Control>
-        
+
+        <!-- Tipo de Control de Brillo -->
+        <Control Id="BrilloLabel"        Type="Text"     X="190" Y="132" Width="60" Height="18" TabSkip="no" Text="Brillo" />
+        <Control Id="BrilloOptions"      Type="ComboBox" X="260" Y="130" Width="90" Height="18" Property="BRILLO" ComboList="yes" >
+          <ComboBox Property="BRILLO">
+            <ListItem Value="2" Text="Control Normal" />
+            <ListItem Value="1" Text="JHCTECH KMDA-3211" />
+          </ComboBox>
+        </Control>
+
         <!-- LAN Team Type -->
         <Control Id="LanTeamTypeLabel"       Type="Text"     X="10" Y="192" Width="90" Height="18" TabSkip="no" Text="Team de Red" />
         <Control Id="LanTeamTypeOptions"     Type="ComboBox" X="85" Y="190" Width="90" Height="18" Property="NICTEAM" ComboList="yes" >
