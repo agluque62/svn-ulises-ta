@@ -37,6 +37,21 @@ namespace HMI.Presentation.Urr.UI
 		public GraphicsPath ImgPath;
 		public Rectangle ImgRect;
 
+		//LALM 210618
+		// Funcion Que limita el numero maximo de caracteres de una agrupacion a 16.
+		private String GenIdAgrupacion(String agrupacion)
+		{
+			int longmax = 16;
+			String IdAgrupacion = agrupacion;
+			int len = agrupacion.Length;
+			if (len > longmax)
+			{
+				int mitad = longmax / 2;
+				IdAgrupacion = agrupacion.Substring(0, mitad - 1) + ".." + agrupacion.Substring(len - (mitad - 1), mitad - 1);
+			}
+			return IdAgrupacion;
+		}
+
 		public BtnStateInfo(Rectangle rect, BtnState state, BtnStyle style,
 			int cornerRadius, Color borderColor, Color innerBorderColor, Color backColor, ColorBlend blend,
 			string text, Font font, StringFormat textFormat, Color foreColor, Rectangle textRect,
@@ -50,7 +65,8 @@ namespace HMI.Presentation.Urr.UI
 			InnerBorderColor = innerBorderColor;
 			BackColor = backColor;
 			Blend = blend;
-			Text = text.Length > 20 ? text.Substring(0,17) + "..." : text;
+			//Text = text.Length > 20 ? text.Substring(0, 17) + "..." : text;
+			Text = GenIdAgrupacion(text);
 			Font = font;
 			TextFormat = textFormat;
 			ForeColor = foreColor;

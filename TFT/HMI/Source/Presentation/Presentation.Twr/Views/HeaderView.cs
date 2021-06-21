@@ -187,10 +187,29 @@ namespace HMI.Presentation.Twr.Views
 			}
 		}
 
+		//LALM 210618
+		// Funcion Que limita el numero maximo de caracteres de una agrupacion a 16.
+		private String GenIdAgrupacion(String agrupacion)
+		{
+			int longmax = 16;
+			String IdAgrupacion = agrupacion;
+			int len = agrupacion.Length;
+			if (len > longmax)
+			{
+				int mitad = longmax / 2;
+				IdAgrupacion = agrupacion.Substring(0, mitad - 1) + ".." + agrupacion.Substring(len - (mitad - 1), mitad - 1);
+			}
+			return IdAgrupacion;
+		}
+
 		[EventSubscription(EventTopicNames.TitleIdChanged, ThreadOption.Publisher)]
 		public void OnTitleIdChanged(object sender, EventArgs e)
 		{
 			_TitleBT.Text = _StateManager.Title.Id;
+            //LALM 210617 define el tamaño maximo del identificador de puesto y
+            // permite recortar la linea y ademas que se quede en la parte de abajo de su zona de pintado.
+            //LALM 210618 Se unifica el criterio de generacion nombre agrupacion
+			_TitleBT.Text = GenIdAgrupacion(_StateManager.Title.Id);
 		}
 
 		[EventSubscription(EventTopicNames.SplitShowModeSelectionUI, ThreadOption.Publisher)]

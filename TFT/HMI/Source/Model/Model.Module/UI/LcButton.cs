@@ -49,12 +49,28 @@ namespace HMI.Model.Module.UI
 			TextAlign = ContentAlignment.TopCenter;
 		}
 
+		//LALM 210618
+		// Funcion Que limita el numero maximo de caracteres de una agrupacion a 16.
+		private String GenIdAgrupacion(String agrupacion)
+		{
+			int longmax = 16;
+			String IdAgrupacion = agrupacion;
+			int len = agrupacion.Length;
+			if (len > longmax)
+			{
+				int mitad = longmax / 2;
+				IdAgrupacion = agrupacion.Substring(0, mitad - 1) + ".." + agrupacion.Substring(len - (mitad - 1), mitad - 1);
+			}
+			return IdAgrupacion;
+		}
+
 		public void Reset(string dst, bool drawX, Color rx, Color tx)
 		{
 			_TxBackColor = tx;
 			_RxBackColor = rx;
 			_DrawX = drawX;
-			base.Text = dst.Length > 20 ? dst.Substring(0,17) + "..." : dst;
+			//base.Text = dst.Length > 20 ? dst.Substring(0, 17) + "..." : dst;
+			base.Text = GenIdAgrupacion(dst);
 		}
 
 		protected override void OnResize(EventArgs e)
