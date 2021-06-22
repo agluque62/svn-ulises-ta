@@ -110,11 +110,18 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			_CallTout.AutoReset = false;
 			_CallTout.Elapsed += OnCallTimeout;
+			// LALM 210420
+			// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
+			// Configuro Timer de 7 segundos
+			_RxNotifTimer.AutoReset = true;
+			_RxNotifTimer.Elapsed += onRxNotifTimer;
+			_RxNotifTimer.Interval = 1000;
+			_tiempo_memorizada = 7;
 		}
 
-        /// <summary>
-        /// 
-        /// </summary>
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Reset()
 		{
 			MakeHangUpRx();
@@ -303,10 +310,9 @@ namespace HMI.CD40.Module.BusinessEntities
 		public int HandleIncomingCall(int sipCallId, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
 		{
 			SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, sipCallId, info, inInfo, false);
-
 			if (inCall != null)
 			{
-                if ((Top.ScreenSaverEnabled) || Top.Hw.LCSpeaker == false)
+				if ((Top.ScreenSaverEnabled) || Top.Hw.LCSpeaker == false)
                 {
                     return SipAgent.SIP_DECLINE;
                 }
@@ -324,6 +330,9 @@ namespace HMI.CD40.Module.BusinessEntities
                     RxState = LcRxState.Mem;
 					_RxState = LcRxState.Idle;
 
+					_RxNotifTimer.Enabled = true;
+					_RxNotifTimer.Interval = 1000;
+					_tiempo_memorizada = 7;
 					return SipAgent.SIP_BUSY;
 				}
 				else
@@ -331,6 +340,34 @@ namespace HMI.CD40.Module.BusinessEntities
 					_SipCallRx = inCall;
 					_ActiveRx = this;
 
+					// LALM 210420
+					// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
+					// Cuando el destino de la llamada no corresponde al sector principal en una agrupacion
+					if (inInfo.DstId != _Channels[0].AccId)
+					{
+						_lastaccid = inInfo.DstId;
+						_RxNotifTimer.Enabled = true;
+						_RxNotifTimer.Interval = 1000;
+						_tiempo_memorizada = 7;
+					}
+					else
+                    {//LALM 210621 Quito la memorizada si el destino correspode al sector principal.
+						_lastaccid = "";
+						_RxNotifTimer.Enabled = false;
+						_RxNotifTimer.Interval = 1000;
+						_tiempo_memorizada = 0;
+					}
+					//LALM 210610 
+					// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
+					// Cuando la llamada viene por linea lineas analógicas.
+					// Tomo esta opción para líneas analógicas
+					if (inInfo.SrcId[0] != 0)
+                    {
+						_lastsrcid = inInfo.SrcId;
+						_RxNotifTimer.Enabled = true;
+						_RxNotifTimer.Interval = 1000;
+						_tiempo_memorizada = 7;
+					}
 					_Channels.Sort(delegate(SipChannel a, SipChannel b)
 						{
 							return b.First.CompareTo(a.First);
@@ -464,6 +501,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /// Guarda el ultimo canal por el que se intentó la ultima llamada saliente
         /// </summary>
         private static int _LastChannel = 0;
+		// LALM 210420
+		// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
+		private string _lastaccid = "";
+		private string _lastsrcid = "";
         /// <summary>
         /// 
         /// </summary>
@@ -475,6 +516,11 @@ namespace HMI.CD40.Module.BusinessEntities
 		private SipCallInfo _SipCallTx = null;
 		private SipCallInfo _SipCallRx = null;
 		private Timer _CallTout = new Timer(Settings.Default.LcCallsTout);
+		// LALM 210419 nuevo timer control de lastaccid Peticiones #3684
+		// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
+		private Timer _RxNotifTimer = new UiTimer(1000);
+		private int _tiempo_memorizada = 7;
+
 		private int _Tone = -1;
 		private string _Dependencia;
 
@@ -524,15 +570,44 @@ namespace HMI.CD40.Module.BusinessEntities
             }
 
 			string dstUri = string.Format("<sip:{0}@{1}{2}>", remoteId, path.Line.Ip, dstParams);
-
+			// LALM 210610 #3684
+			// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
+			// se señaliza ocupado cuando se intenta responder por AI a una llamada iniciada desde otro SCV,
+			// al rol de mayor número ATS de los sectores agrupados
+			// Tomo esta opción para líneas analógicas
+			if (_lastsrcid!="")
+            {
+				dstUri = string.Format("<sip:{0}@{1}{2}>", _lastsrcid, path.Line.Ip, dstParams);
+			}
 			try
 			{
                 CORESIP_CallFlags flags = CORESIP_CallFlags.CORESIP_CALL_NO_FLAGS;
                 if (path.ModoSinProxy == false)
                     flags |= CORESIP_CallFlags.CORESIP_CALL_EXTERNAL_IP;
-                int sipCallId = SipAgent.MakeLcCall(ch.AccId, dstUri, flags);
-				_SipCallTx.Update(sipCallId, ch.AccId, remoteId, ch, path.Remote, path.Line);
 
+				// LALM 210420
+				// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
+				// No puedo considerar el estado Idle ya que memorizada es un subestado de Idle.
+				// Convendría saber cuando esta memorizada, por eso se pone el timer de 7 segundos.
+				if (_RxState == LcRxState.Unavailable)
+					/*|| _RxState == LcRxState.Idle*/
+					_lastaccid = "";
+				if (_lastaccid != "")
+				{
+					int sipCallId = SipAgent.MakeLcCall(_lastaccid, dstUri, flags);
+					_SipCallTx.Update(sipCallId, _lastaccid, remoteId, ch, path.Remote, path.Line);
+					//LALM 210609
+					// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
+					// No quito inmediatamente lastaccid, espero a que venza el teporizador
+					//if (_RxState!=LcRxState.Rx)
+					//	_lastaccid = "";
+				}
+				else
+                {
+					int sipCallId = SipAgent.MakeLcCall(ch.AccId, dstUri, flags);
+					_SipCallTx.Update(sipCallId, ch.AccId, remoteId, ch, path.Remote, path.Line);
+
+				}
 				return true;
 			}
 			catch (Exception ex)
@@ -603,6 +678,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 
 			_CallTout.Enabled = false;
+			_RxNotifTimer.Enabled = false;
 			return LcTxState.Congestion;
 		}
 
@@ -885,6 +961,27 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 		}
 
+
+		// LALM 210420 comprobacion cada 7 segundos si la llamada esta pendiente.
+		// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
+		// se señaliza ocupado cuando se intenta responder por AI a una llamada iniciada desde otro SCV,
+		// al rol de mayor número ATS de los sectores agrupados
+		private void onRxNotifTimer(object sender, ElapsedEventArgs e)
+		{
+			if (_tiempo_memorizada>0)
+				_tiempo_memorizada--;
+			else
+            {
+				if (RxState == LcRxState.Idle)
+				{
+					if (_lastaccid != "")
+						_lastaccid = "";
+					if (_lastsrcid != "")
+						_lastsrcid = "";
+				}
+				_tiempo_memorizada = 7;
+			}
+		}
 		#endregion
 	}
 }

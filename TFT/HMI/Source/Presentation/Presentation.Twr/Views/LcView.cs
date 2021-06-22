@@ -222,11 +222,19 @@ namespace HMI.Presentation.Twr.Views
 			}
 		}
 
+		public static bool enclavamiento = false;// enclavamiento.
+		public static bool pillada;
 		private void LcButton_MouseUp(object sender, MouseEventArgs e)
 		{
 			if (!_Pulsed)
 				return;
 
+			if (enclavamiento)
+            {
+				pillada = !pillada;
+				if (pillada)
+					return;
+            }
 			int id = ((LcButton)sender).Id;
 
 			try
