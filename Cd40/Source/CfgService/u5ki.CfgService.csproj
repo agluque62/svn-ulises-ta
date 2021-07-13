@@ -120,6 +120,7 @@
       <Link>VersionInfo.cs</Link>
     </Compile>
     <Compile Include="CfgService.cs" />
+    <Compile Include="CfgService_old.cs" />
     <Compile Include="CfgTranslators.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
