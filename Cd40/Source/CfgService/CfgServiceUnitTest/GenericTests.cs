@@ -3,10 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
 using Utilities;
+using U5ki.CfgService;
+using U5ki.CfgService.SoapCfg;
 
 namespace CfgServiceUnitTest
 {
@@ -59,5 +62,72 @@ namespace CfgServiceUnitTest
             taskstarted = false;
             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
         }
+
+        [TestMethod]
+        public void SoapServerMethod()
+        {
+            using (InterfazSOAPConfiguracion soapSrv = new InterfazSOAPConfiguracion())
+            {
+                soapSrv.Timeout = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
+                var entryDate = DateTime.Now;
+                try
+                {
+                    //var mcp = soapSrv.GetParametrosMulticast("departamento");
+                    var mcp = TrySoap.Get("departamento", soapSrv.GetParametrosMulticast);
+                    if (mcp.First == false) return;
+
+                    var hfd = TrySoap.Get("departamento", soapSrv.GetPoolHfElement);
+                    var eep = TrySoap.Get("departamento", "1", soapSrv.GetPoolNMElements);
+                }
+                catch (Exception x)
+                {
+                    Debug.WriteLine($"{x.Message} Elapsed => {DateTime.Now - entryDate}");
+                }
+            }
+        }
+
+        class TrySoap
+        {
+            public static Pair<bool,T> Get<T>(string p, Func<string, T> method)
+            {
+                try
+                {
+                    Debug.WriteLine($"method => {method}, p => {p}");
+                    return new Pair<bool, T>(true, method(p));
+                }
+                catch (Exception x)
+                {
+                    Debug.WriteLine($"method => {method}, p => {p}, Exception => {x.Message}");
+                    var cont = !(x is WebException) || (x as WebException).Status != WebExceptionStatus.Timeout;
+                    return new Pair<bool, T>(cont, default);
+                }
+            }
+            public static T Get<T>(string p1, string p2, Func<string, string, T> method)
+            {
+                try
+                {
+                    Debug.WriteLine($"method => {method}, p1 => {p1}, p2 => {p2}");
+                    return method(p1, p2);
+                }
+                catch (Exception x)
+                {
+                    Debug.WriteLine($"method => {method}, p => {p1}, p2 => {p2}, Exception => {x.Message}");
+                    return default;
+                }
+            }
+        }
+
+        [TestMethod]
+        public void CfgServiceStartStop()
+        {
+            var service = new CfgService();
+            service.Start();
+
+            Task.Delay(TimeSpan.FromSeconds(10)).Wait();
+
+            service.Stop();
+
+        }
+
     }
 }

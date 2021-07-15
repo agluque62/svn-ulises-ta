@@ -711,6 +711,7 @@ namespace U5ki.CfgService
                             hosts.Add(asign.IdHost);
                         }
                     }
+
                     SoapCfg.LoginTerminalVoz soapLoginCfg;
                     SoapCfg.CfgUsuario soapCfgUser;
                     /** De la lista de Hosts, determina los usuarios y de enlaces a usuarios internos y externos ??? y de 'usarios dominantes' ??? */
