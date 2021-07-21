@@ -24,6 +24,7 @@ namespace U5ki.CfgService
         const string LastCfgFileJson = "u5ki.LastCfg.json";
         const string TYPE_POOL_NM = "0";
         const string TYPE_POOL_EE = "1";
+        int SoapTimeout = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
 
         #region IService
         public string Name => "Cd40ConfigService";
@@ -151,14 +152,6 @@ namespace U5ki.CfgService
             LastCheckDate = DateTime.MinValue;
             while (SupervisionTaskSync.WaitOne(TimeSpan.FromMilliseconds(100)) == false)
             {
-                // Tarea 1. Configurar la escucha de los avisos MCAST.
-                WorkingThread.Enqueue("", () =>
-                {
-                    if (Master)
-                        InitCfgChangesListener();
-                });
-
-                // Tarea 2. Chequear periodicamente la configuracion.
                 var elapsed = DateTime.Now - LastCheckDate;
                 if (elapsed > TimeSpan.FromSeconds(Settings.Default.CfgRefreshSegTime))
                 {
@@ -166,6 +159,10 @@ namespace U5ki.CfgService
                     {
                         if (Master)
                         {
+                            // Tarea 1. Configurar la escucha de los avisos MCAST.
+                            InitCfgChangesListener();
+
+                            // Tarea 2. Chequear periodicamente la configuracion.
                             TestCfg((version) =>
                             {
                                 if (GetCfg(version))
@@ -359,19 +356,21 @@ namespace U5ki.CfgService
             {
                 using (SoapCfg.InterfazSOAPConfiguracion soapSrv = new U5ki.CfgService.SoapCfg.InterfazSOAPConfiguracion())
                 {
-                    SoapCfg.ParametrosMulticast mc = soapSrv.GetParametrosMulticast(Settings.Default.CfgSystemId);
+                    soapSrv.Timeout = SoapTimeout;
+                    var mcp = TrySoap.Get(Settings.Default.CfgSystemId, soapSrv.GetParametrosMulticast, TrySoapLog);
+                    if (mcp.First == false) return;
 
-                    CfgChangesListener = new UdpSocket(Settings.Default.MCastItf4Config, ((int)mc.PuertoMulticastConfiguracion));
+                    CfgChangesListener = new UdpSocket(Settings.Default.MCastItf4Config, ((int)mcp.Second?.PuertoMulticastConfiguracion));
                     CfgChangesListener.MaxReceiveThreads = 1;
                     CfgChangesListener.NewDataEvent += OnMulticastMsg;
-                    CfgChangesListener.Base.JoinMulticastGroup(IPAddress.Parse(mc.GrupoMulticastConfiguracion));
+                    CfgChangesListener.Base.JoinMulticastGroup(IPAddress.Parse(mcp.Second?.GrupoMulticastConfiguracion));
                     CfgChangesListener.BeginReceive();
                 }
             }
         }
         void ClearInitCfgChangesListener()
         {
-            CfgChangesListener.NewDataEvent -= OnMulticastMsg;
+            if (CfgChangesListener != null) CfgChangesListener.NewDataEvent -= OnMulticastMsg;
             CfgChangesListener?.Dispose();
             CfgChangesListener = null;
         }
@@ -381,7 +380,7 @@ namespace U5ki.CfgService
             {
                 try
                 {
-                    soapSrv.Timeout = (int)TimeSpan.FromSeconds(10).TotalMilliseconds;
+                    soapSrv.Timeout = SoapTimeout;
                     /** Comprueba si han habido cambios de configuracion */
                     string soapVersion = soapSrv.GetVersionConfiguracion(Settings.Default.CfgSystemId);
                     if ((LastCfg != null) && (soapVersion == LastCfg.Version))
@@ -402,7 +401,7 @@ namespace U5ki.CfgService
             string systemId = Settings.Default.CfgSystemId;
             using (SoapCfg.InterfazSOAPConfiguracion soapSrv = new U5ki.CfgService.SoapCfg.InterfazSOAPConfiguracion())
             {
-                soapSrv.Timeout = (int)TimeSpan.FromSeconds(10).TotalMilliseconds;
+                soapSrv.Timeout = SoapTimeout;
                 /** Parámetros Multicast*/
                 var mcp = TrySoap.Get(systemId, soapSrv.GetParametrosMulticast, TrySoapLog);
                 if (mcp.First == false) return false;

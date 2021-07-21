@@ -123,10 +123,11 @@ namespace CfgServiceUnitTest
             var service = new CfgService();
             service.Start();
 
-            Task.Delay(TimeSpan.FromSeconds(10)).Wait();
+            Task.Delay(TimeSpan.FromSeconds(20)).Wait();
 
             service.Stop();
 
+            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
         }
 
     }
