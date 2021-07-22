@@ -88,7 +88,7 @@ namespace U5ki.PresenceService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10.12.35.130")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10.12.60.35")]
         public string MulticastGroupInterfazIp {
             get {
                 return ((string)(this["MulticastGroupInterfazIp"]));

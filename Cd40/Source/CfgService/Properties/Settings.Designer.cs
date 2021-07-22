@@ -46,7 +46,7 @@ namespace U5ki.CfgService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("192.168.0.211")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10.12.60.35")]
         public string MCastItf4Config {
             get {
                 return ((string)(this["MCastItf4Config"]));
@@ -56,7 +56,7 @@ namespace U5ki.CfgService.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://192.168.2.3/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfi" +
+        [global::System.Configuration.DefaultSettingValueAttribute("http://10.12.60.35/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfi" +
             "guracion.asmx")]
         public string Cd40_CfgService_SoapCfg_InterfazSOAPConfiguracion {
             get {
