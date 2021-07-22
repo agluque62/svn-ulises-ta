@@ -942,10 +942,11 @@ namespace U5ki.TifxService
             var dominio = prx.RsId;
             /** Busco la dependencia que contenga como proxy al dominio de la uri */
             var deps = last_cfg.ConfiguracionGeneral.PlanDireccionamientoIP
-                .Where(dep => dep.TipoHost == Tipo_Elemento_HW.TEH_EXTERNO_TELEFONIA && (
+                .Where(dep => dep.TipoHost == Tipo_Elemento_HW.TEH_EXTERNO_TELEFONIA && dep.EsCentralIP == true && (
                     (dep.IpRed1 != "" && dominio.Contains(dep.IpRed1) == true) ||
                     (dep.IpRed2 != "" && dominio.Contains(dep.IpRed2) == true) ||
                     (dep.IpRed3 != "" && dominio.Contains(dep.IpRed3) == true)))
+                .GroupBy(d => d.IdHost).Select(d => d.First()) // Cuando las dependencias tienen asociado mas de un rango, aparecen repetidas.
                 .Select(dep => new DepInfo4Proxy()
                 {
                     name = dep.IdHost,
