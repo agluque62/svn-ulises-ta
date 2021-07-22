@@ -163,13 +163,21 @@ namespace U5ki.CfgService
                             InitCfgChangesListener();
 
                             // Tarea 2. Chequear periodicamente la configuracion.
+                            LogDebug<CfgService>($"Chequeando Configuracion Remota...");
                             TestCfg((version) =>
                             {
+                                LogDebug<CfgService>($"Detectada nueva configuracion => {version}");
                                 if (GetCfg(version))
                                 {
+                                    LogDebug<CfgService>($"Nueva configuracion => {version}, obtenida del Servidor...");
+
                                     PublishCfg();
                                     SaveCfg();
+
+                                    LogDebug<CfgService>($"Nueva configuracion => {version}, Publicada y salvada...");
+                                    return true;
                                 }
+                                return false;
                             });
                         }
                     });
@@ -184,6 +192,7 @@ namespace U5ki.CfgService
         }
         private void OnMasterStatusChanged(object sender, bool master)
         {
+            LogDebug<CfgService>($"OnMasterStatusChanged => Master {master}");
             //Para que el servicio de configuración entre el último master
             if (master) Task.Delay(TimeSpan.FromSeconds(3)).Wait();
 
@@ -206,6 +215,7 @@ namespace U5ki.CfgService
         {
             if (e.Content != null)
             {
+                LogDebug<CfgService>($"OnResourceChanged => Resource Type: {e.Type}, when master={Master}");
                 WorkingThread.Enqueue("OnResourceChanged", () =>
                 {
                     if (!Master)
@@ -220,6 +230,7 @@ namespace U5ki.CfgService
                             }
                             string json = JsonConvert.SerializeObject(LastCfg);
                             File.WriteAllText(LastCfgFileJson, json);
+                            LogDebug<CfgService>($"New Cfg {LastCfg.Version}, when master={Master} saved on disk.");
                         }
                         catch (Exception exc)
                         {
@@ -227,6 +238,10 @@ namespace U5ki.CfgService
                         }
                     }
                 });
+            }
+            else
+            {
+                LogError<CfgService>($"OnResourceChanged => e.Content is null");
             }
         }
         private void OnMulticastMsg(object sender, DataGram dg)
@@ -243,14 +258,25 @@ namespace U5ki.CfgService
                         var currentversion = par;
                         WorkingThread.Enqueue("OnMulticastMsg (Configuration change notification)", () =>
                         {
-                            if (currentversion != LastCfg.Version)
+                            if (Master)
                             {
-                                LogInfo<CfgService>($"Recibida notificacion de cambio de configuracion => {currentversion}");
-                                if (GetCfg(currentversion))
+                                if (currentversion != LastCfg.Version)
                                 {
-                                    PublishCfg();
-                                    SaveCfg();
+                                    LogInfo<CfgService>($"Recibida notificacion de cambio de configuracion => {currentversion}");
+                                    if (GetCfg(currentversion))
+                                    {
+                                        LogDebug<CfgService>($"Nueva configuracion => {currentversion}, obtenida del Servidor...");
+
+                                        PublishCfg();
+                                        SaveCfg();
+
+                                        LogDebug<CfgService>($"Nueva configuracion => {currentversion}, Publicada y salvada...");
+                                    }
                                 }
+                            }
+                            else
+                            {
+                                LogError<CfgService>($"OnMulticastMsg => Error. Multicast message received on SLAVE mode.");
                             }
                         });
                     }
@@ -260,12 +286,22 @@ namespace U5ki.CfgService
                     ExceptionManage<CfgService>("OnMulticastMsg", x, $"");
                 }
             }
+            else
+            {
+                LogError<CfgService>($"OnMulticastMsg => Error. Multicast message received whitout data.");
+            }
         }
         #endregion Managers
 
         #region Internals
         void Init()
         {
+            if (SimulatorForTesting)
+            {
+                // TODO....
+                return;
+            }
+
             CfgRegistry = new Registry(Identifiers.CfgMasterTopic);
             CfgRegistry.ChannelError += OnChannelError;
             CfgRegistry.MasterStatusChanged += OnMasterStatusChanged;
@@ -280,6 +316,12 @@ namespace U5ki.CfgService
         }
         void Clear()
         {
+            if (SimulatorForTesting)
+            {
+                // TODO....
+                return;
+            }
+
             ClearInitCfgChangesListener();
 
             CfgRegistry.ChannelError -= OnChannelError;
@@ -348,12 +390,19 @@ namespace U5ki.CfgService
                 LogInfo<CfgService_old>("No cfg file found", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "CfgService", "MASTER");
             }
             /** Provoca una chequeo inmediato de la Configuracion */
+            LogInfo<CfgService_old>("CfgService => MASTER");
             LastCheckDate = DateTime.MinValue;
         }
         void InitCfgChangesListener()
         {
             if (CfgChangesListener == null)
             {
+                if (SimulatorForTesting)
+                {
+                    // TODO....
+                    return;
+                }
+
                 using (SoapCfg.InterfazSOAPConfiguracion soapSrv = new U5ki.CfgService.SoapCfg.InterfazSOAPConfiguracion())
                 {
                     soapSrv.Timeout = SoapTimeout;
@@ -374,8 +423,20 @@ namespace U5ki.CfgService
             CfgChangesListener?.Dispose();
             CfgChangesListener = null;
         }
-        void TestCfg(Action<string> ExecuteChange)
+        void TestCfg(Func<string, bool> ExecuteChange)
         {
+            if (SimulatorForTesting)
+            {
+                string soapVersion = SimulatedCfg.Version;
+                if ((LastCfg != null) && (soapVersion == LastCfg.Version))
+                {
+                    LogDebug<CfgService>($"Configuración actual {LastCfg.Version} coincide con configuración SOAP {soapVersion}");
+                    return;
+                }
+                ExecuteChange(soapVersion);
+                return;
+            }
+
             using (SoapCfg.InterfazSOAPConfiguracion soapSrv = new U5ki.CfgService.SoapCfg.InterfazSOAPConfiguracion())
             {
                 try
@@ -398,6 +459,12 @@ namespace U5ki.CfgService
         }
         bool GetCfg(string version)
         {
+            if (SimulatorForTesting)
+            {
+                LastCfg = SimulatedCfg;
+                return true;
+            }
+
             string systemId = Settings.Default.CfgSystemId;
             using (SoapCfg.InterfazSOAPConfiguracion soapSrv = new U5ki.CfgService.SoapCfg.InterfazSOAPConfiguracion())
             {
@@ -506,8 +573,8 @@ namespace U5ki.CfgService
             LogInfo<CfgService>("Publicando nueva configuración: " + LastCfg.Version, U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
                 "CfgService", CTranslate.translateResource("Publicando nueva configuración: " + LastCfg.Version));
 
-            CfgRegistry.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, LastCfg);
-            CfgRegistry.Publish(LastCfg.Version);
+            CfgRegistry?.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, LastCfg);
+            CfgRegistry?.Publish(LastCfg.Version);
         }
         void TrySoapLog(string msg, Exception x = null)
         {
@@ -562,6 +629,30 @@ namespace U5ki.CfgService
 
         #endregion
 
+        #region SimulatorForTest
+        public bool SimulatorForTesting { get; set; } = false;
+        public Cd40Cfg SimulatedCfg { get; set; }
+        public void SimulateNewMcastMessage(Cd40Cfg newCfg)
+        {
+            SimulatedCfg = newCfg;
+            var cmd = $"1{newCfg.Version}";
+            var dg = new DataGram
+            {
+                Data = Encoding.ASCII.GetBytes(cmd)
+            };
+            OnMulticastMsg(null, dg);
+        }
+        public void SimulateToMaster()
+        {
+            OnMasterStatusChanged(null, true);
+        }
+        public void SimulateToSlave()
+        {
+            OnMasterStatusChanged(null, false);
+        }
+
+        private Random Random { get; set; } = new Random((int)DateTime.Now.Ticks);
+        #endregion  SimulatorForTest
     }
 
 }

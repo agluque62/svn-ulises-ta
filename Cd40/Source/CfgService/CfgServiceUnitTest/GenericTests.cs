@@ -1,13 +1,17 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Net;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
+using Newtonsoft.Json;
+
 using Utilities;
+using U5ki.Infrastructure;
 using U5ki.CfgService;
 using U5ki.CfgService.SoapCfg;
 
@@ -121,13 +125,29 @@ namespace CfgServiceUnitTest
         public void CfgServiceStartStop()
         {
             var service = new CfgService();
-            service.Start();
+            service.SimulatorForTesting = true;
+            service.SimulatedCfg = NewConfig();
 
+            service.Start();
+            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+            service.SimulateToSlave();
+            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+            service.SimulateToMaster();
+            Task.Delay(TimeSpan.FromSeconds(20)).Wait();
+
+            service.SimulateNewMcastMessage(NewConfig());
             Task.Delay(TimeSpan.FromSeconds(20)).Wait();
 
             service.Stop();
 
             Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+        }
+
+        Cd40Cfg NewConfig()
+        {
+            var cfg = JsonConvert.DeserializeObject<Cd40Cfg>(File.ReadAllText("SimulatedCfg.json"));
+            cfg.Version = DateTime.Now.ToString();
+            return cfg;
         }
 
     }
