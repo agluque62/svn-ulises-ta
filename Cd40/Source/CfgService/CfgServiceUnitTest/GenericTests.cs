@@ -126,28 +126,44 @@ namespace CfgServiceUnitTest
         {
             var service = new CfgService();
             service.SimulatorForTesting = true;
-            service.SimulatedCfg = NewConfig();
+            service.SimulatedCfg = NewConfig;
 
             service.Start();
             Task.Delay(TimeSpan.FromSeconds(1)).Wait();
             service.SimulateToSlave();
             Task.Delay(TimeSpan.FromSeconds(1)).Wait();
             service.SimulateToMaster();
-            Task.Delay(TimeSpan.FromSeconds(20)).Wait();
+            Task.Delay(TimeSpan.FromSeconds(200)).Wait();
 
-            service.SimulateNewMcastMessage(NewConfig());
-            Task.Delay(TimeSpan.FromSeconds(20)).Wait();
+            //service.SimulateNewMcastMessage(NewConfig);
+            //Task.Delay(TimeSpan.FromSeconds(200)).Wait();
 
             service.Stop();
 
             Task.Delay(TimeSpan.FromSeconds(1)).Wait();
         }
-
-        Cd40Cfg NewConfig()
+        [TestMethod]
+        public void TestNullables()
         {
-            var cfg = JsonConvert.DeserializeObject<Cd40Cfg>(File.ReadAllText("SimulatedCfg.json"));
-            cfg.Version = DateTime.Now.ToString();
-            return cfg;
+            var cfg = NewConfig;
+            PublishMock(cfg?.Version, cfg != null);
+
+            cfg = null;
+            PublishMock(cfg?.Version, cfg != null);
+        }
+        Cd40Cfg NewConfig
+        {
+            get
+            {
+                var cfg = JsonConvert.DeserializeObject<Cd40Cfg>(File.ReadAllText("SimulatedCfg.json"));
+                cfg.Version = DateTime.Now.ToString();
+                return cfg;
+            }
+        }
+
+        void PublishMock(string p1, bool p2)
+        {
+            Debug.WriteLine($"p1={p1 ?? "null"} p2={p2}");
         }
 
     }

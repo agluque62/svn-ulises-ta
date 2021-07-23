@@ -171,7 +171,7 @@ namespace U5ki.CfgService
                                 {
                                     LogDebug<CfgService>($"Nueva configuracion => {version}, obtenida del Servidor...");
 
-                                    PublishCfg();
+                                    PublishCfg(LastCfg);
                                     SaveCfg();
 
                                     LogDebug<CfgService>($"Nueva configuracion => {version}, Publicada y salvada...");
@@ -267,7 +267,7 @@ namespace U5ki.CfgService
                                     {
                                         LogDebug<CfgService>($"Nueva configuracion => {currentversion}, obtenida del Servidor...");
 
-                                        PublishCfg();
+                                        PublishCfg(LastCfg);
                                         SaveCfg();
 
                                         LogDebug<CfgService>($"Nueva configuracion => {currentversion}, Publicada y salvada...");
@@ -336,8 +336,9 @@ namespace U5ki.CfgService
             {
                 ClearInitCfgChangesListener();
 
-                CfgRegistry?.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, (Cd40Cfg)null);
-                CfgRegistry?.Publish(null, false);
+                //CfgRegistry?.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, (Cd40Cfg)null);
+                //CfgRegistry?.Publish(null, false);
+                PublishCfg(null);
             }
             catch (Exception x)
             {
@@ -382,8 +383,9 @@ namespace U5ki.CfgService
             }
             if (LastCfg != null)
             {
-                CfgRegistry?.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, LastCfg);
-                CfgRegistry?.Publish(LastCfg.Version);
+                //CfgRegistry?.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, LastCfg);
+                //CfgRegistry?.Publish(LastCfg.Version);
+                PublishCfg(LastCfg);
             }
             else
             {
@@ -397,11 +399,11 @@ namespace U5ki.CfgService
         {
             if (CfgChangesListener == null)
             {
-                if (SimulatorForTesting)
-                {
-                    // TODO....
-                    return;
-                }
+                //if (SimulatorForTesting)
+                //{
+                //    // TODO....
+                //    return;
+                //}
 
                 using (SoapCfg.InterfazSOAPConfiguracion soapSrv = new U5ki.CfgService.SoapCfg.InterfazSOAPConfiguracion())
                 {
@@ -425,17 +427,17 @@ namespace U5ki.CfgService
         }
         void TestCfg(Func<string, bool> ExecuteChange)
         {
-            if (SimulatorForTesting)
-            {
-                string soapVersion = SimulatedCfg.Version;
-                if ((LastCfg != null) && (soapVersion == LastCfg.Version))
-                {
-                    LogDebug<CfgService>($"Configuración actual {LastCfg.Version} coincide con configuración SOAP {soapVersion}");
-                    return;
-                }
-                ExecuteChange(soapVersion);
-                return;
-            }
+            //if (SimulatorForTesting)
+            //{
+            //    string soapVersion = SimulatedCfg.Version;
+            //    if ((LastCfg != null) && (soapVersion == LastCfg.Version))
+            //    {
+            //        LogDebug<CfgService>($"Configuración actual {LastCfg.Version} coincide con configuración SOAP {soapVersion}");
+            //        return;
+            //    }
+            //    ExecuteChange(soapVersion);
+            //    return;
+            //}
 
             using (SoapCfg.InterfazSOAPConfiguracion soapSrv = new U5ki.CfgService.SoapCfg.InterfazSOAPConfiguracion())
             {
@@ -459,11 +461,11 @@ namespace U5ki.CfgService
         }
         bool GetCfg(string version)
         {
-            if (SimulatorForTesting)
-            {
-                LastCfg = SimulatedCfg;
-                return true;
-            }
+            //if (SimulatorForTesting)
+            //{
+            //    LastCfg = SimulatedCfg;
+            //    return true;
+            //}
 
             string systemId = Settings.Default.CfgSystemId;
             using (SoapCfg.InterfazSOAPConfiguracion soapSrv = new U5ki.CfgService.SoapCfg.InterfazSOAPConfiguracion())
@@ -568,13 +570,17 @@ namespace U5ki.CfgService
                 ExceptionManage<CfgService>("SaveCfg", x, $"Exception On saving to file configuration {LastCfg.Version} Excepción: {x.Message}");
             }
         }
-        void PublishCfg()
+        void PublishCfg(Cd40Cfg cfg)
         {
-            LogInfo<CfgService>("Publicando nueva configuración: " + LastCfg.Version, U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
-                "CfgService", CTranslate.translateResource("Publicando nueva configuración: " + LastCfg.Version));
+            LogDebug<CfgService>($"PublishCfg {cfg?.Version ?? "null"}");
 
-            CfgRegistry?.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, LastCfg);
-            CfgRegistry?.Publish(LastCfg.Version);
+            CfgRegistry?.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, cfg);
+            CfgRegistry?.Publish(cfg?.Version, cfg != null);
+            if (cfg != null)
+            {
+                LogInfo<CfgService>("Publicando nueva configuración: " + cfg.Version, U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
+                    "CfgService", CTranslate.translateResource("Publicando nueva configuración: " + cfg.Version));
+            }
         }
         void TrySoapLog(string msg, Exception x = null)
         {
