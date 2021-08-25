@@ -155,7 +155,8 @@ namespace Utilities
             SearchForPhysicalDevices();
             InitialStatusGet();
 
-            EventLogQuery logquery = FilePath == "" ? new EventLogQuery(Cfg.WindowsLog, PathType.LogName) : new EventLogQuery(FilePath, PathType.FilePath);
+            //EventLogQuery logquery = FilePath == "" ? new EventLogQuery(Cfg.WindowsLog, PathType.LogName) : new EventLogQuery(FilePath, PathType.FilePath);
+            var logquery = new EventLogQuery(Cfg.WindowsLog, PathType.LogName);
             watcher = new EventLogWatcher(logquery);
             watcher.EventRecordWritten += new EventHandler<EventRecordWrittenEventArgs>(watcher_EventRecordWritten);
             watcher.Enabled = true;
@@ -219,8 +220,16 @@ namespace Utilities
                 for (int lan = 0; lan < NICList.Count; lan++)
                 {
                     string LanDevice = NICList[lan].DeviceId;
-                    List<EventRecord> last_lan_ev_down = _LogEntries.Where(e => Cfg.DownEventId == (e.Id) && e.ToXml().Contains(LanDevice)).OrderByDescending(e => e.TimeCreated).ToList();
-                    List<EventRecord> last_lan_ev_up = _LogEntries.Where(e => Cfg.UpEventId == (e.Id) && e.ToXml().Contains(LanDevice)).OrderByDescending(e => e.TimeCreated).ToList();
+                    List<EventRecord> last_lan_ev_down = _LogEntries
+                        .Where(e => Cfg.DownEventId == (e.Id))
+                        .Where(e => FromDevice(LanDevice, e))
+                        .OrderByDescending(e => e.TimeCreated)
+                        .ToList();
+                    List<EventRecord> last_lan_ev_up = _LogEntries
+                        .Where(e => Cfg.UpEventId == (e.Id))
+                        .Where(e => FromDevice(LanDevice, e))
+                        .OrderByDescending(e => e.TimeCreated)
+                        .ToList();
 
                     long last_lan_down = last_lan_ev_down.Count == 0 ? DateTime.MinValue.Ticks : last_lan_ev_down[0].TimeCreated.Value.Ticks;
                     long last_lan_up = last_lan_ev_up.Count == 0 ? DateTime.MinValue.Ticks : last_lan_ev_up[0].TimeCreated.Value.Ticks;
@@ -306,6 +315,13 @@ namespace Utilities
         {
             if (lan < NICList.Count && StatusChanged != null)
                 StatusChanged(lan, NICList[lan].Status);
+        }
+
+        bool FromDevice(string devid, EventRecord record)
+        {
+            var xml = record.ToXml();
+            var recstr = $"<Data>{devid}</Data>";
+            return xml.Contains(recstr);
         }
 
         /// <summary>
