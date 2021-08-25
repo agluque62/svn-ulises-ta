@@ -17,7 +17,7 @@ namespace UnitTestProject1
         public void IntelChipsetTest()
         {
             string filePath = "c:\\Users\\arturo.garcia\\Downloads\\CED_PICT03_eventos_sistema.evtx";
-            string jconfig = "{ \"TeamingType\": \"Intel\", \"WindowsLog\": \"System\", \"EventSource\": \"iANSMiniport\", \"UpEventId\": 15, \"DownEventId\": 11, \"PropertyIndex\": 1 }";
+            string jconfig = "{ \"TeamingType\": \"Intel\", \"WindowsLog\": \"System\", \"EventSource\": \"iANSMiniport\", \"UpEventId\": [15], \"DownEventId\": [11], \"PropertyIndex\": 1 }";
             var mon = new NicEventMonitor(jconfig,
                     (lan, status) =>
                     {
@@ -29,11 +29,10 @@ namespace UnitTestProject1
             Debug.WriteLine("NetworkIFSupervisor Arrancado...");
 
             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-
-            //mon.EventSimulate(1, false);
-            //Task.Delay(TimeSpan.FromSeconds(2)).Wait();
-            //mon.EventSimulate(1, true);
-            //Task.Delay(TimeSpan.FromSeconds(2)).Wait();
+            mon.EventSimulate(1, false);
+            Task.Delay(TimeSpan.FromSeconds(2)).Wait();
+            mon.EventSimulate(1, true);
+            Task.Delay(TimeSpan.FromSeconds(2)).Wait();
 
             mon.Dispose();
 
@@ -45,7 +44,7 @@ namespace UnitTestProject1
         public void MarvellChipsetTest()
         {
             string filePath = "c:\\Users\\arturo.garcia\\Downloads\\EvSistema, Puesto chipsetMarvel.evtx";
-            string jconfig = "{ \"TeamingType\": \"Marvell\", \"WindowsLog\": \"System\", \"EventSource\": \"yukonw7\", \"UpEventId\": 123, \"DownEventId\": 83, \"PropertyIndex\": 0 }";
+            string jconfig = "{ \"TeamingType\": \"Marvell\", \"WindowsLog\": \"System\", \"EventSource\": \"yukonw7\", \"UpEventId\": [121,123], \"DownEventId\": [83], \"PropertyIndex\": 0 }";
             var mon = new NicEventMonitor(jconfig,
                     (lan, status) =>
                     {

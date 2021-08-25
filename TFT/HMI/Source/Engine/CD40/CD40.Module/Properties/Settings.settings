@@ -146,12 +146,6 @@
     <Setting Name="LcSpkAsioId" Type="System.String" Scope="Application">
       <Value Profile="(Default)">HD Audio output 2</Value>
     </Setting>
-    <Setting Name="MicAsioId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">HD Audio Mic input 1</Value>
-    </Setting>
-    <Setting Name="CasAsioId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">HD Audio output 1</Value>
-    </Setting>
     <Setting Name="ExpireInProxy" Type="System.UInt32" Scope="Application">
       <Value Profile="(Default)">60</Value>
     </Setting>
@@ -263,12 +257,18 @@
     <Setting Name="LanTeamConfigs" Type="System.Collections.Specialized.StringCollection" Scope="Application">
       <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;string&gt;{ "TeamingType": "Marvell", "WindowsLog": "System", "EventSource":"yukonw7", "UpEventId": 123, "DownEventId": 83, "PropertyIndex": 0 }&lt;/string&gt;
-  &lt;string&gt;{ "TeamingType": "Intel", "WindowsLog": "System", "EventSource":"iANSMiniport", "UpEventId": 15, "DownEventId": 11, "PropertyIndex": 1 }&lt;/string&gt;
+  &lt;string&gt;{ "TeamingType": "Marvell", "WindowsLog": "System", "EventSource":"yukonw7", "UpEventId": [121,123], "DownEventId": [83], "PropertyIndex": 0 }&lt;/string&gt;
+  &lt;string&gt;{ "TeamingType": "Intel", "WindowsLog": "System", "EventSource":"iANSMiniport", "UpEventId": [15], "DownEventId": [11], "PropertyIndex": 1 }&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
     <Setting Name="CwpPttFilterMsec" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="MicAsioId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">USB Headset1</Value>
+    </Setting>
+    <Setting Name="CasAsioId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">USB Headset1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

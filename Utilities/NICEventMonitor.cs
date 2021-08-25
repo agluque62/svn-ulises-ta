@@ -47,8 +47,8 @@ namespace Utilities
             public string TeamingType { get; set; }
             public string WindowsLog { get; set; }
             public string EventSource { get; set; }
-            public int UpEventId { get; set; }
-            public int DownEventId { get; set; }
+            public int [] UpEventId { get; set; }
+            public int [] DownEventId { get; set; }
             public int PropertyIndex { get; set; }
 
             public NicEventMonitorConfig()
@@ -56,8 +56,8 @@ namespace Utilities
                 TeamingType = "Intel";
                 WindowsLog = "System";
                 EventSource = "iANSMiniport";
-                UpEventId = 15;
-                DownEventId = 11;
+                UpEventId = new int[] { 15 };
+                DownEventId = new int[] { 11 };
                 PropertyIndex = 1;
             }
         }
@@ -135,7 +135,7 @@ namespace Utilities
                 using (EventLog eventLog = new EventLog(Cfg.WindowsLog, Environment.MachineName, Cfg.EventSource))
                 {
                     string idLan = lan < NICList.Count ? NICList[lan].DeviceId : "IDLan " + lan.ToString();
-                    EventInstance eventInstance = new EventInstance(status == false ? Cfg.DownEventId : Cfg.UpEventId, 1, EventLogEntryType.Information);
+                    EventInstance eventInstance = new EventInstance(status == false ? Cfg.DownEventId[0] : Cfg.UpEventId[0], 1, EventLogEntryType.Information);
                     object[] prop = new object[] { Cfg.PropertyIndex == 0 ? idLan : "", Cfg.PropertyIndex == 1 ? idLan : "" };
                     eventLog.WriteEvent(eventInstance, prop);
                 }
@@ -221,12 +221,12 @@ namespace Utilities
                 {
                     string LanDevice = NICList[lan].DeviceId;
                     List<EventRecord> last_lan_ev_down = _LogEntries
-                        .Where(e => Cfg.DownEventId == (e.Id))
+                        .Where(e => Cfg.DownEventId.Contains(e.Id))
                         .Where(e => FromDevice(LanDevice, e))
                         .OrderByDescending(e => e.TimeCreated)
                         .ToList();
                     List<EventRecord> last_lan_ev_up = _LogEntries
-                        .Where(e => Cfg.UpEventId == (e.Id))
+                        .Where(e => Cfg.UpEventId.Contains(e.Id))
                         .Where(e => FromDevice(LanDevice, e))
                         .OrderByDescending(e => e.TimeCreated)
                         .ToList();
@@ -249,7 +249,8 @@ namespace Utilities
         /// </summary>
         protected void LogEntriesGet()
         {
-            string evtQuery = String.Format("*[System[(Provider/@Name=\"{0}\") and ((EventID={1}) or (EventID={2}) )]]", Cfg.EventSource, Cfg.DownEventId, Cfg.UpEventId);
+            //string evtQuery = String.Format("*[System[(Provider/@Name=\"{0}\") and ((EventID={1}) or (EventID={2}) )]]", Cfg.EventSource, Cfg.DownEventId, Cfg.UpEventId);
+            string evtQuery = String.Format("*[System[(Provider/@Name=\"{0}\")]]", Cfg.EventSource);
             EventLogQuery logquery = FilePath == "" ? new EventLogQuery(Cfg.WindowsLog, PathType.LogName, evtQuery) :
                 new EventLogQuery(FilePath, PathType.FilePath, evtQuery);
 
@@ -259,7 +260,8 @@ namespace Utilities
             _LogEntries.Clear();
             while ((entry = elr.ReadEvent()) != null)
             {
-                _LogEntries.Add(entry);
+                if (Cfg.UpEventId.Contains(entry.Id) || Cfg.DownEventId.Contains(entry.Id))
+                    _LogEntries.Add(entry);
             }
             _LogEntries = _LogEntries.OrderByDescending(e => e.TimeCreated).ToList();
         }
@@ -272,7 +274,7 @@ namespace Utilities
         protected void watcher_EventRecordWritten(object sender, EventRecordWrittenEventArgs e)
         {
             if (e.EventRecord.LogName == Cfg.WindowsLog && e.EventRecord.ProviderName == Cfg.EventSource &&
-                (e.EventRecord.Id == Cfg.UpEventId || e.EventRecord.Id == Cfg.DownEventId))
+                ( Cfg.UpEventId.Contains(e.EventRecord.Id) || Cfg.DownEventId.Contains(e.EventRecord.Id)))
             {
                 lock (NICList)
                 {
@@ -283,7 +285,7 @@ namespace Utilities
                         NICItem lan = NICList.Where(nic => nic.DeviceId == idLan).FirstOrDefault();
                         if (lan != null)
                         {
-                            lan.Status = e.EventRecord.Id == Cfg.UpEventId ? LanStatus.Up : LanStatus.Down;
+                            lan.Status = Cfg.UpEventId.Contains(e.EventRecord.Id) ? LanStatus.Up : LanStatus.Down;
                             RaiseStatusChanged(lan.Index);
                         }
                     }

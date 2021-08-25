@@ -120,7 +120,6 @@
     <Compile Include="BusinessEntities\LcManager.cs" />
     <Compile Include="BusinessEntities\MicronasHwManager.cs" />
     <Compile Include="BusinessEntities\MMAudioDeviceManager.cs" />
-    <Compile Include="BusinessEntities\NICEventMonitor.cs" />
     <Compile Include="BusinessEntities\RdManager.cs" />
     <Compile Include="BusinessEntities\RecorderManager.cs" />
     <Compile Include="BusinessEntities\Resource.cs" />

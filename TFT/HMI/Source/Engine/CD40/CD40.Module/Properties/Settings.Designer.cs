@@ -12,7 +12,7 @@ namespace HMI.CD40.Module.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -461,24 +461,6 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("HD Audio Mic input 1")]
-        public string MicAsioId {
-            get {
-                return ((string)(this["MicAsioId"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("HD Audio output 1")]
-        public string CasAsioId {
-            get {
-                return ((string)(this["CasAsioId"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("60")]
         public uint ExpireInProxy {
             get {
@@ -785,15 +767,6 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int LanTeamType {
-            get {
-                return ((int)(this["LanTeamType"]));
-            }
-        }
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("90")]
         public int OverloadQueueWarning {
             get {
@@ -803,10 +776,19 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int LanTeamType {
+            get {
+                return ((int)(this["LanTeamType"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <string>{ ""TeamingType"": ""Marvell"", ""WindowsLog"": ""System"", ""EventSource"":""yukonw7"", ""UpEventId"": 123, ""DownEventId"": 83, ""PropertyIndex"": 0 }</string>
-  <string>{ ""TeamingType"": ""Intel"", ""WindowsLog"": ""System"", ""EventSource"":""iANSMiniport"", ""UpEventId"": 15, ""DownEventId"": 11, ""PropertyIndex"": 1 }</string>
+  <string>{ ""TeamingType"": ""Marvell"", ""WindowsLog"": ""System"", ""EventSource"":""yukonw7"", ""UpEventId"": [121,123], ""DownEventId"": [83], ""PropertyIndex"": 0 }</string>
+  <string>{ ""TeamingType"": ""Intel"", ""WindowsLog"": ""System"", ""EventSource"":""iANSMiniport"", ""UpEventId"": [15], ""DownEventId"": [11], ""PropertyIndex"": 1 }</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection LanTeamConfigs {
             get {
@@ -820,6 +802,24 @@ namespace HMI.CD40.Module.Properties {
         public int CwpPttFilterMsec {
             get {
                 return ((int)(this["CwpPttFilterMsec"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset1")]
+        public string MicAsioId {
+            get {
+                return ((string)(this["MicAsioId"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset1")]
+        public string CasAsioId {
+            get {
+                return ((string)(this["CasAsioId"]));
             }
         }
     }
