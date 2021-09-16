@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using System.Globalization;
@@ -11,7 +12,8 @@ using U5ki.Infrastructure;
 using NLog;
 
 namespace U5ki.NodeBox.WebServer 
-{   class WebAppServer : BaseCode
+{   
+    public class WebAppServer : BaseCode, IDisposable
     {
         /// <summary>
         /// 
@@ -27,6 +29,7 @@ namespace U5ki.NodeBox.WebServer
         public bool HtmlEncode { get; set; }
         public bool Enable { get; set; }
         public string DisableCause { get; set; }
+        public int SyncListenerSpvPeriod { get; set; } = 5;
 
         /// <summary>
         /// 
@@ -55,6 +58,16 @@ namespace U5ki.NodeBox.WebServer
             Enable = enable;
             DisableCause = "";
         }
+        public WebAppServer(string rootDirectory)
+        {
+            Directory.SetCurrentDirectory(rootDirectory);
+            DefaultUrl = "/index.html";
+            DefaultDir = "/appweb";
+            HtmlEncode = true;
+            Enable = true;
+            DisableCause = "";
+        }
+        public void Dispose() { }
 
         /// <summary>
         /// 
@@ -63,26 +76,55 @@ namespace U5ki.NodeBox.WebServer
         /// <param name="cfg"></param>
         public void Start(int port, Dictionary<string, wasRestCallBack> cfg)
         {
-            lock (locker)
+            LogDebug<WebAppServer>($"{Id} Starting WebAppServer");
+            CfgRest = cfg;
+
+            ExecutiveThreadCancel = new CancellationTokenSource();
+            ExecutiveThread = Task.Run(() =>
             {
-                if (_listener != null)
-                    Stop();
-
-                _cfgRest = cfg;
-                _listener = new HttpListener();
-                _listener.Prefixes.Add("http://*:" + port.ToString() + "/");
-
-                /** Configurar la Autentificacion */
-                _listener.AuthenticationSchemes = AuthenticationSchemes.Basic | AuthenticationSchemes.Anonymous;
-                _listener.AuthenticationSchemeSelectorDelegate = request =>
+                DateTime lastListenerTime = DateTime.MinValue;
+                DateTime lastRefreshTime = DateTime.MinValue;
+                // Supervisar la cancelacion.
+                while (ExecutiveThreadCancel.IsCancellationRequested == false)
                 {
-                    /** Todas las operaciones No GET de Usuarios no ulises se consideran inseguras... Habra que autentificarse */
-                    return request.HttpMethod == "GET" || request.Headers["UlisesClient"]=="MTTO" ? AuthenticationSchemes.Anonymous : AuthenticationSchemes.Basic;
-                };
+                    Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
+                    if (DateTime.Now - lastListenerTime >= TimeSpan.FromSeconds(SyncListenerSpvPeriod))
+                    {
+                        // Supervisar la disponibilidad del Listener.
+                        lock (Locker)
+                        {
+                            if (Listener == null)
+                            {
+                                try
+                                {
+                                    LogDebug<WebAppServer>($"{Id} Starting HttpListener");
+                                    Listener = new HttpListener();
+                                    Listener.Prefixes.Add("http://*:" + port.ToString() + "/");
 
-                _listener.Start();
-                _listener.BeginGetContext(new AsyncCallback(GetContextCallback), null);
-            }
+                                    /** Configurar la Autentificacion */
+                                    Listener.AuthenticationSchemes = AuthenticationSchemes.Basic | AuthenticationSchemes.Anonymous;
+                                    Listener.AuthenticationSchemeSelectorDelegate = request =>
+                                    {
+                                        /** Todas las operaciones No GET de Usuarios no ulises se consideran inseguras... Habra que autentificarse */
+                                        return request.HttpMethod == "GET" || request.Headers["UlisesClient"] == "MTTO" ? AuthenticationSchemes.Anonymous : AuthenticationSchemes.Basic;
+                                    };
+
+                                    Listener.Start();
+                                    Listener.BeginGetContext(new AsyncCallback(GetContextCallback), null);
+                                    LogDebug<WebAppServer>($"{Id} HttpListener Started");
+                                }
+                                catch (Exception x)
+                                {
+                                    LogException<WebAppServer>($"{Id} ", x, false);
+                                    ResetListener();
+                                }
+                            }
+                        }
+                        lastListenerTime = DateTime.Now;
+                    }
+                }
+            });
+            LogDebug<WebAppServer>($"{Id} WebAppServer Started");
         }
 
         /// <summary>
@@ -90,14 +132,16 @@ namespace U5ki.NodeBox.WebServer
         /// </summary>
         public virtual void Stop()
         {
-            lock (locker)
+            lock (Locker)
             {
-                if (_listener != null)
-                {
-                    _listener.Close();
-                    _listener = null;
-                    _cfgRest = null;
-                }
+                LogDebug<WebAppServer>($"{Id} Ending WebAppServer");
+
+                ExecutiveThreadCancel?.Cancel();
+                ExecutiveThread?.Wait(TimeSpan.FromSeconds(5));
+                Listener?.Close();
+                Listener = null;
+
+                LogDebug<WebAppServer>($"{Id} WebAppServer Ended");
             }
         }
 
@@ -111,18 +155,19 @@ namespace U5ki.NodeBox.WebServer
         /// <param name="result"></param>
         void GetContextCallback(IAsyncResult result)
         {
-            lock (locker)
+            lock (Locker)
             {
                 //U5kGenericos.SetCurrentCulture();
 
-                if (_listener == null || _listener.IsListening == false)
+                if (Listener == null || Listener.IsListening == false)
                     return;
 
-                HttpListenerContext context = _listener.EndGetContext(result);
-                logrequest(context);
+                HttpListenerContext context = Listener.EndGetContext(result);
 
                 try
                 {
+                    Logrequest(context);
+
                     if (Authenticated(context))
                     {
                         string url = context.Request.Url.LocalPath;
@@ -168,6 +213,12 @@ namespace U5ki.NodeBox.WebServer
                         }
                     }
                 }
+                catch(HttpListenerException x)
+                {
+                    // Si se produce una excepcion de este tipo, hay que reiniciar el LISTENER.
+                    LogException<WebAppServer>("", x, false);
+                    ResetListener();
+                }
                 catch (Exception x)
                 {
                     LogException<WebAppServer>("", x, false);
@@ -176,9 +227,11 @@ namespace U5ki.NodeBox.WebServer
                 }
                 finally
                 {
-                    context.Response.Close();
-                    if (_listener != null && _listener.IsListening)
-                        _listener.BeginGetContext(new AsyncCallback(GetContextCallback), null);
+                    if (Listener != null && Listener.IsListening)
+                    {
+                        context.Response.Close();
+                        Listener.BeginGetContext(new AsyncCallback(GetContextCallback), null);
+                    }
                 }
             }
         }
@@ -263,14 +316,14 @@ namespace U5ki.NodeBox.WebServer
         /// <returns></returns>
         protected wasRestCallBack FindRest(string url)
         {
-            if (_cfgRest == null)
+            if (CfgRest == null)
                 return null;
 
-            if (_cfgRest.ContainsKey(url))
-                return _cfgRest[url];
+            if (CfgRest.ContainsKey(url))
+                return CfgRest[url];
 
             string[] urlComp = url.Split('/');
-            foreach (KeyValuePair<string, wasRestCallBack> item in _cfgRest)
+            foreach (KeyValuePair<string, wasRestCallBack> item in CfgRest)
             {
                 string[] keyComp = item.Key.Split('/');
                 if (keyComp.Count() != urlComp.Count())
@@ -295,7 +348,7 @@ namespace U5ki.NodeBox.WebServer
         /// </summary>
         /// <param name="ext"></param>
         /// <returns></returns>
-        Dictionary<string, string> _filetypes = new Dictionary<string, string>()
+        readonly Dictionary<string, string> _filetypes = new Dictionary<string, string>()
         {
             {".css","text/css"},
             {".jpeg","image/jpg"},
@@ -319,7 +372,18 @@ namespace U5ki.NodeBox.WebServer
                 return _filetypes[ext];
             return "text/text";
         }
+        private void ResetListener()
+        {
+            lock (Locker)
+            {
+                LogDebug<WebAppServer>($"{Id} Reseting Listener");
 
+                Listener?.Close();
+                Listener = null;
+
+                LogDebug<WebAppServer>($"{Id} Listener Reset");
+            }
+        }
         #endregion
 
         #region Autenticacion
@@ -364,19 +428,35 @@ namespace U5ki.NodeBox.WebServer
         #endregion Autentificacion
 
         #region Testing
-        private void logrequest(HttpListenerContext context)
+        private void Logrequest(HttpListenerContext context)
         {
 #if DEBUG
             if (context.Request.QueryString.Count > 0)
             {
-                NLog.LogManager.GetLogger("Testing").Debug("URL: {0}", context.Request.Url.OriginalString);
-                NLog.LogManager.GetLogger("Testing").Debug("Raw URL: {0}", context.Request.RawUrl);
-
                 var array = (from key in context.Request.QueryString.AllKeys
                              from value in context.Request.QueryString.GetValues(key)
                              select string.Format("{0}={1}", key, value)).ToArray();
-
-                NLog.LogManager.GetLogger("Testing").Debug("Query: {0}", String.Join("##",array));
+                
+                LogDebug<WebAppServer>($"{Id} URL: {context.Request.Url.OriginalString}, " +
+                    $"Raw URL: {context.Request.RawUrl}, " +
+                    $"Query: {String.Join("##", array)}");
+            }
+            else
+            {
+                LogDebug<WebAppServer>($"{Id} URL: {context.Request.Url.OriginalString}, " +
+                    $"Raw URL: {context.Request.RawUrl}, ");
+            }
+            ErrorTesting();
+#endif
+        }
+        bool ErrorTriggered = false;
+        private void ErrorTesting()
+        {
+#if DEBUG
+            if (!ErrorTriggered && (DateTime.Now-StartingDate)>TimeSpan.FromSeconds(7))
+            {
+                ErrorTriggered = true;
+                throw new HttpListenerException(1444, "Testing HttpListenerException");
             }
 #endif
         }
@@ -384,9 +464,13 @@ namespace U5ki.NodeBox.WebServer
 
         #region Private
 
-        HttpListener _listener = null;
-        Dictionary<string, wasRestCallBack> _cfgRest = null;
-        Object locker = new Object();
+        string Id => $"On WebAppServer:";
+        Task ExecutiveThread { get; set; } = null;
+        CancellationTokenSource ExecutiveThreadCancel { get; set; } = null;
+        HttpListener Listener { get; set; } = null;
+        Dictionary<string, wasRestCallBack> CfgRest { get; set; } = null;
+        object Locker { get; set; } = new Object();
+        static DateTime StartingDate { get; set; } = DateTime.Now;
 
         #endregion
     }

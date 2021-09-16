@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Windows.Forms;
+using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
 
 using U5ki.NodeBox;
+using U5ki.NodeBox.WebServer;
 using Utilities;
 
 namespace UnitTestProject
@@ -17,20 +18,24 @@ namespace UnitTestProject
     [TestClass]
     public class NbxWebServerUnitTest
     {
-        //NbxWebServer _webServer = new NbxWebServer("d:\\Datos\\Empresa\\_SharedPrj\\UlisesV5000i-trunk\\ulises-ta\\Sources\\Cd40\\Source\\NodeBox");
-
+        //const string RootDirectory = "c:\\Users\\arturo.garcia\\source\\repos\\nucleocc\\dev-branches\\ulises-ta\\Cd40\\Source\\NodeBox";
+        const string RootDirectory = "..\\..\\..\\..\\NodeBox";
+        void PrepareTest(Action<WebAppServer> execute)
+        {
+            using (var server = new WebAppServer(RootDirectory))
+            {
+                server.Start(1444, new Dictionary<string, WebAppServer.wasRestCallBack>());
+                execute(server);
+                server.Stop();
+            }
+        }
         [TestMethod]
         public void NbxWebServerTestMethod1()
         {
-            //_webServer.WebSrvCommand += (cmd, datain) =>
-            //{
-            //    return null;
-            //};
-            //_webServer.Start(14441);
-
-            //MessageBox.Show("WebServerArrancado");
-
-            //_webServer.Dispose();
+            PrepareTest((server) =>
+            {
+                Task.Delay(TimeSpan.FromSeconds(60)).Wait();
+            });
         }
     }
 
