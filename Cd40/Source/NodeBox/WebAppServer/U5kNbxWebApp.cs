@@ -40,7 +40,7 @@ namespace U5ki.NodeBox.WebServer
                     var data = HttpHelper.Get(page).Result;
                     var users = JsonConvert.DeserializeObject<List<SystemUserInfo>>(data);
 
-                    return users?.Where(u => u.id == user && u.pwd == pwd && u.prf == 3).Count() == 1;
+                    return users?.Where(u => u.id == user && u.pwd == pwd && (u.prf == 3 || u.prf==2 || u.prf==1)).Count() == 1;
                 }
                 catch(Exception )
                 {
