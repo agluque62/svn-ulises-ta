@@ -48,20 +48,29 @@ namespace HMI.Presentation.Twr.Views
 		private Keypad _Keypad;
 		private MemUC _Mem;
 		private Dictionary<HMIButton, Color> _SlowBlinkList;
+
 		private bool _SlowBlinkOn = true;
 		private bool _IsCurrentView = false;
 		private int? _CallTimestamp = null;
 		private Number[] _Historic = new Number[4];
 		private TlfDst _SetCall = null;
         private const string UNKNOWN_DST = "99";
+		//lalm 211201 #2855
+		private Timer _TlfTimer = new Timer();//#2855
+		private int? _TickUltimoDigito = null;//#2855
 		private bool _KeypadEnabled
 		{
 			get
 			{
                 if (_StateManager.Tlf.Unhang.State != UnhangState.Idle)
                 {
-                    return false;
+					//#2855
+					if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
+						return true;
+                    //return false;//#2855
                 }
+				else if (_StateManager.Tlf.Unhang.State == UnhangState.Idle)
+					return false;
 				if (!_StateManager.Tft.Enabled || !_StateManager.Engine.Operative ||
 					(_StateManager.Tlf.Priority.State == FunctionState.Error) ||
 					(_StateManager.Tlf.Listen.State == FunctionState.Executing) || (_StateManager.Tlf.Listen.State == FunctionState.Error) ||
@@ -103,6 +112,12 @@ namespace HMI.Presentation.Twr.Views
 					return Tlf.ValidateNumber(_Keypad.Digits);
 				}
 				if (_StateManager.Tlf.Unhang.State != UnhangState.Idle)
+				{
+					return true;
+				}
+				//#2855
+				// Ahora tambien en reposo esta habilitada la marcacion
+				if (_StateManager.Tlf.Unhang.State == UnhangState.Idle)
 				{
 					return true;
 				}
@@ -262,17 +277,23 @@ namespace HMI.Presentation.Twr.Views
                     // cuando se ha hecho una llamada por AI 
                     _Keypad.Enabled = false;
                     _CallBT.Enabled = true;
-                    _SlowBlinkTimer.Enabled = true;
+					//#2855
+					//_Keypad.Enabled = (_StateManager.Tlf.GetTlfState()==Unhang);
+					_CallBT.Enabled = true;
+
+					_SlowBlinkTimer.Enabled = true;
                     _SlowBlinkOn = true;
                     _CallTimestamp = Environment.TickCount;
                     
                     _CallBT.ButtonColor = GetStateColor(_CallBT, UnhangState.Set);
+					_CallBT.ButtonColor = Color.Yellow;
+
                 }
                 else
                 {
-                    _Keypad.Enabled = _KeypadEnabled;
-                    _CallBT.Enabled = _CallEnabled;
-                    _CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
+					_Keypad.Enabled = _KeypadEnabled;
+					_CallBT.Enabled = _CallEnabled;
+					_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
                 }
 
 				_MemBT.Enabled = _MemEnabled;
@@ -291,8 +312,14 @@ namespace HMI.Presentation.Twr.Views
 			{
 				_IsCurrentView = false;
 				_CallTimestamp = null;
+				//#2855
+				// Al cambiar de vista, aunque no se haya empezado a marcar, no se modifica el estado de AI.
+				// Puede que esté la telca AI descolgada sin posicion asociada.
+				if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
+                {
 
-				if (_StateManager.Tlf.Unhang.AssociatePosition != -1)
+                }
+				else if (_StateManager.Tlf.Unhang.AssociatePosition != -1)
 				{
 					_StateManager.Tlf.Unhang.Reset(); 
 
@@ -318,6 +345,10 @@ namespace HMI.Presentation.Twr.Views
 
                 _Keypad.Enabled = _KeypadEnabled;
 				_CallBT.Enabled = _CallEnabled;
+
+				//#2855
+				_Keypad.Enabled = (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado);
+				_CallBT.Enabled = true;
 
 				if (_SlowBlinkList.Remove(_CallBT) && (_SlowBlinkList.Count == 0))
 				{
@@ -465,7 +496,8 @@ namespace HMI.Presentation.Twr.Views
 					}
 
                     _Keypad.Enabled = _KeypadEnabled;
-					_CallBT.Enabled = _CallEnabled;
+					//_CallBT.Enabled = _CallEnabled;//*2855
+					_CallBT.Enabled = true;//#2855 habilito marcador por defecto
 				}
 			}
 
@@ -571,6 +603,10 @@ namespace HMI.Presentation.Twr.Views
 					_SlowBlinkList[bt] = VisualStyle.Colors.Yellow;
 					_SlowBlinkTimer.Enabled = true;
 					break;
+				case UnhangState.Descolgado://#2855	
+					backColor = VisualStyle.Colors.Yellow ;
+					_DescolgarTimer.Enabled = true;
+					break;
 			}
 
 			return backColor;
@@ -638,8 +674,175 @@ namespace HMI.Presentation.Twr.Views
 			}
 		}
 
+		//#2855
+		bool LlamadaCompleta(String dst1)
+		{
+			if ((dst1.Length == 6 && dst1.StartsWith("2")) ||
+				(dst1.Length == 6 && dst1.StartsWith("3")) ||
+				 (dst1.Length == 8 && dst1.StartsWith("02")) ||
+				 (dst1.Length == 8 && dst1.StartsWith("03"))
+				 )
+				return true;
+			return false;
+		}
+
+		//#2855
+		bool CanMakecall(String dst1)
+		{
+			if ((dst1.Length == 6 && dst1.StartsWith("2")) ||
+				(dst1.Length == 6 && dst1.StartsWith("3")) ||
+				(dst1.Length == 8 && dst1.StartsWith("02")) ||
+				(dst1.Length == 8 && dst1.StartsWith("03")) ||
+ 				(dst1.Length > 2 && dst1.StartsWith("04")) ||
+				(dst1.Length > 2 && dst1.StartsWith("05")) ||
+				(dst1.Length > 2 && dst1.StartsWith("06")) ||
+				(dst1.Length > 2 && dst1.StartsWith("07")) ||
+				(dst1.Length > 2 && dst1.StartsWith("08")) ||
+				(dst1.Length > 2 && dst1.StartsWith("09"))
+				 )
+				return true;
+			return false;
+		}
+		//#2855
+		//LALM 211201
+		private void _DescolgarTimer_Tick(object sender, EventArgs e)
+		{
+			try
+			{
+				string dst1 = _Keypad.Display;
+				int? tiempo = Environment.TickCount  - _TickUltimoDigito;
+				if (((Environment.TickCount - _TickUltimoDigito) > 4000) || LlamadaCompleta(dst1))
+					if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
+						if (CanMakecall(dst1))
+						{
+							_TickUltimoDigito = Environment.TickCount;
+							_DescolgarTimer.Enabled = false;
+							try
+							{
+								if ((_StateManager.Tlf.Unhang.State == UnhangState.Descolgado) && _Keypad.Enabled)
+								{
+									string dst = _Keypad.Display;
+									try
+									{
+										_CmdManager.TlfClick(_Keypad.Display);
+										_CallTimestamp = Environment.TickCount;
+										//LALM 211210 Si se quisiera cambiar a pagina AD
+										_CmdManager.SwitchTlfView(ViewNames.TlfDa);
+
+									}
+									catch (Exception ex)
+									{
+										_Logger.Error("ERROR llamando a " + dst, ex);
+									}
+								}
+								else
+								{
+									try
+									{
+										Debug.Assert(_StateManager.Tlf.Unhang.AssociatePosition == Tlf.IaMappedPosition);
+										_CmdManager.TlfClick(Tlf.IaMappedPosition);
+										_CallBT.ButtonColor = GetStateColor(_CallBT, UnhangState.Idle);
+									}
+									catch (Exception ex)
+									{
+										_Logger.Error("ERROR pulsando tecla de llamada en pagina AI", ex);
+									}
+								}
+							}
+							catch (Exception ex)
+							{
+								_Logger.Error("ERROR pulsando tecla de llamada en pagina AI", ex);
+							}
+						}
+			}
+			catch (Exception ex)
+			{
+				_Logger.Error("ERROR generando parpadeo lento para teclas TlfAI", ex);
+			}
+		}
+		//*2855
 		private void _CallBT_Click(object sender, EventArgs e)
 		{
+			//#2855 el keypad siempre esta habilitado, no lo compruebo.
+			_Keypad.Enabled = true;
+			string dst1 = _Keypad.Display;
+			_DescolgarTimer.Enabled = true;
+
+
+			//#2855
+			if (dst1.Length==0)
+            {
+				if (_StateManager.Tlf.Unhang.State == UnhangState.Idle)
+				{
+					// Siempre va a se idle, cuando se cambia de pagina AD to AI se pone a idle.
+					int id = Tlf.NumDestinations;
+					//_StateManager.Tlf.Unhang.Cuelga();
+					//_StateManager.Tlf.Unhang.Descuelga(id);
+					//poner tono
+					_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
+					// LALM 211214 Cambio tlfclick(id) por rlfclick(dst1,id) 
+					// para poder separar la tecla descuelgue de la tecla 19+1
+					//_CmdManager.TlfClick(id);
+					_CmdManager.TlfClick(dst1, id.ToString());
+
+					System.Threading.Thread.Sleep(1000);
+					_Keypad.Enabled = true;
+					_StateManager.Tlf.Unhang.Descuelga(id);
+					_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
+					return;
+				}
+				else if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
+				{
+					//quitar tono
+					_StateManager.Tlf.Unhang.Cuelga();
+
+					//_CallBT.ButtonColor = GetStateColor(_CallBT, UnhangState.Idle);
+					_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
+					_DescolgarTimer.Enabled = false;
+					int id = Tlf.NumDestinations;
+					_CmdManager.TlfClick(id);
+					_Keypad.Enabled = false;
+					return;
+				}
+				else
+					_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
+
+			}
+			else if(dst1.Length>0)
+            {
+				_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
+				if (_StateManager.Tlf.Unhang.State == UnhangState.Idle)
+				{
+					// copia del tratamiento antiguo.
+					string dst = _Keypad.Display;
+					try
+					{
+						_CmdManager.TlfClick(_Keypad.Display);
+						_CallTimestamp = Environment.TickCount;
+					}
+					catch (Exception ex)
+					{
+						_Logger.Error("ERROR llamando a " + dst, ex);
+					}
+					return;
+				}
+				else if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
+				{
+					//quitar tono
+					_StateManager.Tlf.Unhang.Cuelga();
+
+					_CallBT.ButtonColor = GetStateColor(_CallBT, UnhangState.Idle);
+					_DescolgarTimer.Enabled = false;
+					int id = Tlf.NumDestinations;
+					_CmdManager.TlfClick(id);
+					_Keypad.Enabled = false;
+					_Keypad.ResetText();
+					return;
+				}
+
+			}
+			//*2855
+
 			if ((_StateManager.Tlf.Unhang.State == UnhangState.Idle) && _Keypad.Enabled)
 			{
 				string dst = _Keypad.Display;
@@ -735,6 +938,8 @@ namespace HMI.Presentation.Twr.Views
 			}
 			else*/
 			{
+				_TickUltimoDigito = Environment.TickCount;//#2855
+				_DescolgarTimer.Enabled = true;//#2855
 				try
 				{
 					_CallBT.Enabled = _CallEnabled;

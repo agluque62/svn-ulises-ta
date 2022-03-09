@@ -373,6 +373,9 @@ namespace UnoMasUnoUnitTest
             i.IpGrabador1 = "";
             i.IpGrabador2 = "";
             i.RtspPort = 0;
+            i.TipoGrabacionAnalogica = 0;
+            i.EnableGrabacionEd137 = 0;
+            i.EnableGrabacionAnalogica = 0;
             cfg.ConfiguracionGeneral.PlanAsignacionUsuarios.Add(i);
         }
         private void ConfiguracionEquipos(ref Cd40Cfg cfg)

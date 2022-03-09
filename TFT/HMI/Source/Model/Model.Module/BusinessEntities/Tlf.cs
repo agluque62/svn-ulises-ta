@@ -36,7 +36,8 @@ namespace HMI.Model.Module.BusinessEntities
 		InPrio,
 		OutOfService, 
         Inactive,
-        InProcess //Telephony function in process (i.e. selected target for pickUp)
+        InProcess, //Telephony function in process (i.e. selected target for pickUp)
+		offhook //#2855
 	}
 
 	public enum TlfType
@@ -73,7 +74,8 @@ namespace HMI.Model.Module.BusinessEntities
 		Conf = TlfState.Conf,
 		Out = TlfState.Out,
 		OutOfService = TlfState.OutOfService,
-		NotAllowed = TlfState.NotAllowed
+		NotAllowed = TlfState.NotAllowed,
+		Descolgado = TlfState.offhook //#2855
 	}
 
     /// <summary>
@@ -989,6 +991,19 @@ namespace HMI.Model.Module.BusinessEntities
 			}
 		}
 
+		//#2855
+		public void Descuelga(int id)
+		{
+			State = UnhangState.Descolgado;
+			this._AssociatePosition = id;
+		}
+
+		public void Cuelga()
+		{
+			State = UnhangState.Idle;
+			this._AssociatePosition = -1;
+		}
+
 		public void Reset()
 		{
 			_AssociatePosition = -1;
@@ -1057,7 +1072,7 @@ namespace HMI.Model.Module.BusinessEntities
 	public sealed class Tlf
 	{
         //Peticiones #3638
-		public static int NumIaDestinations = 2;//LALM 210923 prueba para ver si pueden entrar dos llamadas
+		public static int NumIaDestinations = 1;//LALM 210923 , anulada, solo puede existir una lina de AI.
 		public static int NumDestinations = Settings.Default.NumTlfDestinations;
 		public static int IaMappedPosition = NumDestinations;
 

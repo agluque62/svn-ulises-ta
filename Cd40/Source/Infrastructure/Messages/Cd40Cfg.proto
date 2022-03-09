@@ -196,6 +196,12 @@ message AsignacionUsuariosTV
 	optional string IpGrabador1 = 3;
 	optional string IpGrabador2 = 4;
 	optional int32 RtspPort = 5;
+	//lalm 211217
+	//#3267 RQF22
+	optional int32 TipoGrabacionAnalogica = 6;
+	//#RQF24
+	optional bool EnableGrabacionEd137 = 7;
+	optional bool EnableGrabacionAnalogica = 8;
 }
 
 message AsignacionUsuariosDominantesTV 
@@ -250,7 +256,7 @@ message ParametrosSectorSCVKeepAlive
 	optional bool Intruido = 8;
 	optional uint32 KeepAlivePeriod = 9;
 	optional uint32 KeepAliveMultiplier = 10;
-	optional bool GrabacionEd137 = 11;
+	//optional bool GrabacionEd137 = 11;
 }
 
 message PermisosRedesSCV

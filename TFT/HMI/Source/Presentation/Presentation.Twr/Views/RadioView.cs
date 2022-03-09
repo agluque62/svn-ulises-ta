@@ -34,6 +34,7 @@ using HMI.Presentation.Twr.Properties;
 using HMI.Presentation.Twr.UI;
 using Utilities;
 using NLog;
+using System.IO;
 
 namespace HMI.Presentation.Twr.Views
 {
@@ -942,7 +943,78 @@ namespace HMI.Presentation.Twr.Views
 			}
 		}
 
-		private void _PttBT_MouseDown(object sender, MouseEventArgs e)
+        private void _PlayBT_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _CmdManager.PlayRadioClick();
+                ;//_CmdManager.RdPlayClick(_NumPositionsByPage);
+                //if (Directory.Exists(Settings.Default.DirectorioGLP))
+			    //	Directory.Delete(Settings.Default.DirectorioGLP, true);
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error("ERROR iniciando operacion Play", ex);
+            }
+        }
+
+        private void _PlayBT_LevelDown(object sender, EventArgs e)
+        {
+            //TODO cambiar por play y stop
+            int level = _RdHeadPhonesUDB.Level - 1;
+
+            try
+            {
+                _CmdManager.RdSetHeadPhonesLevel(level);
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error("ERROR bajando el nivel de los microcascos RD a " + level, ex);
+            }
+        }
+
+        private void _PlayBT_LevelUp(object sender, EventArgs e)
+        {
+            //TODO cambiar por play y stop
+            int level = _RdHeadPhonesUDB.Level - 1;
+
+            try
+            {
+                _CmdManager.RdSetHeadPhonesLevel(level);
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error("ERROR bajando el nivel de los microcascos RD a " + level, ex);
+            }
+        }
+
+
+
+        private void _OutBT_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ;//_CmdManager.RdOutClick(_NumPositionsByPage);
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error("ERROR iniciando operacion Out", ex);
+            }
+        }
+
+        private void _TimeBT_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ;// _CmdManager.RdTimeClick(_NumPositionsByPage);
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error("ERROR iniciando operacion time", ex);
+            }
+        }
+
+        private void _PttBT_MouseDown(object sender, MouseEventArgs e)
 		{
 			try
 			{

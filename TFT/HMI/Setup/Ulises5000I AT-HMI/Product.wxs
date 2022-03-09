@@ -55,7 +55,7 @@
     <Property Id="INSTALLFOLDER_NAME" Value="Ulises5000I-TA"></Property>
     <Property Id="CONFIG_FILE" Value="HMI.exe.config"></Property>
     <Property Id='RECDUAL' Value='0'></Property>
-    <Property Id="PVERSION" Value="2.5.9"></Property>
+    <Property Id="PVERSION" Value="2.6.0"></Property>
 
     <!--Propiedades a mantener cuando se reinstala -->
     <Property Id="ED137REC" Value="0">
@@ -134,8 +134,8 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='RDSTATUSREC_Property' Type='raw' />
     </Property>
-    <!-- Recuperacion de grupos de RTX  -->
-    <Property Id="RDRTXREC" Value="False">
+    <!-- Recuperacion de grupos de RTX Peticiones #4502 lo pongo a true por defecto -->
+    <Property Id="RDRTXREC" Value="True">
       <RegistrySearch Id='UV5KI_HMI_RDRTXREC' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='RDRTXREC_Property' Type='raw' />
@@ -163,8 +163,8 @@
     </Property>
 
 <!---->
-    <!-- Tiempo para Supervisar la Confirmacion TX  -->
-    <Property Id="TIMESPTX" Value="0">
+    <!-- Tiempo para Supervisar la Confirmacion TX Peticiones #4502 lo dejo a 1000.??  -->
+    <Property Id="TIMESPTX" Value="1000">
       <RegistrySearch Id='UV5KI_HMI_TIMESPTX' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='TIMESPTX_Property' Type='raw' />
@@ -175,8 +175,8 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='TIMESPRX_Property' Type='raw' />
     </Property>
-    <!-- -->
-    <Property Id="PTTFILTER" Value="0">
+    <!-- Peticiones #4502 pongo 200 el valor por defecto-->
+    <Property Id="PTTFILTER" Value="200">
       <RegistrySearch Id='UV5KI_HMI_PTTFILTER' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='PTTFILTER_Property' Type='raw' />
@@ -582,7 +582,7 @@
         <util:XmlFile Id="LogoUrr" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
-                        Value="Resources/logo_AENA.PNG"/>
+                        Value="Resources/logo_AENA_URV-7.PNG"/>
         <util:XmlFile Id="AppsUrr" Action="setValue"
                         File = "[#ProfileCatalog]"
                         ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
@@ -619,7 +619,7 @@
         <util:XmlFile Id="LogoURV_7" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='Logo'[\]]/value"
-                        Value="Resources/logo_AENA.PNG"/>
+                        Value="Resources/logo_AENA_URV-7.PNG"/>
         <util:XmlFile Id="GlpForURV_7" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='GLP'[\]]/value"
@@ -1131,8 +1131,8 @@
         <Control Id="ServLabel"    Type="Text" X="10"  Y="70" Width="60" Height="18" TabSkip="no" Text="IP-Servidor" />
         <Control Id="ServEdit"     Type="Edit" X="85"  Y="70" Width="90" Height="18" Property="SERVERIP" Text="{80}" Disabled="yes" />
 
-        <Control Id="TipoInterfaz"        Type="Text"     X="10" Y="92" Width="60" Height="18" TabSkip="no" Text="Cliente" />
-        <Control Id="TipoInterfazOptions" Type="ComboBox" X="85" Y="90" Width="90" Height="18" Property="CLIENTE" ComboList="yes" >
+        <Control Id="TipoInterfaz"        Type="Text"     X="10" Y="102" Width="60" Height="18" TabSkip="no" Text="Cliente" />
+        <Control Id="TipoInterfazOptions" Type="ComboBox" X="85" Y="100" Width="90" Height="18" Property="CLIENTE" ComboList="yes" >
           <ComboBox Property="CLIENTE">
             <ListItem Value="ENAIRE" Text="ENAIRE" />
             <ListItem Value="ASECNA" Text="ASECNA" />
@@ -1160,14 +1160,14 @@
           </ComboBox>
         </Control>-->
 
-        <Control Id="TipoLabel"           Type="Text"     X="10" Y="112" Width="60" Height="18" TabSkip="no" Text="Tipo grabación" />
+        <!--<Control Id="TipoLabel"           Type="Text"     X="10" Y="112" Width="60" Height="18" TabSkip="no" Text="Tipo grabación" />
         <Control Id="TipoOptions"         Type="ComboBox" X="85" Y="110" Width="90" Height="18" Property="RECMODE" ComboList="yes" >
           <ComboBox Property="RECMODE">
             <ListItem Value="0" Text="ENAIRE" />
             <ListItem Value="1" Text="ASECNA" />
             <ListItem Value="2" Text="ASECNA+HF" />
           </ComboBox>
-        </Control>
+        </Control>-->
         <Control Id="HwAudioLabel"        Type="Text"     X="190" Y="112" Width="60" Height="18" TabSkip="no" Text="IAO" />
         <Control Id="HwAudioOptions"      Type="ComboBox" X="260" Y="110" Width="90" Height="18" Property="IAOVER" ComboList="yes" >
           <ComboBox Property="IAOVER">
@@ -1253,8 +1253,7 @@
             <![CDATA[SPEAKERTLF = "False" AND SPEAKERONLYMODE = "False"]]>
           </Condition>
         </Control>
-
-        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
+		  <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
         <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
           <Publish Event="DoAction" Value="CustomActionEd137Rec">1</Publish>
         </Control>
@@ -1299,8 +1298,8 @@
             <ListItem Value="False" Text="No" />
           </ComboBox>
         </Control>
-
-        <Control Id="Ed137RecLabel"       Type="Text"     X="10" Y="112" Width="90" Height="18" TabSkip="no" Text="Grabación ED137" />
+<!--LALM210118 SE QUITA LA GRABACION DEL SETUP-->
+        <!--<Control Id="Ed137RecLabel"       Type="Text"     X="10" Y="112" Width="90" Height="18" TabSkip="no" Text="Grabación ED137" />
         <Control Id="Ed137RecOptions"     Type="ComboBox" X="85" Y="110" Width="90" Height="18" Property="ED137REC" ComboList="yes" >
           <ComboBox Property="ED137REC">
             <ListItem Value="0" Text="No" />
@@ -1308,14 +1307,26 @@
             <ListItem Value="3" Text="Dual" />
           </ComboBox>
         </Control>
-        
-        <Control Id="REC1Label"   Type="Text" X="10"  Y="132" Width="60" Height="18" TabSkip="no" Text="Grabador-A" />
-        <Control Id="REC1Edit"    Type="Edit" X="85"  Y="130" Width="90" Height="18" Property="RECA" Text="{80}"/>
-        <Control Id="REC2Label"   Type="Text" X="190" Y="132" Width="60" Height="18" TabSkip="no" Text="Grabador-B" />
-        <Control Id="REC2Edit"    Type="Edit" X="260" Y="130" Width="90" Height="18" Property="RECB" Text="{80}"/>
 
+		  <Control Id="REC1Label"   Type="Text" X="10"  Y="132" Width="60" Height="18" TabSkip="no" Text="Grabador-A" />
+		  <Control Id="REC1Edit"    Type="Edit" X="85"  Y="130" Width="90" Height="18" Property="RECA" Text="{80}">
+			  --><!--lalm 210301 Intento deshabilitar grabacion--><!--
+			  <Condition Action="disable"><![CDATA[ED137REC = "0"]]> </Condition>
+			  <Condition Action="enable"><![CDATA[ED137REC <> "0"]]> </Condition>
+		  </Control>
+
+		  <Control Id="REC2Label"   Type="Text" X="190" Y="132" Width="60" Height="18" TabSkip="no" Text="Grabador-B" />
+        <Control Id="REC2Edit"    Type="Edit" X="260" Y="130" Width="90" Height="18" Property="RECB" Text="{80}">
+			--><!--lalm 210301 Intento deshabilitar grabacion--><!--
+			<Condition Action="disable"><![CDATA[ED137REC = "0"]]> </Condition>
+			<Condition Action="enable"><![CDATA[ED137REC <> "0"]]> </Condition>
+		</Control>
         <Control Id="GLPLabel"   Type="Text" X="10" Y="152" Width="60" Height="18" TabSkip="no" Text="GLP-Dir." />
-        <Control Id="GLPEdit"    Type="Edit" X="85" Y="150" Width="90" Height="18" Property="GLPDIR" Text="{40}"/>
+        <Control Id="GLPEdit"    Type="Edit" X="85" Y="150" Width="90" Height="18" Property="GLPDIR" Text="{40}">
+			--><!--lalm 210301 Intento deshabilitar grabacion--><!--
+			<Condition Action="disable"><![CDATA[ED137REC = "0"]]> </Condition>
+			<Condition Action="enable"><![CDATA[ED137REC <> "0"]]> </Condition>
+		</Control>-->
 
         <Control Id="RadioStatusRecovery_label" Type="Text"       X="10" Y="172" Width="105" Height="18" TabSkip="no" Text="Recuperación Estados Radio" />
         <Control Id="RadioStatusRecovery_value" Type="ComboBox"   X="125" Y="170" Width="50" Height="18" Property="RDSTATUSREC" ComboList="yes" >
@@ -1329,7 +1340,7 @@
           </ComboBox>
         </Control>
 
-        <Control Id="RadioRtxRecovery_label"  Type="Text"     X="190" Y="172" Width="100" Height="18" TabSkip="no" Text="Recupera Estado RTX" />
+        <Control Id="RadioRtxRecovery_label"  Type="Text"     X="190" Y="172" Width="100" Height="18" TabSkip="no" Text="Recupera Estado RTX(defecto yes)" />
         <Control Id="RadioRtxRecovery_value"  Type="ComboBox" X="300" Y="170" Width="50"  Height="18" Property="RDRTXREC" ComboList="yes" >
           <ComboBox Property="RDRTXREC" >
             <ListItem Value="True"  Text="Si" />

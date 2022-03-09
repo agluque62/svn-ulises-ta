@@ -312,7 +312,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 delegate(){_TlfManager = new TlfManager();},
                 delegate(){_LcManager = new LcManager();},
                 delegate(){_RdManager = new RdManager();},
-                delegate(){_RecorderManager = new RecorderManager(Settings.Default.GLP);},
+                delegate(){_RecorderManager = new RecorderManager(Settings.Default.GLP/*, Settings.Default.GLPONLYRADIO*/);},
                 delegate(){_ReplayManager = new ReplayManager();}
             };
             var nNames = new List<string> 

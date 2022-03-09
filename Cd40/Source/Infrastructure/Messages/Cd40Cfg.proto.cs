@@ -488,10 +488,41 @@ namespace U5ki.Infrastructure
       get { return _RtspPort; }
       set { _RtspPort = value; }
     }
+
+    //#3267 RQF22 211217
+    
+    private int _TipoGrabacionAnalogica = 0;
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name = @"TipoGrabacionAnalogica", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int TipoGrabacionAnalogica
+        {
+        get { return _TipoGrabacionAnalogica; }
+        set { _TipoGrabacionAnalogica = value; }
+    }
+
+    private bool _EnableGrabacionAnalogica = false;
+    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name = @"EnableGrabacionAnalogica", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool EnableGrabacionAnalogica
+    {
+        get { return _EnableGrabacionAnalogica; }
+        set { _EnableGrabacionAnalogica = value; }
+    }
+
+        //RQF-24
+        private bool _EnableGrabacionEd137 = false;
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name = @"EnableGrabacionEd137", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool EnableGrabacionEd137
+        {
+        get { return _EnableGrabacionEd137; }
+        set { _EnableGrabacionEd137 = value; }
+    }
+
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
+    { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+    }
   
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"AsignacionUsuariosDominantesTV")]
   public partial class AsignacionUsuariosDominantesTV : global::ProtoBuf.IExtensible
@@ -791,14 +822,14 @@ namespace U5ki.Infrastructure
       set { _KeepAliveMultiplier = value; }
     }
 
-    private bool _GrabacionEd137 = default(bool);
-    [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"GrabacionEd137", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(default(bool))]
-    public bool GrabacionEd137
-    {
-      get { return _GrabacionEd137; }
-      set { _GrabacionEd137 = value; }
-    }
+    //private bool _GrabacionEd137 = default(bool);
+    //[global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"GrabacionEd137", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    //[global::System.ComponentModel.DefaultValue(default(bool))]
+    //public bool GrabacionEd137
+    //{
+    //  get { return _GrabacionEd137; }
+    //  set { _GrabacionEd137 = value; }
+    //}
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

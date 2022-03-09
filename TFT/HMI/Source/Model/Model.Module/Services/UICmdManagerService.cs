@@ -12,6 +12,7 @@ using HMI.Model.Module.Properties;
 using HMI.Model.Module.Constants;
 using HMI.Model.Module.BusinessEntities;
 using Utilities;
+using System.IO;
 
 namespace HMI.Model.Module.Services
 {
@@ -47,6 +48,8 @@ namespace HMI.Model.Module.Services
 		public event EventHandler CambioPaginaRadioUp;
 		[EventPublication(EventTopicNames.CambioPaginaRadioDown, PublicationScope.Global)]
 		public event EventHandler CambioPaginaRadioDown;
+		[EventPublication(EventTopicNames.PlayRadio, PublicationScope.Global)]
+		public event EventHandler PlayRadio;
 
 		public UICmdManagerService([ServiceDependency] StateManagerService stateManager, [ServiceDependency] IEngineCmdManagerService engineCmdManager)
 		{
@@ -516,6 +519,7 @@ namespace HMI.Model.Module.Services
 			{
 				case TlfState.Idle:
 				case TlfState.PaPBusy:
+				case TlfState.offhook://#2855
 					if (id < Tlf.NumDestinations)
 					{
 						if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
@@ -541,13 +545,19 @@ namespace HMI.Model.Module.Services
                         }
 						else
 						{
-                            if (_StateManager.Tlf.PickUp.State == FunctionState.Error)
+							//#2855 si la tecla AI esta desclogada, la cuelgo.
+							if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
+                            {
+								_StateManager.Tlf.Unhang.Cuelga();
+							}
+							if (_StateManager.Tlf.PickUp.State == FunctionState.Error)
                                 _EngineCmdManager.CancelPickUp();
 							_EngineCmdManager.BeginTlfCall(id, _StateManager.Tlf.Priority.NewCall(id));
 						}
 					}
 					else
 					{
+						//#2855
 						TlfClick(_StateManager.Tlf[id].Number, false, null, id);
 					}
 					break;
@@ -728,6 +738,11 @@ namespace HMI.Model.Module.Services
             {
                 _EngineCmdManager.CancelTransfer();
             }
+			//#2855
+			else if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
+			{
+				_StateManager.Tlf.Unhang.Cuelga();
+			}
 			else if ((_StateManager.Tlf[TlfState.RemoteIn] > 0) && Settings.Default.SupportInTlfCancel)
 			{
 				int id = _StateManager.Tlf.GetFirstInState(TlfState.RemoteIn);
@@ -895,7 +910,93 @@ namespace HMI.Model.Module.Services
 		private void TlfClick(string number, bool ia, string givenLiteral = null, int id = Int32.MaxValue)
         {
             string literal = null;
-            if (number.Length > 0)
+			//LALM 211201
+			//#2855
+			if (number.Length == 0)
+			{
+				//_StateManager.Tlf.Reset(TlfState.offhook);
+				_EngineCmdManager.Descuelga();
+
+
+				// habria que colgar todo lo que esta en uso.
+				if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
+				{
+					// espero a que marquen
+				}
+				else if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
+				{
+					// espero a que marquen
+					//_EngineCmdManager.TransferTo(number);
+				}
+				else if (_StateManager.Tlf.PickUp.State == FunctionState.Ready)
+				{
+					// espero a que marquen
+					//_EngineCmdManager.PreparePickUp(number);
+				}
+				else if (_StateManager.Tlf.PickUp.State == FunctionState.Executing)
+				{
+					// espero a que marquen
+					//_EngineCmdManager.CancelPickUp();
+					//_EngineCmdManager.PreparePickUp(number);
+				}
+				else if (_StateManager.Tlf.Forward.State == FunctionState.Ready)
+				{
+					// espero a que marquen
+					//_EngineCmdManager.PrepareForward(number);
+				}
+				else if (_StateManager.Tlf.PickUp.State == FunctionState.Idle)
+				{
+					// espero a que marquen
+					//_EngineCmdManager.CancelPickUp();
+					//_EngineCmdManager.PreparePickUp(number);
+				}
+				else
+				{
+					bool wait = false;
+
+					for (int i = 0; i < Tlf.NumDestinations + Tlf.NumIaDestinations; i++)
+					{
+						TlfDst dst = _StateManager.Tlf[i];
+						literal = dst.Dst;
+
+						switch (dst.State)
+						{
+							case TlfState.Hold:
+								break;
+							case TlfState.Conf:
+								_EngineCmdManager.EndTlfConfCall(i);
+								wait = true;
+								break;
+							case TlfState.Out:
+							case TlfState.Set:
+							case TlfState.RemoteHold:
+							case TlfState.Congestion:
+							case TlfState.OutOfService:
+							case TlfState.Busy:
+								_EngineCmdManager.EndTlfCall(i);
+								wait = true;
+								break;
+							case TlfState.InProcess:
+								//Do nothing
+								break;
+						}
+					}
+
+					if (wait && (_EngineCmdManager.Name == "Ope"))
+					{
+						_EngineCmdManager.Wait(500);
+					}
+					if (_StateManager.Tlf.PickUp.State == FunctionState.Error)
+						_EngineCmdManager.CancelPickUp();
+					if (id != Int32.MaxValue)
+						_EngineCmdManager.BeginTlfCall(number, _StateManager.Tlf.Priority.NewCall(Tlf.IaMappedPosition), id, literal);
+					else
+						_EngineCmdManager.BeginTlfCall(number, _StateManager.Tlf.Priority.NewCall(Tlf.IaMappedPosition), givenLiteral);
+					_StateManager.Tlf.Unhang.NewCall(ia);
+				}
+			}
+			//*2855
+			if (number.Length > 0)
             {
                 number = Tlf.NumberToEngine(number);
 
@@ -969,12 +1070,97 @@ namespace HMI.Model.Module.Services
                         _EngineCmdManager.BeginTlfCall(number, _StateManager.Tlf.Priority.NewCall(Tlf.IaMappedPosition), givenLiteral);
                     _StateManager.Tlf.Unhang.NewCall(ia);
                 }
-            }
-        }
+			}
+		}
 
-        public void SendCmdHistoricalEvent(string user, string frec)
+		public void SendCmdHistoricalEvent(string user, string frec)
         {
             _EngineCmdManager.SendCmdHistoricalEvent(user, frec);
         }
-    }
+				
+		public class item
+		{
+			private string seg;
+			private string tipo;
+			private string text;
+			private long lenght;
+            private DateTime datetime;
+            public string Text { get => text; set => text = value; }
+            public long Lenght { get => lenght; set => lenght = value; }
+            public string Tipo { get => tipo; set => tipo = value; }
+            public string Seg { get => seg; set => seg = value; }
+            public DateTime Datetime { get => datetime; set => datetime = value; }
+        }
+
+        private item FilterLastFile()
+		{
+			List<item> ListViewItem = new List<item>();
+			try
+			{
+                DirectoryInfo di = new DirectoryInfo(Settings.Default.DirectorioGLPRxRadio);
+
+				FileInfo[] fi = di.GetFiles("*.*", SearchOption.AllDirectories);
+				if (fi.Length == 0)
+					return null;
+
+				FileInfo lastInfo = fi[fi.Length - 1];
+				foreach (System.IO.FileInfo f in fi)
+				{
+					if (!f.Name.Contains("@"))
+                    {
+						item subItem = new item();
+
+						switch (f.Name.Split('_')[0])
+						{
+							case "RxRadio":
+								subItem.Tipo = "_RxRadio";
+								subItem.Seg = String.Format("{0:0.00} s.", (float)f.Length / 16000.0);
+								subItem.Lenght = f.Length;
+								subItem.Text = f.DirectoryName + "/" + f.Name;
+								subItem.Datetime = File.GetCreationTime(subItem.Text);
+								if (subItem.Lenght>1600)
+									ListViewItem.Add(subItem);
+								break;
+						}
+
+					}
+				}
+			}
+			catch (DirectoryNotFoundException)
+			{
+			}
+			DateTime d = new DateTime(0);
+			item ret = null;
+			foreach (item i in ListViewItem)
+				if (i.Datetime > d)
+                {
+					d = i.Datetime;
+					ret = i;
+                }
+			return ret;
+		}
+
+
+		public void PlayRadioClick()
+		{
+			//TODO  algo como esto.
+			if (Directory.Exists(Settings.Default.DirectorioGLPRxRadio))
+			{
+				item item = FilterLastFile();
+				if (item!=null)
+                {
+					FunctionReplay function = BusinessEntities.FunctionReplay.PlayNoLoop;
+					ViaReplay via = BusinessEntities.ViaReplay.SpeakerLc;
+					string fileName = item.Text;
+					long fileLength = item.Lenght;
+					FunctionReplay(function, via, fileName, fileLength);
+				}
+			}
+			General.SafeLaunchEvent(PlayRadio, this);
+			//this._BtnPlay.Click += new System.EventHandler(this._BtnPlay_Click);
+
+			;//	Directory.Delete(Settings.Default.DirectorioGLP, true);
+
+		}
+	}
 }

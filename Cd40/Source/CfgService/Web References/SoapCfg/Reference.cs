@@ -1598,7 +1598,10 @@ namespace U5ki.CfgService.SoapCfg {
         private string ipGrabador2Field;
         
         private int rtspPortField;
-        
+
+        private int TipoGrabacionAnalogicafield;
+        private bool EnableGrabacionAnalogicafield;
+        private bool EnableGrabacionEd137field;
         /// <remarks/>
         public string IdUsuario {
             get {
@@ -1648,9 +1651,47 @@ namespace U5ki.CfgService.SoapCfg {
                 this.rtspPortField = value;
             }
         }
+
+        /// RQF24
+        public bool EnableGrabacionEd137
+        {
+            get
+            {
+                return this.EnableGrabacionEd137field;
+            }
+            set
+            {
+                this.EnableGrabacionEd137field = value;
+            }
+        }
+
+        /// RQF22
+        public int TipoGrabacionAnalogica
+        {
+            get
+            {
+                return this.TipoGrabacionAnalogicafield;
+            }
+            set
+            {
+                this.TipoGrabacionAnalogicafield = value;
+            }
+        }
+
+        public bool EnableGrabacionAnalogica
+        {
+            get
+            {
+                return this.EnableGrabacionAnalogicafield;
+            }
+            set
+            {
+                this.EnableGrabacionAnalogicafield = value;
+            }
+        }
     }
-    
-    /// <remarks/>
+
+    /// RQF24
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3761.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]

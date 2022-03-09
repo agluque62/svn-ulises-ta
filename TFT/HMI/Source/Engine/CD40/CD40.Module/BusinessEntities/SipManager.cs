@@ -51,6 +51,8 @@ namespace HMI.CD40.Module.BusinessEntities
         public event GenericEventHandler<string, int, CORESIP_CFWR_OPT_TYPE, string> CallForwardResp;
         public event GenericEventHandler<int, string> CallMoved;
         public event GenericEventHandler<string> SipMessage;
+        //RQF-22
+        public event GenericEventHandler<int> TipoGrabacionAnalogica;
 
         public void Init()
 		{
@@ -159,7 +161,32 @@ namespace HMI.CD40.Module.BusinessEntities
             AsignacionUsuariosTV tv = Top.Cfg.GetUserTv(Top.Cfg.MainId);
             if (tv != null)
             {
-                SipAgent.PictRecordingCfg(tv.IpGrabador1, tv.IpGrabador2, tv.RtspPort);
+                //SipAgent.PictRecordingCfg(tv.IpGrabador1, tv.IpGrabador2, tv.RtspPort);
+                //RQF-24
+                bool EnableGrabacionEd137ant = SipAgent.GetEnableGrabacionED137();
+                SipAgent.PictRecordingCfg(tv.IpGrabador1, tv.IpGrabador2, tv.RtspPort,
+                                          tv.EnableGrabacionEd137);
+
+                //RQF-22
+                SipAgent.PictGrabacionAnalogicaCfg(tv.TipoGrabacionAnalogica, tv.EnableGrabacionAnalogica);
+
+                //RQF-22
+                Top.WorkingThread.Enqueue("TipoGrabacionAnalogica", delegate ()
+                {
+                    Top.Mixer.SetTipoGrabacionAnalogica(tv.TipoGrabacionAnalogica);
+                    //Top.Mixer.SetGrabacionAnalogica(tv.TipoGrabacionAnalogica);
+                    Top.Mixer.Init();
+                    Top.Mixer.Start();
+                });
+
+                //RQF24
+                bool EnableGrabacionEd137 = tv.EnableGrabacionEd137;
+                //EnableGrabacionEd137 = 1;
+                if (EnableGrabacionEd137!= EnableGrabacionEd137ant)
+                Top.WorkingThread.Enqueue("EnableGrabacionEd137", delegate ()
+                {
+                    SipAgent.Record(EnableGrabacionEd137) ;
+                });
             }
         }
         /// <summary>

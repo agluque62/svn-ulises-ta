@@ -50,6 +50,7 @@ namespace Utilities
             public int [] UpEventId { get; set; }
             public int [] DownEventId { get; set; }
             public int PropertyIndex { get; set; }
+            public bool LanInverted { get; set; }
 
             public NicEventMonitorConfig()
             {
@@ -59,6 +60,7 @@ namespace Utilities
                 UpEventId = new int[] { 15 };
                 DownEventId = new int[] { 11 };
                 PropertyIndex = 1;
+                LanInverted = false;
             }
         }
 
@@ -188,6 +190,7 @@ namespace Utilities
 
                 int Index = 0;
                 NICList = NICList.OrderBy(lan => lan.DeviceId).ToList();
+                if (Cfg.LanInverted) NICList.Reverse();
                 NICList.ForEach(i => { i.Index = Index++; });
             }
             catch (Exception x)

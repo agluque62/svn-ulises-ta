@@ -16,8 +16,8 @@ namespace UnitTestProject1
         [TestMethod]
         public void IntelChipsetTest()
         {
-            string filePath = "c:\\Users\\arturo.garcia\\Downloads\\CED_PICT03_eventos_sistema.evtx";
-            string jconfig = "{ \"TeamingType\": \"Intel\", \"WindowsLog\": \"System\", \"EventSource\": \"iANSMiniport\", \"UpEventId\": [15], \"DownEventId\": [11], \"PropertyIndex\": 1 }";
+            string filePath = "c:\\Users\\luisangel.lopez\\Downloads\\pict-events\\Sistema_UCS02_URR_BCN-Intel.evtx";
+            string jconfig = "{ \"TeamingType\": \"Intel\", \"WindowsLog\": \"System\", \"EventSource\": \"iANSMiniport\", \"UpEventId\": [15], \"DownEventId\": [11], \"PropertyIndex\": 1, \"LanInverted\": 1 }";
             var mon = new NicEventMonitor(jconfig,
                     (lan, status) =>
                     {
@@ -43,8 +43,8 @@ namespace UnitTestProject1
         [TestMethod]
         public void MarvellChipsetTest()
         {
-            string filePath = "c:\\Users\\arturo.garcia\\Downloads\\EvSistema, Puesto chipsetMarvel.evtx";
-            string jconfig = "{ \"TeamingType\": \"Marvell\", \"WindowsLog\": \"System\", \"EventSource\": \"yukonw7\", \"UpEventId\": [121,123], \"DownEventId\": [83], \"PropertyIndex\": 0 }";
+            string filePath = "c:\\Users\\luisangel.lopez\\Downloads\\EvSistema, Puesto chipsetMarvel.evtx";
+            string jconfig = "{ \"TeamingType\": \"Marvell\", \"WindowsLog\": \"System\", \"EventSource\": \"yukonw7\", \"UpEventId\": [121,123], \"DownEventId\": [83], \"PropertyIndex\": 0, \"LanInverted\" : 0 }";
             var mon = new NicEventMonitor(jconfig,
                     (lan, status) =>
                     {

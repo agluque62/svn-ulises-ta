@@ -398,6 +398,15 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DirectorioGLPRxRadio/")]
+        public string DirectorioGLPRxRadio {
+            get {
+                return ((string)(this["DirectorioGLPRxRadio"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("LocalCalls.xml")]
         public string PathHistoricalOfLocalCalls {
             get {
@@ -456,24 +465,6 @@ namespace HMI.CD40.Module.Properties {
         public string LcSpkAsioId {
             get {
                 return ((string)(this["LcSpkAsioId"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("HD Audio Mic input 1")]
-        public string MicAsioId {
-            get {
-                return ((string)(this["MicAsioId"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("HD Audio output 1")]
-        public string CasAsioId {
-            get {
-                return ((string)(this["CasAsioId"]));
             }
         }
         
@@ -705,12 +696,32 @@ namespace HMI.CD40.Module.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LcSpeakerSimul {
+            get {
+                return ((bool)(this["LcSpeakerSimul"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool GLP {
             get {
                 return ((bool)(this["GLP"]));
             }
         }
-        
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("false")]
+        public bool GLPOnlyRadio
+        {
+            get
+            {
+                return ((bool)(this["GLPOnlyRadio"]));
+            }
+        }
+
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(".1.3.6.1.4.1.7916.8.2.2.11.0")]
@@ -805,8 +816,8 @@ namespace HMI.CD40.Module.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <string>{ ""TeamingType"": ""Marvell"", ""WindowsLog"": ""System"", ""EventSource"":""yukonw7"", ""UpEventId"": 123, ""DownEventId"": 83, ""PropertyIndex"": 0 }</string>
-  <string>{ ""TeamingType"": ""Intel"", ""WindowsLog"": ""System"", ""EventSource"":""iANSMiniport"", ""UpEventId"": 15, ""DownEventId"": 11, ""PropertyIndex"": 1 }</string>
+  <string>{ ""TeamingType"": ""Marvell"", ""WindowsLog"": ""System"", ""EventSource"":""yukonw7"", ""UpEventId"": [121,123], ""DownEventId"": [83], ""PropertyIndex"": 0, ""LanInverted"" : 0 }</string>
+  <string>{ ""TeamingType"": ""Intel"", ""WindowsLog"": ""System"", ""EventSource"":""iANSMiniport"", ""UpEventId"": [15], ""DownEventId"": [11], ""PropertyIndex"": 1, ""LanInverted"" : 0 }</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection LanTeamConfigs {
             get {
@@ -825,10 +836,19 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool LcSpeakerSimul {
+        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset1")]
+        public string MicAsioId {
             get {
-                return ((bool)(this["LcSpeakerSimul"]));
+                return ((string)(this["MicAsioId"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset1")]
+        public string CasAsioId {
+            get {
+                return ((string)(this["CasAsioId"]));
             }
         }
     }

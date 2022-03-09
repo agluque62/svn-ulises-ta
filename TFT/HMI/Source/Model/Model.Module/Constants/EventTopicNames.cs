@@ -83,6 +83,11 @@ namespace HMI.Model.Module.Constants
         public const string ReplayUI = "ReplayUI";
         public const string DeleteSessionGlp = "DeleteSessionGlp";
 
+		//LALM 210224 Errores #4755 confirmación de cambio de página radio
+		public const string CambioPaginaRadioUp = "CambioPaginaRadioUp";
+		public const string CambioPaginaRadioDown = "CambioPaginaRadioDown";
+		public const string PlayRadio= "PlayRadio";
+
 		#endregion
 
 		#region Engine Events

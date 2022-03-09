@@ -12,9 +12,10 @@ using U5ki.Infrastructure;
 using NLog;
 
 namespace U5ki.NodeBox.WebServer 
-{   
+{
     public class WebAppServer : BaseCode, IDisposable
     {
+        bool closing_web = false;
         /// <summary>
         /// 
         /// </summary>
@@ -132,6 +133,7 @@ namespace U5ki.NodeBox.WebServer
         /// </summary>
         public virtual void Stop()
         {
+            closing_web = true;
             lock (Locker)
             {
                 LogDebug<WebAppServer>($"{Id} Ending WebAppServer");
@@ -155,6 +157,8 @@ namespace U5ki.NodeBox.WebServer
         /// <param name="result"></param>
         void GetContextCallback(IAsyncResult result)
         {
+            if (closing_web)
+                return;
             lock (Locker)
             {
                 //U5kGenericos.SetCurrentCulture();

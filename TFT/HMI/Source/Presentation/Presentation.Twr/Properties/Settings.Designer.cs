@@ -352,5 +352,28 @@ namespace HMI.Presentation.Twr.Properties {
                 return ((bool)(this["ConfCambioPagRad"]));
             }
         }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Recording\\")]
+        public string DirectorioGLP
+        {
+            get
+            {
+                return ((string)(this["DirectorioGLP"]));
+            }
+        }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DirectorioGLPRxRadio\\")]
+        public string DirectorioGLPRxRadio
+        {
+            get
+            {
+                return ((string)(this["DirectorioGLPRxRadio"]));
+            }
+        }
+
     }
 }

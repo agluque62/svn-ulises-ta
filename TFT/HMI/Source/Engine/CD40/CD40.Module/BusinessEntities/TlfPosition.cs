@@ -156,8 +156,13 @@ namespace HMI.CD40.Module.BusinessEntities
                                     _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingPrio.wav", true);
                                 Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
 								break;
-						}
-					}
+                            //#2855
+                            case TlfState.offhook:
+                                _Tone = SipAgent.CreateWavPlayer("Resources/Tones/Descolgado.wav", true);
+                                Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
+                                break;
+                        }
+                    }
 
 					if ((_EvSub != IntPtr.Zero) && (value != TlfState.Out))
 					{
@@ -179,9 +184,12 @@ namespace HMI.CD40.Module.BusinessEntities
 							case TlfState.Busy:
 								code = SipAgent.SIP_BUSY;
 								break;
-						}
+                            //#2855
+                            case TlfState.offhook:
+                                break;
+                        }
 
-						SipAgent.TransferNotify(_EvSub, code);
+                        SipAgent.TransferNotify(_EvSub, code);
 						_EvSub = IntPtr.Zero;
 					}
 
@@ -199,7 +207,10 @@ namespace HMI.CD40.Module.BusinessEntities
                         case TlfState.Idle:
                             _SipCall = null;
                             break;
-					}
+                        //#2855
+                        case TlfState.offhook:
+                            break;
+                    }
 
                     DeleteInScreen();
                     General.SafeLaunchEvent(TlfPosStateChanged, this);
@@ -487,6 +498,18 @@ namespace HMI.CD40.Module.BusinessEntities
 			//State = TlfState.Unavailable;
             _HoldOnEstablish = false;
 		}
+
+        //LALM 211201
+        //#2855
+        public void DescuelgaPos(bool descolgado)
+        {
+            if (State == TlfState.Idle)
+                State = TlfState.offhook;
+            else if (State == TlfState.offhook)
+                State = TlfState.Idle;
+        }
+        //*2855
+
 
         /// <summary>
         /// 
@@ -1313,11 +1336,13 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         //lalm 210930
-        //Peticiones #3638
+        //Peticiones #3638, anulada, solo puede existir una lina de AI.
+//#if PETICION_3638
         public void RefrescaPos()
         {
             General.SafeLaunchEvent(TlfPosStateChanged, this);
         }
+//#endif
         #region Protected Members
         /// <summary>
         /// 
@@ -1692,7 +1717,7 @@ namespace HMI.CD40.Module.BusinessEntities
 				_SipCall = null;
                 _HoldOnEstablish = false;
                 //Top.Tlf.PriorityCall = false;
-			}
+            }
 		}
 
         /// <summary>

@@ -299,6 +299,9 @@ namespace U5ki.CfgService
             cfg.IpGrabador1 = soapCfg.IpGrabador1;
             cfg.IpGrabador2 = soapCfg.IpGrabador2;
             cfg.RtspPort = soapCfg.RtspPort;
+			//RQF22
+			cfg.TipoGrabacionAnalogica = soapCfg.TipoGrabacionAnalogica;
+			cfg.EnableGrabacionEd137 = soapCfg.EnableGrabacionEd137; 
         }
         /// <summary>
         /// 

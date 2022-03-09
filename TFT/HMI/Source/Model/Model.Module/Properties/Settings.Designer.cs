@@ -432,5 +432,15 @@ namespace HMI.Model.Module.Properties {
                 return ((bool)(this["BigFonts"]));
             }
         }
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DirectorioGLPRxRadio/")]
+        public string DirectorioGLPRxRadio
+        {
+            get
+            {
+                return ((string)(this["DirectorioGLPRxRadio"]));
+            }
+        }
     }
 }

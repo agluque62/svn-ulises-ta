@@ -81,5 +81,12 @@ namespace HMI.Model.Module.Services
 
         /** 20180716. Para activar tonos de Falsa Maniobra Radio */
         void GenerateRadioBadOperationTone(int durationInMsec);
-    }
+		//LALM 210224 Errores #4756 visualizacion de mensaje de error por frecuencia prioritaria
+		void SetErrorFP();
+		void ResetErrorFP();
+		//LALM 2102024
+		void SetCambioRadio(bool up);
+		//LALM 211201
+		void Descuelga();
+	}
 }

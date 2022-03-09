@@ -11,6 +11,7 @@ using System.Reflection;
 using U5ki.Infrastructure.Properties;
 using NLog;
 using Utilities;
+using System.IO;
 
 namespace U5ki.Infrastructure
 {
@@ -879,9 +880,10 @@ namespace U5ki.Infrastructure
         public const int WG67Reason_KATimeout = 2001;
 
         private static string UG5K_REC_CONF_FILE = "ug5krec-config.ini";
-		#region Dll Interface
+        private static string UG5K_REC_ANALOGIC_FILE = "ug5krec-analogic.ini";
+        #region Dll Interface
 
-		public const int CORESIP_MAX_USER_ID_LENGTH = 100;
+        public const int CORESIP_MAX_USER_ID_LENGTH = 100;
 		public const int CORESIP_MAX_FILE_PATH_LENGTH = 256;
 		public const int CORESIP_MAX_ERROR_INFO_LENGTH = 512;
         public const int CORESIP_MAX_HOSTID_LENGTH = 32;
@@ -1021,7 +1023,9 @@ namespace U5ki.Infrastructure
 	        public int LatMax;
         }
        
-        enum CORESIP_RecCmdType : int {CORESIP_REC_RESET = 0 // Ordena reiniciar el grabador
+        enum CORESIP_RecCmdType : int {CORESIP_REC_RESET = 0, // Ordena reiniciar el grabador
+            CORESIP_REC_ENABLE = 1, //Activa la grabacion
+            CORESIP_REC_DISABLE =2//Desactiva la grabacion
         };
 
         const uint CORESIP_CALL_ID = 0x40000000;
@@ -1602,6 +1606,25 @@ namespace U5ki.Infrastructure
 
         //Settings que se puedan acceder desde otros proyectos de la solución
         public static uint _KAPeriod = Settings.Default.KAPeriod;
+        
+        //RQF24
+        public static void Record(bool on)
+        {
+            // Falta por implementar esta función.
+#if IMPLEMENTED
+            CORESIP_Record(on);
+
+#endif
+            CORESIP_Error err;
+            // Notificar al módulo de grabación que ha cambiado la configuración.
+            CORESIP_RecCmdType valor = (on)?CORESIP_RecCmdType.CORESIP_REC_ENABLE:
+                           CORESIP_RecCmdType.CORESIP_REC_DISABLE;
+            if (CORESIP_RecorderCmd(valor, out err) != 0)
+            {
+                throw new Exception(err.Info);
+            }
+            _Logger.Debug("Notificado al módulo de CoreSip {0}",valor.ToString());
+        }
 
         public static void Init(string accId, string ip, uint port, uint max_calls = 32, string proxyIP=null)
 		{
@@ -1646,7 +1669,9 @@ namespace U5ki.Infrastructure
 
                 /// JCAM 18/01/2016
                 /// Grabación según norma ED-137
-                cfg.RecordingEd137 = Settings.Default.RecordingEd137;
+                //cfg.RecordingEd137 = Settings.Default.RecordingEd137;
+                //LALM211221
+                cfg.RecordingEd137 = (uint)GetGrabacionED137();
 
                 cfg.max_calls = max_calls;     // Maximo número de llamadas por defecto en el puesto
                 cfg.TimeToDiscardRdInfo = Settings.Default.SQSourceConfirmTime;
@@ -1660,7 +1685,7 @@ namespace U5ki.Infrastructure
                 CORESIP_Error err;
                 if (CORESIP_Init(cfg, out err) != 0)
                 {
-                    throw new Exception(err.Info);
+                        throw new Exception(err.Info);
                 }
 
                 try
@@ -1924,7 +1949,6 @@ namespace U5ki.Infrastructure
 
 			int dev=0;
 			CORESIP_Error err;
-
             if (CORESIP_AddSndDevice(info, out dev, out err) != 0)            
             {            
                 throw new Exception(err.Info);                
@@ -2932,10 +2956,10 @@ namespace U5ki.Infrastructure
         public static void SendOptionsCFWD(string accId, string dst, CORESIP_CFWR_OPT_TYPE cfwr_options_type, string body, out string callid, bool by_proxy)
         {
 
-            CORESIP_Error err;
             StringBuilder callid_ = new StringBuilder(CORESIP_MAX_CALLID_LENGTH + 1);
 #if CALLFORWARD
 #if _TRACEAGENT_
+            CORESIP_Error err;
             _Logger.Debug("Entrando en SipAgent.SendOptionsCFWD {0}", dst);
 #endif
             if (CORESIP_SendOptionsCFWD(_Accounts[accId], dst, cfwr_options_type, body, callid_, by_proxy, out err) != 0)
@@ -3169,23 +3193,43 @@ namespace U5ki.Infrastructure
 
         // JCAM. 20170324
         /* GRABACION VOIP CFG */
-        public static void PictRecordingCfg(string ipRecorder1, string ipRecorder2, int rtspPort)
+        //#3267 RQF22 211217
+        public static void PictRecordingCfg(string ipRecorder1, string ipRecorder2,
+                           int rtspPort, bool EnableGrabacionED137)
         {
             CORESIP_Error err;
             bool result = false;
+            bool changes = false;
 
             String fullRecorderFileName = Settings.Default.RecorderServicePath + "\\"+ SipAgent.UG5K_REC_CONF_FILE;
+            if (!Directory.Exists(Settings.Default.RecorderServicePath))
+            {
+                // Try to create the directory.
+                Directory.CreateDirectory(Settings.Default.RecorderServicePath);
+            }
             // Actualizar el fichero INI que maneja el módudo de grabación
             try
             {
                 result = Native.Kernel32.WritePrivateProfileString("GENERAL", "DUAL_RECORDER", (!ipRecorder1.Equals("") && !ipRecorder2.Equals("")) ? "1" : "0",
                     fullRecorderFileName);
+                string ip_rec_a = GetSeccionClave("RTSP", "IP_REC_A", fullRecorderFileName);
+                string ip_rec_b = GetSeccionClave("RTSP", "IP_REC_B", fullRecorderFileName);
+                string port_rtsp = GetSeccionClave("RTSP", "PORT_RTSP", fullRecorderFileName);
+                bool enablegrabacionED137 = GetSeccionClave("RTSP", "EnableGrabacionED137", fullRecorderFileName).CompareTo("False") == 0 ? false :true;
+                if (ip_rec_a != ipRecorder1 ||
+                    ip_rec_b != ipRecorder2 ||
+                    port_rtsp != rtspPort.ToString()||
+                    enablegrabacionED137!= EnableGrabacionED137)
+                    changes = true;
+                
                 result |= Native.Kernel32.WritePrivateProfileString("GENERAL", "MAX_SESSIONS", "2", fullRecorderFileName);
                 result |= Native.Kernel32.WritePrivateProfileString("SERVICIO", "IP_SERVICIO", "127.0.0.1", fullRecorderFileName);
                 result |= Native.Kernel32.WritePrivateProfileString("SERVICIO", "PORT_IN_SERVICIO", "65003", fullRecorderFileName);
                 result |= Native.Kernel32.WritePrivateProfileString("RTSP", "IP_REC_A", ipRecorder1 ?? string.Empty, fullRecorderFileName);
                 result |= Native.Kernel32.WritePrivateProfileString("RTSP", "IP_REC_B", ipRecorder2 ?? string.Empty, fullRecorderFileName);
                 result |= Native.Kernel32.WritePrivateProfileString("RTSP", "PORT_RTSP", rtspPort.ToString(), fullRecorderFileName);
+                //RQF24
+                result |= Native.Kernel32.WritePrivateProfileString("RTSP ", "EnableGrabacionED137 ", EnableGrabacionED137.ToString(), fullRecorderFileName);
             }
             catch (Exception exc)
             {
@@ -3196,13 +3240,138 @@ namespace U5ki.Infrastructure
             {
                 _Logger.Error("Error escribiendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
             }
-            // Notificar al módulo de grabación que ha cambiado la configuración.
-            if (CORESIP_RecorderCmd(CORESIP_RecCmdType.CORESIP_REC_RESET, out err) != 0)
+            if (changes==true)
             {
-                throw new Exception(err.Info);
+                // Notificar al módulo de grabación que ha cambiado la configuración.
+                if (CORESIP_RecorderCmd(CORESIP_RecCmdType.CORESIP_REC_RESET, out err) != 0)
+                {
+                    throw new Exception(err.Info);
+                }
+                _Logger.Debug("Notificado al módulo de grabación reinicio {0}");
             }
-            _Logger.Debug("Notificado al módulo de grabación reinicio {0}");
         }
+
+        public static void PictGrabacionAnalogicaCfg(int TipoGrabacionAnalogica, bool EnableGrabacionAnalogica)
+        {
+            bool result = false;
+            bool changes = false;
+
+            String fullRecorderAnalogicaFileName = ".\\" + SipAgent.UG5K_REC_ANALOGIC_FILE;
+            // Actualizar el fichero INI que maneja el módudo de grabación Analogica
+            try
+            {
+                int tipograbacionanalogica=0;
+                bool enablegrabacionanalogica = false;
+                string retorno;
+                retorno = GetSeccionClave("GrabacionAnalogica", "TipoGrabacionAnalogica", fullRecorderAnalogicaFileName);
+                if (retorno.Length > 0)
+                {
+                    tipograbacionanalogica = int.Parse(GetSeccionClave("GrabacionAnalogica", "TipoGrabacionAnalogica", fullRecorderAnalogicaFileName));
+                }
+                else
+                {
+                    Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "TipoGrabacionAnalogica ", TipoGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
+                    Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "EnableGrabacionAnalogica ", EnableGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
+                }
+                enablegrabacionanalogica = bool.Parse(GetSeccionClave("GrabacionAnalogica", "EnableGrabacionAnalogica", fullRecorderAnalogicaFileName));
+                if (tipograbacionanalogica != TipoGrabacionAnalogica ||
+                        enablegrabacionanalogica != EnableGrabacionAnalogica)
+                    changes = true;
+
+                //RQF22
+                result |= Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "TipoGrabacionAnalogica ", TipoGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
+                result |= Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "EnableGrabacionAnalogica ", EnableGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
+                }
+                catch (Exception exc)
+                {
+                    _Logger.Error("Error leyendo/escribiendo fichero UG5K_REC_ANALOGICA_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
+                }
+            if (result == false)
+            {
+                _Logger.Error("Error escribiendo fichero UG5K_REC_ANALOGICA_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
+            }
+            if (changes == true)
+            {
+                // Notificar al módulo de propio de grabación analogica que ha cambiado la configuración.
+                {
+                    // TODO LALM
+                }
+                _Logger.Debug("Notificado al módulo de grabación analogica ");
+            }
+        }
+
+        //RQF24
+        public static int GetGrabacionED137()
+        {
+            uint result = 0;
+            int resultado;
+            String fullRecorderFileName = Settings.Default.RecorderServicePath + "\\" + SipAgent.UG5K_REC_CONF_FILE;
+            StringBuilder sGrabaciónED137 = new StringBuilder(10);
+            try
+            {
+                result = Native.Kernel32.GetPrivateProfileString("RTSP", "EnableGrabacionED137 ", "", sGrabaciónED137, 10, fullRecorderFileName);
+            }
+            catch (Exception exc)
+            {
+                _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
+            }
+            _Logger.Debug("Leyendo fichero {1} :{0}", sGrabaciónED137, fullRecorderFileName);
+            if (result != 1)
+            {
+                _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
+            }
+
+            Int32.TryParse(sGrabaciónED137.ToString(), out resultado);
+            return resultado;
+        }
+
+        public static bool GetEnableGrabacionED137()
+        {
+            uint result = 0;
+            bool resultado;
+            String fullRecorderFileName = Settings.Default.RecorderServicePath + "\\" + SipAgent.UG5K_REC_CONF_FILE;
+            StringBuilder sEnableGrabacionED137 = new StringBuilder(10);
+            try
+            {
+                result = Native.Kernel32.GetPrivateProfileString("EnableGrabacionED137 ", "EnableGrabacionED137 ", "", sEnableGrabacionED137, 10, fullRecorderFileName);
+            }
+            catch (Exception exc)
+            {
+                _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
+            }
+            _Logger.Debug("Leyendo fichero {1} :{0}", sEnableGrabacionED137, fullRecorderFileName);
+            if (result != 1)
+            {
+                _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
+            }
+
+            bool.TryParse(sEnableGrabacionED137.ToString(), out resultado);
+            return resultado;
+        }
+
+        //RQF24-RQF22
+        public static string GetSeccionClave(string seccion,string clave, string fullRecorderFileName)
+        {
+            uint result = 0;
+            //String fullRecorderFileName = Settings.Default.RecorderServicePath + "\\" + SipAgent.UG5K_REC_CONF_FILE;
+            StringBuilder retorno  = new StringBuilder(50);
+            try
+            {
+                result = Native.Kernel32.GetPrivateProfileString(seccion,clave, "", retorno, 50, fullRecorderFileName);
+            }
+            catch (Exception exc)
+            {
+                _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
+            }
+            _Logger.Debug("Leyendo fichero {1} :{0}", retorno, fullRecorderFileName);
+            if (result != 1)
+            {
+                _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
+            }
+
+            return retorno.ToString();
+        }
+
 
         /* GRABACION VOIP START */
         /** */

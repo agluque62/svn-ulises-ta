@@ -97,7 +97,7 @@ namespace HMI.CD40.Module.BusinessEntities
         public int ActivityRing()
         {
             TlfPosition tlf;
-            for (int i = 0; i < Tlf.NumDestinations + Tlf.NumIaDestinations - 1; i++)
+            for (int i = 0; i < Tlf.NumDestinations + Tlf.NumIaDestinations; i++)
             {
                 if (_TlfPositions.TryGetValue(i, out tlf) == true)
                 {
@@ -762,7 +762,97 @@ namespace HMI.CD40.Module.BusinessEntities
 					literal = rs.NumeroAbonado;
 					break;
 			}
+
 		}
+
+        //#2855
+        //lalm 211201
+        // Esta funcion descuelga o cuelga dependiendo del estado de la tecla colgardescolgar
+        public void Descuelga()
+        {
+            ResetActiveCalls(null);
+            TlfIaPosition tlf =null;
+            int pos = Tlf.NumDestinations;
+            bool colgar = false;
+            // Cuelgo si esta descolgado
+            // Quito las llamadas que haya
+            if (_ActiveCalls.Count > 0)
+            {
+                for (int i = 0; i < _ActiveCalls.Count; i++)
+                {
+                    if ((ActiveCalls[i] is TlfIaPosition==true))
+                    {
+                        tlf = (TlfIaPosition)ActiveCalls[i];
+                        if (tlf.State == TlfState.offhook)
+                            colgar = true;
+                        if ((tlf.State == TlfState.Set)||
+                            (tlf.State == TlfState.Out)
+                            )
+                            colgar = true;
+                    }
+                    else
+                    {
+                        TlfPosition tlf1 = (TlfPosition)ActiveCalls[i];
+                        if (tlf1.State == TlfState.Set)
+                        {
+                            tlf1.HangUp(0);
+                            RemoveActiveCall(tlf1);
+                        }
+                    }
+                }
+            }
+            if (colgar)
+            {
+                int id = pos;
+                for (int i = 0; i < _ActiveCalls.Count; i++)
+                {
+                    tlf = (TlfIaPosition)ActiveCalls[i];
+                    if (tlf.State == TlfState.offhook)
+                    {
+                        TlfPosition tlf1 = null;
+                        if (_TlfPositions.TryGetValue(id, out tlf1))
+                            tlf.DescuelgaPos(false);
+                        break;
+                    }
+                    // si esta en conversacion cuelgo la conversacion y desculego la linea.
+                    if ((tlf.State == TlfState.Set) || (tlf.State == TlfState.Out))
+                    {
+                        TlfPosition tlf1 = null;
+                        if (_TlfPositions.TryGetValue(id, out tlf1))
+                        {
+                            tlf1.HangUp(0);
+
+                            //descuelgo AI.
+                            tlf = new TlfIaPosition(pos);
+                            tlf.State = TlfState.Idle;
+                            AddActiveCall(tlf);
+
+
+                            tlf1 = null;
+                            if (_TlfPositions.TryGetValue(id, out tlf1))
+                                tlf1.DescuelgaPos(true);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Descuelgo la linea
+            if (!colgar)//descuelgo AI
+            {
+                Debug.Assert(pos < Tlf.NumDestinations + Tlf.NumIaDestinations);
+                //descuelgo AI.
+                tlf = new TlfIaPosition(pos);
+                tlf.State = TlfState.Idle;
+                AddActiveCall(tlf);
+
+                int id = pos;
+                TlfPosition tlf1 = null;
+                if (_TlfPositions.TryGetValue(id, out tlf1))
+                    tlf.DescuelgaPos(true);
+            }
+        }
+        //*2855
 
         /// <summary>
         /// Guarda el atributo de salida del audio para telefonía
@@ -776,12 +866,12 @@ namespace HMI.CD40.Module.BusinessEntities
         //        _RxAudioVia = TlfRxAudioVia.HeadPhones;
         //}
 
-		#region Private Members
+        #region Private Members
 
         /// <summary>
         /// 
         /// </summary>
-		class TransferRequest
+        class TransferRequest
 		{
 			public TlfPosition By;
 			public TlfPosition To;
@@ -1116,19 +1206,19 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 			}
             //LALM 210928 tratamiento de dos lineas 19+1
-			//Peticiones #3638
-            int NumIa = 0;
+			//Peticiones #3638, anulada, solo puede existir una lina de AI.
+            //int NumIa = 0;
 			foreach (TlfPosition tlf in _TlfPositions.Values)
 			{
 				//LALM 211004
-				//Peticiones #3638
-                if (tlf is TlfIaPosition)
-                    NumIa++;
-                if ((NumIa > 1) && (info.Priority != CORESIP_Priority.CORESIP_PR_URGENT) && (info.Priority != CORESIP_Priority.CORESIP_PR_EMERGENCY))
-                {
-                    answer.Value = SipAgent.SIP_BUSY;
-                    return;
-                }
+				//Peticiones #3638, anulada, solo puede existir una lina de AI.
+                //if (tlf is TlfIaPosition)
+                //    NumIa++;
+                //if ((NumIa > 1) && (info.Priority != CORESIP_Priority.CORESIP_PR_URGENT) && (info.Priority != CORESIP_Priority.CORESIP_PR_EMERGENCY))
+                //{
+                //    answer.Value = SipAgent.SIP_BUSY;
+                //    return;
+                //}
                 answer.Value  = tlf.HandleIncomingCall(call, call2replace, info, inInfo);
 				if (answer.Value != SipAgent.SIP_DECLINE)
 				{
@@ -1553,6 +1643,11 @@ namespace HMI.CD40.Module.BusinessEntities
 					{
 						st = TlfState.RemoteMem;
 					}
+                    //#2855
+                    else if (tlf.OldState== TlfState.Idle && tlf.State==TlfState.offhook)
+                    {
+                        st = TlfState.Idle;
+                    }
 				}
 
                 MensajesDeIntrusion(tlf);
@@ -1590,8 +1685,8 @@ namespace HMI.CD40.Module.BusinessEntities
 					});
 				}
 			}
-            //lalm 210930
-            Recoloca19m1();
+            //lalm 210930, anulada, solo puede existir una lina de AI.
+            //Recoloca19m1();
 		}
 
         /// <summary>
@@ -1710,8 +1805,23 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
                 else if (tlf.OldState != TlfState.NotAllowed || tlf.State != TlfState.Idle)
                 {
+                    // #2855 cambiar el estado y comunicarlo con SafeLaunchEvent
+                    if (tlf.State == TlfState.offhook)
+                    {
+                        tlf.RefrescaPos();
+                        General.SafeLaunchEvent(OnTlfIaStateChanged, this);
+                        General.SafeLaunchEvent(OnTlfStateChanged, this);
+                        TlfIaPosition tlfia = (TlfIaPosition)tlf;
+                        OnTlfIaStateChanged(tlfia);
+
+                    }
+                    else if (tlf.State == TlfState.Idle)
+                    {
+                        tlf.RefrescaPos();
+                    }
+                    //#*2855
                 }
-			}
+            }
             // Si la llamada intervenida estaba aparcada, al culminarse la intrusión
             // el _ActiveCall.Count == 0 y el tono de intrusión hay que quitarlo.
             else if (_ActiveCalls.Count == 0 && _IntrusionTone != -1)
@@ -1728,6 +1838,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
         //210928
         // Cuenta el numero de lineas IA en conferencia.
+#if PETICION_3638
         private int NumIaConf()
         {
             int NumIAConf = 0;
@@ -1744,10 +1855,11 @@ namespace HMI.CD40.Module.BusinessEntities
             return NumIAConf;
 
         }
-
-        //LALM 210928  #3638
+#endif
+        //LALM 210928  #3638, anulada, solo puede existir una lina de AI.
         // Cuelga la llamda de menor prioridad de las linas 19+1
-        private void HangupLessPriority()
+#if PETICION_3638
+        private void HangupLessPriority_()
         {
             int NumIAConf = 0;
             List<TlfPosition> listatlf = new List<TlfPosition>(); ;
@@ -1803,6 +1915,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 }
             }
         }
+#endif
         /// <summary>
         /// 
         /// </summary>
@@ -1825,8 +1938,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 //evitar el desorden en hold on/off muy rapidos
                     if (tlf.OldState == TlfState.Hold)
                         ResetActiveCalls(tlf);
-                    if (NumIaConf() > 1)
-                        HangupLessPriority();
+                    // anulada, solo puede existir una lina de AI.
+                    //if (NumIaConf() > 1)
+                    //    HangupLessPriority();
                     break;
 			}
 
@@ -2011,8 +2125,9 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         //lalm 210930
-        //Peticiones #3638
-        void Recoloca19m1()
+        //Peticiones #3638, anulada, solo puede existir una lina de AI.
+#if PETICION_3638
+        void Recoloca19m1_()
         {
             //Recoloca las 19+1
             TlfPosition tlf;
@@ -2076,6 +2191,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 }
             }
         }
-        #endregion
+#endif
+#endregion
     }
 }

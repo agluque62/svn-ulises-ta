@@ -55,5 +55,10 @@ namespace HMI.Model.Module.Services
         void ChangeSite(int id);
         void PickUpClick();
         void ForwardClick();
-    }
+		void SetErrorFP();
+		void ResetErrorFP();
+		//LALM 210324
+		void SetCambioRadio(bool up);
+		void PlayRadioClick();
+	}
 }

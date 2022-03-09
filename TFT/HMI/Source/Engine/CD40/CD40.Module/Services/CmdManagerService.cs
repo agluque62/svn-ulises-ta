@@ -872,6 +872,19 @@ namespace HMI.CD40.Module.Services
                 }
             });
         }
+        
+        //211201
+        //#2855
+        public void Descuelga()
+        {
+            Top.WorkingThread.Enqueue("Descuelga", delegate ()
+            {
+                if (AllowTlf())
+                    Top.Tlf.Descuelga();
+
+            });
+        }
+        //*2855
 
         public void RetryTlfCall(int id)
         {

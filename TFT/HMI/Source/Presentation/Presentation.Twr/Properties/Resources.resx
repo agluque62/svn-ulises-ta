@@ -190,19 +190,19 @@
   <data name="InfoIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Info.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-	<data name="JackOff" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\JackOff.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-	</data>
-	<data name="JackOffTwr" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\JackOffTwr.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-	</data>
-	<data name="JackOn" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\JackOn.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-	</data>
-	<data name="JackOnTwr" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\JackOnTwr.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-	</data>
-	<data name="Llamar" xml:space="preserve">
+  <data name="JackOff" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\JackOff.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="JackOffTwr" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\JackOffTwr.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="JackOn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\JackOn.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="JackOnTwr" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\JackOnTwr.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Llamar" xml:space="preserve">
     <value>Llamar</value>
   </data>
   <data name="Mem" xml:space="preserve">

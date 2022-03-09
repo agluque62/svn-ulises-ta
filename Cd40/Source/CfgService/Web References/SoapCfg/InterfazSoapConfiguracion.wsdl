@@ -1546,8 +1546,12 @@
           <s:element minOccurs="0" maxOccurs="1" name="IdHost" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="IpGrabador1" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="IpGrabador2" type="s:string" />
-          <s:element minOccurs="1" maxOccurs="1" name="RtspPort" type="s:int" />
-        </s:sequence>
+		  <s:element minOccurs="1" maxOccurs="1" name="RtspPort" type="s:int" />
+
+		  <s:element minOccurs="1" maxOccurs="1" name="TipoGrabacionAnalogica" type="s:int" />
+		  <s:element minOccurs="1" maxOccurs="1" name="EnableGrabacionEd137" type="s:int" />
+
+		</s:sequence>
       </s:complexType>
       <s:complexType name="ArrayOfAsignacionRecursosGW">
         <s:sequence>

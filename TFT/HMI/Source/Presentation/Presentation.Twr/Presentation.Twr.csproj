@@ -444,6 +444,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\play.png" />
     <None Include="Resources\SpeakerTlf.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -63,6 +63,7 @@ namespace HMI.CD40.Module.BusinessEntities
         private bool[] _GlpSessionsStarted = new bool[6];
         private List<int>[] _GlpCallId = new List<int>[6];
         private bool _LocalRecordingEnabled = false;
+        private bool _LocalRecordingOnlyRadio = false;
         private object _Sync = new object();
 
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
@@ -72,12 +73,12 @@ namespace HMI.CD40.Module.BusinessEntities
 
         public event GenericEventHandler<StateMsg<bool>> BriefingChanged;
         public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
-
-        public RecorderManager(bool enable)
+        
+        public RecorderManager(bool enable, bool onlyradio = false)
         {
             // TODO: Complete member initialization
             this._LocalRecordingEnabled = enable;
-
+            this._LocalRecordingOnlyRadio = onlyradio;
             _Logger.Info("Grabacion habilitada: " + enable.ToString());
         }
 
@@ -332,7 +333,9 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             if (!this._LocalRecordingEnabled)
                 return;
-
+            //lalm 220110
+            if (this._LocalRecordingOnlyRadio && !(fuente == FuentesGlp.RxRadio || fuente == FuentesGlp.RxRadio))
+                return;
             lock (_Sync)
             {
                 try
@@ -347,8 +350,9 @@ namespace HMI.CD40.Module.BusinessEntities
                         string dirName = "Recording/" + fuente.ToString();
                          * */
                         string dirName = Settings.Default.DirectorioGLP + fuente.ToString();
-                        /* Fin Modificacion */
-
+                            /* Fin Modificacion */
+                        if (_LocalRecordingOnlyRadio)
+                            dirName = Settings.Default.DirectorioGLPRxRadio;
                         if (!System.IO.Directory.Exists(dirName))
                             System.IO.Directory.CreateDirectory(dirName);
 
@@ -399,7 +403,7 @@ namespace HMI.CD40.Module.BusinessEntities
                                 File.Delete(_SessionsFileName[(int)fuente]);
                                 _Logger.Warn("GLP.SesionGlp. El fichero ya existe.");
                             }
-
+                            
                             _SessionsFileName[(int)fuente] = string.Empty;
                         }
                     }
@@ -421,6 +425,9 @@ namespace HMI.CD40.Module.BusinessEntities
         internal void SessionGlp(FuentesGlp fuente, bool iniciar)
         {
             if (!this._LocalRecordingEnabled)
+                return;
+            //lalm 220110
+            if (iniciar && this._LocalRecordingOnlyRadio && !(fuente == FuentesGlp.RxRadio || fuente == FuentesGlp.RxRadio))
                 return;
 
             lock (_Sync)
@@ -801,9 +808,13 @@ namespace HMI.CD40.Module.BusinessEntities
                     }
                     break;
                 case FunctionReplay.Play:
+                case FunctionReplay.PlayNoLoop:
                     if (_ReplayTone == -1)
                     {
-                        _ReplayTone = SipAgent.CreateWavPlayer(fileName, true);
+                        if (funcion == FunctionReplay.Play)
+                            _ReplayTone = SipAgent.CreateWavPlayer(fileName, true);
+                        if (funcion == FunctionReplay.PlayNoLoop)
+                            _ReplayTone = SipAgent.CreateWavPlayer(fileName, false );
                         Top.Mixer.LinkReplay(_ReplayTone, via);
                         _Replaying = true;
 

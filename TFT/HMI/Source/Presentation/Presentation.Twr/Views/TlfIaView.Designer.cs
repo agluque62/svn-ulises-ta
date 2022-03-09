@@ -53,6 +53,7 @@ namespace HMI.Presentation.Twr.Views
 			this._Num3BT = new HMI.Model.Module.UI.HMIButton();
 			this._Num4BT = new HMI.Model.Module.UI.HMIButton();
 			this._SlowBlinkTimer = new System.Windows.Forms.Timer(this.components);
+			this._DescolgarTimer = new System.Windows.Forms.Timer(this.components);
 			_TlfIaTLP = new System.Windows.Forms.TableLayoutPanel();
 			_IaFunctionsTLP = new System.Windows.Forms.TableLayoutPanel();
 			_TlfIaTLP.SuspendLayout();
@@ -124,7 +125,7 @@ namespace HMI.Presentation.Twr.Views
 			// _CallBT
 			// 
 			this._CallBT.Dock = System.Windows.Forms.DockStyle.Fill;
-			this._CallBT.Enabled = false;
+			this._CallBT.Enabled = true;//#2855 habilito marcador por defecto
 			this._CallBT.ImageDisabled = global::HMI.Presentation.Twr.Properties.Resources.UnhangDisabled;
 			this._CallBT.ImageNormal = global::HMI.Presentation.Twr.Properties.Resources.Unhang;
 			this._CallBT.Location = new System.Drawing.Point(97, 40);
@@ -192,6 +193,11 @@ namespace HMI.Presentation.Twr.Views
 			this._SlowBlinkTimer.Interval = 500;
 			this._SlowBlinkTimer.Tick += new System.EventHandler(this._SlowBlinkTimer_Tick);
 			// 
+			// _DescolgarTimer
+			// 
+			this._DescolgarTimer.Interval = 500;
+			this._DescolgarTimer.Tick += new System.EventHandler(this._DescolgarTimer_Tick);
+			// 
 			// TlfIaView
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -214,6 +220,7 @@ namespace HMI.Presentation.Twr.Views
 		private HMI.Model.Module.UI.HMIButton _Num4BT;
 		private Microsoft.Practices.CompositeUI.WinForms.DeckWorkspace _IaToolsWS;
 		private System.Windows.Forms.Timer _SlowBlinkTimer;
+		private System.Windows.Forms.Timer _DescolgarTimer;
 
 	}
 }
