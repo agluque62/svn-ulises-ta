@@ -730,12 +730,6 @@ namespace CoreSipNet
         [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
         static extern int CORESIP_DestroyWavRecorder(int wavPlayer, out CORESIP_Error error);
 
-        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        static extern int CORESIP_CreateWG67Subscription(string dst, ref IntPtr wg67, ref CORESIP_Error error);
-
-        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        static extern int CORESIP_DestroyWG67Subscription(IntPtr wg67, ref CORESIP_Error error);
-
         /** AGL */
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void WavRemoteEnd(IntPtr obj);
@@ -1726,38 +1720,7 @@ namespace CoreSipNet
             {
                 throw new Exception("SipAgent.TransferNotify Error: " + err.Info);
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dst"></param>
-        /// <returns></returns>
-        public static IntPtr CreateWG67Subscription(string dst)
-        {
-            IntPtr wg67 = IntPtr.Zero;
-            CORESIP_Error err = new CORESIP_Error();
-
-            if (CORESIP_CreateWG67Subscription(dst, ref wg67, ref err) != 0)
-            {
-                throw new Exception("Error creating WG67 KEY-IN Subscription: " + err.Info);
-            }
-            return wg67;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="wg67"></param>
-        public static void DestroyWG67Subscription(IntPtr wg67)
-        {
-            CORESIP_Error err = new CORESIP_Error();
-
-            if (CORESIP_DestroyWG67Subscription(wg67, ref err) != 0)
-            {
-                throw new Exception("Error destroying WG67 KEY-IN Subscription: " + err.Info);
-            }
-        }
+        }        
 
         /** AGL */
 //        public static void Wav2Remote(string file, string id, string ip, int port)

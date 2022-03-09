@@ -184,8 +184,25 @@ namespace U5ki.Infrastructure
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
 	public delegate void InfoReceivedCb(int call, string info, uint lenInfo);
 
-	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void WG67NotifyCb(IntPtr wg67, CORESIP_WG67Info wg67Info, IntPtr userData);
+    /**
+	* WG67SubscriptionCb
+	* Esta funcion se llama cuando hay un cambio en el estado de una subscripcion al evento WG67KEY-IN.
+	  Como Suscriptor se llama cuando ha cambiado el estado, o porque se ha recibido un NOTIFY.
+	  Como Notificador se llama cuando ha cambiado el estado de la suscripcion.
+	* @param	info			Estructura con la info
+	*/
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void WG67SubscriptionStateCb(CORESIP_WG67_Subscription_Info wg67Info);
+
+    /**
+	* WG67SubscriptionReceivedCb
+	* Esta funcion se llama cuando se recibe el primer request de suscripcion al evento WG67KEY-IN.
+	* Si dentro de esta callback se llama a la funcion CORESIP_Set_WG67_notify_status se establece un estado inicial de la suscripcion
+	* @param	accId. Identificador del account.
+	* @param	subscriberUri. uri del suscriptor
+	*/
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public delegate void WG67SubscriptionReceivedCb(int accId, string subscriberUri);
 
     /// <summary>
     ///  Received when subscription to conference arrives
@@ -272,29 +289,33 @@ namespace U5ki.Infrastructure
 	[Flags]
 	public enum CORESIP_CallFlags
 	{
-        [Description("TxRx")]
+        [Description("Type: Radio txrxmode=TxRx")]
 		CORESIP_CALL_NO_FLAGS = 0,
+        CORESIP_CALL_NINGUNO = 0x0,			//Type: Radio-TxRx txrxmode=TxRx
         [Description("Conference focus")]
         CORESIP_CALL_CONF_FOCUS = 0x1,
-        [Description("Coupling")]
+        [Description("Tipo de sesion Radio Coupling. Type: Coupling")]
 		CORESIP_CALL_RD_COUPLING = 0x2,
-        [Description("Rx")]
+        [Description("Modo de Radio receptor. txrxmode=Rx")]
 		CORESIP_CALL_RD_RXONLY = 0x4,
-        [Description("Tx")]
+        [Description("Modo de Radio transmisor. txrxmode=Tx")]
 		CORESIP_CALL_RD_TXONLY = 0x8,
         [Description("Echo Canceller")]
 		CORESIP_CALL_EC = 0x10,
         [Description("Through external central IP")]
         CORESIP_CALL_EXTERNAL_IP = 0x20,
+        [Description("Tipo de sesion Radio IDLE. Type: Radio-idle")]
+        CORESIP_CALL_RD_IDLE = 0x40,
+        [Description("Tipo de sesion Radio-Rxonly. Type: Radio-rxonly")]
+        CORESIP_CALL_RD_RADIO_RXONLY = 0x80,
+        [Description("No el sdp no incluira txrxmode. ")]
+        CORESIP_CALL_NO_TXRXMODE = 0x100    //Sin txrxmode. si este flag es activado, CORESIP_CALL_RD_RXONLY y CORESIP_CALL_RD_TXONLY no pueden estar activados.
+    }
 
-        CORESIP_CALL_NINGUNO = 0x0,			//Se refiere a transceptor 
-	    CORESIP_CALL_RD_IDLE = 0x12,		
-	    CORESIP_CALL_RD_TXRX = 0x14 		
-	}
     /// <summary>
     /// 
     /// </summary>
-	public enum CORESIP_CallState
+    public enum CORESIP_CallState
 	{
         [Description("Null")]
 		CORESIP_CALL_STATE_NULL,					/**< Before INVITE is sent or received  */
@@ -309,8 +330,9 @@ namespace U5ki.Infrastructure
         [Description("Confirmed")]
 		CORESIP_CALL_STATE_CONFIRMED,			/**< After ACK is sent/received.	    */
         [Description("Disconnected")]
-		CORESIP_CALL_STATE_DISCONNECTED,		/**< Session is terminated.		    */
+		CORESIP_CALL_STATE_DISCONNECTED		/**< Session is terminated.		    */
 	}
+
     /// <summary>
     /// 
     /// </summary>
@@ -353,8 +375,10 @@ namespace U5ki.Infrastructure
         [Description("Prioritario")]
 		CORESIP_PTT_PRIORITY,
         [Description("Emergencia")]
-		CORESIP_PTT_EMERGENCY
-	}
+		CORESIP_PTT_EMERGENCY,
+        [Description("Test")]
+        CORESIP_PTT_TEST
+    }
     /// <summary>
     /// 
     /// </summary>
@@ -480,18 +504,16 @@ namespace U5ki.Infrastructure
 	public class CORESIP_CallInfo
 	{
 		public int AccountId;
-		public CORESIP_CallType Type;
-		public CORESIP_Priority Priority;
-		public CORESIP_CallFlags Flags;
+		public CORESIP_CallType Type;                   //Tipo de llamada
+        public CORESIP_Priority Priority;               //Prioridad. Se refiere a los valores soportados en la cabecera Priority
+        public uint CallFlags;                          //En CORESIP el tipo es CORESIP_CallFlagsMask. Que es equivalente
 
-        public CORESIP_CallFlags Flags_type;			//UNIFETM: Este campo falta en ULISES. En el ETM lo utiliza para indicar el tipo de agente radio. Se pasa a la callback de onIncommingCall
-        //public int SourcePort;						//UNIFETM: Este campo falta en ULISES. En el ETM no se utiliza. Se le asigna valor, pero para nada. Yo lo quitaria en ETM
+        public int SourcePort;						    //UNIFETM: Este campo falta en ULISES. En el ETM no se utiliza. Se le asigna valor, pero para nada. 
         public int DestinationPort;						//UNIFETM: Este campo falta en ULISES. Se asigna el valor en onIncomingCall. es un valor que se retorna en la callback. No es de entrada.
 
 #if _VOTER_
         /** 20160608. VOTER */
         public int PreferredCodec = 0;
-        public int PreferredBss = 0;
 #endif
 
         //EDU 20170223
@@ -505,11 +527,26 @@ namespace U5ki.Infrastructure
         public bool AudioInBssWindow;
         public bool NotUnassignable;
         public int cld_supervision_time;
+        public int forced_cld = -1;                 //Para ETM, es el CLD que se envia de forma forzada en ms. 
+                                                    //Si vale -1 entonces no se fuerza y se envia el CLD calculado o el Tn1 en el caso del ETM
+                                                    //EN ULISES SE IGNORA
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_BSS_LENGTH + 1)]
         public string bss_method;
-        public uint porcentajeRSSI;                     //Peso del valor de Qidx del tipo RSSI en el calculo del Qidx final. 0 indica que el calculo es solo interno (centralizado). 10 que el calculo es solo el RSSI. 
-	}
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_BSS_LENGTH * 3 + 1)]
+        public string etm_vcs_bss_methods;		    //Para ETM, string con los literales de los metodos BSS separados por comas, enviados por VCS. En ULISES string long 0
+
+        public uint porcentajeRSSI;                 //Peso del valor de Qidx del tipo RSSI en el calculo del Qidx final. 0 indica que el calculo es solo interno (centralizado). 10 que el calculo es solo el RSSI. 
+
+        public int R2SKeepAlivePeriod = -1;         //Valor entre 20 y 1000 del periodo de los KeepAlives. Si el valor es -1, se ignora y se utilizará el valor por defecto (200). EN ULISES poner -1
+        public int R2SKeepAliveMultiplier = -1;     //Valor entre 2 y 50 del numbero de R2S-Keepalive no recibidos antes producirse un Keep Alive time-out. Si el valor es -1, se ignora y se utilizará el valor por defecto (10). EN ULISES PONER -1
+
+        int NoFreqDisconn;                          //Si vale distinto de cero para llamadas hacia GRS, indica que la sesion no se desconecte cuando se modifica 
+                                                    //el identificador de la frecuencia (Fid) en el GRS
+                                                    //Y se envia Notify al evento WG67 cuando se modifica le Fid. Solo es valido en ED137C
+
+    }
+
 
     /// <summary>
     /// 
@@ -524,8 +561,8 @@ namespace U5ki.Infrastructure
 		public string ReferBy;
 
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_RS_LENGTH + 1)]
-		public string RdFr;
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_IP_LENGTH + 1)]
+		public string RdFr;                 //Con valor "000.000" no se envia el fid. Debe estar terminado cn el caracter '\0'
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_IP_LENGTH + 1)]
 		public string RdMcastAddr;
 		public uint RdMcastPort;
 
@@ -562,6 +599,12 @@ namespace U5ki.Infrastructure
 		public string DstSubId;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_NAME_LENGTH + 1)]
         public string DisplayName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_RS_LENGTH + 1)]
+        public string RdFr;                             //EN ETM Valor de fid de la llamada entrante hacia el GRS
+                                                        //EN ULISES SE IGNORA
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_BSS_LENGTH + 1)]
+        public string etm_grs_bss_method_selected;      //Para ETM, como GRS receptor/transceptor, Es el metodo BSS seleccionado para enviar el Qidx. 
+                                                        //EN ULISES SE IGNORA
     }
     /// <summary>
     /// 
@@ -623,9 +666,8 @@ namespace U5ki.Infrastructure
 		public CORESIP_PttType PttType;
 		public ushort PttId;
         public uint PttMute;
-		public uint ClimaxCld;
         public uint Squ;
-        public uint RssiQidx;			//Valor de Qidx del tipo RSSI que se envia cuando es un agente simulador de radio y Squ es activo
+        public uint RssiQidx;			//Valor de Qidx del tipo RSSI que se envia cuando es un agente simulador de radio y Squ es activo. Ingonar en Ulises
 	}
     /// <summary>
     /// 
@@ -649,7 +691,14 @@ namespace U5ki.Infrastructure
         public int tx_rtp_port;
         public int tx_cld;
         public int tx_owd;
-	}
+
+        public uint MAM_received;          //Si es distinto de cero entonces se ha recibido un MAM	y los siguientes campos son validos	
+        public uint Tn1_ms;                //Tn1 en ms calculado del MAM recibido
+        public uint Tj1_ms;                //Tj1 en ms calculado del MAM recibido
+        public uint Tid_ms;                //Tid en ms calculado del MAM recibido
+        public uint Tsd_ms;                //Tsd en ms calculado del MAM recibido
+        public int Ts2_ms;				   //Ts2 en ms calculado del MAM recibido. Un valor negativo indica que no se ha recibido.
+    }
 	/// <summary>
 	/// 
 	/// </summary>
@@ -682,8 +731,6 @@ namespace U5ki.Infrastructure
 	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 	public class CORESIP_Callbacks
 	{
-		public IntPtr UserData;
-
 		public LogCb OnLog;
 		public KaTimeoutCb OnKaTimeout;
 		public RdInfoCb OnRdInfo;
@@ -692,67 +739,117 @@ namespace U5ki.Infrastructure
 		public TransferRequestCb OnTransferRequest;
 		public TransferStatusCb OnTransferStatus;
 		public ConfInfoCb OnConfInfo;
-		public OptionsReceiveCb OnOptionsReceive ;
-		public WG67NotifyCb OnWG67Notify;
+		public OptionsReceiveCb OnOptionsReceive;
+        public WG67SubscriptionStateCb OnWG67SubscriptionState;
+        public WG67SubscriptionReceivedCb OnWG67SubscriptionReceived;
 		public InfoReceivedCb OnInfoReceived;
         public IncomingSubscribeConfCb OnIncomingSubscribeConf;
         public SubPresCb OnSubPres;
         public FinWavCb OnFinWavCb;
         public DialogNotifyCb OnDialogNotify;
         public PagerCb OnPager;
-#if CALLFORWARD
+
         public CfwrOptReceivedCb OnCfwrOptReceived;
         public CfwrOptResponseCb OnCfwrOptResponse;
         public MovedTemporallyCb OnMovedTemporally;
-#endif
+
 #if _ED137_
 	// PlugTest FAA 05/2011
 		public UpdateOvrCallMembersCb OnUpdateOvrCallMembers; //(CORESIP_EstablishedOvrCallMembers info);
 		public InfoCRDCb OnInfoCrd;								//(CORESIP_CRD InfoCrd);
 #endif
     }
+
+	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+	public class CORESIP_WG67_Subscription_Info
+    {
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct CORESIP_WG67SessionsInfo
+        {
+            public ushort PttId;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH + 1)]
+            public string Uri;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_SESSTYPE_LENGTH + 1)]
+            public string SessionType;
+        }
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH + 1)]
+        public string Role;						//Puede valer "subscriber" o "notifier"
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH + 1)]
+        public string SubscriberUri;			//Uri del subscriptor
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH + 1)]
+        public string NotifierUri;				//Uri del GRS notificador
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_REASON_LENGTH + 1)]
+        public string SubscriptionState;
+
+        public int NotifyReceived;              //Si es distinto de cero entonces la llamada a la callback se debe a la recepción de un Notify
+
+        //Los siguientes campos solo son validos si se ha recibido un Notify. Es decir NotifyReceived es distinto de cero
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_REASON_LENGTH + 1)]
+        public string Reason;                 /*< Optional termination reason. */
+        public int Expires;                   /*< Expires param, or -1 if not present. */
+        public int Retry_after;               /*< Retry after param, or -1 if not present. */
+
+        public int Found_Parse_Errors;        //Si el valor es distinto de cero entonces indica que se han encontrado errores parseando.
+
+        public uint SessionsCount;                   //Numero de sesiones que contiene el Notify
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = SipAgent.CORESIP_MAX_WG67_SUBSCRIBERS)]
+        public CORESIP_WG67SessionsInfo[] SessionInfo;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_BODY_LEN)]
+        public string RawBody;                  //Es el cuerpo del NOTIFY sin parsear  
+    }
+
+    //Estructura que define el cuerpo de los Notify al evento WG67KEY-IN
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public class CORESIP_WG67Notify_Body_Config
+    {
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct CORESIP_WG67NotifySessionsInfo
+        {
+            public uint ptt_id;                         //Un valor numérico con el ptt-id. 
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH)]
+            public string sip_from_uri;                 //Uri del tipo sip:user@host:port. cadena acabada en '\0'
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH)]
+            public string call_type;                    //Posibles valores "coupling", "Radio-Rxonly", "Radio-TxRx", "Radio-Idle". cadena acabada en '\0'
+        }
+
+        public int exclude_real_sessions;               //Si el valor es distinto de cero, entonces en el NOTIFY se excluyen las sesiones reales y 
+                                                        //solo aparecen las definidas en esta estructura.
+        public int num_sessions;                        //Número de sesiones del array SessionsInfo
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = SipAgent.CORESIP_MAX_WG67_NOTIFY_SESSIONS)]
+        public CORESIP_WG67NotifySessionsInfo[] SessionsInfo;
+    }
+
+    //Estructura que define la cabecera Subscription-State y Expires.
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public class CORESIP_WG67Notify_SubscriptionState_Config
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH)]
+        public string subscription_state;               //Es obligatorio y puede tener los valores: "pending", "active", "terminated". Cadena terminada en cero.
+
+        public int expires;                             //Valor en segundos del tiempo en que expira la subscripcion. 
+                                                        //Es opcional, si es negativo se ignora. Con estado "terminated" tambien se ignora.
+
+        public int retry_after;                         //Valor en segundos del tiempo durante el cual no se permite una resubscripcion. 
+                                                        //Es opcional, si es negativo se ignora. Con un estado distinto de "terminated" tambien se ignora.
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH)]
+        public string reason;                           //Es opcional y puede ser de longitud cero. Puede tener uno de estos valores. (Cadena terminada en cero):
+                                                        // "deactivated", "probation", "rejected", "timeout", "giveup", "noresource"
+                                                        // Se explica en RFC3265, apartado 3.2.4
+    }
+
     /// <summary>
     /// 
     /// </summary>
-	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-	public class CORESIP_Params
-	{
-		public int EnableMonitoring;
-
-		public uint KeepAlivePeriod;
-		public uint KeepAliveMultiplier;
-	}
-
-
-	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-	public class CORESIP_WG67Info
-	{
-		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-		public struct CORESIP_WG67SubscriberInfo
-		{
-			public ushort PttId;
-
-			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH + 1)]
-			public string SubsUri;
-		}
-
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_URI_LENGTH + 1)]
-		public string DstUri;
-
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_REASON_LENGTH + 1)]
-		public string LastReason;
-
-		public int SubscriptionTerminated;
-		public uint SubscribersCount;
-
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = SipAgent.CORESIP_MAX_WG67_SUBSCRIBERS)]
-		public CORESIP_WG67SubscriberInfo[] Subscribers;
-	}
-
-	/// <summary>
-    /// 
-    /// </summary>
-	public static class SipAgent
+    public static class SipAgent
 	{
 		public const int SIP_TRYING = 100;
 		public const int SIP_RINGING = 180;
@@ -791,17 +888,32 @@ namespace U5ki.Infrastructure
 		public const int CORESIP_MAX_IP_LENGTH = 25;
 		public const int CORESIP_MAX_URI_LENGTH = 256;
         public const int CORESIP_MAX_TAG_LENGTH = 256;
-		public const int CORESIP_MAX_SOUND_DEVICES = 10;
-		public const int CORESIP_MAX_RS_LENGTH = 128;
+		public const int CORESIP_MAX_SOUND_DEVICES = 20;
+        public const int CORESIP_MAX_WAV_PLAYERS = 50;
+        public const int CORESIP_MAX_WAV_RECORDERS = 50;
+        public const int CORESIP_MAX_RDRX_PORTS = 128;
+        public const int CORESIP_MAX_SOUND_RX_PORTS = 128;
+        public const int CORESIP_MAX_GENERIC_PORTS = 16;
+        public const int CORESIP_MAX_RS_LENGTH = 128;
 		public const int CORESIP_MAX_REASON_LENGTH = 128;
 		public const int CORESIP_MAX_WG67_SUBSCRIBERS = 25;
+        public const int CORESIP_MAX_WG67_NOTIFY_SESSIONS = 7;
 		public const int CORESIP_MAX_CODEC_LENGTH = 50;
 		public const int CORESIP_MAX_CONF_USERS = 25;
 		public const int CORESIP_MAX_CONF_STATE_LENGTH = 25;
-        public const int CORESIP_MAX_ZONA_LENGTH = 128;     //EDU 20170223
-        public const int CORESIP_MAX_BSS_LENGTH = 32;     //EDU 20170223
-        public const int CORESIP_MAX_NAME_LENGTH = 20;    //B. Santamaria 20180206
-        public const int CORESIP_MAX_CALLID_LENGTH = 256;    
+        public const int CORESIP_MAX_SLOTSTOSNDPORTS = 50;
+        public const int CORESIP_MAX_ZONA_LENGTH = 128;     
+        public const int CORESIP_MAX_BSS_LENGTH = 32;
+        public const int CORESIP_MAX_SUPPORTED_LENGTH = 512;
+        public const int CORESIP_MAX_NAME_LENGTH = 20;          //B. Santamaria 20180206
+        public const int CORESIP_MAX_CALLID_LENGTH = 256;
+        public const int CORESIP_MAX_RSSI_QIDX = 15;            //Valor maximo de QIDX RSSI
+        public const int CORESIP_MAX_QIDX = 31;                 //Valor maximo de other QIDX
+        public const int CORESIP_MAX_ATTENUATION_DB = 100;
+        public const int CORESIP_MAX_BODY_LEN = 1024;
+        public const int CORESIP_MAX_SESSTYPE_LENGTH = 32;
+        public const int CORESIP_MAX_SELCAL_LENGTH = 4;
+
 #if _ED137_
 		// PlugTest FAA 05/2011
 		public const int CORESIP_MAX_OVR_CALLS_MEMBERS = 10;
@@ -811,7 +923,7 @@ namespace U5ki.Infrastructure
 		public const int CORESIP_MAX_FRECUENCY_LENGTH = 7;
 #endif
 
-		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 		struct CORESIP_Error
 		{
 			public int Code;
@@ -848,10 +960,17 @@ namespace U5ki.Infrastructure
             public string HostId;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_IP_LENGTH + 1)]
 			public string IpAddress;
-			public uint Port;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_USER_ID_LENGTH + 1)]
+            public string UserAgent;            //Nombre del agente SIP. Si es un string de longitud cero 
+                                                //entonces se usa el de por defecto que es "U5K-UA/1.0.0". Por tanto en ULISES no se usa para que se quede un string de long cero
+            public uint Port;                   //Puerto SIP
             public uint RtpPorts;				//Valor por el que empiezan a crearse los puertos RTP
 
-			public CORESIP_Callbacks Cb;
+            public uint UseDefaultSoundDevices; //Si es distinto de cero entonces se utilizan los dispositivos de microfono y altavoz 
+                                                //por defecto en el sistema automáticamente, sin que lo tenga que manejar en la aplicacion.
+
+
+            public CORESIP_Callbacks Cb;
 
 			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_CODEC_LENGTH + 1)]
 			public string DefaultCodec;
@@ -930,8 +1049,15 @@ namespace U5ki.Infrastructure
 		static extern void CORESIP_End();
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int CORESIP_SetLogLevel(uint level, out CORESIP_Error error);
-		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-		static extern int CORESIP_SetParams([In] CORESIP_Params info, out CORESIP_Error error);
+
+        /**
+        *	CORESIP_SetParams Establece los Parametros del Modulo. @ref SipAgent::SetParams
+	    *	@param	MaxForwards	Valor de la cabecera Max-Forwards. Si vale NULL se ignora.
+	    *	@param	error	Puntero @ref CORESIP_Error a la estructura de Error.
+	    *	@return			Codigo de Error
+	    */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+		static extern int CORESIP_SetParams([In] int MaxForwards, out CORESIP_Error error);
 
         /**
          *	CORESIP_CreateAccount. Registra una cuenta SIP en el Módulo. @ref SipAgent::CreateAccount
@@ -1005,8 +1131,22 @@ namespace U5ki.Infrastructure
 		static extern int CORESIP_CallMake([In] CORESIP_CallInfo info, [In] CORESIP_CallOutInfo outInfo, out int call, out CORESIP_Error error);
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int CORESIP_CallHangup(int call, int code, out CORESIP_Error error);
-		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-		static extern int CORESIP_CallAnswer(int call, int code, int addToConference, out CORESIP_Error error);
+
+        /**
+         *	CORESIP_CallAnswer
+         *	@param	call		Identificador de Llamada
+         *	@param	code		...
+         *	@param	addToConference		...
+         *	@param	reason_code. Es el codigo del campo cause de la cabecera reason. En caso radio y el codigo esta entre 2000 y 2099 reason_text podria ser NULL porque se pone internamente.
+         *						En el caso de que no se utilice este parametro entonces su valor debera ser cero
+         *	@param	reason_text. Es el texto del campo text de la cabecera Reason. En caso de ser NULL no se incluira el campo text.
+         *						Debe de ser un string acabado con el caracter cero. 
+         *	@param	error		Puntero a la Estructura de error
+         *	@return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_CallAnswer(int call, int code, int addToConference, int reason_code, string reason_text, out CORESIP_Error error);
+
         /**
          *	CORESIP_CallMovedTemporallyAnswer
          *	@param	call		Identificador de Llamada
@@ -1032,7 +1172,21 @@ namespace U5ki.Infrastructure
         static extern int CORESIP_CallProccessRedirect(int call, string dstUri, CORESIP_REDIRECT_OP op, out CORESIP_Error error);
         [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
         static extern int CORESIP_CallHold(int call, int hold, out CORESIP_Error error);
-		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+
+        /**
+         *	CallReinvite
+         *	@param	call		Identificador de llamada
+         *	@param	error		Puntero a la Estructura de error
+         *	@param	CallType_SDP	9 couplig, 7 Radio-Rxonly, 5 Radio-TxRx, 6 Radio-Idle
+         *	@param	TxRx_SDP		4 Rx, 8 Tx, 0 TxRx, 22 Vacio
+         *  @param	etm_vcs_bss_methods	Para ETM, como VCS, string con los literales de los metodos BSS separados por comas. El string debe terminar caracter '\0'. Si vale NULL se ignora
+         *	@return				Codigo de Error
+         */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_CallReinvite(int call, out CORESIP_Error error, int CallType_SDP, int TxRx_SDP, string etm_vcs_bss_methods);
+
+
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
         static extern int CORESIP_CallTransfer(int call, int dstCall, [In] string dst, [In] string displayName, out CORESIP_Error error);
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int CORESIP_CallPtt(int call, [In] CORESIP_PttInfo info, out CORESIP_Error error);
@@ -1108,13 +1262,7 @@ namespace U5ki.Infrastructure
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int CORESIP_CreateWavRecorder([In] string file, out int wavPlayer, out CORESIP_Error error);
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-		static extern int CORESIP_DestroyWavRecorder(int wavPlayer, out CORESIP_Error error);		
-		
-		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-		static extern int CORESIP_CreateWG67Subscription(string dst, ref IntPtr wg67, ref CORESIP_Error error);
-
-		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-		static extern int CORESIP_DestroyWG67Subscription(IntPtr wg67, ref CORESIP_Error error);
+		static extern int CORESIP_DestroyWavRecorder(int wavPlayer, out CORESIP_Error error);
 
         /** AGL */
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1212,11 +1360,11 @@ namespace U5ki.Infrastructure
          * CORESIP_SetTipoGRS.	...
          * Funcion para activar en la Coresip un accId para que funcione como una radio 
          * @param	accId           Account de la Coresip
-         * @param	Flags           Opciones de la radio
+         * @param	Flags           Opciones de la radio. El tipo uint es equivalente al tipo CORESIP_CallFlagsMask de CORESIP
          * @return	CORESIP_OK OK, CORESIP_ERROR  error.
          */
         [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        static extern int CORESIP_SetTipoGRS(int accId, CORESIP_CallFlags Flag, CORESIP_Error error);
+        static extern int CORESIP_SetTipoGRS(int accId, uint Flag, CORESIP_Error error);
 
         /**
          * CORESIP_SetImpairments.	...
@@ -1369,12 +1517,19 @@ namespace U5ki.Infrastructure
             remove {/*_Cb.*/OnPager -= value; }
         }
 
-        static WG67NotifyCb OnWG67Notify;
-		public static event WG67NotifyCb WG67Notify
-		{
-			add {/*_Cb.*/OnWG67Notify += value; }
-			remove {/*_Cb.*/OnWG67Notify -= value; }
-		}
+        static WG67SubscriptionStateCb OnWG67SubscriptionState;
+        public static event WG67SubscriptionStateCb WG67SubscriptionState
+        {
+            add {/*_Cb.*/OnWG67SubscriptionState += value; }
+            remove {/*_Cb.*/OnWG67SubscriptionState -= value; }
+        }
+
+        static WG67SubscriptionReceivedCb OnWG67SubscriptionReceived;
+        public static event WG67SubscriptionReceivedCb WG67SubscriptionReceived
+        {
+            add {/*_Cb.*/OnWG67SubscriptionReceived += value; }
+            remove {/*_Cb.*/OnWG67SubscriptionReceived -= value; }
+        }
 
         /// <summary>
         /// 
@@ -1499,20 +1654,14 @@ namespace U5ki.Infrastructure
                 cfg.DIA_TxAttenuation_dB = Settings.Default.DIA_TxAttenuation_dB;
                 cfg.IA_TxAttenuation_dB = Settings.Default.IA_TxAttenuation_dB;
                 cfg.RD_TxAttenuation_dB = Settings.Default.RD_TxAttenuation_dB;
- 
+
+                cfg.UseDefaultSoundDevices = 0;
+
                 CORESIP_Error err;
                 if (CORESIP_Init(cfg, out err) != 0)
                 {
                     throw new Exception(err.Info);
                 }
-
-                CORESIP_Params sipParams = new CORESIP_Params();
-
-                sipParams.EnableMonitoring = 0;
-                sipParams.KeepAlivePeriod = Settings.Default.KAPeriod;
-                sipParams.KeepAliveMultiplier = Settings.Default.KAMultiplier;
-
-                SetParams(sipParams);
 
                 try
                 {
@@ -1613,21 +1762,6 @@ namespace U5ki.Infrastructure
 			CORESIP_SetLogLevel(eqLevel, out err);
 #if _TRACEAGENT_
             _Logger.Debug("Saliendo de SipAgent.SetLogLevel");
-#endif
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-		public static void SetParams(CORESIP_Params cfg)
-		{
-#if _TRACEAGENT_
-            _Logger.Debug("Entrando en SipAgent.SetParmas");
-#endif
-            CORESIP_Error err;
-			CORESIP_SetParams(cfg, out err);
-#if _TRACEAGENT_
-            _Logger.Debug("Saliendo de SipAgent.SetParams");
 #endif
         }
 
@@ -2162,9 +2296,9 @@ namespace U5ki.Infrastructure
 			info.AccountId = acc;
 			info.Type = CORESIP_CallType.CORESIP_CALL_DIA;
 			info.Priority = priority;
-			info.Flags = flags;
+			info.CallFlags = (uint) flags;
 
-			outInfo.DstUri = dst;
+            outInfo.DstUri = dst;
 			outInfo.ReferBy = referBy;
             outInfo.RequireReplaces = false;
 
@@ -2209,7 +2343,7 @@ namespace U5ki.Infrastructure
             info.AccountId = acc;
             info.Type = CORESIP_CallType.CORESIP_CALL_DIA;
             info.Priority = priority;
-            info.Flags = flags;
+            info.CallFlags = (uint)flags;
 
             outInfo.DstUri = dst;
             outInfo.RequireReplaces = true;
@@ -2252,9 +2386,9 @@ namespace U5ki.Infrastructure
             info.AccountId = acc;
 			info.Type = CORESIP_CallType.CORESIP_CALL_IA;
 			info.Priority = CORESIP_Priority.CORESIP_PR_URGENT;
-            info.Flags = flags;
+            info.CallFlags = (uint)flags;
 
-			outInfo.DstUri = dst;
+            outInfo.DstUri = dst;
 
 			int callId;
 			CORESIP_Error err;
@@ -2300,10 +2434,12 @@ namespace U5ki.Infrastructure
 			info.Type = CORESIP_CallType.CORESIP_CALL_RD;
             /* AGL*/
             info.Priority = prioridad;  // CORESIP_Priority.CORESIP_PR_EMERGENCY;
-			info.Flags = flags;
+            info.CallFlags = (uint)flags;
+
+            info.R2SKeepAlivePeriod = (int)U5ki.Infrastructure.Properties.Settings.Default.KAPeriod;
+            info.R2SKeepAliveMultiplier = (int)U5ki.Infrastructure.Properties.Settings.Default.KAMultiplier;
 #if _VOTER_
-			/** 20160609 */
-            info.PreferredBss = 0;          // Globales.IndexOfPreferredBss;
+            /** 20160609 */
             info.PreferredCodec = 0;        // Globales.IndexOfPreferredCodec;
 #endif
             //EDU 20170223
@@ -2376,9 +2512,9 @@ namespace U5ki.Infrastructure
 			info.AccountId = acc;
 			info.Type = type;
 			info.Priority = CORESIP_Priority.CORESIP_PR_NONURGENT;  // .CORESIP_PR_NORMAL;
-            info.Flags = flags;
+            info.CallFlags = (uint)flags;
 
-			outInfo.DstUri = dst;
+            outInfo.DstUri = dst;
 
 			int callId;
 			CORESIP_Error err;
@@ -2453,7 +2589,7 @@ namespace U5ki.Infrastructure
             _Logger.Debug("Entrando en SipAgent.AnswerCall {0}, {1}, {2}", callId, response, addToConference);
 #endif
 #if !UNIT_TEST
-            if (CORESIP_CallAnswer(callId, response, addToConference ? 1 : 0, out err) != 0)
+            if (CORESIP_CallAnswer(callId, response, addToConference ? 1 : 0, 0, null, out err) != 0)
 			{
 				throw new Exception(err.Info);
 			}
@@ -2893,50 +3029,6 @@ namespace U5ki.Infrastructure
             }
         }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="dst"></param>
-		/// <returns></returns>
-		public static IntPtr CreateWG67Subscription(string dst)
-		{
-#if _TRACEAGENT_
-            _Logger.Debug("Entrando en SipAgent.CreateWG67Subscription {0}", dst);
-#endif
-            IntPtr wg67 = IntPtr.Zero;
-			CORESIP_Error err = new CORESIP_Error();
-
-			if (CORESIP_CreateWG67Subscription(dst, ref wg67, ref err) != 0)
-			{
-				_Logger.Error("Error creating WG67 KEY-IN Subscription" + err.Info);
-			}
-
-#if _TRACEAGENT_
-            _Logger.Debug("Saliendo de SipAgent.CreateWG67Subcription");
-#endif
-            return wg67;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="wg67"></param>
-		public static void DestroyWG67Subscription(IntPtr wg67)
-		{
-#if _TRACEAGENT_
-            _Logger.Debug("Entrando en SipAgent.DestroyWG67Subscription {0}", wg67);
-#endif
-            CORESIP_Error err = new CORESIP_Error();
-
-			if (CORESIP_DestroyWG67Subscription(wg67, ref err) != 0)
-			{
-				_Logger.Error("Error destroying WG67 KEY-IN Subscription" + err.Info);
-			}
-#if _TRACEAGENT_
-            _Logger.Debug("Saliendo de SipAgent.DestroyWG67Subscription");
-#endif
-        }
-
         /**
          *	CreateConferenceSubscription. Crea una subscripcion por evento de conferencia
          *	@param	accId		Identificador del account.
@@ -3310,7 +3402,7 @@ namespace U5ki.Infrastructure
                 if (OnOptionsReceive != null)
                     OnOptionsReceive(p1, p2, p3, p4, p5);
             });
-#if CALLFORWARD
+
             _Cb.OnCfwrOptReceived = new CfwrOptReceivedCb((p1, p2, p3, p4, p5) =>
             {
                 foreach (string accountName in _Accounts.Keys)
@@ -3338,11 +3430,15 @@ namespace U5ki.Infrastructure
                 if (OnMovedTemporally != null)
                     OnMovedTemporally(p1, p2);
             });
-#endif
-            _Cb.OnWG67Notify = new WG67NotifyCb((p1, p2, p3) =>
+            _Cb.OnWG67SubscriptionState = new WG67SubscriptionStateCb((p1) =>
             {
-                if (OnWG67Notify != null)
-                    OnWG67Notify(p1, p2, p3);
+                if (OnWG67SubscriptionState != null)
+                    OnWG67SubscriptionState(p1);
+            });
+            _Cb.OnWG67SubscriptionReceived = new WG67SubscriptionReceivedCb((p1, p2) =>
+            {
+                if (OnWG67SubscriptionReceived != null)
+                    OnWG67SubscriptionReceived(p1, p2);
             });
             _Cb.OnInfoReceived = new InfoReceivedCb((p1, p2, p3) =>
             {

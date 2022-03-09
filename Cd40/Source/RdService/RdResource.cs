@@ -352,8 +352,6 @@ namespace U5ki.RdService
             Reset();
             if (call >= 0)
 			{
-				//WG67Subscribe(null, false);
-
 				SipAgent.HangupCall(call);
 			}
 		}
@@ -391,8 +389,6 @@ namespace U5ki.RdService
                 if (_SipCallId >= 0)
                     _SipCallSt = CORESIP_CallState.CORESIP_CALL_STATE_CONNECTING;
 
-                //WG67Subscribe(_Uri, true);
-                // LogManager.GetCurrentClassLogger().Debug("MakeRdCall para {0}", _Frecuency);
 			}
             return true;
 		}
@@ -531,39 +527,6 @@ namespace U5ki.RdService
         {
             throw new NotImplementedException();
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="wg67Info"></param>
-        /// <returns></returns>
-        public void HandleWG67Info(CORESIP_WG67Info wg67Info)
-		{
-		}
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dst"></param>
-        /// <param name="subscribe"></param>
-		public void WG67Subscribe(string dst, bool subscribe)
-		{
-			if (subscribe && (_WG67Subscription == IntPtr.Zero))
-			{
-				_WG67Subscription = SipAgent.CreateWG67Subscription(dst);
-				//if (_WG67Subscription != IntPtr.Zero)
-				//{
-				//    SipAgent.WG67NotifyEvent += _WG67NotifyAsyncCb;
-				//}
-			}
-			else if (!subscribe && (_WG67Subscription != IntPtr.Zero))
-			{
-				//SipCore.WG67NotifyEvent -= _WG67NotifyAsyncCb;
-				SipAgent.DestroyWG67Subscription(_WG67Subscription);
-				_WG67Subscription = IntPtr.Zero;
-				//_WG67Info = null;
-			}
-		}
-
 
         public void SetNewRdResourceParams(CfgRecursoEnlaceExterno enlace)
         {

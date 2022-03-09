@@ -2461,52 +2461,6 @@ namespace U5ki.RdService
             }
         }
 #endif
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="wg67"></param>
-        /// <param name="wg67Info"></param>
-        /// <param name="userData"></param>
-        private void OnWG67Notify(IntPtr wg67, CORESIP_WG67Info wg67Info, IntPtr userData)
-        {
-            _EventQueue.Enqueue(wg67.ToString() + "_WG67", delegate()
-            {
-#if _LOCKING_
-                    lock (_lock)
-#endif
-                {
-                    if (_Master)
-                    {
-                        foreach (RdFrecuency rdFr in Frecuencies.Values)
-                        {
-                            WG67Info info = new WG67Info();
-
-                            info.DstUri = wg67Info.DstUri;
-                            if (wg67Info.SubscriptionTerminated != 0)
-                            {
-                                info.SubscriptionTerminated = true;
-                                info.LastReason = wg67Info.LastReason;
-                            }
-                            else
-                            {
-                                //if (rdFr.HandleWG67(wg67, wg67Info))
-                                //{
-                                //    break;
-                                //}
-
-                                //info.SubscribersCount = wg67Info.SubscribersCount;
-                                //info.Subscribers = new WG67Info.SubscriberInfo[wg67Info.SubscribersCount];
-                                //for (uint i = 0; i < wg67Info.SubscribersCount; i++)
-                                //{
-                                //    info.Subscribers[i].PttId = wg67Info.Subscribers[i].PttId;
-                                //    info.Subscribers[i].SubsUri = wg67Info.Subscribers[i].SubsUri;
-                                //}
-                            }
-                        }
-                    }
-                }
-            });
-        }
 
         /// <summary>
         /// 20171130. Para el ping a los TX HF por Options...

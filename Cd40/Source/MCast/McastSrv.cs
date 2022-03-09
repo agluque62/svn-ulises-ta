@@ -21,14 +21,79 @@ using NLog;
 
 namespace U5ki.Mcast
 {
-    /// <summary>
-    /// 
-    /// </summary>
+	/// <summary>
+	/// 
+	/// </summary>
 	public partial class McastSrv : ServiceBase
 	{
-        /// <summary>
-        /// 
-        /// </summary>
+		public const int TestSP_MAX_PROCS = 128;
+		public const int TestSP_MAX_NAME_SIZE = 256;
+		public const int TestSP_MAX_IP_SIZE = 22;
+
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+		public struct TestSP_report_proc
+		{
+			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = TestSP_MAX_NAME_SIZE)]
+			public string name;
+			public int state;
+			public int gstate;
+			public int packet_sent;
+			public int packet_recv;
+			public int packet_delivered;
+			public int retrans;
+			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = TestSP_MAX_IP_SIZE)]
+			public string my_ip;
+			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = TestSP_MAX_IP_SIZE)]
+			public string leader_ip;
+			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = TestSP_MAX_NAME_SIZE)]
+			public string leader_name;
+			public int membership_changes;
+			public int num_procs;
+			public int num_segments;
+			public int window;
+			public int personal_window;
+			public int accelerated_ring;
+			public int accelerated_window;
+			public int num_sessions;
+			public int num_groups;
+			public int major_version;
+			public int minor_version;
+			public int patch_version;
+		}		
+
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		delegate void Report_Spread_Status(int numprocs, [In, MarshalAs(UnmanagedType.LPArray, SizeConst = TestSP_MAX_PROCS)] TestSP_report_proc[] value);
+
+		[DllImport("DllTestSpread.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+		static extern int Init_Spread_Status(StringBuilder sp_config_file, StringBuilder proc_name,
+			[MarshalAs(UnmanagedType.FunctionPtr)] Report_Spread_Status callbackPointer, StringBuilder error, int size_error);
+
+		[DllImport("DllTestSpread.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+		static extern int End_Spread_Status();
+
+		[DllImport("DllTestSpread.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+		static extern int Get_Spread_Status(StringBuilder error, int size_error);		
+
+		Report_Spread_Status report_Spread_callback =
+		(numprocs, value) =>
+		{
+			_Logger.Info("---- report_Spread_callback ----");
+
+			for (int i = 0; i < numprocs; i++)
+			{
+				_Logger.Info("----");
+				var type = value[i].GetType();
+				foreach (var prop in type.GetFields())
+				{
+					_Logger.Info(prop.Name + ":" + prop.GetValue(value[i]).ToString());
+				}
+			}
+			_Logger.Info("---------------------");
+		};
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public McastSrv()
 		{
 			InitializeComponent();
@@ -132,6 +197,17 @@ namespace U5ki.Mcast
 			StartMcast();
 			_Logger.Info("MCAST: "+"Nodo iniciado");
 
+			//StringBuilder sp_config_file = new StringBuilder("C:\\Program Files (x86)\\NUCLEOCC\\Ulises5000I-MCast\\spread.conf");
+			StringBuilder sp_config_file = new StringBuilder("spread.conf");
+			StringBuilder error = new StringBuilder(256);
+			StringBuilder proc_name = new StringBuilder(_HostId);
+			if (Init_Spread_Status(sp_config_file, proc_name, report_Spread_callback, error, error.Capacity) < 0)
+            {
+				_Logger.Info("MCAST: " + "ERROR: Init_Spread_Status: " + error);
+			}
+
+			int count_get_spread_status = 58;
+
 			while (!_EndEvent.WaitOne(2000, false))
 			{
 				if ((_Process != null) && _Process.HasExited)
@@ -147,7 +223,15 @@ namespace U5ki.Mcast
                 else
                 {
                 }
+
+				if (++count_get_spread_status >= 60)
+				{
+					Get_Spread_Status(error, error.Length); //Get_Spread_Status se ejecuta cada 2 minutos
+					count_get_spread_status = 0;
+				}
 			}
+
+			End_Spread_Status();
 
 			if (_Process != null)
 			{

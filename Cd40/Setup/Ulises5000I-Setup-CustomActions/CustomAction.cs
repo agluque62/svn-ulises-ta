@@ -64,6 +64,12 @@ namespace Ulises5000I_Setup_CustomActions
 
                     conf.WriteLine(String.Format("}}"));
 
+                    /*Los valores de timeouts corresponden a los de por defecto en el spread de una red LAN*/
+                    /*Se hace asi porque se detecto que al apagar un puesto el spread dejaba de funcionar el tiempo
+                     * definido por TokenTimeout. Asi que se ha bajado su valor y el del resto*/
+
+                    /*Valores originales que que son como los que asigna por defecto a una WAN*/
+                    /*
                     conf.WriteLine("TokenTimeout = 5000");
                     conf.WriteLine("HurryTimeout = 1500");
                     conf.WriteLine("AliveTimeout = 250");
@@ -72,7 +78,19 @@ namespace Ulises5000I_Setup_CustomActions
                     conf.WriteLine("SegTimeout = 500");
                     conf.WriteLine("GatherTimeout = 2500");
                     conf.WriteLine("FormTimeout = 2500");
-                        /** 20170903. AGL. Se cambia este parámetro para evitar transitorios en conmutación de NBX... */
+                    */
+
+                    /*Estos son los nuevos valores, que coinciden con los que el spread asigna por defecto en una LAN*/
+                    conf.WriteLine("TokenTimeout = 1250");
+                    conf.WriteLine("HurryTimeout = 500");
+                    conf.WriteLine("AliveTimeout = 250");
+                    conf.WriteLine("JoinTimeout = 250");
+                    conf.WriteLine("RepTimeout = 625");
+                    conf.WriteLine("SegTimeout = 500");
+                    conf.WriteLine("GatherTimeout = 1250");
+                    conf.WriteLine("FormTimeout = 1250");
+
+                    /** 20170903. AGL. Se cambia este parámetro para evitar transitorios en conmutación de NBX... */
                     conf.WriteLine(/*"LookupTimeout = 45000"*/"LookupTimeout = 15000");
 
                     conf.WriteLine("DebugFlags = { PRINT EXIT }");
