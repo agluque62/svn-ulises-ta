@@ -674,6 +674,8 @@ namespace HMI.CD40.Module.BusinessEntities
             /** 20180626. #3609. Se anidan eventos y no se tratan bien en la cola.*/
             HwSupervisor.Enabled = true;
             /** Para Inicializar el estado de JACKS */
+            // LALM 210420.1 presencia de altavoz LC
+            // Peticiones #4810
             CheckPresencia();
 
         }
@@ -682,6 +684,10 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             // Fuerza la presencia del altavoz radio
             SetPresenceRdSpeaker(true);
+            // Fuerza la presencia del altavoz TF/LC
+            _Logger.Info("CheckPresencia LcSpeakerSimul={0}", Settings.Default.LcSpeakerSimul);
+            //if (Settings.Default.LcSpeakerSimul)
+                SetPresenceLcSpeaker(true);
         }
 
         /// <summary>

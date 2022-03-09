@@ -163,6 +163,9 @@ namespace HMI.Model.Module.Constants
         public const string ForwardStateEngine = "ForwardStateEngine";
         public const string RemoteForwardStateEngine = "RemoteForwardStateEngine";
         public const string RedirectedCallEngine = "RedirectedCallEngine";
+		//LAlM 211008
+		//#2629 Presentar via utilizada en llamada saliente.
+		public const string TlfResStateEngine = "TlfResStateEngine";
         
         #endregion
     }

@@ -155,6 +155,7 @@ namespace HMI.Model.Module.Services
 				{
 					_EngineCmdManager.CancelListen();
 				}
+
 				else if (_StateManager.Tlf.Listen.State == FunctionState.Error)
 				{
 					_EngineCmdManager.RecognizeListenState();
@@ -472,6 +473,16 @@ namespace HMI.Model.Module.Services
 		public void OnTlfPosStateEngine(object sender, RangeMsg<TlfState> msg)
 		{
 			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.TlfPosStateEngine, msg);
+
+			_StateManager.Tlf.Reset(msg);
+		}
+
+		// lalm 211008 suscripcion al cambio de recurso.
+		//#2629 Presentar via utilizada en llamda saliente.
+		[EventSubscription(EventTopicNames.TlfResStateEngine, ThreadOption.UserInterface)]
+		public void OnTlfResStateEngine(object sender, RangeMsg<TlfInfo> msg)
+		{
+			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.TlfResStateEngine, msg);
 
 			_StateManager.Tlf.Reset(msg);
 		}

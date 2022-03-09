@@ -88,8 +88,13 @@ namespace HMI.Model.Module.Messages
         public readonly TlfType _Type;
         public readonly bool _IsTop;
         public readonly bool _AllowsForward; //Point to point telephony destination CGW
+		//LALM 211007
+		//#2629 Presentar via utilizada en llamada saliente.
+		public readonly string _recused;
 
-		public TlfInfo(string dst, TlfState st, bool priorityAllowed, TlfType type, bool isTop, bool allowsForward)
+		//LALM 211007
+		//#2629 Presentar via utilizada en llamada saliente.
+		public TlfInfo(string dst, TlfState st, bool priorityAllowed, TlfType type, bool isTop, bool allowsForward, string recused = "")
 		{
 			Dst = dst;
 			St = st;
@@ -97,9 +102,30 @@ namespace HMI.Model.Module.Messages
             _Type = type;
             _IsTop = isTop;
             _AllowsForward = allowsForward;
-        }
+			//LALM 211007
+			//#2629 Presentar via utilizada en llamada saliente.
+			if (recused != "")
 
-        public override string ToString()
+				if (recused.IndexOf("rs=") > 0)
+				{
+					int begin = recused.IndexOf("rs=");
+					_recused = " [" + recused.Substring(begin + 3).Split('>')[0] + "] ";
+				}
+				else if (recused.IndexOf("sip:") > 0)
+				{
+					int begin = recused.IndexOf("sip:");
+					_recused = "";
+					// Si se quisiera presentar el abonado
+					//_recused = " (" + recused.Substring(begin + 4).Split('@')[0] + ")";
+				}
+				else
+                {
+					_recused = "";
+				}
+					
+		}
+
+		public override string ToString()
 		{
             return string.Format("[Dst={0}] [State={1}] [PrioAllowed={2}] [Type={3}] [IsTop={4}] [ForwAllowed={4}]", Dst, St, _PriorityAllowed, _Type, _IsTop, _AllowsForward);
         }
@@ -249,17 +275,29 @@ namespace HMI.Model.Module.Messages
 		public TlfState State;
         public readonly bool _IsTop;
         public readonly bool _AllowsForward;
+		//LALM 211008
+		//#2629 Presentar via utilizada en llamada saliente.
+		public string _recused;
 
-        public TlfIaDestination(string alias, string number, TlfState state, bool isTop = true, bool allowsForward = true)
+		public TlfIaDestination(string alias, string number, TlfState state, bool isTop = true, bool allowsForward = true, string recused = "")
 		{
 			Alias = alias;
 			Number = number;
 			State = state;
             _IsTop = isTop;
             _AllowsForward = allowsForward;
-        }
+			//LALM 211008
+			//#2629 Presentar via utilizada en llamada saliente.
+			if (recused != null && recused.IndexOf("rs=") > 0)
+			{
+				int begin = recused.IndexOf("rs=");
+				_recused = " (" + recused.Substring(begin + 3).Split('>')[0] + ")";
+			}
+			else
+				_recused = "";
+		}
 
-    public override string ToString()
+		public override string ToString()
 		{
             return string.Format("[Alias={0}] [Number={1}] [State={2} [IsTop={3}]", Alias, Number, State, _IsTop);
 		}

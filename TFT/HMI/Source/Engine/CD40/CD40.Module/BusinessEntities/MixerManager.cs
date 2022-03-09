@@ -340,6 +340,12 @@ namespace HMI.CD40.Module.BusinessEntities
             else if (tipoAudio == eAudioDeviceTypes.SIMUL)
             {
                 /** En el tipo Simulado, no hay dispositivos de audio */
+
+                //Para que puedan pasarse de modo normal a disgregado
+                //_InstructorDev = 0;
+                //_AlumnDev = 0;
+                //_RdSpeakerDev = 0;
+                //_LcSpeakerDev = 0;
             }
             else
             {
@@ -559,7 +565,15 @@ namespace HMI.CD40.Module.BusinessEntities
 				_RingVolume = CalculateVolume(level);
                 return true;
             }
-			else if (_BuzzerEnabled)
+            // LALM 210429
+            // Peticiones #4810
+            // Configurar la restricción de presencia de altavoz LC
+            else if (Settings.Default.LcSpeakerSimul)
+            {
+                _RingVolume = CalculateVolume(level);
+                return true;
+            }
+            else if (_BuzzerEnabled)
 			{
 				_RingVolume = CalculateVolume(level);
 
@@ -745,7 +759,9 @@ namespace HMI.CD40.Module.BusinessEntities
 					if ((_InstructorDev >= 0 && _InstructorJack) && ((_SplitMode == SplitMode.Off) || (_SplitMode == SplitMode.RdLc)))
 					{
 						Link(id, _InstructorDev, dir, priority);
-                        if (dir == MixerDir.SendRecv)
+                        // LALM 210922
+                        //Errores #3909 HMI: Telefonia en Altavoz -> Grabación Enaire
+                        if ((dir == MixerDir.SendRecv) || (dir == MixerDir.Recv))
                         {
                             Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, true);
                             /* AGL.REC */
@@ -755,7 +771,9 @@ namespace HMI.CD40.Module.BusinessEntities
 					if ((_AlumnDev >= 0 && _AlumnJack) && ((_SplitMode == SplitMode.Off) || (_SplitMode == SplitMode.LcTf)))
 					{
 						Link(id, _AlumnDev, dir, priority);
-                        if (dir == MixerDir.SendRecv)
+                        // LALM 210922
+                        //Errores #3909 HMI: Telefonia en Altavoz -> Grabación Enaire
+                        if ((dir == MixerDir.SendRecv) ||(dir == MixerDir.Recv))
                         {
                             Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, true);
                             /* AGL.REC */
@@ -880,7 +898,11 @@ namespace HMI.CD40.Module.BusinessEntities
 					if (_LcSpeakerDev >= 0)
 					{
 						_Mixer.Link(id, Mixer.UNASSIGNED_PRIORITY, _LcSpeakerDev, priority);
-                        Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+                        //Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+                        //lalm 20201214 cambio el onoff por update.
+                        //lalm 20211004 sobra esta linea
+                        //Top.Lc.lc_activo = true;
+                        Top.Lc.UpdateLcSpeakerLed();
 
                         /*- AGL.REC La grabacion del Altavoz-LC es Continua ...
                         BS si es grabacion unificada. 
@@ -898,7 +920,10 @@ namespace HMI.CD40.Module.BusinessEntities
 					}
                     else if (Top.Hw is SimCMediaHwManager)
                     {
-                        Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+                        //Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+                        //lalm 20201214 cambio el onoff por update.
+                        Top.Lc.lc_activo = true;
+                        Top.Lc.UpdateLcSpeakerLed();
                     }
                     else
                     {
@@ -911,7 +936,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     if (_RdSpeakerDev >= 0)
                     {
                         _Mixer.Link(id, Mixer.UNASSIGNED_PRIORITY, _RdSpeakerDev, priority);
-                        Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, HwManager.ON);
+                        Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, HwManager.ON);
                         /*- AGL.REC La Grabación del Altavoz Radio es Continua...
 						Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, true);
                         * */
@@ -938,7 +963,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     if (_HfSpeakerDev >= 0)
                     {
                         _Mixer.Link(id, Mixer.UNASSIGNED_PRIORITY, _HfSpeakerDev, priority);
-                        Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, HwManager.ON);
+                        Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, HwManager.ON);
                         /*- AGL.REC La Grabación del Altavoz Radio es Continua...
 						Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, true);
                         * */
@@ -1020,7 +1045,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, false);
 
                         Top.Recorder.SessionGlp(info._TipoFuente, false);
-                        Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
+                        Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
 						break;
 
 					case MixerDev.MhpRd:
@@ -1573,7 +1598,7 @@ namespace HMI.CD40.Module.BusinessEntities
 					break;
 
 				case MixerDev.SpkLc:
-                    Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+                    Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
 					_Mixer.Link(id, Mixer.UNASSIGNED_PRIORITY, _LcSpeakerDev, priority);
 					break;
 
@@ -1583,7 +1608,11 @@ namespace HMI.CD40.Module.BusinessEntities
 
                 case MixerDev.Invalid:
                     if (Top.Hw is SimCMediaHwManager)
-                        Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+                        //Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+                        //lalm 20201214 cambio el onoff por update.
+                        Top.Lc.lc_activo = false;
+                        Top.Lc.ring_activo = false;
+                        Top.Lc.UpdateLcSpeakerLed();
                     break;
 			}
 
@@ -1604,11 +1633,15 @@ namespace HMI.CD40.Module.BusinessEntities
                     case MixerDev.MhpRd:
                     case MixerDev.SpkRd:
                     case MixerDev.SpkLc:
-                            Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
+                            Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
                         break;
                     case MixerDev.Invalid:
                         if (Top.Hw is SimCMediaHwManager)
-                            Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
+                            //Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
+                            //lalm 20201214 cambio el onoff por update.
+                            Top.Lc.lc_activo = false;
+                            Top.Lc.ring_activo = false;
+                            Top.Lc.UpdateLcSpeakerLed();
                         break;
                 }
                 id_ringing = -1;
@@ -1792,7 +1825,10 @@ namespace HMI.CD40.Module.BusinessEntities
 					if (instructorJack && !_InstructorJack)	// Conexión jacks instructor
 					{
 						Link(p._CallId, _InstructorDev, p._Dir, p._Priority);
-                        if (p._Dir == MixerDir.SendRecv)
+                        // LALM 210922
+                        //Errores #3909 HMI: Telefonia en Altavoz -> Grabación Enaire
+                        if ((p._Dir == MixerDir.SendRecv)|| (p._Dir == MixerDir.Send))
+
                             Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, true);
                     }
 					else if (!instructorJack && _InstructorJack) // Desconexión jacks instructor
@@ -1804,7 +1840,9 @@ namespace HMI.CD40.Module.BusinessEntities
 					if (alumnJack && !_AlumnJack)	// Conexión jacks alumno
 					{
 						Link(p._CallId, _AlumnDev, p._Dir, p._Priority);
-                        if (p._Dir == MixerDir.SendRecv)
+                        // LALM 210922
+                        //Errores #3909 HMI: Telefonia en Altavoz -> Grabación Enaire
+                        if ((p._Dir == MixerDir.SendRecv) || (p._Dir == MixerDir.Send))
                             Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, true);
                     }
 					else if (!alumnJack && _AlumnJack) // Desconexión jacks alumno
@@ -2114,5 +2152,12 @@ namespace HMI.CD40.Module.BusinessEntities
             _ECHandsFreeManager.fullDuplexLC = sendLc && receiveLc;
         }
 		#endregion
+
+        //LALM 211029 
+        //# Error 3629 Terminal de Audio -> Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV
+        public bool AltavozRingCompartidoLC
+        {
+            get { return (_RingDev == MixerDev.SpkLc); }
+        }
     }
 }

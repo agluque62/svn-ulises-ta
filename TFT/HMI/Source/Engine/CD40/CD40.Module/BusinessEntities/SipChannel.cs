@@ -194,12 +194,20 @@ namespace HMI.CD40.Module.BusinessEntities
             if (Remote.Ids[0].Contains("0*"))
                 Remote.Ids[0] = Remote.Ids[0].Substring(2);
         }
+
+        //LALM 211012
+        //#2629 Presentar via utilizada en llamada saliente.
+        public void Reset(string uri)
+        {
+            if (Remote.Ids[0].Contains("0*"))
+                Remote.Ids[0] = Remote.Ids[0].Substring(2);
+        }
     }
 
 #if DEBUG
 	public struct SipResult
 #else
-	struct SipResult
+    struct SipResult
 #endif
     {
 		public int Result;

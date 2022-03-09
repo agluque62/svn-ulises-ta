@@ -711,6 +711,7 @@ namespace HMI.Model.Module.UI
 			//rr.AddLine(x, y + h - radius, x, y + radius);
 
 			//return rr;
+
 			GraphicsPath path = new GraphicsPath();
 
 			if (radius <= 0)
@@ -747,7 +748,7 @@ namespace HMI.Model.Module.UI
 			}
 			else
 			{
-				int diameter = radius * 2;
+ 				int diameter = radius * 2;
 				Rectangle arc = new Rectangle(baseRect.Location, new Size(diameter, diameter));
 
 				// top left arc 
@@ -818,7 +819,7 @@ namespace HMI.Model.Module.UI
 			int cornerRadius, Color borderColor, Color innerBorderColor, Color backColor, ColorBlend blend)
 		{
 			Rectangle rr = new Rectangle(rect.X, rect.Y, rect.Width - 1, rect.Height - 1);
-
+			
 			if (style == BtnStyle.Flat)
 			{
 				using (GraphicsPath path = GetRoundedRect(rr, cornerRadius))

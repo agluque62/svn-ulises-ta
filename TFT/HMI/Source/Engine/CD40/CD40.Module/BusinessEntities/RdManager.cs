@@ -16,6 +16,7 @@ using HMI.CD40.Module.Snmp;
 using U5ki.Infrastructure;
 using Utilities;
 using NLog;
+using System.Net.NetworkInformation;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
@@ -127,10 +128,28 @@ namespace HMI.CD40.Module.BusinessEntities
             return (Top.Hw.HfSpeaker && (Top.Mixer.HfSpeakerDev > 0 || Top.Hw is SimCMediaHwManager));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-		public void Init()
+        // LALM 210521 
+        // Peticiones #4816
+        public static bool GetIsMyNetworkAvailable()
+        {
+            String SipIp = Top.SipIp;
+            List<string> ips = new List<string>();
+            NetworkInterface[] nets = NetworkInterface.GetAllNetworkInterfaces();
+
+            foreach (NetworkInterface iface in nets)
+                if ((iface.NetworkInterfaceType != NetworkInterfaceType.Loopback) &&
+                    (iface.OperationalStatus == OperationalStatus.Up))
+                    foreach (UnicastIPAddressInformation ip in iface.GetIPProperties().UnicastAddresses)
+                        ips.Add(ip.Address.ToString());
+            foreach (String ip in ips)
+                if (ip == SipIp)
+                    return true;
+            return false;
+        }
+            /// <summary>
+            /// 
+            /// </summary>
+            public void Init()
 		{
 			_PttTimer.AutoReset = false;
 			_PttTimer.Elapsed += OnPttTimerElapsed;
@@ -168,14 +187,20 @@ namespace HMI.CD40.Module.BusinessEntities
 
         void _TimerNetworkStatus_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (_StatusNetworkOn && !System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            // if (_StatusNetworkOn && !System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            // LALM 210521 
+            // Peticiones #4816 Comprobar si hay varios interfaces de red activos
+            if (_StatusNetworkOn && !GetIsMyNetworkAvailable())
             {
                 _StatusNetworkOn = false;
 
                 _Logger.Error("Reset HMI por pérdida de red.");
                 Process.Start("Launcher.exe", "HMI.exe");
             }
-            else if (!_StatusNetworkOn && System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            // else if (!_StatusNetworkOn && System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            // LALM 210521 
+            // Peticiones #4816 Comprobar si hay varios interfaces de red activos
+            else if (!_StatusNetworkOn && GetIsMyNetworkAvailable())
             {
                 _StatusNetworkOn = true;
             }

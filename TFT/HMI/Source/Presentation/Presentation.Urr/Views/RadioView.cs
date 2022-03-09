@@ -278,7 +278,7 @@ namespace HMI.Presentation.Urr.Views
             _urrRdPageButton.Enabled = false;//_RdPageEnabled;
             _UrrUpPageBT.Enabled = _RdPageEnabled;
             _UrrDownPageBT.Enabled = _RdPageEnabled;
-	
+	        
         }
 
         [EventSubscription(EventTopicNames.SiteManagerChanged, ThreadOption.Publisher)]
@@ -292,7 +292,7 @@ namespace HMI.Presentation.Urr.Views
             //_urrRdPageButton.Enabled = _RdPageEnabled;
             //_UrrUpPageBT.Enabled = _RdPageEnabled;
             //_UrrDownPageBT.Enabled = _RdPageEnabled;
-	
+
         }
 
         [EventSubscription(EventTopicNames.SiteChanged, ThreadOption.Publisher)]

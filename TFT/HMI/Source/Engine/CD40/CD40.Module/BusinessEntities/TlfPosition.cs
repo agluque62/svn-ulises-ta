@@ -55,6 +55,41 @@ namespace HMI.CD40.Module.BusinessEntities
 			get { return _OldState; }
 		}
 
+        ///lalm 211015
+        ///#3618 Señal de Llamada Entrante durante CONV en altavoz
+        bool LineaCalienteEnUso()
+        {
+            // 211029 cambio lc_activo por lc.Activitylc()
+            // hay un error lc_activo se queda a true cuando hay actividad en el altavoz de lc/tlf.
+            if (Top.Lc.lc_activo)
+                return true;
+            return false;
+        }
+
+        //LALM 211029 Cambio lc activo por activity y se implementa activitylc
+        //# Error 3629 Terminal de Audio -> Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV
+        public virtual int Tone
+        {
+            get { return _Tone; }
+            set
+            {
+                _Tone = value;
+                Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
+            }
+        }
+
+        bool LineaTlfEnUso()
+        {
+
+            if (Top.Mixer.RxTlfAudioVia == TlfRxAudioVia.Speaker)
+            {
+                if (Top.Tlf.Activity())
+                    return true;
+            }
+            return false;
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -102,12 +137,24 @@ namespace HMI.CD40.Module.BusinessEntities
 								Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
 								break;
 							case TlfState.In:
-								_Tone = SipAgent.CreateWavPlayer("Resources/Tones/Ring.wav", true);
-								Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
-								break;
+                                //LALM 211014
+                                //#3618 Señal de Llamada Entrante durante CONV en altavoz
+                                // Si La linea caliente esta ocupada, genero otro tono.
+                                if (LineaCalienteEnUso()||LineaTlfEnUso())
+                                    _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingNoIntrusivo.wav", true);
+                                else
+                                    _Tone = SipAgent.CreateWavPlayer("Resources/Tones/Ring.wav", true);
+                                Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
+                                break;
 							case TlfState.InPrio:
-								_Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingPrio.wav", true);
-								Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
+                                //LALM 211014
+                                //#3618 Señal de Llamada Entrante durante CONV en altavoz
+                                // Si La linea caliente esta ocupada, genero otro tono.
+                                if (LineaCalienteEnUso() || LineaTlfEnUso())
+                                    _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingNoIntrusivo.wav", true);
+                                else
+                                    _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingPrio.wav", true);
+                                Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
 								break;
 						}
 					}
@@ -1183,9 +1230,12 @@ namespace HMI.CD40.Module.BusinessEntities
                  PermisoRed((uint)(((SipChannel)inCall.Ch).Prefix),true)))
 			{
 
-                if ((Top.ScreenSaverEnabled) || (Top.Mixer.RxTlfAudioVia == TlfRxAudioVia.Speaker && !Top.Hw.LCSpeaker))
+                if ((Top.ScreenSaverEnabled) || (Top.Mixer.RxTlfAudioVia == TlfRxAudioVia.Speaker && !Top.Hw.LCSpeaker) ||
+                // Errores #4928
+                // 211028 si no jacks ni altavoz de LC rechazo la llamada.
+                (!Top.Hw.InstructorJack && !Top.Hw.AlumnJack && !Top.Hw.LCSpeaker && Top.Hw.ListaDispositivos.Count == 0))
                 {
-                    return SipAgent.SIP_DECLINE;
+                        return SipAgent.SIP_DECLINE;
                 }
 
 				if (_SipCall != null)
@@ -1261,7 +1311,14 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             General.SafeLaunchEvent(ForwardedCallMsg, this, _Literal);
         }
-		#region Protected Members
+
+        //lalm 210930
+        //Peticiones #3638
+        public void RefrescaPos()
+        {
+            General.SafeLaunchEvent(TlfPosStateChanged, this);
+        }
+        #region Protected Members
         /// <summary>
         /// 
         /// </summary>
@@ -1447,6 +1504,42 @@ namespace HMI.CD40.Module.BusinessEntities
 			return false;
 		}
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// LALM 211006
+        ///#2629 Presentar via utilizada en llamada saliente.
+        /// <param name="ch"></param>
+        /// <param name="path"></param>
+        /// <param name="prio"></param>
+        /// <param name="remoteId"></param>
+        /// <returns></returns>
+        private static string getdstParams(SipChannel ch, SipPath path, int prio, string remoteId)
+        {
+            string dstParams = "";
+            if (!path.Line.centralIP)
+            {
+                //Estos parametros son internos, sirven para dar información a la pasarela
+                //En encaminamiento IP no se deben usar
+                if (!string.IsNullOrEmpty(path.Remote.SubId))
+                {
+                    dstParams += string.Format(";isub={0}", path.Remote.SubId);
+                }
+                if ((ch.Prefix != Cd40Cfg.INT_DST) && (ch.Prefix != Cd40Cfg.IP_DST) && (ch.Prefix != Cd40Cfg.UNKNOWN_DST) &&
+                        ((ch.Prefix != Cd40Cfg.PP_DST) || (string.Compare(remoteId, path.Line.Id, true /*ignoreCase*/) != 0)))
+                {
+                    dstParams += string.Format(";cd40rs={0}", path.Line.Id);
+                  
+                }
+                if (ch.Prefix == Cd40Cfg.ATS_DST)
+                {
+                    dstParams += string.Format(";cd40prio={0}", prio);
+                }
+            }
+
+            return dstParams;
+        }
+
         public ArrayList GetUris()
         {
             if (_Channels[0].GetType() == typeof(IntChannel))
@@ -1532,6 +1625,12 @@ namespace HMI.CD40.Module.BusinessEntities
                     _Logger.Debug("LLamada por alternativa {0} soyPriv:{1} prio {2}", path.Line.Id, Top.Cfg.SoyPrivilegiado, numPriority);
                     if (TryCall(ch, path, numPriority))
 					{
+                        //LALM 211007
+                        //#2629 Presentar via utilizada en llamada saliente.
+                        string remoteid = "";
+                        string uri = getdstParams(ch,path,(int)( _SipCall.Priority + 1),remoteid);
+                        path.Reset(uri);
+
 						return TlfState.Out;
 					}
 
@@ -1791,6 +1890,6 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
-		#endregion
-	}
+        #endregion
+    }
 }

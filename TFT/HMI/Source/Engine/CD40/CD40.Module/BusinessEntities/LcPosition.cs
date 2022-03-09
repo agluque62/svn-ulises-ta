@@ -401,8 +401,18 @@ namespace HMI.CD40.Module.BusinessEntities
 					Top.Mixer.Unlink(sipCallId);
 					Top.Mixer.Link(sipCallId, MixerDev.SpkLc, MixerDir.Send, Mixer.LC_PRIORITY, FuentesGlp.RxLc);
                     Top.Recorder.SessionGlp(sipCallId, FuentesGlp.RxLc, true);
+					//LALM 210719 #4796 Escucha(ESCUCHA AG SIN IMPLEMENTAR)
+					//Top.Mixer.LinkListen(CORESIP_SndDevType.CORESIP_SND_LC_LISTEN, true);
 					RxState = LcRxState.Rx;
                     Top.Lc.HoldedTlf = true;
+					//LALM 211029 
+					//# Error 3629 Terminal de Audio -> Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV
+					if (Top.Tlf.ActivityRing() != -1 && Top.Mixer.AltavozRingCompartidoLC)
+					{
+						// Quito tono de ring
+						Top.Tlf.QuitaTonoRing();
+						Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+					}
 				}
 				else if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED)
 				{
@@ -417,6 +427,14 @@ namespace HMI.CD40.Module.BusinessEntities
                     _OldRxState = _RxState;
                     RxState = LcRxState.Idle;
                     Top.Lc.HoldedTlf = false;
+					//LALM 211029 
+					//# Error 3629 Terminal de Audio -> Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV
+					if (Top.Tlf.ActivityRing() != -1 && Top.Mixer.AltavozRingCompartidoLC)
+					{
+						// Pongo tono de ring
+						Top.Tlf.RecuperaTonoRing();
+						Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+					}
 				}
 
 				return true;
@@ -505,9 +523,9 @@ namespace HMI.CD40.Module.BusinessEntities
 		// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
 		private string _lastaccid = "";
 		private string _lastsrcid = "";
-        /// <summary>
-        /// 
-        /// </summary>
+		/// <summary>
+		/// 
+		/// </summary>
 		private int _Pos;
 		private string _Literal = "";
 		private LcRxState _RxState = LcRxState.Unavailable;

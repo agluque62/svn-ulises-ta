@@ -104,8 +104,12 @@ namespace HMI.CD40.Module.BusinessEntities
                 else return false;
             }
             set
-            {   // Solo aplica si comparten altavoz con la telefonía
-                if (Top.Mixer.RxTlfAudioVia == TlfRxAudioVia.Speaker)
+            {   // Solo aplica si comparten altavoz con la telefonía 
+                // LALM 211025
+                // #4795
+                // La transmisión de una línea telefónica quedará anulada cuando se seleccione
+                // una línea caliente => se añade DetectedAnyLCTx
+                if (Top.Mixer.RxTlfAudioVia == TlfRxAudioVia.Speaker || Top.Lc.DetectedAnyLCTx())
                 {
                     // se aparca la llamada si hay llamadas telefonicas activas (aparcada no es activa)
                     // se desaparca la llamada, si se ha aparcado antes desde aquí.
@@ -351,13 +355,36 @@ namespace HMI.CD40.Module.BusinessEntities
                     AnyLcIN = true;
                     break;
                 }
-
             }
 
             return AnyLcIN;
         }
-        
 
-		#endregion
-	}
+        // LALM 211025
+        // #4795
+        private bool DetectedAnyLCTx() 
+        {
+            bool AnyLcOut = false;
+
+            for (int i = 0, to = _LcPositions.Length; i < to; i++)
+            {
+                //lalm 211025
+                if (_LcPositions[i].TxState == LcTxState.Tx)
+                {
+                    AnyLcOut = true;
+                    break;
+                }
+            }
+
+            return AnyLcOut;
+        }
+
+        //LALM 211029 
+        //# Error 3629 Terminal de Audio -> Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV
+        public bool ActivityLc()
+        {
+            return AnyActiveLcRx;
+        }
+        #endregion
+    }
 }

@@ -178,14 +178,17 @@ namespace HMI.Model.Module.UI
             Reset(frecuency, alias, drawX, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor, state);
         }
 
-        public void Reset(string frecuency, string alias, bool drawX, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor, 
-            Color rxForeColor, Color titleForeColor, FrequencyState state = FrequencyState.Available)
+		//LALM 210223  Errores #4756 prioridad.
+		// Inserto un nuevo parametro prioridad.
+		public void Reset(string frecuency, string alias, bool drawX, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor, 
+            Color rxForeColor, Color titleForeColor, FrequencyState state = FrequencyState.Available, int prioridad=0, bool bloqueo=false)
 		{
 			_Frecuency = frecuency;
 			_Alias = alias.Length > 11 ? (alias.Substring(0,8)+"...") : alias ;
 			_RtxGroup = rtxGroup;
 			_PttImage = ptt;
 			_SquelchImage = squelch;
+			
 
             ForeColor = titleForeColor;
 //            BackColor = titleForeColor;
@@ -198,11 +201,22 @@ namespace HMI.Model.Module.UI
                 else if (state == FrequencyState.Degraded)
                     _CurrentBackColor = Color.OrangeRed;
                 else if (state == FrequencyState.Available)
-                    _CurrentBackColor = VisualStyle.ButtonColor;
-                else //FrequencyState.NotAvailable
+                {
+					_CurrentBackColor = VisualStyle.ButtonColor;
+					////LALM 210223  Errores #4756 prioridad.
+					// Cambio el color de la tecla cuando la prioridad es 3=prio violet, cuando es 4=emergencia blue
+					if (prioridad==3)
+						_CurrentBackColor = VisualStyle.Colors.Violet;
+					else if (prioridad == 4)
+						_CurrentBackColor = VisualStyle.Colors.Blue;
+				}
+				else //FrequencyState.NotAvailable
                 {
                      _CurrentBackColor = title;              
                 }
+				//LALM 210707 nuevo parametro bloqueo para pintar otro color.
+				if (bloqueo)
+					_CurrentBackColor = VisualStyle.Colors.Orange;
             }
 
             _BtnInfo.SetBackColor(BtnState.Normal, _CurrentBackColor);
@@ -484,5 +498,10 @@ namespace HMI.Model.Module.UI
 				General.SafeLaunchEvent(RxLongClick, this);
 			}
 		}
-	}
+
+        public void Reset(string frecuency, string alias, bool unavailable, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor, Color rxForeColor, Color titleForeColor, FrequencyState state, object priority)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

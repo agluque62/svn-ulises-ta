@@ -35,27 +35,27 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace HMI.CD40.Module.Services
 {
-	class CmdManagerService : IEngineCmdManagerService
-	{
-		#region Events
+    class CmdManagerService : IEngineCmdManagerService
+    {
+        #region Events
 
         [EventPublication(EventTopicNames.ProxyStateChangedEngine, PublicationScope.Global)]
         public event EventHandler<StateMsg<bool>> ProxyStateChangedEngine;
 
         [EventPublication(EventTopicNames.ConnectionStateEngine, PublicationScope.Global)]
-		public event EventHandler<EngineConnectionStateMsg> ConnectionStateEngine;
+        public event EventHandler<EngineConnectionStateMsg> ConnectionStateEngine;
 
-		[EventPublication(EventTopicNames.IsolatedStateEngine, PublicationScope.Global)]
-		public event EventHandler<EngineIsolatedStateMsg> IsolatedStateEngine;
+        [EventPublication(EventTopicNames.IsolatedStateEngine, PublicationScope.Global)]
+        public event EventHandler<EngineIsolatedStateMsg> IsolatedStateEngine;
 
-		[EventPublication(EventTopicNames.PositionIdEngine, PublicationScope.Global)]
-		public event EventHandler<PositionIdMsg> PositionIdEngine;
+        [EventPublication(EventTopicNames.PositionIdEngine, PublicationScope.Global)]
+        public event EventHandler<PositionIdMsg> PositionIdEngine;
 
-		[EventPublication(EventTopicNames.SplitModeEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<SplitMode>> SplitModeEngine;
+        [EventPublication(EventTopicNames.SplitModeEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<SplitMode>> SplitModeEngine;
 
-		[EventPublication(EventTopicNames.JacksStateEngine, PublicationScope.Global)]
-		public event EventHandler<JacksStateMsg> JacksStateEngine;
+        [EventPublication(EventTopicNames.JacksStateEngine, PublicationScope.Global)]
+        public event EventHandler<JacksStateMsg> JacksStateEngine;
 
         [EventPublication(EventTopicNames.SpeakerStateEngine, PublicationScope.Global)]
         public event EventHandler<JacksStateMsg> SpeakerStateEngine;
@@ -64,55 +64,55 @@ namespace HMI.CD40.Module.Services
         public event EventHandler<JacksStateMsg> SpeakerExtStateEngine;
 
         [EventPublication(EventTopicNames.BuzzerStateEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<bool>> BuzzerStateEngine;
+        public event EventHandler<StateMsg<bool>> BuzzerStateEngine;
 
-		[EventPublication(EventTopicNames.BuzzerLevelEngine, PublicationScope.Global)]
-		public event EventHandler<LevelMsg<Buzzer>> BuzzerLevelEngine;
+        [EventPublication(EventTopicNames.BuzzerLevelEngine, PublicationScope.Global)]
+        public event EventHandler<LevelMsg<Buzzer>> BuzzerLevelEngine;
 
-		[EventPublication(EventTopicNames.TlfInfoEngine, PublicationScope.Global)]
-		public event EventHandler<RangeMsg<TlfInfo>> TlfInfoEngine;
+        [EventPublication(EventTopicNames.TlfInfoEngine, PublicationScope.Global)]
+        public event EventHandler<RangeMsg<TlfInfo>> TlfInfoEngine;
 
-		[EventPublication(EventTopicNames.TlfPosStateEngine, PublicationScope.Global)]
-		public event EventHandler<RangeMsg<TlfState>> TlfPosStateEngine;
+        [EventPublication(EventTopicNames.TlfPosStateEngine, PublicationScope.Global)]
+        public event EventHandler<RangeMsg<TlfState>> TlfPosStateEngine;
 
-		[EventPublication(EventTopicNames.LcSpeakerLevelEngine, PublicationScope.Global)]
-		public event EventHandler<LevelMsg<LcSpeaker>> LcSpeakerLevelEngine;
+        [EventPublication(EventTopicNames.LcSpeakerLevelEngine, PublicationScope.Global)]
+        public event EventHandler<LevelMsg<LcSpeaker>> LcSpeakerLevelEngine;
 
-		[EventPublication(EventTopicNames.TlfHeadPhonesLevelEngine, PublicationScope.Global)]
-		public event EventHandler<LevelMsg<TlfHeadPhones>> TlfHeadPhonesLevelEngine;
+        [EventPublication(EventTopicNames.TlfHeadPhonesLevelEngine, PublicationScope.Global)]
+        public event EventHandler<LevelMsg<TlfHeadPhones>> TlfHeadPhonesLevelEngine;
 
         [EventPublication(EventTopicNames.TlfSpeakerLevelEngine, PublicationScope.Global)]
         public event EventHandler<LevelMsg<LcSpeaker>> TlfSpeakerLevelEngine;
-        
+
         [EventPublication(EventTopicNames.RdInfoEngine, PublicationScope.Global)]
-		public event EventHandler<RangeMsg<RdInfo>> RdInfoEngine;
+        public event EventHandler<RangeMsg<RdInfo>> RdInfoEngine;
 
-		[EventPublication(EventTopicNames.RdPageEngine, PublicationScope.Global)]
-		public event EventHandler<PageMsg> RdPageEngine;
+        [EventPublication(EventTopicNames.RdPageEngine, PublicationScope.Global)]
+        public event EventHandler<PageMsg> RdPageEngine;
 
-		[EventPublication(EventTopicNames.RdPttEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<bool>> RdPttEngine;
+        [EventPublication(EventTopicNames.RdPttEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<bool>> RdPttEngine;
 
-		[EventPublication(EventTopicNames.HoldTlfCallEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<bool>> HoldTlfCallEngine;
+        [EventPublication(EventTopicNames.HoldTlfCallEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<bool>> HoldTlfCallEngine;
 
-		[EventPublication(EventTopicNames.CompletedIntrusionStateEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<string>> CompletedIntrusionStateEngine;
+        [EventPublication(EventTopicNames.CompletedIntrusionStateEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<string>> CompletedIntrusionStateEngine;
 
-		[EventPublication(EventTopicNames.BeginingIntrudeToStateEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<string>> BeginingIntrudeToStateEngine;
+        [EventPublication(EventTopicNames.BeginingIntrudeToStateEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<string>> BeginingIntrudeToStateEngine;
 
-		[EventPublication(EventTopicNames.IntrudeToStateEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<string>> IntrudeToStateEngine;
+        [EventPublication(EventTopicNames.IntrudeToStateEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<string>> IntrudeToStateEngine;
 
-		[EventPublication(EventTopicNames.RemoveRtxGroup, PublicationScope.Global)]
-		public event EventHandler RemoveRtxGroup;
+        [EventPublication(EventTopicNames.RemoveRtxGroup, PublicationScope.Global)]
+        public event EventHandler RemoveRtxGroup;
 
-		//[EventPublication(EventTopicNames.RdPosPttStateEngine, PublicationScope.Global)]
-		//public event EventHandler<RangeMsg<PttState>> RdPosPttStateEngine;
+        //[EventPublication(EventTopicNames.RdPosPttStateEngine, PublicationScope.Global)]
+        //public event EventHandler<RangeMsg<PttState>> RdPosPttStateEngine;
 
-		//[EventPublication(EventTopicNames.RdPosSquelchStateEngine, PublicationScope.Global)]
-		//public event EventHandler<RangeMsg<SquelchState>> RdPosSquelchStateEngine;
+        //[EventPublication(EventTopicNames.RdPosSquelchStateEngine, PublicationScope.Global)]
+        //public event EventHandler<RangeMsg<SquelchState>> RdPosSquelchStateEngine;
 
         [EventPublication(EventTopicNames.BriefingStateEngine, PublicationScope.Global)]
         public event EventHandler<StateMsg<bool>> BriefingStateEngine;
@@ -121,13 +121,13 @@ namespace HMI.CD40.Module.Services
         public event EventHandler<StateMsg<bool>> PlayingStateEngine;
 
         [EventPublication(EventTopicNames.RdPosStateEngine, PublicationScope.Global)]
-		public event EventHandler<RangeMsg<RdState>> RdPosStateEngine;
+        public event EventHandler<RangeMsg<RdState>> RdPosStateEngine;
 
-		[EventPublication(EventTopicNames.RdRtxModificationEndEngine, PublicationScope.Global)]
-		public event EventHandler RdRtxModificationEndEngine;
+        [EventPublication(EventTopicNames.RdRtxModificationEndEngine, PublicationScope.Global)]
+        public event EventHandler RdRtxModificationEndEngine;
 
-		//[EventPublication(EventTopicNames.RdRtxGroupsEngine, PublicationScope.Global)]
-		//public event EventHandler<RangeMsg<RdRtxGroup>> RdRtxGroupsEngine;
+        //[EventPublication(EventTopicNames.RdRtxGroupsEngine, PublicationScope.Global)]
+        //public event EventHandler<RangeMsg<RdRtxGroup>> RdRtxGroupsEngine;
 
         [EventPublication(EventTopicNames.RdSpeakerLevelEngine, PublicationScope.Global)]
         public event EventHandler<LevelMsg<RdSpeaker>> RdSpeakerLevelEngine;
@@ -135,66 +135,66 @@ namespace HMI.CD40.Module.Services
         [EventPublication(EventTopicNames.RdHFLevelEngine, PublicationScope.Global)]
         public event EventHandler<LevelMsg<HfSpeaker>> RdHFLevelEngine;
 
-		[EventPublication(EventTopicNames.RdHeadPhonesLevelEngine, PublicationScope.Global)]
-		public event EventHandler<LevelMsg<RdHeadPhones>> RdHeadPhonesLevelEngine;
+        [EventPublication(EventTopicNames.RdHeadPhonesLevelEngine, PublicationScope.Global)]
+        public event EventHandler<LevelMsg<RdHeadPhones>> RdHeadPhonesLevelEngine;
 
-		[EventPublication(EventTopicNames.RdFrAsignedToOtherEngine, PublicationScope.Global)]
-		public event EventHandler<RdFrAsignedToOtherMsg> RdFrAsignedToOtherEngine;
+        [EventPublication(EventTopicNames.RdFrAsignedToOtherEngine, PublicationScope.Global)]
+        public event EventHandler<RdFrAsignedToOtherMsg> RdFrAsignedToOtherEngine;
 
         [EventPublication(EventTopicNames.RdHfFrAssignedEngine, PublicationScope.Global)]
         public event EventHandler<RdHfFrAssigned> RdHfFrAssignedEngine;
 
-		[EventPublication(EventTopicNames.LcInfoEngine, PublicationScope.Global)]
-		public event EventHandler<RangeMsg<LcInfo>> LcInfoEngine;
+        [EventPublication(EventTopicNames.LcInfoEngine, PublicationScope.Global)]
+        public event EventHandler<RangeMsg<LcInfo>> LcInfoEngine;
 
-		[EventPublication(EventTopicNames.LcPosStateEngine, PublicationScope.Global)]
-		public event EventHandler<RangeMsg<LcState>> LcPosStateEngine;
+        [EventPublication(EventTopicNames.LcPosStateEngine, PublicationScope.Global)]
+        public event EventHandler<RangeMsg<LcState>> LcPosStateEngine;
 
-		[EventPublication(EventTopicNames.TransferStateEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<FunctionState>> TransferStateEngine;
+        [EventPublication(EventTopicNames.TransferStateEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<FunctionState>> TransferStateEngine;
 
-		//[EventPublication(EventTopicNames.IntrudedByEngine, PublicationScope.Global)]
-		//public event EventHandler<StateMsg<string>> IntrudedByEngine;
+        //[EventPublication(EventTopicNames.IntrudedByEngine, PublicationScope.Global)]
+        //public event EventHandler<StateMsg<string>> IntrudedByEngine;
 
-		//[EventPublication(EventTopicNames.InterruptedByEngine, PublicationScope.Global)]
-		//public event EventHandler<StateMsg<string>> InterruptedByEngine;
+        //[EventPublication(EventTopicNames.InterruptedByEngine, PublicationScope.Global)]
+        //public event EventHandler<StateMsg<string>> InterruptedByEngine;
 
-		[EventPublication(EventTopicNames.ListenStateEngine, PublicationScope.Global)]
-		public event EventHandler<ListenPickUpMsg> ListenStateEngine;
+        [EventPublication(EventTopicNames.ListenStateEngine, PublicationScope.Global)]
+        public event EventHandler<ListenPickUpMsg> ListenStateEngine;
 
-		[EventPublication(EventTopicNames.HangToneStateEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<bool>> HangToneStateEngine;
+        [EventPublication(EventTopicNames.HangToneStateEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<bool>> HangToneStateEngine;
 
-		[EventPublication(EventTopicNames.TlfIaPosStateEngine, PublicationScope.Global)]
-		public event EventHandler<RangeMsg<TlfIaDestination>> TlfIaPosStateEngine;
+        [EventPublication(EventTopicNames.TlfIaPosStateEngine, PublicationScope.Global)]
+        public event EventHandler<RangeMsg<TlfIaDestination>> TlfIaPosStateEngine;
 
-		[EventPublication(EventTopicNames.ShowNotifMsgEngine, PublicationScope.Global)]
-		public event EventHandler<NotifMsg> ShowNotifMsgEngine;
+        [EventPublication(EventTopicNames.ShowNotifMsgEngine, PublicationScope.Global)]
+        public event EventHandler<NotifMsg> ShowNotifMsgEngine;
 
-		//[EventPublication(EventTopicNames.HideNotifMsgEngine, PublicationScope.Global)]
-		//public event EventHandler<EventArgs<string>> HideNotifMsgEngine;
+        [EventPublication(EventTopicNames.HideNotifMsgEngine, PublicationScope.Global)]
+        public event EventHandler<EventArgs<string>> HideNotifMsgEngine;
 
-		[EventPublication(EventTopicNames.RemoteListenStateEngine, PublicationScope.Global)]
-		public event EventHandler<ListenPickUpMsg> RemoteListenStateEngine;
+        [EventPublication(EventTopicNames.RemoteListenStateEngine, PublicationScope.Global)]
+        public event EventHandler<ListenPickUpMsg> RemoteListenStateEngine;
 
-		[EventPublication(EventTopicNames.ConfListEngine, PublicationScope.Global)]
-		public event EventHandler<RangeMsg<string>> ConfListEngine;
+        [EventPublication(EventTopicNames.ConfListEngine, PublicationScope.Global)]
+        public event EventHandler<RangeMsg<string>> ConfListEngine;
 
-		[EventPublication(EventTopicNames.PermissionsEngine, PublicationScope.Global)]
-		public event EventHandler<StateMsg<Permissions>> PermissionsEngine;
+        [EventPublication(EventTopicNames.PermissionsEngine, PublicationScope.Global)]
+        public event EventHandler<StateMsg<Permissions>> PermissionsEngine;
 
-		[EventPublication(EventTopicNames.AgendaChangedEngine, PublicationScope.Global)]
-		public event EventHandler<RangeMsg<Number>> AgendaChangedEngine;
+        [EventPublication(EventTopicNames.AgendaChangedEngine, PublicationScope.Global)]
+        public event EventHandler<RangeMsg<Number>> AgendaChangedEngine;
 
-		//[EventPublication(EventTopicNames.NumberBookChangedEngine, PublicationScope.Global)]
-		//public event EventHandler<RangeMsg<Area>> NumberBookChangedEngine;
+        //[EventPublication(EventTopicNames.NumberBookChangedEngine, PublicationScope.Global)]
+        //public event EventHandler<RangeMsg<Area>> NumberBookChangedEngine;
 
         [EventPublication(EventTopicNames.HistoricalOfLocalCallsEngine, PublicationScope.Global)]
         public event EventHandler<RangeMsg<LlamadaHistorica>> HistoricalOfLocalCallsEngine;
 
         [EventPublication(EventTopicNames.SelCalResponseEngine, PublicationScope.Global)]
         public event EventHandler<StateMsg<string>> SelCalResponseEngine;
-        
+
 #if _HF_GLOBAL_STATUS_
         [EventPublication(EventTopicNames.HfGlobalStatusEngine, PublicationScope.Global)]
         public event EventHandler<StateMsg<string>> HfGlobalStatusEngine;
@@ -218,16 +218,20 @@ namespace HMI.CD40.Module.Services
         [EventPublication(EventTopicNames.RedirectedCallEngine, PublicationScope.Global)]
         public event EventHandler<PositionIdMsg> RedirectedCallEngine;
 
+        //lalam 211008
+        //#2629 Presentar via utilizada en llamada saliente.
+        [EventPublication(EventTopicNames.TlfResStateEngine, PublicationScope.Global)]
+        public event EventHandler<RangeMsg<TlfInfo>> TlfResStateEngine;
         #endregion
 
         public void Run()
-		{
-			try
-			{
+        {
+            try
+            {
 #if _NEWSTART_
-				Top.Init();
+                Top.Init();
 
-				if (Top.Registry!=null) Top.Registry.ChannelError += OnSpreadChannelError;
+                if (Top.Registry != null) Top.Registry.ChannelError += OnSpreadChannelError;
 
                 if (Top.Hw != null)
                 {
@@ -236,7 +240,7 @@ namespace HMI.CD40.Module.Services
                     Top.Hw.SpeakerExtChangedHw += OnSpeakerExtChanged;
                 }
 
-				if (Top.Mixer != null) Top.Mixer.SplitModeChanged += OnSplitModeChanged;
+                if (Top.Mixer != null) Top.Mixer.SplitModeChanged += OnSplitModeChanged;
 
                 if (Top.Cfg != null)
                 {
@@ -271,6 +275,8 @@ namespace HMI.CD40.Module.Services
                     Top.Tlf.Forward.RemoteForwardChanged += OnRemoteForwardChanged;
                     Top.Tlf.Forward.ForwardError += OnFunctionError;
                     Top.Tlf.Forward.SetSnmpString += OnSetSnmpString;
+                    //LALM 211007
+                    Top.Tlf.ResourceChanged += OnTlfResourceChanged;
                 }
                 if (Top.Lc != null)
                 {
@@ -304,20 +310,20 @@ namespace HMI.CD40.Module.Services
                 if (Top.Recorder != null) Top.Recorder.BriefingChanged += OnBriefingChanged;
                 if (Top.Replay != null) Top.Replay.PlayingChanged += OnPlayingChanged;
 
-				Top.Start();
+                Top.Start();
 
-				Top.PublisherThread.Enqueue(EventTopicNames.ConnectionStateEngine, delegate()
-				{
-					General.SafeLaunchEvent(ConnectionStateEngine, this, new EngineConnectionStateMsg(true));
-				});
+                Top.PublisherThread.Enqueue(EventTopicNames.ConnectionStateEngine, delegate ()
+                {
+                    General.SafeLaunchEvent(ConnectionStateEngine, this, new EngineConnectionStateMsg(true));
+                });
 
-				if (!Top.Mixer.BuzzerEnabled)
-				{
-					Top.PublisherThread.Enqueue(EventTopicNames.BuzzerStateEngine, delegate()
-					{
-						General.SafeLaunchEvent(BuzzerStateEngine, this, new StateMsg<bool>(false));
-					});
-				}
+                if (!Top.Mixer.BuzzerEnabled)
+                {
+                    Top.PublisherThread.Enqueue(EventTopicNames.BuzzerStateEngine, delegate ()
+                    {
+                        General.SafeLaunchEvent(BuzzerStateEngine, this, new StateMsg<bool>(false));
+                    });
+                }
 #else
 				Top.Init();
 
@@ -382,11 +388,11 @@ namespace HMI.CD40.Module.Services
 				}
 #endif
             }
-			catch (Exception ex)
-			{
-				_Logger.Fatal("ERROR inicializando ULISES-TA: \n{0}", ex.Message);
-			}
-			finally
+            catch (Exception ex)
+            {
+                _Logger.Fatal("ERROR inicializando ULISES-TA: \n{0}", ex.Message);
+            }
+            finally
             {
                 /**
                  * AGL 17072012. Trata de Rellenar la tabla de Dependencias desde un fichero local.
@@ -395,61 +401,61 @@ namespace HMI.CD40.Module.Services
                 /**
                  * Fin de la Modificacion */
             }
-		}
+        }
 
-		public void Stop()
-		{
-			Top.End();
-		}
+        public void Stop()
+        {
+            Top.End();
+        }
 
-		#region IEngineCmdManagerService Members
+        #region IEngineCmdManagerService Members
 
-		public string Name
-		{
-			get { return "Cd40"; }
-		}
+        public string Name
+        {
+            get { return "Cd40"; }
+        }
 
-		public void GetEngineInfo()
-		{
-		}
+        public void GetEngineInfo()
+        {
+        }
 
         public bool HayConferencia()
         {
             return Top.Tlf.HayConferencia;
         }
-        
+
         public void SetSplitMode(SplitMode mode)
-		{
-			Top.WorkingThread.Enqueue("SetSplitMode", delegate()
-			{
-				if (Top.Mixer.SplitMode == mode)
-				{
-					Top.PublisherThread.Enqueue(EventTopicNames.SplitModeEngine, delegate()
-					{
-						General.SafeLaunchEvent(SplitModeEngine, this, new StateMsg<SplitMode>(mode));
-					});
-				}
-				else if (Top.Lc.Activity || (Top.Rd.PttSource != PttSource.NoPtt) || Top.Tlf.Activity())
-				{
+        {
+            Top.WorkingThread.Enqueue("SetSplitMode", delegate ()
+            {
+                if (Top.Mixer.SplitMode == mode)
+                {
+                    Top.PublisherThread.Enqueue(EventTopicNames.SplitModeEngine, delegate ()
+                    {
+                        General.SafeLaunchEvent(SplitModeEngine, this, new StateMsg<SplitMode>(mode));
+                    });
+                }
+                else if (Top.Lc.Activity || (Top.Rd.PttSource != PttSource.NoPtt) || Top.Tlf.Activity())
+                {
                     int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                     Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
 
-                    Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
-					{
-						NotifMsg msg = new NotifMsg("SplitModeError", Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
-						General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
-					});
-                
+                    Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
+                    {
+                        NotifMsg msg = new NotifMsg("SplitModeError", Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    });
+
                     Wait(500);
                     Top.Mixer.Unlink(_BadOperationTone);
                     SipAgent.DestroyWavPlayer(_BadOperationTone);
                 }
-				else if (!Top.Mixer.SetSplitMode(mode))
-				{
+                else if (!Top.Mixer.SetSplitMode(mode))
+                {
                     int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                     Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
 
-                    Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+                    Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
                     {
                         NotifMsg msg = new NotifMsg("SplitModeError", Resources.BadOperation, Resources.SplitModeError, 0, MessageType.Error, MessageButtons.Ok);
                         General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
@@ -458,59 +464,59 @@ namespace HMI.CD40.Module.Services
                     Wait(500);
                     Top.Mixer.Unlink(_BadOperationTone);
                     SipAgent.DestroyWavPlayer(_BadOperationTone);
-				}
-			});
-		}
+                }
+            });
+        }
 
-		public void SetBuzzerState(bool enabled)
-		{
-			Top.WorkingThread.Enqueue("SetBuzzerState", delegate()
-			{
-				if (Top.Mixer.SetBuzzerState(enabled))
-				{
-					Top.PublisherThread.Enqueue(EventTopicNames.BuzzerStateEngine, delegate()
-					{
-						General.SafeLaunchEvent(BuzzerStateEngine, this, new StateMsg<bool>(enabled));
-					});
-				}
-			});
-		}
+        public void SetBuzzerState(bool enabled)
+        {
+            Top.WorkingThread.Enqueue("SetBuzzerState", delegate ()
+            {
+                if (Top.Mixer.SetBuzzerState(enabled))
+                {
+                    Top.PublisherThread.Enqueue(EventTopicNames.BuzzerStateEngine, delegate ()
+                    {
+                        General.SafeLaunchEvent(BuzzerStateEngine, this, new StateMsg<bool>(enabled));
+                    });
+                }
+            });
+        }
 
-		public void SetBuzzerLevel(int level)
-		{
-			Top.WorkingThread.Enqueue("SetBuzzerLevel", delegate()
-			{
-				if (Top.Mixer.SetBuzzerLevel(level))
-				{
-					Top.PublisherThread.Enqueue(EventTopicNames.BuzzerLevelEngine, delegate()
-					{
-						General.SafeLaunchEvent(BuzzerLevelEngine, this, new LevelMsg<Buzzer>(level));
-					});
-				}
-			});
-		}
+        public void SetBuzzerLevel(int level)
+        {
+            Top.WorkingThread.Enqueue("SetBuzzerLevel", delegate ()
+            {
+                if (Top.Mixer.SetBuzzerLevel(level))
+                {
+                    Top.PublisherThread.Enqueue(EventTopicNames.BuzzerLevelEngine, delegate ()
+                    {
+                        General.SafeLaunchEvent(BuzzerLevelEngine, this, new LevelMsg<Buzzer>(level));
+                    });
+                }
+            });
+        }
 
-		public void SetRdHeadPhonesLevel(int level)
-		{
-			Top.WorkingThread.Enqueue("SetRdHeadPhonesLevel", delegate()
-			{
-				if (Top.Mixer.SetRdHeadPhonesLevel(level))
-				{
-					Top.PublisherThread.Enqueue(EventTopicNames.RdHeadPhonesLevelEngine, delegate()
-					{
-						General.SafeLaunchEvent(RdHeadPhonesLevelEngine, this, new LevelMsg<RdHeadPhones>(level));
-					});
-				}
-			});
-		}
+        public void SetRdHeadPhonesLevel(int level)
+        {
+            Top.WorkingThread.Enqueue("SetRdHeadPhonesLevel", delegate ()
+            {
+                if (Top.Mixer.SetRdHeadPhonesLevel(level))
+                {
+                    Top.PublisherThread.Enqueue(EventTopicNames.RdHeadPhonesLevelEngine, delegate ()
+                    {
+                        General.SafeLaunchEvent(RdHeadPhonesLevelEngine, this, new LevelMsg<RdHeadPhones>(level));
+                    });
+                }
+            });
+        }
 
         public void SetRdSpeakerLevel(int level)
         {
-            Top.WorkingThread.Enqueue("SetRdSpeakerLevel", delegate()
+            Top.WorkingThread.Enqueue("SetRdSpeakerLevel", delegate ()
             {
                 if (Top.Mixer.SetRdSpeakerLevel(level))
                 {
-                    Top.PublisherThread.Enqueue(EventTopicNames.RdSpeakerLevelEngine, delegate()
+                    Top.PublisherThread.Enqueue(EventTopicNames.RdSpeakerLevelEngine, delegate ()
                     {
                         General.SafeLaunchEvent(RdSpeakerLevelEngine, this, new LevelMsg<RdSpeaker>(level));
                     });
@@ -520,11 +526,11 @@ namespace HMI.CD40.Module.Services
 
         public void SetRdHfSpeakerLevel(int level)
         {
-            Top.WorkingThread.Enqueue("SetRdHfSpeakerLevel", delegate()
+            Top.WorkingThread.Enqueue("SetRdHfSpeakerLevel", delegate ()
             {
                 if (Top.Mixer.SetHfSpeakerLevel(level))
                 {
-                    Top.PublisherThread.Enqueue(EventTopicNames.RdHFLevelEngine, delegate()
+                    Top.PublisherThread.Enqueue(EventTopicNames.RdHFLevelEngine, delegate ()
                     {
                         General.SafeLaunchEvent(RdHFLevelEngine, this, new LevelMsg<HfSpeaker>(level));
                     });
@@ -533,98 +539,98 @@ namespace HMI.CD40.Module.Services
         }
 
         public void SetRdPage(int oldPage, int newPage, int numPosByPage)
-		{
-			Top.WorkingThread.Enqueue("SetRdPage", delegate()
-			{
-				Top.Rd.SetRdPage(oldPage, newPage, numPosByPage);
+        {
+            Top.WorkingThread.Enqueue("SetRdPage", delegate ()
+            {
+                Top.Rd.SetRdPage(oldPage, newPage, numPosByPage);
 
-				Top.PublisherThread.Enqueue(EventTopicNames.RdPageEngine, delegate()
-				{
-					General.SafeLaunchEvent(RdPageEngine, this, new PageMsg(newPage));
-				});
-			});
-		}
+                Top.PublisherThread.Enqueue(EventTopicNames.RdPageEngine, delegate ()
+                {
+                    General.SafeLaunchEvent(RdPageEngine, this, new PageMsg(newPage));
+                });
+            });
+        }
 
-		public void SetRdPtt(bool on)
-		{
-			Top.WorkingThread.Enqueue("SetRdPtt", delegate()
-			{
+        public void SetRdPtt(bool on)
+        {
+            Top.WorkingThread.Enqueue("SetRdPtt", delegate ()
+            {
                 //Se permite Ptt SW desde HMI
                 if (!on || AllowRd(true))
-				{
+                {
                     if (Top.Recorder.Briefing)  // Si se hace PTT mientras está abierta una sesión briefing, esta se corta
                         Top.Recorder.SessionGlp(FuentesGlp.Briefing, false);
 
                     Top.Rd.SetPtt(on, PttSource.Hmi);
-				}
-			});
-		}
+                }
+            });
+        }
 
-		public void SetRdRx(int id, bool on, bool forced)
-		{
-			Top.WorkingThread.Enqueue("SetRdRx", delegate()
-			{
-				//if (!on || AllowRd())
-				if (forced || (AllowRd() && AllowBriefing()))
-				{
-					Top.Rd.SetRx(id, on, forced);
-				}
-			});
-		}
+        public void SetRdRx(int id, bool on, bool forced)
+        {
+            Top.WorkingThread.Enqueue("SetRdRx", delegate ()
+            {
+                //if (!on || AllowRd())
+                if (forced || (AllowRd() && AllowBriefing()))
+                {
+                    Top.Rd.SetRx(id, on, forced);
+                }
+            });
+        }
 
-		public void SetRdTx(int id, bool on)
-		{
-			Top.WorkingThread.Enqueue("SetRdTx", delegate()
-			{
-				//if (!on || AllowRd())
-				if (AllowRd(id) && AllowBriefing())
-				{
-					Top.Rd.SetTx(id, on);
-				}
-			});
-		}
+        public void SetRdTx(int id, bool on)
+        {
+            Top.WorkingThread.Enqueue("SetRdTx", delegate ()
+            {
+                //if (!on || AllowRd())
+                if (AllowRd(id) && AllowBriefing())
+                {
+                    Top.Rd.SetTx(id, on);
+                }
+            });
+        }
 
         public void ForceTxOff(int id)
         {
-            Top.WorkingThread.Enqueue("ForceTxOff", delegate()
+            Top.WorkingThread.Enqueue("ForceTxOff", delegate ()
             {
                 Top.Rd.ForceTxOff(id);
             });
         }
 
-		public void ConfirmRdTx(int id)
-		{
-			Top.WorkingThread.Enqueue("ConfirmRdTx", delegate()
-			{
+        public void ConfirmRdTx(int id)
+        {
+            Top.WorkingThread.Enqueue("ConfirmRdTx", delegate ()
+            {
                 if (AllowRd() && AllowBriefing())
-				{
-					Top.Rd.ConfirmTx(id);
-				}
-			});
-		}
+                {
+                    Top.Rd.ConfirmTx(id);
+                }
+            });
+        }
 
-		public void ResetRdPosition(int id)
-		{
-			Top.WorkingThread.Enqueue("ResetRdPositon", delegate()
-			{
-				Top.Rd.SetQuiet(id);
-			});
-		}
+        public void ResetRdPosition(int id)
+        {
+            Top.WorkingThread.Enqueue("ResetRdPositon", delegate ()
+            {
+                Top.Rd.SetQuiet(id);
+            });
+        }
 
-		public void SetRdAudio(int id, RdRxAudioVia audioVia, bool forced)
-		{
-			Top.WorkingThread.Enqueue("SetRdAudio", delegate()
-			{
+        public void SetRdAudio(int id, RdRxAudioVia audioVia, bool forced)
+        {
+            Top.WorkingThread.Enqueue("SetRdAudio", delegate ()
+            {
                 if (forced || (AllowRd() && AllowBriefing()))
-				{
-					Top.Rd.SetAudioVia(id, audioVia);
-				}
-			});
-		}
+                {
+                    Top.Rd.SetAudioVia(id, audioVia);
+                }
+            });
+        }
 
         public void NextRdAudio(int id)
         {
-            Top.WorkingThread.Enqueue("SetRdAudio", delegate()
+            Top.WorkingThread.Enqueue("SetRdAudio", delegate ()
             {
                 if ((AllowRd() && AllowBriefing()))
                 {
@@ -634,7 +640,7 @@ namespace HMI.CD40.Module.Services
         }
         public void SetManagingSite(bool managing)
         {
-            Top.WorkingThread.Enqueue("ManagingSite", delegate()
+            Top.WorkingThread.Enqueue("ManagingSite", delegate ()
             {
                 Top.Rd.SiteManaging = managing;
             });
@@ -642,7 +648,7 @@ namespace HMI.CD40.Module.Services
 
         public void ChangeSite(int pos, string alias)
         {
-            Top.WorkingThread.Enqueue("ChangeSite", delegate()
+            Top.WorkingThread.Enqueue("ChangeSite", delegate ()
             {
                 Top.Rd.ChangSite(pos, alias);
             });
@@ -660,85 +666,85 @@ namespace HMI.CD40.Module.Services
         }
 
         /** */
-		public void SetRtxGroup(int rtxGroup, Dictionary<int, RtxState> newRtxGroup, bool force = false)
-		{
-			Top.WorkingThread.Enqueue("SetRtxGroup", delegate()
-			{
-				bool disableGroup = true;
+        public void SetRtxGroup(int rtxGroup, Dictionary<int, RtxState> newRtxGroup, bool force = false)
+        {
+            Top.WorkingThread.Enqueue("SetRtxGroup", delegate ()
+            {
+                bool disableGroup = true;
 
-				foreach (RtxState st in newRtxGroup.Values)
-				{
-					if (st != RtxState.Delete)
-					{
-						disableGroup = false;
-						break;
-					}
-				}
+                foreach (RtxState st in newRtxGroup.Values)
+                {
+                    if (st != RtxState.Delete)
+                    {
+                        disableGroup = false;
+                        break;
+                    }
+                }
                 /** */
-				if (disableGroup || force || (AllowRd() && AllowRtx(newRtxGroup)))
-				{
-					Top.Rd.SetRtxGroup(rtxGroup, newRtxGroup);
-				}
+                if (disableGroup || force || (AllowRd() && AllowRtx(newRtxGroup)))
+                {
+                    Top.Rd.SetRtxGroup(rtxGroup, newRtxGroup);
+                }
 
-				Top.PublisherThread.Enqueue(EventTopicNames.ConnectionStateEngine, delegate()
-				{
-					General.SafeLaunchEvent(RdRtxModificationEndEngine, this);
-				});
-			});
-		}
+                Top.PublisherThread.Enqueue(EventTopicNames.ConnectionStateEngine, delegate ()
+                {
+                    General.SafeLaunchEvent(RdRtxModificationEndEngine, this);
+                });
+            });
+        }
 
-		public void SetLc(int id, bool on)
-		{
-			Top.WorkingThread.Enqueue("SetLc", delegate()
-			{
+        public void SetLc(int id, bool on)
+        {
+            Top.WorkingThread.Enqueue("SetLc", delegate ()
+            {
                 //Cuando on == false i.e. se suelta la tecla, 
                 //se continua siempre para poder colgar la llamada
-				if ( AllowLc() || !on )
-				{
+                if (AllowLc() || !on)
+                {
                     // Si la telefonía va por altavoz y hay llamada de LC se quita 
                     // el estado "en espera de cuelgue"
-                    if (Top.Mixer.RxTlfAudioVia == TlfRxAudioVia.Speaker) 
+                    if (Top.Mixer.RxTlfAudioVia == TlfRxAudioVia.Speaker)
                         Top.Tlf.SetHangToneOff();
-					Top.Lc.SetLc(id, on);
-				}
-			});
-		}
+                    Top.Lc.SetLc(id, on);
+                }
+            });
+        }
 
-		public void SetLcSpeakerLevel(int level)
-		{
-			Top.WorkingThread.Enqueue("SetLcSpeakerLevel", delegate()
-			{
-				if (Top.Mixer.SetLcSpeakerLevel(level))
-				{
-					Top.PublisherThread.Enqueue(EventTopicNames.LcSpeakerLevelEngine, delegate()
-					{
-						General.SafeLaunchEvent(LcSpeakerLevelEngine, this, new LevelMsg<LcSpeaker>(level));
-					});
-				}
-			});
-		}
+        public void SetLcSpeakerLevel(int level)
+        {
+            Top.WorkingThread.Enqueue("SetLcSpeakerLevel", delegate ()
+            {
+                if (Top.Mixer.SetLcSpeakerLevel(level))
+                {
+                    Top.PublisherThread.Enqueue(EventTopicNames.LcSpeakerLevelEngine, delegate ()
+                    {
+                        General.SafeLaunchEvent(LcSpeakerLevelEngine, this, new LevelMsg<LcSpeaker>(level));
+                    });
+                }
+            });
+        }
 
-		public void SetTlfHeadPhonesLevel(int level)
-		{
-			Top.WorkingThread.Enqueue("SetTlfHeadPhonesLevel", delegate()
-			{
-				if (Top.Mixer.SetTlfHeadPhonesLevel(level))
-				{
-					Top.PublisherThread.Enqueue(EventTopicNames.TlfHeadPhonesLevelEngine, delegate()
-					{
-						General.SafeLaunchEvent(TlfHeadPhonesLevelEngine, this, new LevelMsg<TlfHeadPhones>(level));
-					});
-				}
-			});
-		}
+        public void SetTlfHeadPhonesLevel(int level)
+        {
+            Top.WorkingThread.Enqueue("SetTlfHeadPhonesLevel", delegate ()
+            {
+                if (Top.Mixer.SetTlfHeadPhonesLevel(level))
+                {
+                    Top.PublisherThread.Enqueue(EventTopicNames.TlfHeadPhonesLevelEngine, delegate ()
+                    {
+                        General.SafeLaunchEvent(TlfHeadPhonesLevelEngine, this, new LevelMsg<TlfHeadPhones>(level));
+                    });
+                }
+            });
+        }
 
         public void SetTlfSpeakerLevel(int level)
         {
-            Top.WorkingThread.Enqueue("SetTlfSpeakerLevel", delegate()
+            Top.WorkingThread.Enqueue("SetTlfSpeakerLevel", delegate ()
             {
                 if (Top.Mixer.SetTlfSpeakerLevel(level))
                 {
-                    Top.PublisherThread.Enqueue(EventTopicNames.TlfSpeakerLevelEngine, delegate()
+                    Top.PublisherThread.Enqueue(EventTopicNames.TlfSpeakerLevelEngine, delegate ()
                     {
                         General.SafeLaunchEvent(TlfSpeakerLevelEngine, this, new LevelMsg<LcSpeaker>(level));
                     });
@@ -746,7 +752,7 @@ namespace HMI.CD40.Module.Services
             });
         }
 
-        public bool SetAudioViaTlf (bool speaker)
+        public bool SetAudioViaTlf(bool speaker)
         {
             bool done = true;
             //No se permite cambiar a altavoz por telefonía si  
@@ -755,7 +761,7 @@ namespace HMI.CD40.Module.Services
             {
                 int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                 Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
-                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
                 {
                     NotifMsg msg = new NotifMsg(Resources.LCSpeakerBusy, Resources.BadOperation, Resources.LCSpeakerBusy, 3000, MessageType.Error, MessageButtons.Ok);
                     General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
@@ -767,38 +773,38 @@ namespace HMI.CD40.Module.Services
                 done = false;
             }
             else
-            Top.WorkingThread.Enqueue("SetAudioViaTlf", delegate()
-            {
-                Top.Mixer.SetTlfAudioVia(speaker);
-             });
+                Top.WorkingThread.Enqueue("SetAudioViaTlf", delegate ()
+                {
+                    Top.Mixer.SetTlfAudioVia(speaker);
+                });
             return done;
         }
 
         public void ModoSoloAltavoces()
         {
-                Top.Mixer.ModoSoloAltavoces = true;
+            Top.Mixer.ModoSoloAltavoces = true;
         }
 
         public void SetDoubleRadioSpeaker()
         {
-                Top.Rd.DoubleRadioSpeaker = true;
+            Top.Rd.DoubleRadioSpeaker = true;
         }
 
         public void BeginTlfCall(int id, bool prio)
-		{
-			Top.WorkingThread.Enqueue("BeginTlfCall", delegate()
-			{
-				if (AllowTlf())
-				{
+        {
+            Top.WorkingThread.Enqueue("BeginTlfCall", delegate ()
+            {
+                if (AllowTlf())
+                {
                     if (Top.Recorder.Briefing)  // Si se hace una llamada mientras está abierta una sesión briefing, esta se corta
                         Top.Recorder.SessionGlp(FuentesGlp.Briefing, false);
                     if (Top.Replay.Replaying)
                         Top.Replay.DoFunction(Model.Module.BusinessEntities.FunctionReplay.Stop, ViaReplay.None, null, 0);
 
                     Top.Tlf.Call(id, prio);
-				}
-			});
-		}
+                }
+            });
+        }
         /// <summary>
         /// Llamada desde teclado o AI
         /// La prioridad sólo se gestiona para prefijos 0 y 3 (destinos ATS)
@@ -807,35 +813,45 @@ namespace HMI.CD40.Module.Services
         /// <param name="prio"></param>
         /// <param name="literal"></param>
         public void BeginTlfCall(string number, bool prio, string literal)
-		{
-			Top.WorkingThread.Enqueue("BeginTlfCall", delegate()
-			{
-				if (AllowTlf())
-				{
+        {
+            // LALM 210127
+            // Errores #3952
+            // Evito la llamada a mi mismo
+            if (EsMiNumeroPropio(number))
+                return;
+            Top.WorkingThread.Enqueue("BeginTlfCall", delegate ()
+            {
+                if (AllowTlf())
+                {
                     if (Top.Recorder.Briefing)  // Si se hace una llamada mientras está abierta una sesión briefing, esta se corta
                         Top.Recorder.SessionGlp(FuentesGlp.Briefing, false);
                     if (Top.Replay.Replaying)
                         Top.Replay.DoFunction(Model.Module.BusinessEntities.FunctionReplay.Stop, ViaReplay.None, null, 0);
 
                     uint prefix;
-					string dst;
+                    string dst;
 
                     if (TryParseNumber(number, out prefix, out dst, ref literal))
-					{
+                    {
                         if ((prefix != Cd40Cfg.ATS_DST) && (prefix != Cd40Cfg.INT_DST))
                             prio = false;
                         Top.Tlf.Call(prefix, dst, number, prio, literal);
-					}
-				}
-			});
-		}
+                    }
+                }
+            });
+        }
 
         //Esta llamada debe intentarse por número y si falla el TryParseNumber, por el id
         //Se utiliza para las llamadas por la 19+1
         //Si viene un literal, lo uso, si no, el literal es el número
         public void BeginTlfCall(string number, bool prio, int id, string literal)
         {
-            Top.WorkingThread.Enqueue("BeginTlfCall", delegate()
+            // LALM 210127
+            // Errores #3952
+            // Evito la llamada a mi mismo
+            if (EsMiNumeroPropio(number))
+                return;
+            Top.WorkingThread.Enqueue("BeginTlfCall", delegate ()
             {
                 if (AllowTlf())
                 {
@@ -849,7 +865,7 @@ namespace HMI.CD40.Module.Services
 
                     if (TryParseNumber(number, out prefix, out dst, ref literal, false))
                     {
-                         Top.Tlf.Call(prefix, dst, number, prio, literal);
+                        Top.Tlf.Call(prefix, dst, number, prio, literal);
                     }
                     else
                         Top.Tlf.Call(id, prio);
@@ -857,28 +873,28 @@ namespace HMI.CD40.Module.Services
             });
         }
 
-		public void RetryTlfCall(int id)
-		{
-			Top.WorkingThread.Enqueue("RetryTlfCall", delegate()
-			{
-				if (AllowTlf())
-				{
+        public void RetryTlfCall(int id)
+        {
+            Top.WorkingThread.Enqueue("RetryTlfCall", delegate ()
+            {
+                if (AllowTlf())
+                {
                     if (Top.Recorder.Briefing)  // Si se hace una llamada mientras está abierta una sesión briefing, esta se corta
                         Top.Recorder.SessionGlp(FuentesGlp.Briefing, false);
                     if (Top.Replay.Replaying)
                         Top.Replay.DoFunction(Model.Module.BusinessEntities.FunctionReplay.Stop, ViaReplay.None, null, 0);
 
                     Top.Tlf.RetryCall(id);
-				}
-			});
-		}
+                }
+            });
+        }
 
-		public void AnswerTlfCall(int id)
-		{
-			Top.WorkingThread.Enqueue("AnswerTlfCall", delegate()
-			{
-				if (AllowTlf())
-				{
+        public void AnswerTlfCall(int id)
+        {
+            Top.WorkingThread.Enqueue("AnswerTlfCall", delegate ()
+            {
+                if (AllowTlf())
+                {
                     if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite responder a la llamada
                         Top.Tlf.Accept(id, null);
                     else
@@ -886,50 +902,50 @@ namespace HMI.CD40.Module.Services
                         NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
                         General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
                     }
-				}
-			});
-		}
+                }
+            });
+        }
 
-		public void EndTlfCall(int id, TlfState st)
-		{
-			EndTlfCall(id);
-		}
+        public void EndTlfCall(int id, TlfState st)
+        {
+            EndTlfCall(id);
+        }
 
-		public void EndTlfCall(int id)
-		{
-			Top.WorkingThread.Enqueue("EndTlfCall", delegate()
-			{
-				Top.Tlf.HangUp(id);
-			});
-		}
+        public void EndTlfCall(int id)
+        {
+            Top.WorkingThread.Enqueue("EndTlfCall", delegate ()
+            {
+                Top.Tlf.HangUp(id);
+            });
+        }
 
-		public void EndTlfConfCall(int id)
-		{
-			Top.WorkingThread.Enqueue("EndTlfConfCall", delegate()
-			{
-				Top.Tlf.HangUp(id);
-			});
-		}
+        public void EndTlfConfCall(int id)
+        {
+            Top.WorkingThread.Enqueue("EndTlfConfCall", delegate ()
+            {
+                Top.Tlf.HangUp(id);
+            });
+        }
 
-		public void RecognizeTlfState(int id)
-		{
-			Top.WorkingThread.Enqueue("RecognizeTlfState", delegate()
-			{
-				Top.Tlf.RecognizeTlfState(id);
-			});
-		}
+        public void RecognizeTlfState(int id)
+        {
+            Top.WorkingThread.Enqueue("RecognizeTlfState", delegate ()
+            {
+                Top.Tlf.RecognizeTlfState(id);
+            });
+        }
 
-		public void EndTlfConf()
-		{
-			Top.WorkingThread.Enqueue("EndTlfConf", delegate()
-			{
-				Top.Tlf.HangUpConf();
-			});
-		}
+        public void EndTlfConf()
+        {
+            Top.WorkingThread.Enqueue("EndTlfConf", delegate ()
+            {
+                Top.Tlf.HangUpConf();
+            });
+        }
 
         public void EndTlfAll()
         {
-            Top.WorkingThread.Enqueue("EndTlfAll", delegate()
+            Top.WorkingThread.Enqueue("EndTlfAll", delegate ()
             {
                 Top.Tlf.EndTlfAll();
             });
@@ -939,24 +955,24 @@ namespace HMI.CD40.Module.Services
         {
             if (viable)
             {
-                Top.WorkingThread.Enqueue("MakeConference", delegate()
+                Top.WorkingThread.Enqueue("MakeConference", delegate ()
                 {
                     Top.Tlf.MakeConference();
                 });
             }
             else
-        	{
-                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+            {
+                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
                 {
                     NotifMsg msg = new NotifMsg(Resources.MaxConferenceNumber, Resources.BadOperation, Resources.MaxConferenceNumber, 0, MessageType.Error, MessageButtons.Ok);
                     General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
                 });
-	        }
+            }
         }
 
         public void SetHold(bool on)
         {
-            Top.WorkingThread.Enqueue("SetHold", delegate()
+            Top.WorkingThread.Enqueue("SetHold", delegate ()
             {
                 if (AllowTlf() && !Top.Recorder.Briefing && !Top.Replay.Replaying)
                     Top.Tlf.HoldConference(on);
@@ -968,28 +984,43 @@ namespace HMI.CD40.Module.Services
             });
         }
 
-		public void ListenTo(int id)
-		{
-			Top.WorkingThread.Enqueue("ListenTo", delegate()
-			{
+        //LALM 210127
+        // Errores #3952
+        // Funcion que comprueba si el numero pertence al puesto
+        private bool EsMiNumeroPropio(String NumPropio)
+        {
+            foreach (StrNumeroAbonado num in Top.Cfg.HostAddresses)
+            {
+                String miNumero = string.Format("{0:D2}{1}", num.Prefijo, num.NumeroAbonado);
+                if (NumPropio == miNumero)
+                    return true;
+            }
+            return false;
+        }
+
+
+        public void ListenTo(int id)
+        {
+            Top.WorkingThread.Enqueue("ListenTo", delegate ()
+            {
                 if (AllowTlf())
-				{
+                {
                     if (!Top.Recorder.Briefing && !Top.Replay.Replaying)
                     {
-					    Top.Tlf.Listen.To(id);
-					    if (Top.Tlf.Listen.State == FunctionState.Error && _ListenOperationTone == 0)
-					    {
+                        Top.Tlf.Listen.To(id);
+                        if (Top.Tlf.Listen.State == FunctionState.Error && _ListenOperationTone == 0)
+                        {
                             ListenToError();
-					    }
+                        }
                     }
                     else
-                	{
+                    {
                         NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
                         General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
                     }
-				}
-			});
-		}
+                }
+            });
+        }
 
         /// <summary>
         /// Acciones que se realizan cuando se detecta un error en la ejecución de Listen.To
@@ -1004,16 +1035,21 @@ namespace HMI.CD40.Module.Services
             _ListenOperationTone = 0;
         }
 
-		public void ListenTo(string number)
-		{
-			Top.WorkingThread.Enqueue("ListenTo", delegate()
-			{
+        public void ListenTo(string number)
+        {
+            // LALM 210127
+            // Errores #3952
+            // Evito la llamada a mi mismo
+            if (EsMiNumeroPropio(number))
+                return;
+            Top.WorkingThread.Enqueue("ListenTo", delegate ()
+            {
                 if (AllowTlf())
-				{
+                {
                     if (!Top.Recorder.Briefing && !Top.Replay.Replaying)
                     {
                         uint prefix;
-                        string dst,lit= null;
+                        string dst, lit = null;
 
                         if (TryParseNumber(number, out prefix, out dst, ref lit))
                         {
@@ -1030,49 +1066,49 @@ namespace HMI.CD40.Module.Services
                         General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
                     }
                 }
-			});
-		}
+            });
+        }
 
-		public void CancelListen()
-		{
-			Top.WorkingThread.Enqueue("CancelListen", delegate()
-			{
-				if (Top.Tlf.Listen.State == FunctionState.Executing)
-				{
-					Top.Tlf.Listen.Cancel(-1);
-				}
-			});
-		}
+        public void CancelListen()
+        {
+            Top.WorkingThread.Enqueue("CancelListen", delegate ()
+            {
+                if (Top.Tlf.Listen.State == FunctionState.Executing)
+                {
+                    Top.Tlf.Listen.Cancel(-1);
+                }
+            });
+        }
 
-		public void RecognizeListenState()
-		{
-			Top.WorkingThread.Enqueue("RecognizeListenState", delegate()
-			{
-				if (Top.Tlf.Listen.State == FunctionState.Error)
-				{
-					Top.Tlf.Listen.Cancel(-1);
-				}
-			});
-		}
+        public void RecognizeListenState()
+        {
+            Top.WorkingThread.Enqueue("RecognizeListenState", delegate ()
+            {
+                if (Top.Tlf.Listen.State == FunctionState.Error)
+                {
+                    Top.Tlf.Listen.Cancel(-1);
+                }
+            });
+        }
 
-		public void SetRemoteListen(bool allow, int id)
-		{
-			Top.WorkingThread.Enqueue("SetRemoteListen", delegate()
-			{
-				if (allow)
-				{
-					Top.Tlf.Listen.Accept(id);
-				}
-				else
-				{
-					Top.Tlf.Listen.Cancel(id);
-				}
-			});
-		}
+        public void SetRemoteListen(bool allow, int id)
+        {
+            Top.WorkingThread.Enqueue("SetRemoteListen", delegate ()
+            {
+                if (allow)
+                {
+                    Top.Tlf.Listen.Accept(id);
+                }
+                else
+                {
+                    Top.Tlf.Listen.Cancel(id);
+                }
+            });
+        }
 
         public void PreparePickUp(int id)
         {
-            Top.WorkingThread.Enqueue("PreparePickUp", delegate()
+            Top.WorkingThread.Enqueue("PreparePickUp", delegate ()
             {
                 if (AllowTlf())
                     if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite iniciar el pickUp
@@ -1089,13 +1125,18 @@ namespace HMI.CD40.Module.Services
 
         public void PreparePickUp(string number)
         {
-             Top.WorkingThread.Enqueue("PreparePickUp", delegate()
+            // LALM 210127
+            // Errores #3952
+            // Evito la llamada a mi mismo
+            if (EsMiNumeroPropio(number))
+                return;
+            Top.WorkingThread.Enqueue("PreparePickUp", delegate ()
             {
                 if (AllowTlf())
                     if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite iniciar el pickUp
                     {
                         uint prefix;
-                        string dst,lit= null;
+                        string dst, lit = null;
 
                         if (TryParseNumber(number, out prefix, out dst, ref lit))
                         {
@@ -1111,24 +1152,24 @@ namespace HMI.CD40.Module.Services
         }
         public void PickUp(int id)
         {
-             Top.WorkingThread.Enqueue("PickUp", delegate()
-            {
-                if (AllowTlf())
-                    if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite iniciar el pickUp
-                    {
-                        Top.Tlf.PickUp.Capture(id);
-                    }
-                    else
-                    {
-                        NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
-                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
-                    }
-            });
+            Top.WorkingThread.Enqueue("PickUp", delegate ()
+           {
+               if (AllowTlf())
+                   if (!Top.Recorder.Briefing && !Top.Replay.Replaying)  // Si no está abierta una sesión briefing, se permite iniciar el pickUp
+                   {
+                       Top.Tlf.PickUp.Capture(id);
+                   }
+                   else
+                   {
+                       NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
+                       General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                   }
+           });
         }
 
         public void CancelPickUp()
         {
-            Top.WorkingThread.Enqueue("PickUp", delegate()
+            Top.WorkingThread.Enqueue("PickUp", delegate ()
             {
                 Top.Tlf.PickUp.Cancel();
             });
@@ -1152,6 +1193,11 @@ namespace HMI.CD40.Module.Services
 
         public void PrepareForward(string number)
         {
+            // LALM 210127
+            // Errores #3952
+            // Evito la llamada a mi mismo
+            if (EsMiNumeroPropio(number))
+                return;
             Top.WorkingThread.Enqueue("Forward", delegate ()
             {
                 if (AllowTlf())
@@ -1177,6 +1223,46 @@ namespace HMI.CD40.Module.Services
             Top.WorkingThread.Enqueue("Forward", delegate ()
             {
                 Top.Tlf.Forward.Cancel(false);
+            });
+        }
+
+        //LALM 210224 Nuevo mensaje de canal ocupado por fgrecuencia prioritaria.
+        //Errores #4756 visualizacion de mensaje de error por frecuencia prioritaria
+        public void SetErrorFP()
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
+            {
+                String Activity;
+                Activity = "Inhabilitación del canal de radio por frecuencia prioritaria.";
+                NotifMsg msg = new NotifMsg("ErrorFP", Resources.BadOperation, Activity, 30000, MessageType.Error, MessageButtons.Ok);
+                General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+            });
+        }
+
+        //LALM 210616 Nuevo mensaje de canal ocupado por fgrecuencia prioritaria.
+        //Errores #4756 Quitar mensaje de error por frecuencia prioritaria
+        public void ResetErrorFP()
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.HideNotifMsgEngine, delegate ()
+            {
+                String Activity;
+                Activity = "Inhabilitación del canal de radio por frecuencia prioritaria.";
+                Activity = "ErrorFP";
+                General.SafeLaunchEvent(HideNotifMsgEngine, this, new EventArgs<string>(Activity));
+            });
+        }
+        // 210224
+        public void SetCambioRadio(bool up)
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
+            {
+                String Activity;
+                {
+                    Activity = "¿Desea cambiar de página radio?";
+                    NotifMsg msg = new NotifMsg("Cambio de Página de Radio", "Aviso", Activity, 3000, MessageType.Error, MessageButtons.OkCancel);
+                    msg.Info = (object)up;
+                    General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                }
             });
         }
 
@@ -1237,7 +1323,12 @@ namespace HMI.CD40.Module.Services
 
 		public void TransferTo(string number)
 		{
-			Top.WorkingThread.Enqueue("TransferTo", delegate()
+            // LALM 210127
+            // Errores #3952
+            // Evito la llamada a mi mismo
+            if (EsMiNumeroPropio(number))
+                return;
+            Top.WorkingThread.Enqueue("TransferTo", delegate()
 			{
                 if (AllowTlf())
 				{
@@ -1566,8 +1657,17 @@ namespace HMI.CD40.Module.Services
 				General.SafeLaunchEvent(TlfInfoEngine, this, tlfPositions);
             });
 		}
+        //lalam 211007
+        //#2629 Presentar via utilizada en llamada saliente.
+        private void OnTlfResourceChanged(object sender, RangeMsg<TlfInfo> TlfInfoR)
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.TlfResStateEngine, delegate ()
+            {
+                General.SafeLaunchEvent(TlfResStateEngine, this, TlfInfoR);
+            });
+        }
 
-		private void OnTlfPositionsChanged(object sender, RangeMsg<TlfState> tlfStates)
+        private void OnTlfPositionsChanged(object sender, RangeMsg<TlfState> tlfStates)
 		{
 			Top.PublisherThread.Enqueue(EventTopicNames.TlfPosStateEngine, delegate()
 			{
@@ -2118,14 +2218,24 @@ namespace HMI.CD40.Module.Services
                     if (String.IsNullOrEmpty(lit))
                         lit = dst;
 
-					switch (prefix)
-					{
-						case Cd40Cfg.INT_DST:
-						case Cd40Cfg.PP_DST:
-						case Cd40Cfg.IP_DST:
+                    // LALM 210630
+                    // Otra alternativa al Errores #4862
+                    // Si se quisiera que las llamadas con prefijo "02" se señalicen en las teclas de aceso directo 
+                    // con prefijo punto a punto de telefonia IP "01" habria que introducir este path
+                    // if (prefix == Cd40Cfg.IP_DST) prefix = Cd40Cfg.PP_DST;
+
+                    switch (prefix)
+                    {
+                        //LALM 210707
+                        // Errores #4862
+                        // impedimos que las llamadas con prefijo 02 progresen.
+                        case Cd40Cfg.IP_DST:
+                            return false;
+                        case Cd40Cfg.INT_DST:
+                        case Cd40Cfg.PP_DST:
                         case Cd40Cfg.UNKNOWN_DST:
-							return true;
-						default:
+                            return true;
+                        default:
 							if (Top.Cfg.ExistNet(prefix, dst))
 							{
 								string[] user = Top.Cfg.GetUserFromAddress(prefix, dst);
@@ -2144,18 +2254,33 @@ namespace HMI.CD40.Module.Services
 			}
             if (message)
             {
-			Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
-			{
-				NotifMsg msg = new NotifMsg(Resources.BadNumberError, Resources.BadOperation, Resources.BadNumberError, 0, MessageType.Error, MessageButtons.Ok);
-				General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
-			});
+                // 20201120 lalm cambio el mensaje si es la red ATS (AGVN)
+                if (prefix != Cd40Cfg.ATS_DST)
+                {
+                    Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
+                    {
+                        NotifMsg msg = new NotifMsg(Resources.BadNumberError, Resources.BadOperation, Resources.BadNumberError, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    });
+                }
+                else
+                {
+                    ///20201120 LALM Errores #4534 sustituir el mensaje de error “Número Erróneo” por “Número No Accesible”
+                    Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
+                    {
+                        NotifMsg msg = new NotifMsg(Resources.BadNumberATS, Resources.BadOperation, Resources.BadNumberATS, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                    });
+                }
             }
 			return false;
 		}
 
-  /**
-         * AGL 17072012. Trata de Rellenar la tabla de Dependencias desde un fichero local.
-         * */
+
+
+        /**
+               * AGL 17072012. Trata de Rellenar la tabla de Dependencias desde un fichero local.
+               * */
         [EventPublication(EventTopicNames.NumberBookChangedEngine, PublicationScope.Global)]
         public event EventHandler<RangeMsg<Area>> NumberBookChangedEngine;
 

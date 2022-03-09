@@ -96,8 +96,8 @@ namespace HMI.Presentation.Twr.Views
             | System.Windows.Forms.AnchorStyles.Left)));
             this._SplitUC.BackColor = System.Drawing.Color.White;
             this._SplitUC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this._SplitUC.JackOff = global::HMI.Presentation.Twr.Properties.Resources.JackOff;
-            this._SplitUC.JackOn = global::HMI.Presentation.Twr.Properties.Resources.JackOn;
+            this._SplitUC.JackOff = global::HMI.Presentation.Twr.Properties.Resources.JackOffTwr;
+            this._SplitUC.JackOn = global::HMI.Presentation.Twr.Properties.Resources.JackOnTwr;
             this._SplitUC.Location = new System.Drawing.Point(160, 5);
             this._SplitUC.Margin = new System.Windows.Forms.Padding(5);
             this._SplitUC.Name = "_SplitUC";

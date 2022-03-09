@@ -135,8 +135,11 @@ namespace HMI.Model.Module.BusinessEntities
         private bool _IsTop = true;
         private bool _AllowsForward = false;
         private TlfType _Type = TlfType.Unknown;
+		//LALM 211005 
+		//#2629 Presentar via utilizada en llamada saliente.
+		private string _recused = "";
 
- 		public event GenericEventHandler StChanged;
+		public event GenericEventHandler StChanged;
 
 		public int Id
 		{
@@ -196,6 +199,17 @@ namespace HMI.Model.Module.BusinessEntities
         {
             get { return _AllowsForward; }
         }
+
+		//LALM 211006
+		//#2629 Presentar via utilizada en llamada saliente.
+		public string recused
+		{
+			get { return _recused; }
+			set
+			{
+				_recused = value;
+			}
+		}
 
 		public TlfDst(int id)
 		{
@@ -258,6 +272,9 @@ namespace HMI.Model.Module.BusinessEntities
 			{
 				Reset(dst.St);
 			}
+			//lalm 211007
+			//#2629 Presentar via utilizada en llamada saliente.
+			this.recused = dst._recused;
 		}
 
 		public void Reset(TlfDestination dst)
@@ -303,6 +320,9 @@ namespace HMI.Model.Module.BusinessEntities
 
 			_Dst = dst.Alias;
 			_Number = dst.Number;
+			//lalm 211008
+			//#2629 Presentar via utilizada en llamada saliente.
+			_recused = dst._recused;
 
 			Reset(dst.State);
 
@@ -366,7 +386,7 @@ namespace HMI.Model.Module.BusinessEntities
                     if (_Type == TlfType.Md)
                         StateDescription = Resources.MultidestinationCall + " " + _Dst;
 					else
-					    StateDescription = Resources.TalkTlfStateDescription + " " + _Dst;
+					    StateDescription = Resources.TalkTlfStateDescription + " " + _Dst+recused;
 					break;
 				case TlfState.Hold:
 					StateDescription = Resources.HoldToTlfStateDescription + " " + _Dst;
@@ -1036,7 +1056,8 @@ namespace HMI.Model.Module.BusinessEntities
 
 	public sealed class Tlf
 	{
-		public static int NumIaDestinations = 1;
+        //Peticiones #3638
+		public static int NumIaDestinations = 2;//LALM 210923 prueba para ver si pueden entrar dos llamadas
 		public static int NumDestinations = Settings.Default.NumTlfDestinations;
 		public static int IaMappedPosition = NumDestinations;
 

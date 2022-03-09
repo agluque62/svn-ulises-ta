@@ -409,13 +409,16 @@ namespace HMI.Presentation.Twr.Views
 		{
 			Debug.Assert(e.Count > 0);
 			int absPageBegin = _RdPageBT.Page * _NumPositionsByPage;
-
+            int canal_bloqueado = 0;
 			for (int i = Math.Max(e.From, absPageBegin), to = Math.Min(e.From + e.Count, absPageBegin + _NumPositionsByPage); i < to; i++)
 			{
 				RdButton bt = _RdButtons[i - absPageBegin];
 				RdDst dst = _StateManager.Radio[i];
 				EstadoAsignacion estado = _EstadosAsignacion[i - absPageBegin];
-				Reset(bt, dst, ref estado);
+                if (dst.Ptt == PttState.Blocked)
+                    canal_bloqueado = 1;
+
+                Reset(bt, dst, ref estado);
                 /** Esta funcion se ha trasladado al MODEL MODULE */
                 // Para versión Enaire no hay recuperación de estados de asignación
                 // 26/01/2017
@@ -435,7 +438,11 @@ namespace HMI.Presentation.Twr.Views
                 //                                            "," + _EstadosAsignacion[i - absPageBegin]._AudioVia + "," + _EstadosAsignacion[i - absPageBegin].Unavailable);
                 //}
             }
-
+            // LALM 210616 Errores #4756 visualizacion de mensaje de error por frecuencia prioritaria
+            if (canal_bloqueado==1)
+                _CmdManager.SetErrorFP();//poner mensaje Frecuencia prioritaria
+            else
+                _CmdManager.ResetErrorFP();//quitar mensaje Frecuencia prioritaria
             //Settings.Default.Save();
             // Fin modificación 26/01/2017
 
@@ -640,7 +647,7 @@ namespace HMI.Presentation.Twr.Views
 								estado._AudioVia != dst.AudioVia;
         }
 
-		private void Reset(RdButton bt, RdDst dst)
+    private void Reset(RdButton bt, RdDst dst)
 		{
 			bt.Id = dst.Id;
 
@@ -674,7 +681,10 @@ namespace HMI.Presentation.Twr.Views
                 // string alias = dst.Alias;
                 string alias = dst.KeyAlias;
 
-				if (!dst.Unavailable)
+                //LALM 210223 Errores #4756  prioridad
+                int priority = dst.Priority;
+
+                if (!dst.Unavailable)
 				{
 					rtxGroup = dst.RtxGroup;
                     // alias = (dst.TempAlias != string.Empty && dst.TempAlias != dst.Alias) ? dst.TempAlias : alias;
@@ -719,6 +729,7 @@ namespace HMI.Presentation.Twr.Views
 
                     NotifMsg msg = null;
                     title = VisualStyle.ButtonColor;
+
                     switch (dst.Ptt)
 					{
                         case PttState.NoPtt:
@@ -726,7 +737,7 @@ namespace HMI.Presentation.Twr.Views
                         case PttState.ExternPtt:
 						case PttState.PttOnlyPort:
 							ptt = Resources.Ptt;
-							break;
+                            break;
 						case PttState.PttPortAndMod:
 							ptt = _PttBlinkOn ? Resources.Ptt : null;
 							_PttBlinkList[bt] = Resources.Ptt;
@@ -734,7 +745,7 @@ namespace HMI.Presentation.Twr.Views
 							break;
 						case PttState.Blocked:
 							ptt = Resources.PttBlocked;
-							break;
+                            break;
                         //VMG 04/09/2018 Cambios en los estados
                         case PttState.Error://Error en portadora
                             title = VisualStyle.Colors.Red;
@@ -772,7 +783,7 @@ namespace HMI.Presentation.Twr.Views
                             break;*/
 					}
 
-					switch (dst.Squelch)
+                    switch (dst.Squelch)
 					{
 						case SquelchState.SquelchOnlyPort:
 							squelch = Resources.Squelch;
@@ -814,9 +825,15 @@ namespace HMI.Presentation.Twr.Views
                 else
                 {
                     /** 20180321. AGL. ALIAS a mostrar en la tecla... */
-                    // bt.Reset(dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? string.Empty : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    //LALM 21023 Error #4756 aqui Paso la prioridad tambien.
+                    //bt.Reset(dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? string.Empty : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    //bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    //dst.State, priority, (canal_bloqueado == 1));
+
+                    //LALM 210707 nuevo parametro bloqueo para pintar otro color.
+                    bool bloqueado = (dst.Ptt == PttState.Blocked);
                     bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
-                    dst.State );
+                    dst.State, priority, bloqueado);
                 }
                 // Las frecuencias co solo RX (RxOnly), tienen deshabilitada la parte TX de la tecla
                 if (dst.RxOnly)
@@ -949,9 +966,76 @@ namespace HMI.Presentation.Twr.Views
 			}
 		}
 
-		private void _RdPageBT_UpClick(object sender)
-		{
-			int actualPage = _RdPageBT.Page;
+        //LALM 210224 Errores #4755 confirmación de cambio de página radio
+        [EventSubscription(EventTopicNames.CambioPaginaRadioUp, ThreadOption.Publisher)]
+        public void OnCambioPaginaRadio(object sender, EventArgs e)
+        {
+            _RdPageBT_UpClick_Confirmada(sender);
+        }
+
+        //LALM 210224 Errores #4755 confirmación de cambio de página radio
+        [EventSubscription(EventTopicNames.CambioPaginaRadioDown, ThreadOption.Publisher)]
+        public void OnCambioPaginaRadioDown(object sender, EventArgs e)
+        {
+            _RdPageBT_DownClick_Confirmada(sender);
+        }
+
+
+        //LALM 210224
+        // Cambio la funcion cambio de pagina por cambio de pagina confirmada
+        // y a esta se la llama desde cambio de pagina, previa confirmacion.
+        private DateTime _last;
+        public DateTime last
+        {
+            get { return _last; }
+            set { _last = value; }
+        }
+
+        private void _RdPageBT_UpClick(object sender)
+        {
+            //LALM 210224 
+            bool up = true;
+            TimeSpan tick = new TimeSpan(0, 0, 10);//10 segundos
+            bool confirma = global::HMI.Presentation.Twr.Properties.Settings.Default.ConfCambioPagRad;
+            if (confirma)
+            {
+                TimeSpan elapsed = DateTime.Now - last;
+                // Si ha pasado mas de 10 segundos pide confirmación
+                if (elapsed < TimeSpan.Zero || elapsed >= tick)
+                    _CmdManager.SetCambioRadio(up);
+                else
+                    _RdPageBT_UpClick_Confirmada(sender);
+                last = DateTime.Now;
+            }
+            else
+                _RdPageBT_UpClick_Confirmada(sender);
+        }
+
+        private void _RdPageBT_DownClick(object sender)
+        {
+            //LALM 210224
+            bool up = false;
+            TimeSpan tick = new TimeSpan(0, 0, 10);//10 segundos
+            bool confirma = global::HMI.Presentation.Twr.Properties.Settings.Default.ConfCambioPagRad;
+            if (confirma)
+            {
+                TimeSpan elapsed = DateTime.Now - last;
+                // Si ha pasado mas de 10 segundos pide confirmación
+                if (elapsed < TimeSpan.Zero || elapsed >= tick)
+                    _CmdManager.SetCambioRadio(up);
+                else
+                    _RdPageBT_DownClick_Confirmada(sender);
+                last = DateTime.Now;
+            }
+            else
+                _RdPageBT_DownClick_Confirmada(sender);
+        }
+
+        //LALM 210224
+        private void _RdPageBT_UpClick_Confirmada(object sender)
+        {
+
+            int actualPage = _RdPageBT.Page;
 
 			try
 			{
@@ -964,7 +1048,8 @@ namespace HMI.Presentation.Twr.Views
 			}
 		}
 
-		private void _RdPageBT_DownClick(object sender)
+        //LALM 210224
+        private void _RdPageBT_DownClick_Confirmada(object sender)
 		{
 			int actualPage = _RdPageBT.Page;
 

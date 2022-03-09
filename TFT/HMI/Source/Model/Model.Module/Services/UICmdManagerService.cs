@@ -42,7 +42,13 @@ namespace HMI.Model.Module.Services
         [EventPublication(EventTopicNames.DeleteSessionGlp, PublicationScope.Global)]
         public event EventHandler DeleteSessionGlp;
 
-        public UICmdManagerService([ServiceDependency] StateManagerService stateManager, [ServiceDependency] IEngineCmdManagerService engineCmdManager)
+		//LALM 210224 Errores #4755 confirmación de cambio de página radio
+		[EventPublication(EventTopicNames.CambioPaginaRadioUp, PublicationScope.Global)]
+		public event EventHandler CambioPaginaRadioUp;
+		[EventPublication(EventTopicNames.CambioPaginaRadioDown, PublicationScope.Global)]
+		public event EventHandler CambioPaginaRadioDown;
+
+		public UICmdManagerService([ServiceDependency] StateManagerService stateManager, [ServiceDependency] IEngineCmdManagerService engineCmdManager)
 		{
 			_StateManager = stateManager;
 			_EngineCmdManager = engineCmdManager;
@@ -123,6 +129,21 @@ namespace HMI.Model.Module.Services
                     General.SafeLaunchEvent(DeleteSessionGlp, this);
                 }
             }
+			//LALM 210224 Errores #4755 confirmación de cambio de página radio
+			else if (msg.Id == "Cambio de Página de Radio")
+			{
+				if (response == NotifMsgResponse.Ok)
+				{
+					if ((bool)msg.Info==true)
+						General.SafeLaunchEvent(CambioPaginaRadioUp, this);
+					else
+						General.SafeLaunchEvent(CambioPaginaRadioDown, this);
+				}
+				else
+				{
+					// se queda igual
+				}
+			}
 		}
 
 		public void ShowSplitModeSelection()
@@ -404,7 +425,13 @@ namespace HMI.Model.Module.Services
             {
                 _EngineCmdManager.SetRdRx(id, true);
             }
-            else if ((dst.Ptt != PttState.NoPtt && dst.Ptt != PttState.ExternPtt) || 
+			//LALM Errores #4685 
+			// Si el canal esta en un grupo RTX propio no se debe desasignar en TX.
+			else if ((longClick) && (dst.RtxGroup > 0))
+			{
+				_EngineCmdManager.NextRdAudio(id);
+			}
+			else if ((dst.Ptt != PttState.NoPtt && dst.Ptt != PttState.ExternPtt) || 
                 longClick)
             {
                 _EngineCmdManager.SetRdRx(id, false);
@@ -846,9 +873,26 @@ namespace HMI.Model.Module.Services
             }
         }
 
+		//LALM 210224 Errores #4756 visualizacion de mensaje de error por frecuencia prioritaria
+		public void SetErrorFP()
+		{
+			_EngineCmdManager.SetErrorFP();
+		}
+		
+		public void ResetErrorFP()
+		{
+			_EngineCmdManager.ResetErrorFP();
+		}
+
+		//LALM 210224
+		public void SetCambioRadio(bool up)
+		{
+			//Debug.Assert(mode != _StateManager.Light.Mode);
+			_EngineCmdManager.SetCambioRadio( up);
+		}
 		#endregion
 
-        private void TlfClick(string number, bool ia, string givenLiteral = null, int id = Int32.MaxValue)
+		private void TlfClick(string number, bool ia, string givenLiteral = null, int id = Int32.MaxValue)
         {
             string literal = null;
             if (number.Length > 0)

@@ -162,8 +162,8 @@ namespace HMI.Presentation.Twr.Views
             {
                 MensajePresenciaAltavoces(typeof(RdSpeaker));
                 MensajePresenciaAltavoces(typeof(LcSpeaker));
-            }
-        }
+			}
+		}
 
 		[EventSubscription(EventTopicNames.JacksChanged, ThreadOption.Publisher)]
 		public void OnJacksChanged(object sender, EventArgs e)

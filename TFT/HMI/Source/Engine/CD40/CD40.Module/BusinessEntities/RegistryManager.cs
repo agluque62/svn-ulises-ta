@@ -72,14 +72,21 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			_Logger.Trace($"GetRs <{type}>: {rsName}");
 
-			//if (!_Resources.TryGetValue(rsUid, out rs))
 			if (!GetResource(rsUid, out rs))
 			{
 				rs = new Rs<T>(rsName);
 				_Resources[rsUid] = rs;
-			
-				_Logger.Trace($"GetRs <{type}>: {rsName}. New Resource...");
 
+				_Logger.Trace($"GetRs <{type}>: {rsName}. New Resource...");
+			}
+			// LALM 210824 este else hay que comentarlo
+			// Incidencia #4682
+			//else 
+			{
+				// lalm 20201211
+				// Incidencia #4682
+				// si el recurso ya esta creado, hay que volver ha obtenerlo para su posterior comprobacion.
+				rs = _Resources[rsUid];
 				if ((rs is Rs<GwTlfRs>) || (rs is Rs<GwLcRs>))
 				{
 					DireccionamientoIP hostInfo = Top.Cfg.GetGwRsHostInfo(rsName);

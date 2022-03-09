@@ -40,6 +40,9 @@ namespace HMI.CD40.Module.BusinessEntities
 		public event GenericEventHandler<SnmpStringMsg<string, string>> SendSnmpTrapString;
         public event GenericEventHandler<RangeMsg<LlamadaHistorica>> HistoricalOfLocalCallsEngine;
         public event GenericEventHandler<PositionIdMsg> RedirectedCall;
+        //lalm 211007
+        //#2629 Presentar via utilizada en llamada saliente.
+        public event GenericEventHandler<RangeMsg<TlfInfo>> ResourceChanged;
 
         public enum TlfRxAudioVia
         {
@@ -87,6 +90,48 @@ namespace HMI.CD40.Module.BusinessEntities
 		public bool Activity()
 		{
                 return (_ActiveCalls.Count > 0);
+        }
+
+        //LALM 211029 
+        //# Error 3629 Terminal de Audio -> Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV
+        public int ActivityRing()
+        {
+            TlfPosition tlf;
+            for (int i = 0; i < Tlf.NumDestinations + Tlf.NumIaDestinations - 1; i++)
+            {
+                if (_TlfPositions.TryGetValue(i, out tlf) == true)
+                {
+                    if ((tlf.State == TlfState.In) || (tlf.State == TlfState.InPrio) || (tlf.State == TlfState.RemoteIn))
+                        return i;
+                }
+            }
+            return -1;
+        }
+
+        //LALM 211029 
+        //# Error 3629 Terminal de Audio -> Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV
+        public void QuitaTonoRing()
+        {
+            int i = Top.Tlf.ActivityRing();
+            TlfPosition tlf;
+            if (_TlfPositions.TryGetValue(i, out tlf) == true)
+            {
+                int _Tone = tlf.Tone;
+                Top.Mixer.Unlink(_Tone);
+            }
+        }
+
+        //LALM 211029 
+        //# Error 3629 Terminal de Audio -> Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV
+        public void RecuperaTonoRing()
+        {
+            int i = Top.Tlf.ActivityRing();
+            TlfPosition tlf;
+            if (_TlfPositions.TryGetValue(i, out tlf) == true)
+            {
+                int _Tone = tlf.Tone;
+                Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
+            }
         }
 
         public bool ToneOn
@@ -402,8 +447,8 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
         /// <param name="id"></param>
-		public void HangUp(int id)
-		{
+        public void HangUp(int id)
+        {
             Debug.Assert(id < Tlf.NumDestinations + Tlf.NumIaDestinations);
             TlfPosition tlf = null;
             if (_TlfPositions.TryGetValue(id, out tlf))
@@ -411,7 +456,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 if (PickUp.Cancel(id) == false)
                     tlf.HangUp(0);
             }
-		}
+        }
 
         /// <summary>
         /// 
@@ -431,9 +476,12 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 				else
 				{
-					TlfIaPosition tlfIa = (TlfIaPosition)_TlfPositions[id];
-                    TlfIaDestination st = new TlfIaDestination(tlfIa.Literal, tlfIa.Number, tlfIa.State, tlfIa.IsTop, tlfIa.ChAllowsForward);
-					RangeMsg<TlfIaDestination> state = new RangeMsg<TlfIaDestination>(tlfIa.Pos, st);
+                    TlfIaPosition tlfIa = (TlfIaPosition)_TlfPositions[id];
+                    _Logger.Info("Inserto recurso: {0} {1}", tlfIa.Literal, tlfIa.Uri);
+                    //LALM 211008 añado recurso.
+                    //#2629 presentar via Atencion el paraemtro uri puede no corresponder con la llamada.
+                    TlfIaDestination st = new TlfIaDestination(tlfIa.Literal, tlfIa.Number, tlfIa.State, tlfIa.IsTop, tlfIa.ChAllowsForward, tlfIa.Uri);
+                    RangeMsg<TlfIaDestination> state = new RangeMsg<TlfIaDestination>(tlfIa.Pos, st);
 					General.SafeLaunchEvent(IaPositionsChanged, this, state);
 				}
 			}
@@ -1067,10 +1115,21 @@ namespace HMI.CD40.Module.BusinessEntities
 					SipAgent.HangupCall(call2replace, SipAgent.SIP_GONE);
 				}
 			}
-
+            //LALM 210928 tratamiento de dos lineas 19+1
+			//Peticiones #3638
+            int NumIa = 0;
 			foreach (TlfPosition tlf in _TlfPositions.Values)
 			{
-				answer.Value = tlf.HandleIncomingCall(call, call2replace, info, inInfo);
+				//LALM 211004
+				//Peticiones #3638
+                if (tlf is TlfIaPosition)
+                    NumIa++;
+                if ((NumIa > 1) && (info.Priority != CORESIP_Priority.CORESIP_PR_URGENT) && (info.Priority != CORESIP_Priority.CORESIP_PR_EMERGENCY))
+                {
+                    answer.Value = SipAgent.SIP_BUSY;
+                    return;
+                }
+                answer.Value  = tlf.HandleIncomingCall(call, call2replace, info, inInfo);
 				if (answer.Value != SipAgent.SIP_DECLINE)
 				{
 					if (answer.Value == SipAgent.SIP_RINGING)
@@ -1406,8 +1465,15 @@ namespace HMI.CD40.Module.BusinessEntities
 
                 RangeMsg<TlfState> state = new RangeMsg<TlfState>(tlf.Pos, st);
 				General.SafeLaunchEvent(PositionsChanged, this, state);
-			}
-		}
+
+                //lalm 211008 añado recurso
+                //#2629 Presentar via utilizada en llamada saliente.
+                TlfInfo daSt = new TlfInfo(tlf.Literal, tlf.State, tlf.ChAllowsPriority(), TlfType.Unknown, tlf.IsTop, tlf.ChAllowsForward, tlf.Uri);
+                RangeMsg<TlfInfo> stateAD = new RangeMsg<TlfInfo>(tlf.Pos, daSt);
+                General.SafeLaunchEvent(ResourceChanged, this, stateAD);
+
+            }
+        }
 
         /// <summary>
         /// Callback de CORESIP cuando se recive un 302 (moved temporarily) como respuesta a un INVITE.
@@ -1524,6 +1590,8 @@ namespace HMI.CD40.Module.BusinessEntities
 					});
 				}
 			}
+            //lalm 210930
+            Recoloca19m1();
 		}
 
         /// <summary>
@@ -1658,6 +1726,83 @@ namespace HMI.CD40.Module.BusinessEntities
             PublishChangeActivity(oldActivityState, Activity());
 		}
 
+        //210928
+        // Cuenta el numero de lineas IA en conferencia.
+        private int NumIaConf()
+        {
+            int NumIAConf = 0;
+            foreach (TlfPosition tlf in _TlfPositions.Values)
+            {
+                if (tlf is TlfIaPosition)
+                {
+                    if (tlf.State==TlfState.Conf)
+                    {
+                        NumIAConf++;
+                    }
+                }
+            }
+            return NumIAConf;
+
+        }
+
+        //LALM 210928  #3638
+        // Cuelga la llamda de menor prioridad de las linas 19+1
+        private void HangupLessPriority()
+        {
+            int NumIAConf = 0;
+            List<TlfPosition> listatlf = new List<TlfPosition>(); ;
+            foreach (TlfPosition tlf in _TlfPositions.Values) if (tlf is TlfIaPosition)
+            {
+                if (tlf.State == TlfState.Conf)
+                {
+                    listatlf.Add(tlf);
+                    NumIAConf++;
+                    if (NumIAConf>1)
+                    {
+                        // la prioridad menor es la mas alta
+                        if (listatlf[0].CallPriority < listatlf[1].CallPriority)
+                            listatlf[1].HangUp(0);
+                        else
+                        {
+                            //intento cambiar los objtos en las lista
+                            //_TlfPositions.[22].Values = listatlf[1].Val;
+                            //_TlfPositions.[21].Values = listatlf[0];
+                            listatlf[0].HangUp(0);
+                            bool confirmacion_reposo = false;
+                            if (!confirmacion_reposo)
+                                return;
+                            string dstUri = listatlf[1].Uri;
+                            //TlfPosition tlfMoved = GetTlfPosition(dstUri, "");
+                            int call = listatlf[1].CallId;
+                            foreach (TlfPosition tlf1 in _TlfPositions.Values) 
+                            {
+                                CORESIP_Priority prioCall;
+                                if (tlf1 is TlfIaPosition && tlf1.HandleCallMoved(call, out prioCall))
+                                {
+                                    TlfPosition tlfMoved = GetTlfPosition(dstUri, "");
+                                    if (tlfMoved != null)
+                                    {
+                                        switch (tlfMoved.State)
+                                        {
+                                            case TlfState.Idle:
+                                            case TlfState.PaPBusy:
+                                                if (prioCall == CORESIP_Priority.CORESIP_PR_EMERGENCY)
+                                                    General.SafeLaunchEvent(RedirectedCall, this, new PositionIdMsg(listatlf[0].Pos.ToString()));
+                                                tlfMoved.RedirectCall(call, dstUri);
+                                                ResetActiveCalls(null);
+                                                AddActiveCall(tlfMoved);
+                                                break;
+                                        }
+                                    }
+                                    break;
+                                }
+                                //_TlfPositions[21] = _TlfPositions[22];
+                            }
+                        }
+                    }
+                }
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -1680,6 +1825,8 @@ namespace HMI.CD40.Module.BusinessEntities
                 //evitar el desorden en hold on/off muy rapidos
                     if (tlf.OldState == TlfState.Hold)
                         ResetActiveCalls(tlf);
+                    if (NumIaConf() > 1)
+                        HangupLessPriority();
                     break;
 			}
 
@@ -1863,6 +2010,72 @@ namespace HMI.CD40.Module.BusinessEntities
             return nombreConocido;
         }
 
-		#endregion
-	}
+        //lalm 210930
+        //Peticiones #3638
+        void Recoloca19m1()
+        {
+            //Recoloca las 19+1
+            TlfPosition tlf;
+            TlfPosition tlf1;
+            TlfPosition tlf2;
+            for (int i = Tlf.NumDestinations, to = Tlf.NumDestinations + Tlf.NumIaDestinations - 1; i < to; i++)
+            {
+                if (_TlfPositions.TryGetValue(i, out tlf) == true)
+                {
+                    if (_TlfPositions.TryGetValue(i + 1, out tlf1) == true)
+                    {
+
+                        TlfIaPosition tlfIa = (TlfIaPosition)tlf;
+                        TlfIaPosition tlfIa1 = (TlfIaPosition)tlf1;
+                        if (ActiveCalls.Count ==0)
+                        {
+                            if (tlfIa1.Pos== 172)
+                            {
+                                if (_TlfPositions.TryGetValue(i + 1, out tlf2) == true)
+                                {
+                                    TlfIaPosition tlftmp = (TlfIaPosition)tlf2;
+                                    tlfIa1.setpos(170);
+                                    _TlfPositions[i] = tlfIa1;
+
+                                    tlfIa.setpos(171);
+                                    _TlfPositions[i + 1] = tlfIa;
+
+                                    _TlfPositions[i+1].RefrescaPos();
+                                    _TlfPositions[i].RefrescaPos();
+
+                                }
+                            }
+                        }
+                        if (tlfIa.State == TlfState.Idle)
+                        {
+                            if ((tlfIa1.State == TlfState.Set) || (tlfIa1.State == TlfState.InPrio))
+                            {
+                                //ReAsigna tecla 19+1
+                                if (ActiveCalls.Count < 2)
+                                {
+                                    if ((ActiveCalls.Count > 0) && (_TlfPositions[i].Literal == ActiveCalls[0].Literal))
+                                    {
+                                        return;
+                                    }
+                                }
+                                
+                                if (_TlfPositions.TryGetValue(i, out tlf2) == true)
+                                {
+                                    TlfIaPosition tlftmp = (TlfIaPosition)tlf2;
+                                    tlfIa1.setpos(170);
+                                    _TlfPositions[i] = tlfIa1;
+                                    _TlfPositions[i].RefrescaPos();
+                                    
+                                    tlftmp.setpos(172);
+                                    _TlfPositions[i + 1] = tlftmp;
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        #endregion
+    }
 }

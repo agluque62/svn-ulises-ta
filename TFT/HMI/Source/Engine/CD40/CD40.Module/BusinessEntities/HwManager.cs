@@ -545,6 +545,22 @@ namespace HMI.CD40.Module.BusinessEntities
                 });
             }
         }
+
+        // LALM 210420.1 presencia de altavoz LC
+        // Peticiones #4810 Configurar la restricción de presencia de altavoz LC para operar en saliente y entrante
+        //en Accesos Instantaneos
+        protected void SetPresenceLcSpeaker(bool stateLcSpeaker)
+        {
+            if (_LCSpeaker != stateLcSpeaker)
+            {
+                _LCSpeaker = stateLcSpeaker;
+                Top.WorkingThread.Enqueue("SpeakerLcChanged", delegate ()
+                {
+                    _Logger.Trace("HwManager. OnSpkConnected LcSpeaker {0} ", _LCSpeaker);
+                    General.SafeLaunchEvent(SpeakerChangedHw, this, new JacksStateMsg(stateLcSpeaker, _LCSpeaker));
+                });
+            }
+        }
         /// <summary>
         /// 20160712. AGL. Para capturar los eventos de presencia de HF y presencia de cable grabacion
         /// </summary>

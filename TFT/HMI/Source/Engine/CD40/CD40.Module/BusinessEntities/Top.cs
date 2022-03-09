@@ -18,6 +18,7 @@ using Utilities;
 
 using NLog;
 using ProtoBuf;
+using System.Diagnostics;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
@@ -49,12 +50,45 @@ namespace HMI.CD40.Module.BusinessEntities
 		}
 
         /// <summary>
-        /// 
+        /// LALM
+        /// </summary>
+        public static List<string> GetOperationalV4Ips()
+        {
+            List<string> ips = new List<string>();
+            NetworkInterface[] nets = NetworkInterface.GetAllNetworkInterfaces();
+
+            foreach (NetworkInterface iface in nets)
+                if ((iface.NetworkInterfaceType != NetworkInterfaceType.Loopback) &&
+                    (iface.OperationalStatus == OperationalStatus.Up))
+                    foreach (UnicastIPAddressInformation ip in iface.GetIPProperties().UnicastAddresses)
+                        ips.Add(ip.Address.ToString());
+            return ips;
+        }
+
+        /// <summary>
+        /// LALM Peticion #4618. App TA/HMI.Comprobar en el inicio de la App, que la máquina tiene 
+        /// configurada la dirección IP asignada al puesto, ya que actualmente se bloquea el HMI sin dar 
+        /// ninguna pista
         /// </summary>
 		public static string SipIp
-		{
-			get { return _SipIp; }
-		}
+        {
+            get
+            {
+                //lalm
+                List<string> lista = GetOperationalV4Ips();
+                foreach (String ip in lista)
+                    if (ip == _SipIp)
+                        return _SipIp;
+                // Peticion #4618
+                _Logger.Fatal("IP No configurada {0} \n", _SipIp);
+                return _SipIp;
+                /*
+                _Logger.Fatal("IP No configurada {0} \n", _SipIp);
+                // Devolviendo esto funcionará el programa pero dara error a la larga
+                return "0.0.0.0";
+                */
+            }
+        }
 
         /// <summary>
         /// 
@@ -154,14 +188,73 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         /// <summary>
+        /// Gestor de las escuchas del puesto.
+        /// </summary>
+        //LALM 210722 Listen(ESCUCHA AG SIN IMPLEMENTAR)
+        //public static ListenManager Listen
+        //{
+        //    get { return _ListenManager; }
+        //}
+
+        //211019
+        // Comprueba que esta arrancado el spread.exe
+        static bool spread_running = false;
+        public static bool ComprobarServicios()
+        {
+            int retry = 3;
+            while (retry > 0)
+            {
+                spread_running = Utilities.StartSync.ProcessRunningSync("spread", 20);
+                if (spread_running)
+                    break;
+                retry--;
+            }
+            return spread_running;
+        }
+        
+        public static void Reiniciar(string aviso, int tiempo)
+        {
+            using (Process task = Process.Start(new ProcessStartInfo()
+            {
+                FileName = "shutdown.exe",
+                Arguments = " -r  -t " + tiempo + " -c " + "\"" + aviso + "\"",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            }))
+            {
+                string error = task.StandardError.ReadToEnd();
+                if (String.IsNullOrEmpty(error) == false)
+                {
+                    Process app = Process.Start(" -s  -t " + tiempo);
+                    app.Close();
+                }
+                else
+                {
+                    string result = task.StandardOutput.ReadToEnd();
+                }
+            }
+       }
+        /// <summary>
         /// 
         /// </summary>
+
         delegate void VoidDelegate();
         public static void Init()
 		{
 #if _NEWSTART_
             /** AGL.START Controlado */
             int Contador = 0;
+            //211019
+            // 4937 TFT aislado tras un reinicio de todo el sistema
+            if (!ComprobarServicios())
+            {
+                string aviso = "Sistema incorrectamente arrancado \n LA MAQUINA SE REINICIARÁ";
+                System.Windows.Forms.MessageBox.Show(String.Format(aviso));
+                Reiniciar(aviso, 60);
+                return ;
+            }
             var NewList = new List<VoidDelegate>
             {
                 delegate ()
@@ -368,6 +461,7 @@ namespace HMI.CD40.Module.BusinessEntities
             NtpClientSupervisor.Enabled = Settings.Default.SNMPEnabled == 1;
             _Logger.Info("TIMER NtpClientSupervisor Arrancado...");
             /*****************/
+            return;
         }
 
         /// <summary>

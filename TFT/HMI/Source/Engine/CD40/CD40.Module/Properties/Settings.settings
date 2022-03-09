@@ -221,7 +221,10 @@
     <Setting Name="AudioCardSimul" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="GLP" Type="System.Boolean" Scope="Application">
+	<Setting Name="LcSpeakerSimul" Type="System.Boolean" Scope="Application">
+	  <Value Profile="(Default)">False</Value>
+	</Setting>
+	<Setting Name="GLP" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="NtpClientStatus_Oid" Type="System.String" Scope="Application">

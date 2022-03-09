@@ -298,7 +298,9 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 		public void Init()
 		{
-			Top.Registry.NewConfig += OnNewConfig;
+            //LALM 210507 Comprobacion necesaria.
+            if (Top.Registry!=null)
+			    Top.Registry.NewConfig += OnNewConfig;
 
 			_HostAddresses = new List<StrNumeroAbonado>();
 		}

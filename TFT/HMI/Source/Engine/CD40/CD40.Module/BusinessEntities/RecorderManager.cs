@@ -276,11 +276,11 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="enable"></param>
-        public void EnableSupervisor(bool enable)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="enable"></param>
+            public void EnableSupervisor(bool enable)
         {
             _SupervisorTimer.Enabled = enable && this._LocalRecordingEnabled && ((Top.Cfg.Permissions & Permissions.Replay) == Permissions.Replay);
         }
@@ -546,6 +546,8 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="id"></param>
         /// <param name="fuente"></param>
+        /// LALM __SessionsId no parece que se use para nada...
+        /// SetIdSession no se utiliza.
         public void SetIdSession(int id, FuentesGlp fuente)
         {
             _SessionsId[(int)fuente] = id;
@@ -753,7 +755,7 @@ namespace HMI.CD40.Module.BusinessEntities
 #if DEBUG
     public class ReplayManager
 #else
-   class ReplayManager
+    class ReplayManager
 #endif
     {
         public event GenericEventHandler<StateMsg<bool>> PlayingChanged;
