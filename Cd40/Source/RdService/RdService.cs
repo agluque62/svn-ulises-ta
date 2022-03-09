@@ -1696,6 +1696,11 @@ namespace U5ki.RdService
                             if (rdLink.TipoFrecuencia == Tipo_Frecuencia.HF)
                                 rdFr.FrecuenciaSintonizada = rdLink.FrecuenciaSintonizada;
                             /** Genera los  INVITE de los nuevos y BYE de los antiguos por este orden de la frecuencia ***/
+
+                            //rdLink.MetodosBssOfrecidos = (int)RdResource.BssMethods.CENTRAL;
+                            //rdLink.PorcentajeRSSI = 50;
+
+
                             rdFr.Reset(cfg.ConfiguracionGeneral, rdLink, selectedRs);
 #if DEBUG
                             base.LogTrace<RdService>("[FRECUENCY] Frecuency added: " + rdLinkId);
@@ -2773,7 +2778,8 @@ namespace U5ki.RdService
 
                     // Asignacion de recurso.
 
-                    if (!new FrecuencyHelper(Frecuencies).ResourceSet(frecuency, gearId, uri, tipo, idEmplazamiento, confParams, newconfparams, isMaster)) //#3603                  
+                    //El parametro isTIFX se pone a false ya que esta funcion se usa solo para M+N y en ese caso no se usan pasarelas
+                    if (!new FrecuencyHelper(Frecuencies).ResourceSet(frecuency, gearId, uri, tipo, false, idEmplazamiento, confParams, newconfparams, isMaster)) //#3603                  
 
 #else
                     if (!new FrecuencyHelper(Frecuencies).ResourceSet(frecuency, gearId, gear.SipUri, gear.ResourceType))

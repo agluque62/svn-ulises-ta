@@ -46,11 +46,43 @@ namespace U5ki.Infrastructure
 			return null;
 		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+		public int GetTipoHost(string resourceId, ref Tipo_Elemento_HW tipohost)
+		{
+			foreach (AsignacionRecursosGW res in _PlanAsignacionRecursos)
+			{
+				if (string.Compare(res.IdRecurso, resourceId, true) == 0)
+				{
+					foreach (DireccionamientoIP host in _PlanDireccionamientoIP)
+					{
+						if (string.Compare(host.IdHost, res.IdHost, true) == 0)
+						{
+							tipohost = host.TipoHost;
+							return 0;
+						}
+					}
+					return -1;
+				}
+			}
+
+			return -1;
+		}
+
+		public bool IsResoureInTIFX(string resId)
+		{
+			//Retorna true si es un recurso de pasarela
+			Tipo_Elemento_HW tipohost = Tipo_Elemento_HW.TEH_TOP;
+			if (GetTipoHost(resId, ref tipohost) != -1)
+			{
+				if (tipohost == Tipo_Elemento_HW.TEH_TIFX) return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="userId"></param>
+		/// <returns></returns>
 		public string GetUserHost(string userId)
 		{
 			foreach (AsignacionUsuariosTV tv in _PlanAsignacionUsuarios)

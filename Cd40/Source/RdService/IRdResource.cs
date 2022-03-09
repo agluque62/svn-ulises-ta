@@ -23,6 +23,7 @@ namespace U5ki.RdService
 
         ushort PttId
         { get; }
+
         bool Squelch
         { get; }
 

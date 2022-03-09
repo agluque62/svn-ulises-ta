@@ -671,7 +671,7 @@ namespace U5ki.RdService
                     // RdResource rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, IdEquipo);
                     // RdResource rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, IdEquipo, " ");
                     // 20171107. AGL. los parametros de configuracion por Defecto.
-                    RdResource rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, IdEquipo, " ", new RdFrecuency.NewRdFrequencyParams());
+                    RdResource rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, false, IdEquipo, " ", new RdFrecuency.NewRdFrequencyParams());
                     // JOI FREC_DES FIN
                     fr.RdRs[rsId] = rr;
 

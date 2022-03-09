@@ -1314,7 +1314,7 @@ namespace U5ki.NodeBox
                 SipAgent.Init(
                     U5ki.NodeBox.Properties.Settings.Default.SipUser,
                     U5ki.NodeBox.Properties.Settings.Default.IpPrincipal,
-                    sipPort, 128);
+                    sipPort, U5ki.NodeBox.Properties.Settings.Default.MaxCalls);
                 if (ServerType != ServicesServerTypes.Phone)
                 {
                     SipAgent.ReceiveFromRemote(

@@ -1210,6 +1210,16 @@ namespace U5ki.Infrastructure
 		static extern int	CORESIP_TransferNotify(IntPtr evSub, int code, out CORESIP_Error error);
 
         /**
+	     *	CORESIP_GetRdQidx
+	     *	@param	call		Identificador de llamada
+	     *	@param	Qidx		Qidx del recurso de radio receptor que se retorna. Sera el manejado por el BSS.
+	     *	@param	error		Puntero a la Estructura de error
+	     *	@return				Codigo de Error
+	     */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_GetRdQidx(int call, ref int Qidx, out CORESIP_Error error);
+
+        /**
          *	SendOptionsMsg
          *  Esta función no envia OPTIONS a traves del proxy
          *	@param	dst			Puntero a uri donde enviar OPTIONS
@@ -1219,7 +1229,7 @@ namespace U5ki.Infrastructure
          *	@param	error		Puntero a la Estructura de error
          *	@return				Codigo de Error
          */
-		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
         static extern int CORESIP_SendOptionsMsg([In] string dst, StringBuilder callid, int isRadio, out CORESIP_Error error);
         //Envía OPTIONS directamente sin pasar por el proxy
         /**
@@ -2783,6 +2793,26 @@ namespace U5ki.Infrastructure
             _Logger.Debug("Saliendo de SipAgent.PttOff");
 #endif
         }
+
+        public static int GetRdQidx(int callId)
+        {
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.GetRdResourceInfo {0}", callId);
+#endif
+            CORESIP_Error err;
+            int Qidx = 0;
+
+            if (CORESIP_GetRdQidx(callId, ref Qidx, out err) != 0)
+            {
+                _Logger.Warn("Error SipAgent.GetRdQidx " + err.Info);
+                Qidx = -1;      //Retorna negativo si error
+            }
+            return Qidx;
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.GetRdResourceInfo");
+#endif
+        }
+
         /// <summary>
         /// 
         /// </summary>

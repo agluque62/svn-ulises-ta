@@ -67,7 +67,7 @@ namespace U5ki.RdService
                 _ActiveResource = current_StandbyResource;
                 current_ActiveResource.TxMute = true;
                 _StandbyResource = current_ActiveResource;
-            }            
+            }
         }
 
         public void SetActive(RdResource activeResource)
@@ -83,7 +83,7 @@ namespace U5ki.RdService
         public bool Isconfigured()
         {
             return (_ActiveResource != null && _StandbyResource != null);
-        }        
+        }
 
         #region IRdResource Members
         public RdRsType Type
@@ -94,6 +94,8 @@ namespace U5ki.RdService
 
         public bool isTx
         { get { return _ActiveResource.isTx; } }
+                
+
         /// <summary>
         /// Active SipCallId
         /// </summary>
@@ -290,6 +292,60 @@ namespace U5ki.RdService
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Devuelve el recurso receptor que tiene el mejor Qidx
+        /// Devuelve Qidx como argumento mediante referencia
+        /// </summary>
+        /// <returns></returns>
+        public RdResource GetBetterRx(ref int better_Qidx)
+        {        
+            RdResource ret = null;
+            int active_qidx = 0;
+            int standby_qidx = 0;
+            better_Qidx = 0;
+            if (_ActiveResource.Connected)
+            {
+                active_qidx = SipAgent.GetRdQidx(_ActiveResource.SipCallId);
+                if (active_qidx < 0) active_qidx = 0;
+            }
+
+            if (_StandbyResource.Connected)
+            {
+                standby_qidx = SipAgent.GetRdQidx(_StandbyResource.SipCallId);
+                if (standby_qidx < 0) standby_qidx = 0;                
+            }
+
+            if (_ActiveResource.Connected && _StandbyResource.Connected)
+            {
+                if (active_qidx >= standby_qidx)
+                {
+                    ret = _ActiveResource;
+                    better_Qidx = active_qidx;
+                }
+                else
+                {
+                    ret = _StandbyResource;
+                    better_Qidx = standby_qidx;
+                }
+            }
+            else if (_ActiveResource.Connected && !_StandbyResource.Connected)
+            {
+                ret = _ActiveResource;
+                better_Qidx = active_qidx;
+            }
+            else if (!_ActiveResource.Connected && _StandbyResource.Connected)
+            {
+                ret = _StandbyResource;
+                better_Qidx = standby_qidx;
+            }
+            else
+            {
+                ret = null;
+            }
+
+            return ret;
         }
 
         public List<RdResource> GetListResources()

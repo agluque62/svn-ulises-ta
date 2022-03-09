@@ -354,7 +354,8 @@ namespace U5ki.RdService
                 {
                     RdResourcePair foundPair = newPairs.FirstOrDefault(x => x.ID.Equals(rsCfg.RedundanciaIdPareja));
                     string[] rdUri = RsUri(rsCfg.IdRecurso, sysCfg);
-                    RdResource res = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, cfg.Literal, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg, false);
+                    
+                    RdResource res = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), cfg.Literal, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg, false);
                     if (foundPair == null)
                     {
                         foundPair = new RdResourcePair(rsCfg.RedundanciaIdPareja, _Frecuency);
@@ -514,7 +515,7 @@ namespace U5ki.RdService
                                     rdRs.Dispose();
                                     bool isReplacedMNTemp = rdRs.ReplacedMN;
                                     bool isMasterMNTemp = rdRs.MasterMN;
-                                    rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, cfg.Literal, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313                            }
+                                    rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), cfg.Literal, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313                            }
                                     rdRs.ReplacedMN = isReplacedMNTemp;
                                     rdRs.MasterMN = isMasterMNTemp;//#3603
                                 }
@@ -528,7 +529,7 @@ namespace U5ki.RdService
                             }
                             else
                             {
-                                rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, cfg.Literal, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313
+                                rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), cfg.Literal, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313
                                 if ((cfg.TipoFrecuencia == Tipo_Frecuencia.FD) && (cfg.ModoTransmision == Tipo_ModoTransmision.UltimoReceptor))
                                     rdRs.TxMute = true;
                             }
@@ -984,7 +985,7 @@ namespace U5ki.RdService
                                     (r.Squelch)))
                         {
                             RdResource simpleResource = rdr.GetRxSelected();
-                            if (simpleResource != null)
+                            if (simpleResource != null && simpleResource.PttId_received_in_rtp == 0)    //Solo se refleja cuando el equelch es de avion
                                 return simpleResource.Site;
                         }
                         break;
@@ -1458,7 +1459,7 @@ namespace U5ki.RdService
         {
             RdService.evQueueRd.Enqueue("OnTxDefaultElapsed", delegate ()
             {
-                _TimerTxDefault.Interval = _TimeToTxDefault * 1000;
+                if (_TimeToTxDefault > 0) _TimerTxDefault.Interval = _TimeToTxDefault * 1000;
                 IRdResource TxRsDefault = GetTxRsDefault();
                 IRdResource TxRsSelected = GetTxRsSelected();
                 if ((TxRsDefault == null) || (TxRsSelected == null))
@@ -1835,36 +1836,6 @@ namespace U5ki.RdService
             }
         }
 
-        /// <summary>
-        /// Compara el recurso que llega de configuración con el que ya exisiste en memoria y 
-        /// devuleve el recurso cambiado o el existente.
-        /// Si no hay cambios que afecten al sip, permite no cortar la sesion.
-        /// </summary>
-        /// <param name="existingResource"></param>
-        /// <param name="rsCfg"></param>
-        /// <param name="reinicioSip">true si es necesario un reinicio de sesion por cambios en la frecuencia</param>
-        /// <returns>true si el recurso ha cambiado</returns>
-        private bool CompareResources(ref RdResource existingRdRs, CfgRecursoEnlaceExterno rsCfg, bool reinicioSip, string uri1, string uri2, bool selectedState)
-        {
-            bool hayCambios = existingRdRs.Type != (RdRsType)rsCfg.Tipo ||
-                  existingRdRs.Uri1.Equals(uri1) == false ||
-                  existingRdRs.Uri2.Equals(uri2) == false ||
-                  existingRdRs.Frecuency != _Frecuency;
-            if (reinicioSip || hayCambios)
-            {
-                if (existingRdRs.Connected)
-                    RemoveSipCall(existingRdRs);
-                existingRdRs.Dispose();
-                bool isReplacedMNTemp = existingRdRs.ReplacedMN;
-                bool isMasterMNTemp = existingRdRs.MasterMN;
-                existingRdRs = new RdResource(rsCfg.IdRecurso, uri1, uri2, (RdRsType)rsCfg.Tipo, _Frecuency, rsCfg.IdEmplazamiento, selectedState, new_params, rsCfg);
-                existingRdRs.ReplacedMN = isReplacedMNTemp;
-                existingRdRs.MasterMN = isMasterMNTemp;//#3603
-            }
-
-            existingRdRs.Site = rsCfg.IdEmplazamiento;
-            return (reinicioSip || hayCambios);
-        }
         /// <summary>
         /// Compara dos recursos y devuelve si son iguales.
         /// </summary>
@@ -3115,6 +3086,7 @@ namespace U5ki.RdService
                     foreach (IRdResource rdRs in _RdRs.Values.Where (x=>(x.isTx && x.Site == cfg.EmplazamientoDefecto)))
                     {
                         _TxIDDefault = rdRs.ID;
+                        int forced_interval = 0;
 
                         if (_CurrentSrcPtt == null &&
                             (_FrRs == null || (_FrRs != null && _FrRs.Squelch == RdSrvFrRs.SquelchType.NoSquelch)) &&
@@ -3123,10 +3095,10 @@ namespace U5ki.RdService
                             //La frecuencia esta sin PTT ni squelch y ha cambiado el emplazamiento por defecto
                             //Se arranca con un intervalo pequeño para que
                             //se estableca el 'Tx Sel' cuanto antes
-                            _TimerTxDefault.Interval = 50;
+                            forced_interval = 50;
                         }
 
-                        StartTimerTxDefault();
+                        StartTimerTxDefault(forced_interval);
                         if (String.IsNullOrEmpty(_LastSelectedSite))
                             _LastSelectedSite = cfg.EmplazamientoDefecto;
                         break;
@@ -3182,7 +3154,7 @@ namespace U5ki.RdService
                     (TxRsSelected.Site == _LastSelectedSite))
                     return;
                 IRdResource TxRsDefault = GetTxRsDefault();
-                //Se busca el seleccionado entre los recursos
+                //Se busca el transmisor seleccionado entre los recursos
                 foreach (IRdResource rdRs in _RdRs.Values.Where(x => x.isTx))
                 {
                     if (rdRs.Connected)
@@ -3192,18 +3164,117 @@ namespace U5ki.RdService
                             hayTxEnSite = true;
                             txConnected = rdRs;
                         }
-                        else if (!hayTxEnSite && (TxRsDefault != null) && (rdRs == TxRsDefault))
-                        {
-                            hayTxEnSite = true;
-                            txConnected = rdRs;
-                        }
                         else if (!hayTxEnSite)
                             txConnected = rdRs;
                     }
                     if (!rdRs.TxMute) txSelected = rdRs;
+                }                
+
+                if (!hayTxEnSite)
+                {
+                    //Si no hay transmisor en el emplazamiento (site) seleccionado, busco el de mejor Qidx que no este en el seleccionado y tenga transmisor disponible
+                    IRdResource better_receiver = null;
+                    int better_receiver_qidx = 0;
+
+                    if (TxRsDefault != null && TxRsDefault.Connected)
+                    {
+                        //Inicialmente, el mejor receptor es el de por defecto y tomamos su Qidx.
+                        foreach (IRdResource rdRs in _RdRs.Values.Where(x => x.isRx))
+                        {
+                            if (rdRs.Site == TxRsDefault.Site)
+                            {
+                                if (rdRs is RdResourcePair)
+                                {
+                                    (rdRs as RdResourcePair).GetBetterRx(ref better_receiver_qidx);
+                                }
+                                else
+                                {
+                                    better_receiver_qidx = SipAgent.GetRdQidx(TxRsDefault.SipCallId);
+                                    if (better_receiver_qidx < 0)
+                                    {
+                                        better_receiver_qidx = 0;
+                                        better_receiver = null;
+                                    }
+                                    else
+                                    {
+                                        better_receiver = TxRsDefault;
+                                    }
+                                }
+                            }
+                        }                            
+                    }
+
+                    foreach (IRdResource rdRs in _RdRs.Values.Where(x => x.isRx))
+                    {
+                        if (rdRs.Site != _LastSelectedSite && rdRs.Connected)
+                        {
+                            hayTxEnSite = false;
+                            foreach (IRdResource rdTxRs in _RdRs.Values.Where(x => x.isTx))
+                            {
+                                if (rdTxRs.Connected)
+                                {
+                                    if (rdTxRs.Site == rdRs.Site)
+                                    {
+                                        hayTxEnSite = true;
+                                    }
+                                }
+                            }
+
+                            if (hayTxEnSite)
+                            {
+                                RdResource res = null;
+                                int qidx = 0;
+                                if (rdRs is RdResourcePair)
+                                {
+                                    res = (rdRs as RdResourcePair).GetBetterRx(ref qidx);                                    
+                                }
+                                else
+                                {
+                                    qidx = SipAgent.GetRdQidx(rdRs.SipCallId);
+                                    if (qidx < 0)
+                                    {
+                                        qidx = 0;
+                                        res = null;
+                                    }
+                                    else
+                                    {
+                                        res = (RdResource)rdRs;
+                                    }
+                                }
+
+                                if (res != null)
+                                {
+                                    if (better_receiver != null && qidx > better_receiver_qidx)
+                                    {
+                                        better_receiver = res;
+                                        better_receiver_qidx = qidx;
+                                    }
+                                    else if (qidx >= better_receiver_qidx)
+                                    {
+                                        better_receiver = res;
+                                        better_receiver_qidx = qidx;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //Busco el transmisor del emplazamiento del mejor receptor encontrado.
+                    if (better_receiver != null)
+                    {
+                        foreach (IRdResource rdRs in _RdRs.Values.Where(x => x.isTx))
+                        {
+                            if (rdRs.Connected && rdRs.Site == better_receiver.Site)
+                            {
+                                txConnected = rdRs;
+                            }
+                        }
+                    }
                 }
-                if (txSelected == txConnected)
+
+                if (txSelected != null && txSelected == txConnected)
                     return;
+
                 //Deselecciona
                 if (txSelected != null)
                 {
@@ -3264,15 +3335,16 @@ namespace U5ki.RdService
             }
         }
         //Timer for frequency inactivity, i.e. it should never be started if PTT is on
-        private void StartTimerTxDefault()
+        private void StartTimerTxDefault(int forced_interval = 0)
         {
             if (!string.IsNullOrEmpty(PttSrc))
                 return;
             IRdResource TxRsDefault = GetTxRsDefault();
-            if ((_TimeToTxDefault > 0) && (TxRsDefault != null))
+            if ((_TimeToTxDefault > 0 || (_TimeToTxDefault == 0 && forced_interval > 0)) && (TxRsDefault != null))
             {
                 if (TxRsDefault != GetTxRsSelected())
-                {                    
+                {
+                    if (_TimeToTxDefault == 0 && forced_interval > 0) _TimerTxDefault.Interval = forced_interval;
                     if (_TimerTxDefault.Enabled) _TimerTxDefault.Enabled = false;    //Se reinicia
                     _TimerTxDefault.Enabled = true;
                 }
@@ -3285,9 +3357,9 @@ namespace U5ki.RdService
                 _TimerTxDefault.Enabled = false;
         }
 
-        #endregion
+#endregion
 
-        #region Datos para mostrar en WEB para DEBUG
+#region Datos para mostrar en WEB para DEBUG
 
         public object PrivateData
         {
@@ -3333,6 +3405,6 @@ namespace U5ki.RdService
             }
         }
 
-        #endregion
+#endregion
     }
 }

@@ -87,12 +87,12 @@ namespace U5ki.RdService.Helpers
 
 
 
-        public Boolean ResourceSet(RdFrecuency frecuency, String resourceId, String sipUri, RdRsType type, string idEmplazamiento, RdFrecuency.NewRdFrequencyParams confParams, RdResource.NewRdResourceParams newRDRP, bool isMaster) //#3603
+        public Boolean ResourceSet(RdFrecuency frecuency, String resourceId, String sipUri, RdRsType type, bool isTIFX, string idEmplazamiento, RdFrecuency.NewRdFrequencyParams confParams, RdResource.NewRdResourceParams newRDRP, bool isMaster) //#3603
         {
             return ResourceSet(
                 frecuency,
                 sipUri,
-                new RdResource(resourceId, sipUri, type, frecuency.Frecuency, idEmplazamiento, confParams, newRDRP), idEmplazamiento, isMaster); //#3603		
+                new RdResource(resourceId, sipUri, type, isTIFX, frecuency.Frecuency, idEmplazamiento, confParams, newRDRP), idEmplazamiento, isMaster); //#3603		
 
         }
 

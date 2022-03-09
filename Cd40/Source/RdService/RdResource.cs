@@ -135,6 +135,15 @@ namespace U5ki.RdService
 		{
 			get { return _PttId; }
 		}
+
+        /// <summary>
+        /// 
+        /// </summary>
+		public ushort PttId_received_in_rtp
+        {
+            get { return _PttId_received_in_rtp; }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -210,8 +219,10 @@ namespace U5ki.RdService
             }
         }
 
+        private bool ResourceInInTIFXGW = false;        //Si es true indica que este recurso pertenece a una pasarela de Nucleo
 
-		/// <summary>
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
@@ -219,9 +230,9 @@ namespace U5ki.RdService
         /// <param name="type"></param>
         /// <param name="frecuency"></param>
         // JOI FREC_DES
-		//public RdResource(string id, string uri, RdRsType type, string frecuency)
+        //public RdResource(string id, string uri, RdRsType type, string frecuency)
         //public RdResource(string id, string uri, RdRsType type, string frecuency, string site, RdFrecuency.NewRdFrequencyParams confParams = null)
-        public RdResource(string id, string uri, RdRsType type, string frecuency, string site, RdFrecuency.NewRdFrequencyParams confParams = null, RdResource.NewRdResourceParams newRDRP = null) //JOI 201709 NEWRDRP        
+        public RdResource(string id, string uri, RdRsType type, bool isTIFX, string frecuency, string site, RdFrecuency.NewRdFrequencyParams confParams = null, RdResource.NewRdResourceParams newRDRP = null) //JOI 201709 NEWRDRP        
 		// JOI FREC_DES FIN
 		{
 			_Id = id;
@@ -238,6 +249,8 @@ namespace U5ki.RdService
 			
             if (new_params != null)
                _FreqParams = confParams;
+
+            ResourceInInTIFXGW = isTIFX;
 
 			for (_McastPort = Settings.Default.McastPortBegin; _Ports.ContainsKey(_McastPort); _McastPort++) ;
 			_Ports[_McastPort] = this;
@@ -264,6 +277,7 @@ namespace U5ki.RdService
             _Frecuency = frecuency;
             _Site = site;
             _SelectedSite = selected;
+            ResourceInInTIFXGW = false;
 
             for (_McastPort = Settings.Default.McastPortBegin; _Ports.ContainsKey(_McastPort); _McastPort++) ;
             _Ports[_McastPort] = this;
@@ -283,7 +297,7 @@ namespace U5ki.RdService
         /// <param name="uri2"></param>
         /// <param name="type"></param>
         /// <param name="frecuency"></param>
-        public RdResource(string id, string uri1, string uri2, RdRsType type, string frecuency, string site, bool selected, RdFrecuency.NewRdFrequencyParams newFreqParams, CfgRecursoEnlaceExterno rs, bool connect = true)
+        public RdResource(string id, string uri1, string uri2, RdRsType type, bool isTIFX, string frecuency, string site, bool selected, RdFrecuency.NewRdFrequencyParams newFreqParams, CfgRecursoEnlaceExterno rs, bool connect = true)
         {
             _Id = id;
             _Uri1 = seturi(uri1);
@@ -294,6 +308,8 @@ namespace U5ki.RdService
             _SelectedSite = selected;
 
             _FreqParams = newFreqParams;
+
+            ResourceInInTIFXGW = isTIFX;
 
             for (_McastPort = Settings.Default.McastPortBegin; _Ports.ContainsKey(_McastPort); _McastPort++) ;
             _Ports[_McastPort] = this;
@@ -319,6 +335,7 @@ namespace U5ki.RdService
             _Uri1 = seturi(uri1);
             _Type = type;
             _Frecuency = frecuency;
+            ResourceInInTIFXGW = false;
 
             for (_McastPort = Settings.Default.McastPortBegin; _Ports.ContainsKey(_McastPort); _McastPort++) ;
             _Ports[_McastPort] = this;
@@ -377,14 +394,22 @@ namespace U5ki.RdService
 				CORESIP_CallFlags flags = (_Type == RdRsType.Rx ? CORESIP_CallFlags.CORESIP_CALL_RD_RXONLY :
 					                      (_Type == RdRsType.Tx ? CORESIP_CallFlags.CORESIP_CALL_RD_TXONLY : 
                                                                   CORESIP_CallFlags.CORESIP_CALL_NO_FLAGS));
-				
-                //EDU 20170223
+
+
+                uint PorcentajeRSSI = _FreqParams.PorcentajeRSSI;
+                if (ResourceInInTIFXGW)
+                {
+                    //Si el recurso es de pasarela PorcentajeRSSI se fuerza a 0, no tiene sentido que parte lo calcule la pasarela,
+                    //ya que el calculo es igual que el calculado por la Coresip del Nodebox. 
+                    PorcentajeRSSI = 0;
+                }
+
                 _SipCallId = SipAgent.MakeRdCall(null, _LastUri, _Frecuency, flags, Settings.Default.McastIp, _McastPort,
                     _FreqParams.Priority, new_params.zona, _FreqParams.FrequencyType,
                     _FreqParams.CLDCalculateMethod, _FreqParams.BssWindows, _FreqParams.AudioSync,
                     _FreqParams.AudioInBssWindow, _FreqParams.NotUnassignable, _FreqParams.Cld_supervision_time, 
                     ((BssMethods)_FreqParams.MetodosBssOfrecidos).ToString(),
-                    _FreqParams.PorcentajeRSSI);
+                    PorcentajeRSSI);
 
                 if (_SipCallId >= 0)
                     _SipCallSt = CORESIP_CallState.CORESIP_CALL_STATE_CONNECTING;
@@ -454,6 +479,8 @@ namespace U5ki.RdService
 					_Ptt = RdRsPttType.OwnedPtt;
 				}
             //}
+
+            _PttId_received_in_rtp = info.PttId;
 
             return ((oldSquelch != _Squelch) || (oldPtt != _Ptt) || oldSelected != info.rx_selected || 
                 oldQidxValue != info.rx_qidx || info.tx_ptt_mute_changed != 0);
@@ -626,6 +653,12 @@ namespace U5ki.RdService
         /// 
         /// </summary>
 		private ushort _PttId = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+		private ushort _PttId_received_in_rtp = 0;
+
         /// <summary>
         /// 
         /// </summary>
@@ -698,7 +731,7 @@ namespace U5ki.RdService
         }
 
         //Parametros de la frecuencia
-        private RdFrecuency.NewRdFrequencyParams _FreqParams;// = new RdFrecuency.NewRdFrequencyParams();    //EDU 20170223
+        private RdFrecuency.NewRdFrequencyParams _FreqParams;// = new RdFrecuency.NewRdFrequencyParams();    //EDU 20170223        
 
         /// <summary>
         /// 

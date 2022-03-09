@@ -208,7 +208,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Errors.resx" />
+    <EmbeddedResource Include="Resources\Errors.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Messages.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
