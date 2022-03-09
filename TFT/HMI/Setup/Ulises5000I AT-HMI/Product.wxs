@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="*" Name="Ulises5000I Audio Terminal HMI" Language="1033" Version="2.6.0" Manufacturer="NucleoCC" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
+  <Product Id="*" Name="Ulises5000I Audio Terminal HMI" Language="1033" Version="2.6.2" Manufacturer="Grupo Amper" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
 
     <PropertyRef Id="NETFRAMEWORK45"/>
@@ -58,11 +58,11 @@
     <Property Id="PVERSION" Value="2.6.0"></Property>
 
     <!--Propiedades a mantener cuando se reinstala -->
-    <Property Id="ED137REC" Value="0">
+    <!--<Property Id="ED137REC" Value="0">
       <RegistrySearch Id='UV5KI_HMI_ED137REC' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='ED137REC_Property' Type='raw' />
-    </Property>        
+    </Property>-->        
     <Property Id="IAOVER" Value="B43A">
       <RegistrySearch Id='UV5KI_HMI_IAOVER' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
@@ -207,15 +207,15 @@
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
 
     <!-- DLL Custom Actions -->
-    <Binary Id="Ulises5000I_CustomActions" 
-            SourceFile="..\Ulises5000-AT-HMI-CustomActions\bin\$(var.Configuration)\Ulises5000-AT-HMI-CustomActions.CA.dll" />  
+    <!--<Binary Id="Ulises5000I_CustomActions" 
+            SourceFile="..\Ulises5000-AT-HMI-CustomActions\bin\$(var.Configuration)\Ulises5000-AT-HMI-CustomActions.CA.dll" />-->  
 
   </Product>
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="COMPANYFOLDER" Name="NucleoCC">
+        <Directory Id="COMPANYFOLDER" Name="UlisesV5000">
           <Directory Id="INSTALLFOLDER" Name="Ulises5000I-TA">
             <Directory Id="EN" Name="en-GB" />
             <Directory Id="FR" Name="fr-FR" />
@@ -315,11 +315,11 @@
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Presentation.Asecna.Properties.Settings/setting[\[]@name='DirectorioGLP'[\]]/value"
                         Value="[GLPDIR]"/>        
-        <!-- Record ED137 -->
+        <!-- Record ED137 --><!--
         <util:XmlFile Id="RecordingEd137" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/U5ki.Infrastructure.Properties.Settings/setting[\[]@name='RecordingEd137'[\]]/value"
-                        Value="[ED137REC]"/>
+                        Value="[ED137REC]"/>-->
         <!-- Brillo -->
         <util:XmlFile Id="Brillo" Action="setValue"
                         File = "[#HMI.config]"
@@ -791,7 +791,7 @@
       </Component>
       <Component Id="hmi_registry" Guid="{A6E446BE-44BE-4537-9823-BA2E059290D1}" Permanent="yes">
         <RegistryKey Id="hmi_registry_entries" Root="HKLM" Key="SOFTWARE\Wix\UV5KI_HMI" Action="create">
-          <RegistryValue Name='ED137REC_Property' Value='[ED137REC]' Type='string' />
+          <!--<RegistryValue Name='ED137REC_Property' Value='[ED137REC]' Type='string' />-->
           <RegistryValue Name='IAOVER_Property' Value='[IAOVER]' Type='string' />
           <RegistryValue Name='RECMODE_Property' Value='[RECMODE]' Type='string' />
           <RegistryValue Name='GLPDIR_Property' Value='[GLPDIR]' Type='string' />
@@ -933,7 +933,7 @@
         <IniFile Id="ug5krec.config.05" Action="addLine" Directory="ED137B4SERVICE" Name="ug5krec-config.ini" Section="GENERAL" Key="DUAL_RECORDER" Value="[RECDUAL]"/>
       </Component>      
       <Component Id="HMI.GRABADOR.SERVICE.AUT" Guid="{40BF10CE-5E9B-45C2-8864-79A46BFC0C56}">
-        <Condition><![CDATA[ED137REC <> "0"]]></Condition>
+        <!--<Condition><![CDATA[ED137REC <> "0"]]></Condition>-->
         <File Id="ed137_rec_aut" Name="ED137B4WindowsService.exe"></File>
         <ServiceInstall
             Id="GrbEd137InstallerAut"
@@ -957,7 +957,7 @@
         </ServiceInstall>
         <ServiceControl Id="start_ed137rec_aut" Start="install" Stop="both" Remove="uninstall" Name="u5ki.ed137rec.aut" Wait="yes" />      
       </Component>    
-      <Component Id="HMI.GRABADOR.SERVICE.MAN" Guid="{86FEF4AF-565B-4DCF-AF3B-F300C97B3CC7}">        
+      <!--<Component Id="HMI.GRABADOR.SERVICE.MAN" Guid="{86FEF4AF-565B-4DCF-AF3B-F300C97B3CC7}">        
         <Condition><![CDATA[ED137REC = "0"]]></Condition>
         <File Id="ed137_rec_man" Name="ED137B4WindowsService.exe"></File>
         <ServiceInstall
@@ -972,7 +972,7 @@
             ErrorControl="ignore"
             Interactive="no" >
           <ServiceConfig DelayedAutoStart="no" OnInstall="yes"  OnReinstall="yes" OnUninstall="no"></ServiceConfig>
-          <!--<ServiceDependency Id="u5ki.Mcast"/>-->
+          --><!--<ServiceDependency Id="u5ki.Mcast"/>--><!--
           <util:ServiceConfig
                   FirstFailureActionType='restart'
                   SecondFailureActionType='restart'
@@ -981,7 +981,7 @@
                   ResetPeriodInDays='1' />
         </ServiceInstall>
         <ServiceControl Id="start_ed137rec_man" Stop="both" Remove="uninstall" Name="u5ki.ed137rec.man" Wait="yes" />      
-      </Component>
+      </Component>-->
     </ComponentGroup>    
   </Fragment>
   
@@ -1026,7 +1026,8 @@
                   Impersonate='no'
                   ExeCommand='"[INSTALLFOLDER]uv5ki-scripts.cmd" "[COMPANYFOLDER]" "[INSTALLFOLDER]" [PVERSION]'
                   Return='ignore' />
-    <CustomAction Id="CustomActionEd137Rec" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="Ed137RecVar" />
+    
+    <!--<CustomAction Id="CustomActionEd137Rec" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="Ed137RecVar" />-->
    
     <!-- Programacion de las tareas desde un XML -->
     <!--<CustomAction Id="StartHMITaskV2" Return="check" Execute="deferred" Directory="TARGETDIR" Impersonate="no"
@@ -1255,7 +1256,7 @@
         </Control>
 		  <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
         <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
-          <Publish Event="DoAction" Value="CustomActionEd137Rec">1</Publish>
+          <!--<Publish Event="DoAction" Value="CustomActionEd137Rec">1</Publish>-->
         </Control>
         <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)" />
 

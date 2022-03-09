@@ -301,8 +301,10 @@ namespace U5ki.CfgService
             cfg.RtspPort = soapCfg.RtspPort;
 			//RQF22
 			cfg.TipoGrabacionAnalogica = soapCfg.TipoGrabacionAnalogica;
-			cfg.EnableGrabacionEd137 = soapCfg.EnableGrabacionEd137; 
-        }
+			cfg.EnableGrabacionEd137 = soapCfg.EnableGrabacionEd137;
+			cfg.EnableGrabacionAnalogica = soapCfg.EnableGrabacionAnalogica;
+
+		}
         /// <summary>
         /// 
         /// </summary>

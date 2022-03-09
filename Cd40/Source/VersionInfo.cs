@@ -11,9 +11,9 @@ using System.Runtime.InteropServices;
 #else
  [assembly: AssemblyConfiguration("Release")]
 #endif
-[assembly: AssemblyCompany("NucleoCC")]
+[assembly: AssemblyCompany("Grupo Amper")]
 [assembly: AssemblyProduct("Ulises V 5000 I")]
-[assembly: AssemblyCopyright("Copyright © NucleoCC 2016...2020")]
+[assembly: AssemblyCopyright("Copyright © Grupo Amper 2016...2022")]
 [assembly: AssemblyTrademark("Ulises V 5000")]
 [assembly: AssemblyCulture("")]
 
@@ -35,5 +35,5 @@ using System.Runtime.InteropServices;
 // Puede especificar todos los valores o establecer como predeterminados los números de compilación y de revisión 
 // mediante el carácter '*', como se muestra a continuación:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.6.0")]
-[assembly: AssemblyFileVersion("2.6.0")]
+[assembly: AssemblyVersion("2.6.2.002")]
+[assembly: AssemblyFileVersion("2.6.2.002")]

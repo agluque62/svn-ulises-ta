@@ -3,8 +3,8 @@
   <Product
     Id="*"
     Name="Ulises5000I Audio Terminal Utilities"
-    Language="1033" Version="2.6.0"
-    Manufacturer="NucleoCC"
+    Language="1033" Version="2.6.2"
+    Manufacturer="Grupo Amper"
     UpgradeCode="c17a4cae-94cf-4435-ada9-69eaefc872eb">
 
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
@@ -26,18 +26,6 @@
     <Property Id="NBX_FOLDER">
       <RegistrySearch Id="UV5KI_NBX_FOLDER" Root="HKLM" Key='SOFTWARE\Wix\UV5KI_NBX' Name='FOLDER_Property' Type='raw'  />
     </Property>
-
-    <!-- Propiedades de existencia de Ficheros de configuracion -->
-    <!--<Property Id='SPREAD_CONF'>
-      <DirectorySearch Id='SPREAD_CONF_DIR' Path='c:\Program Files\DF Nucleo\Ulises5000I-MCast' Depth='0'>
-        <FileSearch Id='SPREAD_CONF_FILE' Name='spread.conf'/>    
-      </DirectorySearch>
-    </Property>
-    <Property Id='SPREAD' Value='1'></Property>-->
-    <!-- Mensajes de TEST en Propiedades --><!--
-    <Condition Message="Spread.conf: File does exist.">
-      <![CDATA[Installed OR SPREAD_CONF]]>
-    </Condition>-->
     <Property Id='SPREAD' Value='1'></Property>
 
     <!-- Propiedades que se preservan entre instalaciones / actualizaciones -->
@@ -124,7 +112,7 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="COMPANYFOLDER" Name="NucleoCC">
+        <Directory Id="COMPANYFOLDER" Name="UlisesV5000">
           <Directory Id="U5ki.MCast.INSTALLFOLDER" Name="Ulises5000I-MCast"/>
           <Directory Id="U5ki.NodeBox.INSTALLFOLDER" Name="Ulises5000I-NodeBox">
             <Component Id="CreateProgramFolder" Guid="{2718F974-886C-49BB-8C4E-B7282AB16A14}">
@@ -346,7 +334,7 @@
         <!--NeverOverwrite='yes' Permanent='yes'>-->
         <File Id='NodeBox_nlog_config' Name='nlog.config'/>
       </Component>
-      <Component Id='nucleo_df_logo' Guid='{49DD15C9-593C-42B2-BFD3-5066C740381B}'>
+      <!--<Component Id='nucleo_df_logo' Guid='{49DD15C9-593C-42B2-BFD3-5066C740381B}'>
         <File Id='nucleo.df.new' Name='nucleo-df-new.jpg'/>
       </Component>
       <Component Id='nucleocss_style' Guid='{36A52454-3F33-4E61-83F4-376EF48EFABE}'>
@@ -354,7 +342,7 @@
       </Component>
       <Component Id='nucleo.favicon' Guid='{A7B9ABA5-3942-4E19-93CE-1CBE45826096}'>
         <File Id='favicon' Name='favicon.ico'/>
-      </Component>
+      </Component>-->
       <Component Id="NodeBox_AutInstall" Guid="{1FF09F92-B731-4767-979F-690001574B8B}">
         <Condition><![CDATA[NBOX_AUT = "True"]]></Condition>
         <File Id="nbx_aut" Name="U5ki.NodeBox.exe">

@@ -490,7 +490,6 @@ namespace CoreSipNet
         public const int SIP_DECLINE = 603;
         public const int SIP_UNWANTED = 607;
 
-        //private static string UG5K_REC_CONF_FILE = "ug5krec-config.ini";
         #region Dll Interface
 
         public const int CORESIP_MAX_USER_ID_LENGTH = 100;

@@ -903,6 +903,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 CreateChildrenObjects();                
             }
             CreateOperatorsData();
+            //RQF-22
+            CheckCfgAnalogica();
+
             General.SafeLaunchEvent(ConfigChanged, this);
         }
         /// <summary>
@@ -1295,6 +1298,110 @@ namespace HMI.CD40.Module.BusinessEntities
             return hostId[0];
         }
 
-		#endregion
-	}
+        //RQF-22
+        public static string GetSeccionClave(string seccion, string clave, string fullRecorderFileName)
+        {
+            uint result = 0;
+            //String fullRecorderFileName = Settings.Default.RecorderServicePath + "\\" + SipAgent.UG5K_REC_CONF_FILE;
+            StringBuilder retorno = new StringBuilder(50);
+            try
+            {
+                result = Native.Kernel32.GetPrivateProfileString(seccion, clave, "", retorno, 50, fullRecorderFileName);
+            }
+            catch (Exception exc)
+            {
+                //_Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
+            }
+            //_Logger.Debug("Leyendo fichero {1} :{0}", retorno, fullRecorderFileName);
+            if (result != 1)
+            {
+                //_Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
+            }
+
+            return retorno.ToString();
+        }
+
+
+        // RQF-22
+        private static string UG5K_REC_ANALOGIC_FILE = "ug5krec-analogic.ini";
+        public static void LoadGrabacionAnalogica()
+        {
+            String fullRecorderAnalogicaFileName = ".\\" + UG5K_REC_ANALOGIC_FILE;
+            int TipoGrabacionAnalogica = int.Parse(GetSeccionClave("GrabacionAnalogica", "TipoGrabacionAnalogica", fullRecorderAnalogicaFileName));
+            bool EnableGrabacionAnalogica = bool.Parse(GetSeccionClave("GrabacionAnalogica", "EnableGrabacionAnalogica", fullRecorderAnalogicaFileName));
+
+        }
+
+        public static bool PictGrabacionAnalogicaCfg(int TipoGrabacionAnalogica, bool EnableGrabacionAnalogica)
+        {
+            bool result = false;
+            bool changes = false;
+
+            String fullRecorderAnalogicaFileName = ".\\" + UG5K_REC_ANALOGIC_FILE;
+            // Actualizar el fichero INI que maneja el módudo de grabación Analogica
+            try
+            {
+                int tipograbacionanalogica = 0;
+                bool enablegrabacionanalogica = false;
+                string retorno;
+                retorno = GetSeccionClave("GrabacionAnalogica", "TipoGrabacionAnalogica", fullRecorderAnalogicaFileName);
+                if (retorno.Length > 0)
+                {
+                    tipograbacionanalogica = int.Parse(GetSeccionClave("GrabacionAnalogica", "TipoGrabacionAnalogica", fullRecorderAnalogicaFileName));
+                }
+                else
+                {
+                    Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "TipoGrabacionAnalogica ", TipoGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
+                    Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "EnableGrabacionAnalogica ", EnableGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
+                }
+                enablegrabacionanalogica = bool.Parse(GetSeccionClave("GrabacionAnalogica", "EnableGrabacionAnalogica", fullRecorderAnalogicaFileName));
+                if (tipograbacionanalogica != TipoGrabacionAnalogica ||
+                        enablegrabacionanalogica != EnableGrabacionAnalogica)
+                    changes = true;
+
+                //RQF22
+                result |= Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "TipoGrabacionAnalogica ", TipoGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
+                result |= Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "EnableGrabacionAnalogica ", EnableGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
+            }
+            catch (Exception /*exc*/)
+            {
+                //_Logger.Error("Error leyendo/escribiendo fichero UG5K_REC_ANALOGICA_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
+            }
+            if (result == false)
+            {
+                //_Logger.Error("Error escribiendo fichero UG5K_REC_ANALOGICA_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
+            }
+            if (changes == true)
+            {
+                // Notificar al módulo de propio de grabación analogica que ha cambiado la configuración.
+                {
+                    // TODO LALM, lo notifica el llamante.
+                }
+                _Logger.Debug("Notificado al módulo de grabación analogica Tipo:{0},Enable:{1}", TipoGrabacionAnalogica, EnableGrabacionAnalogica);
+            }
+            return changes;
+        }
+
+        //RQF-22
+        void CheckCfgAnalogica()
+        {
+            AsignacionUsuariosTV tv = Top.Cfg.GetUserTv(Top.Cfg.MainId);
+            bool changes = PictGrabacionAnalogicaCfg(tv.TipoGrabacionAnalogica, tv.EnableGrabacionAnalogica);
+
+            //RQF-22
+            if (changes)//comento para pruebas
+            {
+                Top.WorkingThread.Enqueue("TipoGrabacionAnalogica", delegate ()
+                {
+                    Top.Mixer.SetTipoGrabacionAnalogica(tv.TipoGrabacionAnalogica);
+                    Top.Mixer.SetGrabacionAnalogica(tv.TipoGrabacionAnalogica,tv.EnableGrabacionAnalogica);
+                    //Top.Mixer.Init();
+                    //Top.Mixer.Start();
+                });
+
+            }
+        }
+
+        #endregion
+    }
 }

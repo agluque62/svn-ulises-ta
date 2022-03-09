@@ -170,74 +170,196 @@ namespace HMI.CD40.Module.BusinessEntities
         public int TipoGrabacionAnalogica
         {
 
-            get { return _TipoGrabacionAnalogica; }
+            get
+            {
+                if (_TipoGrabacionAnalogica == 3)
+                    load();
+                return _TipoGrabacionAnalogica;
+            }
             set { _TipoGrabacionAnalogica = value; }
+        }
+        private static string UG5K_REC_ANALOGIC_FILE = "ug5krec-analogic.ini";
+        public void LoadTipoGrabacionAnalogica()
+        {
+            String fullRecorderFileName = ".\\" + UG5K_REC_ANALOGIC_FILE;
+            StringBuilder retorno = new StringBuilder(50);
+            string seccion = "GrabacionAnalogica";
+            string clave = "TipoGrabacionAnalogica";
+            try
+            {
+                Native.Kernel32.GetPrivateProfileString(seccion, clave, "", retorno, 50, fullRecorderFileName);
+                TipoGrabacionAnalogica = int.Parse(retorno.ToString());
+            }
+            catch
+            {
+                TipoGrabacionAnalogica = 0;
+            }
+        }
+
+        public void LoadEnableGrabacionAnalogica()
+        {
+            String fullRecorderFileName = ".\\" + UG5K_REC_ANALOGIC_FILE;
+            StringBuilder retorno = new StringBuilder(50);
+            string seccion = "GrabacionAnalogica";
+            string clave = "EnableGrabacionAnalogica";
+            try
+            {
+                Native.Kernel32.GetPrivateProfileString(seccion, clave, "", retorno, 50, fullRecorderFileName);
+                EnableGrabacionAnalogica = bool.Parse(retorno.ToString());
+            }
+            catch
+            {
+                EnableGrabacionAnalogica = false;
+            }
+        }
+
+        public void load() {
+            LoadEnableGrabacionAnalogica();
+            LoadTipoGrabacionAnalogica();
         }
         private bool _EnableGrabacionAnalogica = false;
         public bool EnableGrabacionAnalogica
         {
 
-            get { return _EnableGrabacionAnalogica; }
+            get {
+                if (_TipoGrabacionAnalogica == 3)
+                    load();
+                return _EnableGrabacionAnalogica; 
+            }
             set { _EnableGrabacionAnalogica = value; }
+        }
+
+        public void RecordModeDisable()
+        {
+            /** Retornos de Grabacion */
+            _InstructorRecorderDevIn = -1;
+            _AlumnRecorderDevIn = -1;
+            _RadioRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input);
+            _LcRecorderDevIn = -1;
+            _RadioHfRecorderIn = -1;
+
+            /** Salidas de Grabacion. */
+            _IntRecorderDevOut = -1;
+            _AlumnRecorderDevOut = -1;
+            _InstructorRecorderDevOut = -1;
+            _IntRecorderDevOut = -1;
+        }
+
+        public void RecordModeHw()
+        {
+            /** Retornos de Grabacion */
+            _InstructorRecorderDevInHw = (_InstructorRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input) : _InstructorRecorderDevInHw;
+            _AlumnRecorderDevInHw = (_AlumnRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input) : _AlumnRecorderDevInHw;
+            _RadioRecorderDevInHw = (_RadioRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input) : _RadioRecorderDevInHw;
+            _LcRecorderDevInHw = (_LcRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input) : _LcRecorderDevInHw;
+            _RadioHfRecorderInHw = (_RadioHfRecorderInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, CMediaDevMode.Input) : _RadioHfRecorderInHw;
+            //_RadioHfRecorderInHw = -1;
+
+            /** Salidas de Grabacion. */
+            _IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output) : _IntRecorderDevOutHw;
+            _AlumnRecorderDevOutHw = (_AlumnRecorderDevOutHw == -1) ? _InstructorRecorderDevOut = _IntRecorderDevOut : _AlumnRecorderDevOutHw;
+
+            if (Settings.Default.CMediaBkpVersion == "B41A")
+            {
+                // BKP_VERSION_B41A
+                _InstructorRecorderDevOutHw = (_InstructorRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output) : _InstructorRecorderDevOutHw;
+                //No es compatible la grabación analogica de telefona por altavoz con este hw
+            }
+            else
+            {
+                // BKP_VERSION_B43A
+                _InstructorRecorderDevOutHw = (_InstructorRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Output) : _InstructorRecorderDevOutHw;
+                _IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output) : _IntRecorderDevOutHw;
+            }
         }
 
         //#3267 RQF22
         public void RecordMode0()
         {
             /** Retornos de Grabacion */
-            _InstructorRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input);
-            _AlumnRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input);
-            _RadioRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input);
-            _LcRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input);
-            _RadioHfRecorderIn = -1;
+            _InstructorRecorderDevInHw = (_InstructorRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input): _InstructorRecorderDevInHw;
+            _AlumnRecorderDevInHw = (_AlumnRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input): _AlumnRecorderDevInHw;
+            _RadioRecorderDevInHw = (_RadioRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input) : _RadioRecorderDevInHw;
+            _LcRecorderDevInHw = (_LcRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input): _LcRecorderDevInHw;
+            //_RadioHfRecorderInHw = -1;
 
             /** Salidas de Grabacion. */
-            _IntRecorderDevOut = -1;
-            _AlumnRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Output);
+            _IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? - 1:-1;
+            _AlumnRecorderDevOutHw = (_AlumnRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Output): _AlumnRecorderDevOutHw;
+
+            _InstructorRecorderDevIn = _InstructorRecorderDevInHw;
+            _AlumnRecorderDevIn = _AlumnRecorderDevInHw;
+            _RadioRecorderDevIn = -1;
+            _LcRecorderDevIn = _LcRecorderDevInHw;
+            _RadioHfRecorderIn = -1;
+            _IntRecorderDevOut = _IntRecorderDevOutHw;
+            _AlumnRecorderDevOut = _AlumnRecorderDevOutHw;
+
             if (Settings.Default.CMediaBkpVersion == "B41A")
             {
                 // BKP_VERSION_B41A
-                _InstructorRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output);
+                _InstructorRecorderDevOutHw = (_InstructorRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output): _InstructorRecorderDevOutHw;
                 //No es compatible la grabación analogica de telefona por altavoz con este hw
+                _InstructorRecorderDevOut = _InstructorRecorderDevOutHw;
             }
             else
             {
                 // BKP_VERSION_B43A
-                _InstructorRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Output);
-                _IntRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output);
-            }
+                _InstructorRecorderDevOutHw = (_InstructorRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Output): _InstructorRecorderDevOutHw;
+                _IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output): _IntRecorderDevOutHw;
 
+                _InstructorRecorderDevOut = _InstructorRecorderDevOutHw;
+                _IntRecorderDevOut = _IntRecorderDevOutHw;
+            }
         }
 
         //#3267 RQF22
         public void RecordMode1()
         {
             /** Retornos de Grabacion */
-            _InstructorRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input);
-            _AlumnRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input);
-            _RadioRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input);
-            _LcRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input);
-            _RadioHfRecorderIn = -1;
+            _InstructorRecorderDevInHw = (_InstructorRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input): _InstructorRecorderDevInHw;
+            _AlumnRecorderDevInHw = (_AlumnRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input): _AlumnRecorderDevInHw;
+            _RadioRecorderDevInHw = (_RadioRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input): _RadioRecorderDevInHw;
+            _LcRecorderDevInHw = (_LcRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input): _LcRecorderDevInHw;
+            //_RadioHfRecorderInHw = -1;
+
+            _InstructorRecorderDevIn = _InstructorRecorderDevInHw;
+            _AlumnRecorderDevIn = _AlumnRecorderDevInHw;
+            _RadioRecorderDevIn = _RadioRecorderDevInHw;
+            _LcRecorderDevIn = _LcRecorderDevInHw;
+            _RadioHfRecorderIn = _RadioHfRecorderInHw;
 
             /** Salidas de Grabacion. */
-            _IntRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output);
-            _AlumnRecorderDevOut = _InstructorRecorderDevOut = _IntRecorderDevOut;
+            _IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output): _IntRecorderDevOutHw;
+            _AlumnRecorderDevOutHw = (_AlumnRecorderDevOutHw == -1) ? _InstructorRecorderDevOut = _IntRecorderDevOut: _AlumnRecorderDevOutHw;
+
+            _IntRecorderDevOut = _IntRecorderDevOutHw;
+            _AlumnRecorderDevOut = _AlumnRecorderDevOutHw;
         }
 
         //#3267 RQF22
         public void RecordMode2()
         {
             /** Retornos de Grabacion */
-            _InstructorRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input);
-            _AlumnRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input);
-            _RadioRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input);
-            _LcRecorderDevIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input);
-            _RadioHfRecorderIn = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, CMediaDevMode.Input); ;
+            _InstructorRecorderDevInHw = (_InstructorRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input): _InstructorRecorderDevInHw;
+            _AlumnRecorderDevInHw = (_AlumnRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input): _AlumnRecorderDevInHw;
+            _RadioRecorderDevInHw = (_RadioRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input): _RadioRecorderDevInHw;
+            _LcRecorderDevInHw = (_LcRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input): _LcRecorderDevInHw;
+            _RadioHfRecorderInHw = (_RadioHfRecorderInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, CMediaDevMode.Input) : _RadioHfRecorderInHw;
 
             /** Salidas de Grabacion. */
-            _IntRecorderDevOut = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output);
-            _AlumnRecorderDevOut = _InstructorRecorderDevOut = _IntRecorderDevOut;
+            _IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output): _IntRecorderDevOutHw;
+            _AlumnRecorderDevOutHw = (_AlumnRecorderDevOutHw == -1) ? _InstructorRecorderDevOut = _IntRecorderDevOut: _AlumnRecorderDevOutHw;
 
+            _InstructorRecorderDevIn = _InstructorRecorderDevInHw;
+            _AlumnRecorderDevIn = _AlumnRecorderDevInHw;
+            _RadioRecorderDevIn = _RadioRecorderDevInHw;
+            _LcRecorderDevIn = _LcRecorderDevInHw;
+            _RadioHfRecorderIn = _RadioHfRecorderInHw;
+
+            /** Salidas de Grabacion. */
+            _IntRecorderDevOut = _IntRecorderDevOutHw;
+            _AlumnRecorderDevOut = _AlumnRecorderDevOutHw;
         }
 
         //#3267 RQF22
@@ -253,6 +375,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 _HfSpeakerDev = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, CMediaDevMode.Output);
             else
                 _HfSpeakerDev = -1;
+
         }
 
         /// <summary>
@@ -316,6 +439,10 @@ namespace HMI.CD40.Module.BusinessEntities
                 else if (EnableGrabacionAnalogica)/* if (Settings.Default.RecordMode == 0) */   // Por defecto será ENAIRE...
                 {
                     RecordMode0();
+                }
+                else
+                {
+                    RecordModeHw();
                 }
             }
             else if (tipoAudio == eAudioDeviceTypes.MICRONAS)    // IAU-MICRONAS. 
@@ -1513,7 +1640,20 @@ namespace HMI.CD40.Module.BusinessEntities
         private int _AlumnRecorderDevOut = -1;
         private int _InstructorRecorderDevOut = -1;
         private int _IntRecorderDevOut = -1;
-		
+
+        /** Dispositivos HW de Retorno de Grabacion */
+        private int _AlumnRecorderDevInHw = -1;
+        private int _InstructorRecorderDevInHw = -1;
+        private int _RadioRecorderDevInHw = -1;
+        private int _LcRecorderDevInHw = -1;
+        private int _RadioHfRecorderInHw = -1;
+
+        /** Dispositivos HW de Salida de Grabacion */
+        private int _AlumnRecorderDevOutHw = -1;
+        private int _InstructorRecorderDevOutHw = -1;
+        private int _IntRecorderDevOutHw = -1;
+
+
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
 
         private Timer _UnlinkGlpRadioTimer = new Timer(100);
@@ -2220,36 +2360,56 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         //#3267 RQF22
-        public void SetTipoGrabacionAnalogica(int tipoGrabacionAnalogica)
+        public bool SetTipoGrabacionAnalogica(int tipoGrabacionAnalogica)
         {
-            switch (TipoGrabacionAnalogica)
+            bool change = tipoGrabacionAnalogica != TipoGrabacionAnalogica;
+            if (change)
             {
-                case 1:
-                    TipoGrabacionAnalogica = tipoGrabacionAnalogica;
-                    break;
-                case 2:
-                    TipoGrabacionAnalogica = tipoGrabacionAnalogica;
-                    break;
-                default:
-                    TipoGrabacionAnalogica = tipoGrabacionAnalogica;
-                    break;
+                End();
+                switch (tipoGrabacionAnalogica)
+                {
+                    case 1:
+                        TipoGrabacionAnalogica = tipoGrabacionAnalogica;
+                        break;
+                    case 2:
+                        TipoGrabacionAnalogica = tipoGrabacionAnalogica;
+                        break;
+                    default:
+                        TipoGrabacionAnalogica = tipoGrabacionAnalogica;
+                        break;
+                }
             }
+            return change;
         }
 
         //#3267 RQF22
-        public void SetGrabacionAnalogica(int tipoGrabacionAnalogica)
+        public void SetGrabacionAnalogica(int tipoGrabacionAnalogica, bool enable)
         {
-            switch (TipoGrabacionAnalogica)
+            eAudioDeviceTypes tipoAudio = HwManager.AudioDeviceType;
+            if (tipoAudio == eAudioDeviceTypes.CMEDIA)    // IAU-CMEDIA
             {
-                case 1:
-                    RecordMode1();
-                    break;
-                case 2:
-                    RecordMode2();
-                    break;
-                default:
-                    RecordMode0();
-                    break;
+                if (enable)
+                {
+                    switch (TipoGrabacionAnalogica)
+                    {
+                        case 1:
+                            RecordMode1();
+                            break;
+                        case 2:
+                            RecordMode2();
+                            break;
+                        default:
+                            RecordMode0();
+                            break;
+                    }
+                    Start();
+                }
+                else
+                {
+                    End();
+                    RecordModeHw();
+                    //RecordModeDisable(); No es necesario.
+                }
             }
         }
     }

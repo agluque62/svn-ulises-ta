@@ -385,20 +385,20 @@ namespace U5ki.Infrastructure
     /// </summary>
 	public enum CORESIP_SndDevType
 	{
-		CORESIP_SND_INSTRUCTOR_MHP,
-		CORESIP_SND_ALUMN_MHP,
-		CORESIP_SND_MAX_IN_DEVICES,
-		CORESIP_SND_MAIN_SPEAKERS = CORESIP_SND_MAX_IN_DEVICES,
-		CORESIP_SND_LC_SPEAKER,
-		CORESIP_SND_RD_SPEAKER,
-		CORESIP_SND_INSTRUCTOR_RECORDER,
-		CORESIP_SND_ALUMN_RECORDER,
-		CORESIP_SND_RADIO_RECORDER,
-		CORESIP_SND_LC_RECORDER,
-        CORESIP_SND_HF_SPEAKER,
-        CORESIP_SND_HF_RECORDER,
-		CORESIP_SND_UNKNOWN
-	}
+        CORESIP_SND_INSTRUCTOR_MHP, //La aplicacion crea 2. El In es la entrada de microfono, Out es la salida del altavoz
+        CORESIP_SND_ALUMN_MHP, //La aplicacion crea 2. El In es la entrada de microfono, Out es la salida del altavoz
+        CORESIP_SND_MAX_IN_DEVICES,
+        CORESIP_SND_MAIN_SPEAKERS = CORESIP_SND_MAX_IN_DEVICES,
+        CORESIP_SND_LC_SPEAKER, //La aplicacion crea 2. In Es la linea de retorno del altavoz LC. Out es la salida
+        CORESIP_SND_RD_SPEAKER, //La aplicacion crea 2. In Es la linea de retorno del altavoz RD. Out es la salida
+        CORESIP_SND_INSTRUCTOR_RECORDER, //La aplicacion crea 2 (in o out). El In es el retorno del altavoz del instructor y el out es el del grabador analogico
+        CORESIP_SND_ALUMN_RECORDER, //La aplicacion crea 2 (in o out). El In es el retorno del altavoz del alumno y el Out es el del grabador analogico
+        CORESIP_SND_RADIO_RECORDER, //La aplicacion crea solo 1. Que es el Out al grabador analogico
+        CORESIP_SND_LC_RECORDER, //La aplicacion crea solo 1. Que es el Out al grabador analogico
+        CORESIP_SND_HF_SPEAKER, //La aplicacion crea 2. In Es la linea de retorno del altavoz HF. Out es la salida
+        CORESIP_SND_HF_RECORDER, //Es la linea Out hacia el grabador analogico
+        CORESIP_SND_UNKNOWN
+    }
 
     //EDU 20170223
     public enum CORESIP_FREQUENCY_TYPE { Simple = 0, Dual = 1, FD = 2, ME = 3 }         // 0. Normal, 1: 1+1, 2: FD, 3: EM
@@ -880,7 +880,6 @@ namespace U5ki.Infrastructure
         public const int WG67Reason_KATimeout = 2001;
 
         private static string UG5K_REC_CONF_FILE = "ug5krec-config.ini";
-        private static string UG5K_REC_ANALOGIC_FILE = "ug5krec-analogic.ini";
         #region Dll Interface
 
         public const int CORESIP_MAX_USER_ID_LENGTH = 100;
@@ -3277,56 +3276,7 @@ namespace U5ki.Infrastructure
                 {
                     throw new Exception(err.Info);
                 }
-                _Logger.Debug("Notificado al módulo de grabación reinicio {0}");
-            }
-        }
-
-        public static void PictGrabacionAnalogicaCfg(int TipoGrabacionAnalogica, bool EnableGrabacionAnalogica)
-        {
-            bool result = false;
-            bool changes = false;
-
-            String fullRecorderAnalogicaFileName = ".\\" + SipAgent.UG5K_REC_ANALOGIC_FILE;
-            // Actualizar el fichero INI que maneja el módudo de grabación Analogica
-            try
-            {
-                int tipograbacionanalogica=0;
-                bool enablegrabacionanalogica = false;
-                string retorno;
-                retorno = GetSeccionClave("GrabacionAnalogica", "TipoGrabacionAnalogica", fullRecorderAnalogicaFileName);
-                if (retorno.Length > 0)
-                {
-                    tipograbacionanalogica = int.Parse(GetSeccionClave("GrabacionAnalogica", "TipoGrabacionAnalogica", fullRecorderAnalogicaFileName));
-                }
-                else
-                {
-                    Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "TipoGrabacionAnalogica ", TipoGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
-                    Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "EnableGrabacionAnalogica ", EnableGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
-                }
-                enablegrabacionanalogica = bool.Parse(GetSeccionClave("GrabacionAnalogica", "EnableGrabacionAnalogica", fullRecorderAnalogicaFileName));
-                if (tipograbacionanalogica != TipoGrabacionAnalogica ||
-                        enablegrabacionanalogica != EnableGrabacionAnalogica)
-                    changes = true;
-
-                //RQF22
-                result |= Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "TipoGrabacionAnalogica ", TipoGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
-                result |= Native.Kernel32.WritePrivateProfileString("GrabacionAnalogica ", "EnableGrabacionAnalogica ", EnableGrabacionAnalogica.ToString(), fullRecorderAnalogicaFileName);
-                }
-                catch (Exception exc)
-                {
-                    _Logger.Error("Error leyendo/escribiendo fichero UG5K_REC_ANALOGICA_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
-                }
-            if (result == false)
-            {
-                _Logger.Error("Error escribiendo fichero UG5K_REC_ANALOGICA_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
-            }
-            if (changes == true)
-            {
-                // Notificar al módulo de propio de grabación analogica que ha cambiado la configuración.
-                {
-                    // TODO LALM
-                }
-                _Logger.Debug("Notificado al módulo de grabación analogica ");
+                _Logger.Debug("Notificado al módulo de GrabaciónEd137 {0}",EnableGrabacionED137);
             }
         }
 
@@ -3339,7 +3289,7 @@ namespace U5ki.Infrastructure
             StringBuilder sGrabaciónED137 = new StringBuilder(10);
             try
             {
-                result = Native.Kernel32.GetPrivateProfileString("RTSP", "EnableGrabacionED137 ", "", sGrabaciónED137, 10, fullRecorderFileName);
+                result = Native.Kernel32.GetPrivateProfileString("RTSP", "EnableGrabacionED137", "", sGrabaciónED137, 10, fullRecorderFileName);
             }
             catch (Exception exc)
             {

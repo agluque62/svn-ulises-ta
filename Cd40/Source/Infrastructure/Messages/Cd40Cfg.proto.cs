@@ -501,7 +501,7 @@ namespace U5ki.Infrastructure
     }
 
     private bool _EnableGrabacionAnalogica = false;
-    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name = @"EnableGrabacionAnalogica", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name = @"EnableGrabacionAnalogica", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool EnableGrabacionAnalogica
     {

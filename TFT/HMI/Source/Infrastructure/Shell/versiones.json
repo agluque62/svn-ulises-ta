@@ -1,7 +1,7 @@
 {
 	"Server": "SERV01",
-	"Version" : "2.5.9.7a",
-	"Fecha": "18-12-2019",
+	"Version" : "2.6.2.(sp2)",
+	"Fecha": "28-01-2022",
 	"Components" : [
 		{
 			"Name": "UV5K-HMI Terminal de Audio",
