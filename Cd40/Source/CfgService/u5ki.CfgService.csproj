@@ -151,10 +151,10 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="http://192.168.2.3/nucleodf/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx">
+    <WebReferenceUrl Include="http://192.168.1.4/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\SoapCfg\</RelPath>
-      <UpdateFromURL>http://192.168.2.3/nucleodf/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx</UpdateFromURL>
+      <UpdateFromURL>http://192.168.1.4/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

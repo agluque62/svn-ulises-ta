@@ -340,29 +340,31 @@ message CfgRecursoEnlaceExterno
 message CfgEnlaceExterno
 {
 	optional string Literal = 1;
-	repeated uint32 ListaPosicionesEnHmi = 2;
-	optional Tipo_Frecuencia TipoFrecuencia = 3;
-	optional bool ExclusividadTxRx = 4;
-	repeated CfgRecursoEnlaceExterno ListaRecursos = 5;
-	optional string EstadoAsignacion = 6;
-	repeated string DestinoAudio = 7;
-	optional uint32 Prioridad = 8;
-	optional bool SupervisionPortadora = 9;
-	optional int32 FrecuenciaSintonizada = 10;
-	optional int32 MetodoCalculoClimax = 11;
-	optional int32 VentanaSeleccionBss = 12;
-	optional bool SincronizaGrupoClimax = 13;
-	optional bool AudioPrimerSqBss = 14;
-	optional bool FrecuenciaNoDesasignable = 15;
-	optional int32 VentanaReposoZonaTxDefecto = 16;
-	optional int32 PrioridadSesionSip = 17;
-	optional int32 CldSupervisionTime = 18;
-	optional int32 MetodosBssOfrecidos = 19;
-	optional string Alias = 20;
-	optional Tipo_ModoTransmision ModoTransmision = 21;
-    optional string EmplazamientoDefecto = 22;
-	optional int32 TiempoVueltaADefecto = 23;
-	optional uint32 PorcentajeRSSI = 24;
+	optional string Alias = 2;
+	optional string DescDestino = 3;
+	repeated uint32 ListaPosicionesEnHmi = 4;
+	optional Tipo_Frecuencia TipoFrecuencia = 5;
+	optional bool ExclusividadTxRx = 6;
+	repeated CfgRecursoEnlaceExterno ListaRecursos = 7;
+	optional string EstadoAsignacion = 8;
+	repeated string DestinoAudio = 9;
+	optional uint32 Prioridad = 10;
+	optional bool SupervisionPortadora = 11;
+	optional int32 FrecuenciaSintonizada = 12;
+	optional int32 MetodoCalculoClimax = 13;
+	optional int32 VentanaSeleccionBss = 14;
+	optional bool SincronizaGrupoClimax = 15;
+	optional bool AudioPrimerSqBss = 16;
+	optional bool FrecuenciaNoDesasignable = 17;
+	optional int32 VentanaReposoZonaTxDefecto = 18;
+	optional string NombreZonaTxDefecto = 19;
+	optional int32 PrioridadSesionSip = 20;
+	optional int32 CldSupervisionTime = 21;
+	optional int32 MetodosBssOfrecidos = 22;	
+	optional Tipo_ModoTransmision ModoTransmision = 23;
+    optional string EmplazamientoDefecto = 24;
+	optional int32 TiempoVueltaADefecto = 25;
+	optional uint32 PorcentajeRSSI = 26;
 }
 
 message CfgRecursoEnlaceInterno

@@ -148,13 +148,13 @@ namespace U5ki.RdService
 
                     case CORESIP_FREQUENCY_TYPE.ME:
                     case CORESIP_FREQUENCY_TYPE.Dual:
-                        LogInfo<RdService>("FD Status. Frequency ID: " + this.Frecuency + ". Status: " + RdSrvFrRs.FrequencyStatusType.NotAvailable,
+                        LogInfo<RdService>("FD Status. IdDestino " + this.IdDestino + " Frequency ID: " + this.Frecuency + ". Status: " + RdSrvFrRs.FrequencyStatusType.NotAvailable,
                                 U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR, "RdService",
                                 CTranslate.translateResource("Frequency type not implemented. Frequency ID: " + this.Frecuency + ". Type: " +
                                     new_params.FrequencyType.ToString()));
                         break;
                     default:
-                        LogInfo<RdService>("FD Status. Frequency ID: " + this.Frecuency + ". Status: " + RdSrvFrRs.FrequencyStatusType.NotAvailable,
+                        LogInfo<RdService>("FD Status. IdDestino " + this.IdDestino + " Frequency ID: " + this.Frecuency + ". Status: " + RdSrvFrRs.FrequencyStatusType.NotAvailable,
                                 U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR, "RdService",
                                 CTranslate.translateResource("Unknow frequency type. Frequency ID: " + this.Frecuency + ". Type: " +
                                     new_params.FrequencyType.ToString()));
@@ -200,6 +200,13 @@ namespace U5ki.RdService
         /// <summary>
         /// 
         /// </summary>
+        public string IdDestino
+        {
+            get { return _IdDestino; }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
         public string Frecuency
         {
             get { return _Frecuency; }
@@ -234,8 +241,9 @@ namespace U5ki.RdService
         /// 
         /// </summary>
         /// <param name="fr"></param>
-        public RdFrecuency(string fr)
+        public RdFrecuency(string idDestino, string fr)
         {
+            _IdDestino = idDestino;
             _Frecuency = fr;
 
             _RtxSquelchTimer = new Timer(TIME_DELAY_TO_RTX)
@@ -321,7 +329,7 @@ namespace U5ki.RdService
         /// </summary>
         public void Reset(ConfiguracionSistema sysCfg, CfgEnlaceExterno cfg, Dictionary<string, bool> selectedRs)
         {
-            Debug.Assert(cfg.Literal == _Frecuency);
+            Debug.Assert(cfg.Literal == _IdDestino);
 
             // Actualización de los nuevos parámetros de la frecuencia a partir de los recibidos en cfg.
             bool hayCambiosEnFrecuencia = ResetNewParams(cfg);
@@ -355,10 +363,10 @@ namespace U5ki.RdService
                     RdResourcePair foundPair = newPairs.FirstOrDefault(x => x.ID.Equals(rsCfg.RedundanciaIdPareja));
                     string[] rdUri = RsUri(rsCfg.IdRecurso, sysCfg);
                     
-                    RdResource res = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), cfg.Literal, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg, false);
+                    RdResource res = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), _IdDestino, _Frecuency, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg, false);
                     if (foundPair == null)
                     {
-                        foundPair = new RdResourcePair(rsCfg.RedundanciaIdPareja, _Frecuency);
+                        foundPair = new RdResourcePair(rsCfg.RedundanciaIdPareja, _IdDestino, _Frecuency);
                         newPairs.Add(foundPair);
                     }
 
@@ -429,7 +437,7 @@ namespace U5ki.RdService
                     LogInfo<RdFrecuency>(
                         msg,
                         U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
-                        _Frecuency,
+                        _IdDestino, _Frecuency,
                         CTranslate.translateResource(msg));
                 }
 
@@ -515,7 +523,7 @@ namespace U5ki.RdService
                                     rdRs.Dispose();
                                     bool isReplacedMNTemp = rdRs.ReplacedMN;
                                     bool isMasterMNTemp = rdRs.MasterMN;
-                                    rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), cfg.Literal, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313                            }
+                                    rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), _IdDestino, _Frecuency, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313                            }
                                     rdRs.ReplacedMN = isReplacedMNTemp;
                                     rdRs.MasterMN = isMasterMNTemp;//#3603
                                 }
@@ -529,7 +537,7 @@ namespace U5ki.RdService
                             }
                             else
                             {
-                                rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), cfg.Literal, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313
+                                rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), _IdDestino, _Frecuency, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313
                                 if ((cfg.TipoFrecuencia == Tipo_Frecuencia.FD) && (cfg.ModoTransmision == Tipo_ModoTransmision.UltimoReceptor))
                                     rdRs.TxMute = true;
                             }
@@ -600,7 +608,7 @@ namespace U5ki.RdService
             }
             
             if (_FrRs != null)
-                RdRegistry.Publish(_Frecuency, _FrRs);
+                RdRegistry.Publish(_IdDestino, _FrRs);
             ConfiguraModoTransmision(cfg);
         }
 
@@ -624,7 +632,7 @@ namespace U5ki.RdService
 
                     if (responseAddr != null)
                     {
-                        RdRegistry.RespondToFrRxChange(responseAddr, _Frecuency, true);
+                        RdRegistry.RespondToFrRxChange(responseAddr, _IdDestino, true);
                     }
                 }
                 else if (index >= 0)
@@ -671,7 +679,7 @@ namespace U5ki.RdService
 
                     if (responseAddr != null)
                     {
-                        RdRegistry.RespondToFrTxChange(responseAddr, _Frecuency, tx);
+                        RdRegistry.RespondToFrTxChange(responseAddr, _IdDestino, tx);
                     }
                 }
                 else if (index >= 0)
@@ -683,7 +691,7 @@ namespace U5ki.RdService
                     {
                         _CurrentPttSemaphore.WaitOne();
                         _SrcPtts.Remove(pttInfo);
-                        LogTrace<RdFrecuency>(_Frecuency + " SetTX:Remove " + pttInfo.SrcId + ",srcPtts.Count " + _SrcPtts.Count.ToString());
+                        LogTrace<RdFrecuency>("IdDestino " + _IdDestino + " Frequency " + _Frecuency + " SetTX:Remove " + pttInfo.SrcId + ",srcPtts.Count " + _SrcPtts.Count.ToString());
 
                         if ((_CurrentSrcPtt != null) && (_CurrentSrcPtt.SrcId == pttInfo.SrcId))
                         {
@@ -703,7 +711,7 @@ namespace U5ki.RdService
 
                     if (changed)
                     {
-                        RdRegistry.Publish(_Frecuency, _FrRs);
+                        RdRegistry.Publish(_IdDestino, _FrRs);
                     }
                 }
             }
@@ -711,7 +719,7 @@ namespace U5ki.RdService
 
         public void ReceivePtt(string topId, PttSource srcType, IEnumerable<int> srcPorts)
         {
-            LogTrace<RdFrecuency>(_Frecuency + " ReceivePtt topID " + topId + ",srcType " + srcType.ToString());
+            LogTrace<RdFrecuency>("IdDestino " + _IdDestino + " Frequency " + _Frecuency + " ReceivePtt topID " + topId + ",srcType " + srcType.ToString());
             if (_FrRs != null)
             {
 
@@ -730,7 +738,7 @@ namespace U5ki.RdService
                     {
                         _CurrentPttSemaphore.WaitOne();
                         _SrcPtts.Remove(pttInfo);
-                        LogTrace<RdFrecuency>(_Frecuency + " ReceivePtt:Remove " + pttInfo.SrcId + ",srcPtts.Count " + _SrcPtts.Count.ToString());
+                        LogTrace<RdFrecuency>("IdDestino " + _IdDestino + " Frequency " + _Frecuency + " ReceivePtt:Remove " + pttInfo.SrcId + ",srcPtts.Count " + _SrcPtts.Count.ToString());
 
                         if ((_CurrentSrcPtt != null) && (_CurrentSrcPtt.SrcId == pttInfo.SrcId))
                         {
@@ -755,9 +763,9 @@ namespace U5ki.RdService
                     {
                         pttInfo = new PttInfo(topId);
                         _SrcPtts.Add(pttInfo);
-                        LogTrace<RdFrecuency>(_Frecuency + " ReceivePtt:Add " + pttInfo.SrcId + ",srcPtts.Count " + _SrcPtts.Count.ToString());
+                        LogTrace<RdFrecuency>("IdDestino " + _IdDestino + " Frequency " + _Frecuency + " ReceivePtt:Add " + pttInfo.SrcId + ",srcPtts.Count " + _SrcPtts.Count.ToString());
                     }
-                    LogTrace<RdFrecuency>(_Frecuency + " set pttType " + pttType.ToString());
+                    LogTrace<RdFrecuency>("IdDestino " + _IdDestino + " Frequency " + _Frecuency + " set pttType " + pttType.ToString());
 
                     if (pttInfo.Reset(srcType, pttType, srcPorts))
                     {
@@ -765,7 +773,7 @@ namespace U5ki.RdService
                         /* Suponemos todos los PTT son del mismo tipo-> No es necesaria una ordenación */
                         // JCAM. 20170316. Ahora sí es necesaria una ordenación
 
-                        LogTrace<RdFrecuency>(_Frecuency + " ReceivePtt:Sort " + ",srcPtts.Count " + _SrcPtts.Count.ToString() + " primero: " + _SrcPtts[0].SrcId);
+                        LogTrace<RdFrecuency>("IdDestino " + _IdDestino + " Frequency " + _Frecuency + " ReceivePtt:Sort " + ",srcPtts.Count " + _SrcPtts.Count.ToString() + " primero: " + _SrcPtts[0].SrcId);
                         _SrcPtts.Sort(delegate (PttInfo x, PttInfo y)
                         {
                             if (x.Type == CORESIP_PttType.CORESIP_PTT_COUPLING)
@@ -796,7 +804,7 @@ namespace U5ki.RdService
                 // el estado ptt de la frecuencia
                 if (changed || ((pttInfo != null) && (pttInfo.SrcType != PttSource.Avion)))
                 {
-                    RdRegistry.Publish(_Frecuency, _FrRs);
+                    RdRegistry.Publish(_IdDestino, _FrRs);
                 }
 
             }
@@ -893,7 +901,7 @@ namespace U5ki.RdService
                     _FrRs.FrequencyStatus = this.Status;
                     if (_FrRs.FrequencyStatus != StatusCheck)
                     {
-                        RdRegistry.Publish(_Frecuency, _FrRs);
+                        RdRegistry.Publish(_IdDestino, _FrRs);
                     }
                 }
                 catch (Exception x)
@@ -908,12 +916,12 @@ namespace U5ki.RdService
         /// </summary>
         public void PublishChanges(object timer)
         {
-            LogTrace<RdFrecuency>(_Frecuency + " PublishChanges ");
+            LogTrace<RdFrecuency>("IdDestino " + _IdDestino + " Frequency " + _Frecuency + " PublishChanges ");
             if (_FrRs != null)
             {
                 if (timer == _PostPtt)
                 {
-                    RdRegistry.EnablePublish(_Frecuency, true);
+                    RdRegistry.EnablePublish(_IdDestino, true);
 
                     _PostPtt.Enabled = false;
                     _PostPtt.Dispose();
@@ -931,7 +939,7 @@ namespace U5ki.RdService
 
         public void Publish()
         {
-            RdRegistry.Publish(_Frecuency, _FrRs);
+            RdRegistry.Publish(_IdDestino, _FrRs);
         }
         /// <summary>
         /// 20170126. AGL. Retorno el RdResource, para poder identificar al recurso en los historicos de Sesiones SIP.
@@ -1204,7 +1212,7 @@ namespace U5ki.RdService
                             }
                             else if (rdRs.Ptt == RdRsPttType.ExternalPtt)
                             {
-                                _FrRs.PttSrcId = _Frecuency + "ExternalPtt";
+                                _FrRs.PttSrcId = _IdDestino + "ExternalPtt";
 
                                 if (_WaitingForSuperviser != null)
                                 {
@@ -1252,7 +1260,7 @@ namespace U5ki.RdService
                                     }
                                     else
                                     {
-                                        _FrRs.PttSrcId = _Frecuency + "ExternalPtt";
+                                        _FrRs.PttSrcId = _IdDestino + "ExternalPtt";
 
                                         foreach (RdResource rdRs_Tx in SipTxCalls().Values)
                                         {
@@ -1328,7 +1336,7 @@ namespace U5ki.RdService
                                     if ((_CurrentSrcPtt == null) && (_PostPtt != null) &&
                                         (_FrRs.Squelch == RdSrvFrRs.SquelchType.NoSquelch))
                                     {
-                                        RdRegistry.EnablePublish(_Frecuency, false);
+                                        RdRegistry.EnablePublish(_IdDestino, false);
 
                                         _PostPtt.Enabled = false;
                                         _PostPtt.Dispose();
@@ -1351,7 +1359,7 @@ namespace U5ki.RdService
                                                 ", qidx method: " + _FrRs.QidxMethod +
                                                 ", Ptt: " + rdRs.Ptt +
                                                 ", Squelch: " + rdRs.Squelch);
-                        RdRegistry.Publish(_Frecuency, _FrRs);
+                        RdRegistry.Publish(_IdDestino, _FrRs);
                     }
                     if (changed)
                     {
@@ -1478,7 +1486,7 @@ namespace U5ki.RdService
                         //Esto provoca que salte el aviso acustico de falsa maniobra,
                         //lo comentamos porque se ha elegido de momento el cambio dinámico de TX
                         //    _FrRs.PttSrcId = "ERROR"; ;
-                        //    RdRegistry.Publish(_Frecuency, _FrRs);
+                        //    RdRegistry.Publish(_IdDestino, _FrRs);
                     }
                     _TxIDSelected = TxRsDefault.ID;
                     _LastSelectedSite = TxRsDefault.Site;
@@ -1566,7 +1574,7 @@ namespace U5ki.RdService
                                     _PttTypes.Clear();
                                     _TxIds.Clear();
 
-                                    RdRegistry.Publish(_Frecuency, frRs);
+                                    RdRegistry.Publish(_IdDestino, frRs);
 
                                     frRs.PttSrcId = string.Empty;
                                     break;
@@ -1614,7 +1622,7 @@ namespace U5ki.RdService
                         if (publish == true || _PublishFreqChanges == true)
                         {
                             _PublishFreqChanges = false;
-                            RdRegistry.PublishStatusFr(_Frecuency, _FrRs);
+                            RdRegistry.PublishStatusFr(_IdDestino, _FrRs);
                         }
                         /** */
                         rdResOut = rdRs;
@@ -1672,7 +1680,7 @@ namespace U5ki.RdService
                 {
                     _FrRs.FrequencyStatus = st;
 
-                    LogTrace<RdService>("FD Status. Frequency ID: " + this.Frecuency + ". Status: " + st,
+                    LogTrace<RdService>("FD Status. IdDestino " + this.IdDestino + " Frequency ID: " + this.Frecuency + ". Status: " + st,
                                 U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "RdService", CTranslate.translateResource("FD Status. Frequency ID: " + this.Frecuency, st.ToString()));
                     hayCambio = true;
                     LogTrace<RdService>("ActualizaFrecuenciaConRecurso FrRs: " + _FrRs.ResourceId + " cambia:" + hayCambio + " St:" + _FrRs.FrequencyStatus);
@@ -1787,10 +1795,49 @@ namespace U5ki.RdService
             List<RdFrecuency> rtxGroupRdFr = new List<RdFrecuency>();
             List<RdFrecuency> rdFrToRemove = new List<RdFrecuency>();
             List<RdFrecuency> actualRtxGroupRdFr;
+            List<RdFrecuency> prevFrequenciesSquAvion = new List<RdFrecuency>();
+            List<RdFrecuency> currentFrequenciesSquAvion = new List<RdFrecuency>();
 
             if (_RtxGroups.TryGetValue(rtxGroupOwner.ToUpper() + rtxGroupId, out actualRtxGroupRdFr))
             {
                 rdFrToRemove.AddRange(actualRtxGroupRdFr);
+
+                //Buscamos las frecuencias que ya tienen squelch de avion
+                foreach (RdFrecuency rdFr in actualRtxGroupRdFr)
+                {
+                    if (rdFr._FrRs.Squelch != RdSrvFrRs.SquelchType.NoSquelch)
+                    {
+                        //Comprobamos si el squelch es de avion
+                        bool squelch_de_avion = true;
+                        foreach (IRdResource rdrs in rdFr.RdRs.Values.Where(r => r.isRx))
+                        {
+                            if (rdrs is RdResourcePair)
+                            {
+                                RdResourcePair rs = rdrs as RdResourcePair;
+                                if (rs.ActiveResource.Ptt != RdRsPttType.NoPtt && rs.ActiveResource.new_params.rx_selected)
+                                {
+                                    squelch_de_avion = false;
+                                }
+                                else if (rs.StandbyResource.Ptt != RdRsPttType.NoPtt && rs.StandbyResource.new_params.rx_selected)
+                                {
+                                    squelch_de_avion = false;
+                                }
+                            }
+                            else
+                            {
+                                RdResource rs = rdrs as RdResource;
+                                if (rs.Ptt != RdRsPttType.NoPtt && rs.new_params.rx_selected)
+                                {
+                                    squelch_de_avion = false;
+                                }
+                            }
+                        }
+                        if (squelch_de_avion)
+                        {
+                            prevFrequenciesSquAvion.Add(rdFr);
+                        }
+                    }
+                }
             }
 
             foreach (RdFrecuency rdFr in wantedRtxGroupRdFr)
@@ -1813,14 +1860,63 @@ namespace U5ki.RdService
                     foreach (RdFrecuency rdFr in rtxGroupRdFr)
                     {
                         if (rdFr._FrRs.Squelch != RdSrvFrRs.SquelchType.NoSquelch)
-                            frInSquelch = rdFr;
+                        {
+                            //Comprobamos si el squelch es de avion
+                            bool squelch_de_avion = true;
+                            foreach (IRdResource rdrs in rdFr.RdRs.Values.Where(r => r.isRx))
+                            {
+                                if (rdrs is RdResourcePair)
+                                {
+                                    RdResourcePair rs = rdrs as RdResourcePair;
+                                    if (rs.ActiveResource.Ptt != RdRsPttType.NoPtt && rs.ActiveResource.new_params.rx_selected)
+                                    {
+                                        squelch_de_avion = false;
+                                    }
+                                    else if (rs.StandbyResource.Ptt != RdRsPttType.NoPtt && rs.StandbyResource.new_params.rx_selected)
+                                    {
+                                        squelch_de_avion = false;
+                                    }
+                                }
+                                else
+                                {                                    
+                                    RdResource rs = rdrs as RdResource;
+                                    if (rs.Ptt != RdRsPttType.NoPtt && rs.new_params.rx_selected)
+                                    {
+                                        squelch_de_avion = false;
+                                    }
+                                }
+                            }
+                            if (!squelch_de_avion)
+                            {
+                                rdFr.AddToRtxGroup(rtxGroupId, rtxGroupOwner);
+                            }
+                            else
+                            {
+                                if (prevFrequenciesSquAvion.Contains(rdFr))
+                                {
+                                    //La frecuencia ya estaba incluida en el grupoy sera con la que nos quedemos
+                                    frInSquelch = rdFr;
+                                }
+                                else if (prevFrequenciesSquAvion.Count == 0)
+                                {
+                                    //Es nueva y no habia otra ya en el grupo asi es que sera esta la activa
+                                    if (frInSquelch == null) frInSquelch = rdFr;
+                                }
+                                currentFrequenciesSquAvion.Add(rdFr);
+                            }
+                        }
                         else
                             rdFr.AddToRtxGroup(rtxGroupId, rtxGroupOwner);
                     }
                     // La frecuencia que está con squelch será la última que se añada al grupo
                     // para que al enviar el PTT estemos seguros que hay más de una frecuencia en el grupo
-                    if (frInSquelch != null)
+                    foreach (RdFrecuency rdFr in currentFrequenciesSquAvion)
                     {
+                        bool no_SendPttToRtxGroup = true;
+                        if (rdFr != frInSquelch) rdFr.AddToRtxGroup(rtxGroupId, rtxGroupOwner, no_SendPttToRtxGroup);
+                    }
+                    if (frInSquelch != null)
+                    {                        
                         frInSquelch.AddToRtxGroup(rtxGroupId, rtxGroupOwner);
                     }
                 }
@@ -1847,7 +1943,8 @@ namespace U5ki.RdService
             bool hayCambios = existingRdRs.Type != newRdRs.Type ||
                   existingRdRs.Uri1.Equals(newRdRs.Uri1) == false ||
                   existingRdRs.Uri2.Equals(newRdRs.Uri2) == false ||
-                  existingRdRs.Frecuency != newRdRs.Frecuency;
+                  existingRdRs.Frecuency != newRdRs.Frecuency ||
+                  existingRdRs.IdDestino != newRdRs.IdDestino;
            return !hayCambios;
         }
         /// <summary>
@@ -1913,8 +2010,8 @@ namespace U5ki.RdService
                 {
                     Picts[item.Key] = idResource;
                 }
-                RdRegistry.Publish(_Frecuency, _FrRs);
-                RdRegistry.RespondToChangingSite(null, _Frecuency, alias, 1);
+                RdRegistry.Publish(_IdDestino, _FrRs);
+                RdRegistry.RespondToChangingSite(null, _IdDestino, alias, 1);
             }
 
             return changed;
@@ -1932,7 +2029,7 @@ namespace U5ki.RdService
                 if (rdRs.Connected)
                 {
                     rdRs.SelectedSite = false;
-                    if (frequency == this._Frecuency && rdRs.Site == alias)
+                    if (frequency == this._IdDestino && rdRs.Site == alias)
                     {
                         changed = rdRs.SelectedSite = rdRs.OldSelected = true;
                         _FrRs.SqSite = rdRs.Site;
@@ -1945,7 +2042,7 @@ namespace U5ki.RdService
             if (changed)
             {
                 Picts[hostId] = idResource;
-                RdRegistry.Publish(_Frecuency, _FrRs);
+                RdRegistry.Publish(_IdDestino, _FrRs);
             }
             else
             {
@@ -2102,7 +2199,11 @@ namespace U5ki.RdService
         /// <summary>
         /// 
         /// </summary>
-        private string _Frecuency = null;
+        private string _IdDestino = null;       //Es el identificador del destino radio.
+        /// <summary>
+        /// 
+        /// </summary>
+        private string _Frecuency = null;       //Corresponde al literal del destino, tradicionalmente es la frecuencia
         /// <summary>
         /// 
         /// </summary>
@@ -2480,7 +2581,7 @@ namespace U5ki.RdService
             {
                 if ((_FrRs != null) && !HasSIPSession())
                 {
-                    LogDebug<RdFrecuency>("Enviando ASPAS temporizada en " + Frecuency);
+                    LogDebug<RdFrecuency>("Enviando ASPAS temporizada en IdDestino " + IdDestino + " freq " + Frecuency);
                     Reset(true);
                 }
             }
@@ -2525,11 +2626,11 @@ namespace U5ki.RdService
         /// </summary>
         /// <param name="rtxGroupId"></param>
         /// <param name="rtxGroupOwner"></param>
-        private void AddToRtxGroup(uint rtxGroupId, string rtxGroupOwner)
+        private void AddToRtxGroup(uint rtxGroupId, string rtxGroupOwner, bool no_SendPttToRtxGroup = false)
         {
             Debug.Assert(_FrRs != null);
             Debug.Assert((_FrRs.RtxGroupId == 0) || ((_FrRs.RtxGroupId == rtxGroupId) && (_FrRs.RtxGroupOwner == rtxGroupOwner)));
-            LogTrace<RdFrecuency>(_Frecuency + " AddToRtxGroup id " + rtxGroupId.ToString());
+            LogTrace<RdFrecuency>("IdDestino" + _IdDestino + "Frequency" + _Frecuency + " AddToRtxGroup id " + rtxGroupId.ToString());
 
             if (_FrRs.RtxGroupId == 0)
             {
@@ -2546,7 +2647,7 @@ namespace U5ki.RdService
                 }
 
                 rtxGroupRdFr.Add(this);
-                RdRegistry.Publish(_Frecuency, _FrRs);
+                RdRegistry.Publish(_IdDestino, _FrRs);
 
                 if (_FrRs.RtxGroupId > 0 && _RtxGroups[owner].Count > 1)
                 {
@@ -2554,13 +2655,13 @@ namespace U5ki.RdService
                         ((_CurrentSrcPtt == null) || (_CurrentSrcPtt.SrcId != _FrRs.PttSrcId)) &&
                         (_PostPtt == null))
                     {
-                        SendPttToRtxGroup(true, false);
+                        if (no_SendPttToRtxGroup == false) SendPttToRtxGroup(true, false);
                     }
                 }
             }
             else if (_SendingPttToRtxGroup)
             {
-                SendPttToRtxGroup(true, true);
+                if (no_SendPttToRtxGroup == false) SendPttToRtxGroup(true, true);
             }
         }
 
@@ -2569,7 +2670,7 @@ namespace U5ki.RdService
         /// </summary>
         private void RemoveFromRtxGroup(bool publish)
         {
-            LogTrace<RdFrecuency>(_Frecuency + " RemoveFromRtxGroup ");
+            LogTrace<RdFrecuency>("IdDestino" + _IdDestino + "Frequency" + _Frecuency + " RemoveFromRtxGroup ");
             if ((_FrRs != null) && (_FrRs.RtxGroupId > 0))
             {
                 string owner = _FrRs.RtxGroupOwner.ToUpper() + _FrRs.RtxGroupId;
@@ -2593,7 +2694,7 @@ namespace U5ki.RdService
                 {
                     _CurrentPttSemaphore.WaitOne();
                     _SrcPtts.Remove(pttInfo);
-                    LogTrace<RdFrecuency>(_Frecuency + "RemoveFromRtxGroup:Remove " + pttInfo.SrcId + ",srcPtts.Count " + _SrcPtts.Count.ToString());
+                    LogTrace<RdFrecuency>("IdDestino" + _IdDestino + "Frequency" + _Frecuency + "RemoveFromRtxGroup:Remove " + pttInfo.SrcId + ",srcPtts.Count " + _SrcPtts.Count.ToString());
                     if ((_CurrentSrcPtt != null) && (_CurrentSrcPtt.SrcType == PttSource.Avion))
                     {
                         NextPtt();
@@ -2616,7 +2717,7 @@ namespace U5ki.RdService
 
                 if (publish)
                 {
-                    RdRegistry.Publish(_Frecuency, _FrRs);
+                    RdRegistry.Publish(_IdDestino, _FrRs);
                 }
             }
         }
@@ -2636,7 +2737,7 @@ namespace U5ki.RdService
                 //Al receptor del mismo emplazamiento y frecuencia se le envia el mismo PTT off que al tx
                 foreach (IRdResource rdRes in RdRs.Values.Where(x => x.Connected))
                 {
-                    LogTrace<RdFrecuency>("PttOff_1 " + Frecuency + ",srcPtts.Count " + _SrcPtts.Count.ToString());
+                    LogTrace<RdFrecuency>("PttOff_1 IdDestino " + IdDestino + ",freq " + Frecuency + ",srcPtts.Count " + _SrcPtts.Count.ToString());
                     rdRes.PttOff();
                 }
 
@@ -2661,7 +2762,7 @@ namespace U5ki.RdService
                     // Todos los recursos asociados a la frecuencia en transmisión hacen PTT
                     //EDU 08/06/2017
                     //Al receptor del mismo emplazamiento y frecuencia se le envia el PTT type
-                    LogTrace<RdFrecuency>("PttOn_1 " + Frecuency + "," + _CurrentSrcPtt.Type.ToString() + ",srcPtts.Count " + _SrcPtts.Count.ToString());
+                    LogTrace<RdFrecuency>("PttOn_1 IdDestino " + IdDestino + ",freq " + Frecuency + "," + _CurrentSrcPtt.Type.ToString() + ",srcPtts.Count " + _SrcPtts.Count.ToString());
                     rdRes.PttOn(_CurrentSrcPtt.Type);
 
                     if (rdRes.isTx)
@@ -2688,7 +2789,7 @@ namespace U5ki.RdService
 
                 if (!changed)
                 {
-                    RdRegistry.DisablePublish(_Frecuency);
+                    RdRegistry.DisablePublish(_IdDestino);
 
                     _PostPtt = new Timer(_CurrentSrcPtt != null ? 200 : 750);
                     _PostPtt.AutoReset = false;
@@ -2775,7 +2876,7 @@ namespace U5ki.RdService
             lock (_RtxGroups)
             {
                 List<RdFrecuency> rtxGroupFr = _RtxGroups[_FrRs.RtxGroupOwner.ToUpper() + _FrRs.RtxGroupId];
-                LogTrace<RdFrecuency>(_Frecuency + " SendPttToRtxGroup on " + pttOn.ToString() + ",force " + force.ToString() +
+                LogTrace<RdFrecuency>("IdDestino" + _IdDestino + "Frequency" + _Frecuency + " SendPttToRtxGroup on " + pttOn.ToString() + ",force " + force.ToString() +
                     " RtxGr " + _RtxGroups.Count().ToString() + "_sendingPtt:" + _SendingPttToRtxGroup.ToString());
 
                 if (pttOn && (!_SendingPttToRtxGroup || force))
@@ -2793,7 +2894,7 @@ namespace U5ki.RdService
                         {
                             if (rdFr != this)
                             {
-                                rdFr.ReceivePtt("Rtx_" + _FrRs.RtxGroupId + "_" + _Frecuency, PttSource.Avion, SipRxCalls_with_rx_selected().Keys);
+                                rdFr.ReceivePtt("Rtx_" + _FrRs.RtxGroupId + "_" + _IdDestino, PttSource.Avion, SipRxCalls_with_rx_selected().Keys);
                             }
                         }
                     }
@@ -2804,7 +2905,7 @@ namespace U5ki.RdService
                     {
                         if (rdFr != this)
                         {
-                            rdFr.ReceivePtt("Rtx_" + _FrRs.RtxGroupId + "_" + _Frecuency, PttSource.Avion, SipRxCalls_with_rx_selected().Keys);
+                            rdFr.ReceivePtt("Rtx_" + _FrRs.RtxGroupId + "_" + _IdDestino, PttSource.Avion, SipRxCalls_with_rx_selected().Keys);
                         }
                     }
                 }
@@ -2818,7 +2919,7 @@ namespace U5ki.RdService
                     {
                         if (rdFr != this)
                         {
-                            rdFr.ReceivePtt("Rtx_" + _FrRs.RtxGroupId + "_" + _Frecuency, PttSource.NoPtt, null);
+                            rdFr.ReceivePtt("Rtx_" + _FrRs.RtxGroupId + "_" + _IdDestino, PttSource.NoPtt, null);
                         }
                     }
                 }
@@ -2887,14 +2988,14 @@ namespace U5ki.RdService
 
                 _CurrentSrcPtt = null;
 
-                LogTrace<RdFrecuency>(_Frecuency + "Reset:Clear " + " srcPtts.Count " + _SrcPtts.Count.ToString());
+                LogTrace<RdFrecuency>("IdDestino" + _IdDestino + "Frequency" + _Frecuency + "Reset:Clear " + " srcPtts.Count " + _SrcPtts.Count.ToString());
                 _SrcPtts.Clear();
                 _PttTypes.Clear();
                 _RxIds.Clear();
                 _TxIds.Clear();
                 _FrRs = null;
 
-                RdRegistry.Publish(_Frecuency, null);
+                RdRegistry.Publish(_IdDestino, null);
                 _CurrentPttSemaphore.Release();
             }
         }
@@ -2914,7 +3015,7 @@ namespace U5ki.RdService
                 _flag = false;
 
                 Reset(false);
-                LogInfo<RdFrecuency>("ASPAS enviadas en " + Frecuency);
+                LogInfo<RdFrecuency>("ASPAS enviadas en IdDestino " + IdDestino + " freq " + Frecuency);
             });
         }
 
@@ -2926,7 +3027,7 @@ namespace U5ki.RdService
         /// <param name="e"></param>
         private void OnTimerSuperviser(object sender, ElapsedEventArgs e)
         {
-            LogTrace<RdFrecuency>(_Frecuency + " OnTimerSuperviser ");
+            LogTrace<RdFrecuency>("IdDestino" + _IdDestino + "Frequency" + _Frecuency + " OnTimerSuperviser ");
             SendPttToRtxGroup(false, false);
 
             _WaitingForSuperviser.Enabled = false;
@@ -2935,7 +3036,7 @@ namespace U5ki.RdService
 
             _FrRs.PttSrcId = "NO_CARRIER";
 
-            RdRegistry.Publish(_Frecuency, _FrRs);
+            RdRegistry.Publish(_IdDestino, _FrRs);
         }
 
         /// <summary>
@@ -2978,7 +3079,7 @@ namespace U5ki.RdService
 
             if (_PostPtt != null)
             {
-                RdRegistry.EnablePublish(_Frecuency, false);
+                RdRegistry.EnablePublish(_IdDestino, false);
 
                 _PostPtt.Enabled = false;
                 _PostPtt.Dispose();
@@ -3040,9 +3141,9 @@ namespace U5ki.RdService
         private void SendLogNewStatus(RdSrvFrRs.FrequencyStatusType oldStatus)
         {
             if (oldStatus != _Status)
-                LogDebug<RdService>("FS Status. Frequency ID: " + this.Frecuency + ". Status: " + _Status,
+                LogDebug<RdService>("FS Status. IdDestino " + IdDestino + " Frequency ID: " + this.Frecuency + ". Status: " + _Status,
                 U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "RdService",
-                CTranslate.translateResource("FS Status. Frequency ID: " + this.Frecuency + " Status: " + _Status.ToString()));
+                CTranslate.translateResource("FS Status. IdDestino " + IdDestino + " Frequency ID: " + this.Frecuency + " Status: " + _Status.ToString()));
         }
 
         /// <summary>
@@ -3290,7 +3391,7 @@ namespace U5ki.RdService
                             //Esto provoca que salte el aviso acustico de falsa maniobra,
                             //lo comentamos porque se ha elegido de momento el cambio dinámico de TX
                             //    _FrRs.PttSrcId = "ERROR"; ;
-                            //    RdRegistry.Publish(_Frecuency, _FrRs);
+                            //    RdRegistry.Publish(_IdDestino, _FrRs);
                         }
                         LogDebug<RdFrecuency>(String.Format("tx deseleccionado por caida {0}", txSelected.Site));
                         txSelected = null;

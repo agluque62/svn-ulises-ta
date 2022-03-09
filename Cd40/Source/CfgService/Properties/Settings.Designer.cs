@@ -12,7 +12,7 @@ namespace U5ki.CfgService.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -46,7 +46,7 @@ namespace U5ki.CfgService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10.12.60.35")]
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.0.211")]
         public string MCastItf4Config {
             get {
                 return ((string)(this["MCastItf4Config"]));
@@ -56,7 +56,7 @@ namespace U5ki.CfgService.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://10.12.60.35/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfi" +
+        [global::System.Configuration.DefaultSettingValueAttribute("http://192.168.1.4/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfi" +
             "guracion.asmx")]
         public string Cd40_CfgService_SoapCfg_InterfazSOAPConfiguracion {
             get {

@@ -490,6 +490,8 @@ namespace U5ki.CfgService
 		public static void Translate(CfgEnlaceExterno cfg, SoapCfg.CfgEnlaceExterno soapCfg)
 		{
 			cfg.Literal = soapCfg.Literal ?? "";
+			cfg.Alias = soapCfg.AliasEnlace ?? "NoAlias";
+			cfg.DescDestino = soapCfg.DescDestino ?? "";
 			cfg.TipoFrecuencia = (Tipo_Frecuencia)soapCfg.TipoFrecuencia;
 			cfg.ExclusividadTxRx = soapCfg.ExclusividadTxRx;
 			cfg.EstadoAsignacion = soapCfg.EstadoAsignacion ?? "";
@@ -529,9 +531,7 @@ namespace U5ki.CfgService
 					Translate(i, soapi);
 					cfg.ListaRecursos.Add(i);
 				}
-			}
-            /** 20180321. Rellenar con ALIAS cuando venga en Configuracion */
-            cfg.Alias = soapCfg.AliasEnlace ?? "NoAlias";
+			}            
             cfg.EmplazamientoDefecto = "";
             cfg.TiempoVueltaADefecto = 0;
             if (soapCfg.ModoTransmision == null)

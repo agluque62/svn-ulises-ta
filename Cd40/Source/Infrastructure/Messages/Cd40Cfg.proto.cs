@@ -821,15 +821,6 @@ namespace U5ki.Infrastructure
       get { return _KeepAliveMultiplier; }
       set { _KeepAliveMultiplier = value; }
     }
-
-    //private bool _GrabacionEd137 = default(bool);
-    //[global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"GrabacionEd137", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    //[global::System.ComponentModel.DefaultValue(default(bool))]
-    //public bool GrabacionEd137
-    //{
-    //  get { return _GrabacionEd137; }
-    //  set { _GrabacionEd137 = value; }
-    //}
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1391,8 +1382,26 @@ namespace U5ki.Infrastructure
       get { return _Literal; }
       set { _Literal = value; }
     }
+
+    private string _Alias = "";
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"Alias", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string Alias
+    {
+      get { return _Alias; }
+      set { _Alias = value; }
+    }
+
+    private string _DescDestino = "";
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"DescDestino", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string DescDestino
+    {
+      get { return _DescDestino; }
+      set { _DescDestino = value; }
+    }
     private readonly global::System.Collections.Generic.List<uint> _ListaPosicionesEnHmi = new global::System.Collections.Generic.List<uint>();
-    [global::ProtoBuf.ProtoMember(2, Name=@"ListaPosicionesEnHmi", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(4, Name=@"ListaPosicionesEnHmi", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public global::System.Collections.Generic.List<uint> ListaPosicionesEnHmi
     {
       get { return _ListaPosicionesEnHmi; }
@@ -1400,7 +1409,7 @@ namespace U5ki.Infrastructure
   
 
     private U5ki.Infrastructure.Tipo_Frecuencia _TipoFrecuencia = U5ki.Infrastructure.Tipo_Frecuencia.Basica;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"TipoFrecuencia", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"TipoFrecuencia", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(U5ki.Infrastructure.Tipo_Frecuencia.Basica)]
     public U5ki.Infrastructure.Tipo_Frecuencia TipoFrecuencia
     {
@@ -1409,7 +1418,7 @@ namespace U5ki.Infrastructure
     }
 
     private bool _ExclusividadTxRx = default(bool);
-    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"ExclusividadTxRx", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"ExclusividadTxRx", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool ExclusividadTxRx
     {
@@ -1417,7 +1426,7 @@ namespace U5ki.Infrastructure
       set { _ExclusividadTxRx = value; }
     }
     private readonly global::System.Collections.Generic.List<U5ki.Infrastructure.CfgRecursoEnlaceExterno> _ListaRecursos = new global::System.Collections.Generic.List<U5ki.Infrastructure.CfgRecursoEnlaceExterno>();
-    [global::ProtoBuf.ProtoMember(5, Name=@"ListaRecursos", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(7, Name=@"ListaRecursos", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<U5ki.Infrastructure.CfgRecursoEnlaceExterno> ListaRecursos
     {
       get { return _ListaRecursos; }
@@ -1425,7 +1434,7 @@ namespace U5ki.Infrastructure
   
 
     private string _EstadoAsignacion = "";
-    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"EstadoAsignacion", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"EstadoAsignacion", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
     public string EstadoAsignacion
     {
@@ -1433,7 +1442,7 @@ namespace U5ki.Infrastructure
       set { _EstadoAsignacion = value; }
     }
     private readonly global::System.Collections.Generic.List<string> _DestinoAudio = new global::System.Collections.Generic.List<string>();
-    [global::ProtoBuf.ProtoMember(7, Name=@"DestinoAudio", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(9, Name=@"DestinoAudio", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<string> DestinoAudio
     {
       get { return _DestinoAudio; }
@@ -1441,7 +1450,7 @@ namespace U5ki.Infrastructure
   
 
     private uint _Prioridad = default(uint);
-    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"Prioridad", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"Prioridad", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint Prioridad
     {
@@ -1450,7 +1459,7 @@ namespace U5ki.Infrastructure
     }
 
     private bool _SupervisionPortadora = default(bool);
-    [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"SupervisionPortadora", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"SupervisionPortadora", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool SupervisionPortadora
     {
@@ -1459,7 +1468,7 @@ namespace U5ki.Infrastructure
     }
 
     private int _FrecuenciaSintonizada = default(int);
-    [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"FrecuenciaSintonizada", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"FrecuenciaSintonizada", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int FrecuenciaSintonizada
     {
@@ -1468,7 +1477,7 @@ namespace U5ki.Infrastructure
     }
 
     private int _MetodoCalculoClimax = default(int);
-    [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"MetodoCalculoClimax", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"MetodoCalculoClimax", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int MetodoCalculoClimax
     {
@@ -1477,7 +1486,7 @@ namespace U5ki.Infrastructure
     }
 
     private int _VentanaSeleccionBss = default(int);
-    [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"VentanaSeleccionBss", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(14, IsRequired = false, Name=@"VentanaSeleccionBss", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int VentanaSeleccionBss
     {
@@ -1486,7 +1495,7 @@ namespace U5ki.Infrastructure
     }
 
     private bool _SincronizaGrupoClimax = default(bool);
-    [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"SincronizaGrupoClimax", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(15, IsRequired = false, Name=@"SincronizaGrupoClimax", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool SincronizaGrupoClimax
     {
@@ -1495,7 +1504,7 @@ namespace U5ki.Infrastructure
     }
 
     private bool _AudioPrimerSqBss = default(bool);
-    [global::ProtoBuf.ProtoMember(14, IsRequired = false, Name=@"AudioPrimerSqBss", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(16, IsRequired = false, Name=@"AudioPrimerSqBss", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool AudioPrimerSqBss
     {
@@ -1504,7 +1513,7 @@ namespace U5ki.Infrastructure
     }
 
     private bool _FrecuenciaNoDesasignable = default(bool);
-    [global::ProtoBuf.ProtoMember(15, IsRequired = false, Name=@"FrecuenciaNoDesasignable", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(17, IsRequired = false, Name=@"FrecuenciaNoDesasignable", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool FrecuenciaNoDesasignable
     {
@@ -1513,7 +1522,7 @@ namespace U5ki.Infrastructure
     }
 
     private int _VentanaReposoZonaTxDefecto = default(int);
-    [global::ProtoBuf.ProtoMember(16, IsRequired = false, Name=@"VentanaReposoZonaTxDefecto", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(18, IsRequired = false, Name=@"VentanaReposoZonaTxDefecto", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int VentanaReposoZonaTxDefecto
     {
@@ -1521,8 +1530,17 @@ namespace U5ki.Infrastructure
       set { _VentanaReposoZonaTxDefecto = value; }
     }
 
+    private string _NombreZonaTxDefecto = "";
+    [global::ProtoBuf.ProtoMember(19, IsRequired = false, Name=@"NombreZonaTxDefecto", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string NombreZonaTxDefecto
+    {
+      get { return _NombreZonaTxDefecto; }
+      set { _NombreZonaTxDefecto = value; }
+    }
+
     private int _PrioridadSesionSip = default(int);
-    [global::ProtoBuf.ProtoMember(17, IsRequired = false, Name=@"PrioridadSesionSip", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"PrioridadSesionSip", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int PrioridadSesionSip
     {
@@ -1531,7 +1549,7 @@ namespace U5ki.Infrastructure
     }
 
     private int _CldSupervisionTime = default(int);
-    [global::ProtoBuf.ProtoMember(18, IsRequired = false, Name=@"CldSupervisionTime", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(21, IsRequired = false, Name=@"CldSupervisionTime", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int CldSupervisionTime
     {
@@ -1540,7 +1558,7 @@ namespace U5ki.Infrastructure
     }
 
     private int _MetodosBssOfrecidos = default(int);
-    [global::ProtoBuf.ProtoMember(19, IsRequired = false, Name=@"MetodosBssOfrecidos", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"MetodosBssOfrecidos", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int MetodosBssOfrecidos
     {
@@ -1548,17 +1566,8 @@ namespace U5ki.Infrastructure
       set { _MetodosBssOfrecidos = value; }
     }
 
-    private string _Alias = "";
-    [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"Alias", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string Alias
-    {
-      get { return _Alias; }
-      set { _Alias = value; }
-    }
-
     private U5ki.Infrastructure.Tipo_ModoTransmision _ModoTransmision = U5ki.Infrastructure.Tipo_ModoTransmision.Climax;
-    [global::ProtoBuf.ProtoMember(21, IsRequired = false, Name=@"ModoTransmision", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"ModoTransmision", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(U5ki.Infrastructure.Tipo_ModoTransmision.Climax)]
     public U5ki.Infrastructure.Tipo_ModoTransmision ModoTransmision
     {
@@ -1567,7 +1576,7 @@ namespace U5ki.Infrastructure
     }
 
     private string _EmplazamientoDefecto = "";
-    [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"EmplazamientoDefecto", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"EmplazamientoDefecto", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
     public string EmplazamientoDefecto
     {
@@ -1576,7 +1585,7 @@ namespace U5ki.Infrastructure
     }
 
     private int _TiempoVueltaADefecto = default(int);
-    [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"TiempoVueltaADefecto", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(25, IsRequired = false, Name=@"TiempoVueltaADefecto", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int TiempoVueltaADefecto
     {
@@ -1585,7 +1594,7 @@ namespace U5ki.Infrastructure
     }
 
     private uint _PorcentajeRSSI = default(uint);
-    [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"PorcentajeRSSI", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(26, IsRequired = false, Name=@"PorcentajeRSSI", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint PorcentajeRSSI
     {

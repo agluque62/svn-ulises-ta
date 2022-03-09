@@ -92,7 +92,7 @@ namespace U5ki.RdService.Helpers
             return ResourceSet(
                 frecuency,
                 sipUri,
-                new RdResource(resourceId, sipUri, type, isTIFX, frecuency.Frecuency, idEmplazamiento, confParams, newRDRP), idEmplazamiento, isMaster); //#3603		
+                new RdResource(resourceId, sipUri, type, isTIFX, frecuency.IdDestino, frecuency.Frecuency, idEmplazamiento, confParams, newRDRP), idEmplazamiento, isMaster); //#3603		
 
         }
 

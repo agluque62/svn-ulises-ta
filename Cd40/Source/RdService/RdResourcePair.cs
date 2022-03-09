@@ -26,10 +26,12 @@ namespace U5ki.RdService
         public string _ID
         { get; set; } = "";
 
+        private string IdDestino { get; set; }
         private string FrequencyId { get; set; }
-        public RdResourcePair(string id, string Frequency)
+        public RdResourcePair(string id, string idDestino, string Frequency)
         {
             _ID = id;
+            IdDestino = idDestino;
             FrequencyId = Frequency;
         }
 
@@ -541,7 +543,7 @@ namespace U5ki.RdService
             var msg = $"Equipo {_ActiveResource.ID} seleccionado automaticamente en grupo 1+1 {ID}. Motivo: {cause}";
             LogInfo<RdService>(msg,
                 U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
-                FrequencyId,
+                IdDestino, FrequencyId,
                 Translate.CTranslate.translateResource(msg));
         }
 

@@ -563,6 +563,12 @@ namespace U5ki.Infrastructure
 
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_RS_LENGTH + 1)]
 		public string RdFr;                 //Con valor "000.000" no se envia el fid. Debe estar terminado cn el caracter '\0'
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_RS_LENGTH + 1)]
+        public string IdDestino;             //Identificador del destino de radio. Si esta campo tiene una longitud mayor que cero
+                                            //entonces, el identificador para agrupar las radios es este.
+                                            //Si no, entonces el identificador para agrupar es RdFr
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_IP_LENGTH + 1)]
 		public string RdMcastAddr;
 		public uint RdMcastPort;
@@ -2441,12 +2447,14 @@ namespace U5ki.Infrastructure
         /// <param name="accId"></param>
         /// <param name="dst"></param>
         /// <param name="frecuency"></param>
+        /// <param name="IdDestino"></param> Identificador unico del distino radio. Puede haber 2 destinos con el mismo identificador de la frecuencia. 
+        ///                                 Pero este parametro es unico para un destino radio
         /// <param name="flags"></param>
         /// <param name="mcastIp">Grupo Multicast de Recepcion para los HMI.</param>
         /// <param name="mcastPort">Puerto del grupo asociado al recurso radio.</param>
         /// /// <param name="porcentajeRSSI">Peso del valor de Qidx del tipo RSSI en el calculo del Qidx final. 0 indica que el calculo es solo centralizado. 10 que el calculo es solo el RSSI.</param>
         /// <returns></returns>
-		public static int MakeRdCall(string accId, string dst, string frecuency, CORESIP_CallFlags flags, string mcastIp, uint mcastPort,
+		public static int MakeRdCall(string accId, string dst, string frecuency, string IdDestino, CORESIP_CallFlags flags, string mcastIp, uint mcastPort,
             CORESIP_Priority prioridad, string Zona, CORESIP_FREQUENCY_TYPE FrequencyType,
             CORESIP_CLD_CALCULATE_METHOD CLDCalculateMethod, int BssWindows, bool AudioSync, bool AudioInBssWindow, bool NotUnassignable,
             int cld_supervision_time, string bss_method, uint porcentajeRSSI = 0)
@@ -2489,7 +2497,8 @@ namespace U5ki.Infrastructure
 
 			outInfo.DstUri = dst;
 			outInfo.RdFr = frecuency;
-			outInfo.RdMcastAddr = mcastIp;
+            outInfo.IdDestino = IdDestino;
+            outInfo.RdMcastAddr = mcastIp;
 			outInfo.RdMcastPort = mcastPort;
 
 			int callId = -1;

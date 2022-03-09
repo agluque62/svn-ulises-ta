@@ -606,11 +606,11 @@ namespace U5ki.RdService
                 string rsId = SipUri.ToUpper() + RdRsType.Tx;
 
                 if (_frToCheck == null)
-                    _frToCheck = new RdFrecuency(IdEquipo);
+                    _frToCheck = new RdFrecuency(IdEquipo, IdEquipo);
 
                 if (_frToCheck.RdRs.Count == 0 || !_frToCheck.RdRs.ContainsKey(rsId))
                 {
-                    rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, IdEquipo, toCheck);
+                    rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, IdEquipo, IdEquipo, toCheck);
                     _frToCheck.RdRs[rsId] = rr;
                 }
                 else
@@ -667,11 +667,8 @@ namespace U5ki.RdService
 
                     /** Asignar el equipo a la frecuencia */
                     string rsId = SipUri.ToUpper() + RdRsType.Tx;
-                    // JOI FREC_DES
-                    // RdResource rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, IdEquipo);
-                    // RdResource rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, IdEquipo, " ");
                     // 20171107. AGL. los parametros de configuracion por Defecto.
-                    RdResource rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, false, IdEquipo, " ", new RdFrecuency.NewRdFrequencyParams());
+                    RdResource rr = new RdResource(IdEquipo, SipUri, RdRsType.Tx, false, IdEquipo, IdEquipo, " ", new RdFrecuency.NewRdFrequencyParams());
                     // JOI FREC_DES FIN
                     fr.RdRs[rsId] = rr;
 

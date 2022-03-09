@@ -12,6 +12,7 @@ namespace U5ki.Infrastructure
         public class radioSessionData
         {
             /* datos de frecuencia */
+            public string idDestino { get; set; }
             public string frec { get; set; }
             public int ftipo { get; set; }
             public int prio { get; set; }

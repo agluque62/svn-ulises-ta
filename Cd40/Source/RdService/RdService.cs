@@ -334,6 +334,7 @@ namespace U5ki.RdService
                                         {
                                             GlobalTypes.radioSessionData data = new GlobalTypes.radioSessionData()
                                             {
+                                                idDestino = frec.IdDestino,
                                                 frec = frec.Frecuency,
                                                 // Tipo de Frecuencia 0: Normal, 1: 1+1, 2: FD, 3: EM
                                                 ftipo = (int)frec.GetParam.FrequencyType,
@@ -377,7 +378,7 @@ namespace U5ki.RdService
                                 }
                                 local_rsp = local_rsp
                                     .OrderBy(o => ((GlobalTypes.radioSessionData)o).std)
-                                    .ThenBy(o => ((GlobalTypes.radioSessionData)o).frec).ToList();
+                                    .ThenBy(o => ((GlobalTypes.radioSessionData)o).idDestino).ToList();
                             }
                             retorno = true;
                             break;
@@ -433,6 +434,7 @@ namespace U5ki.RdService
                         case ServiceCommands.RdUnoMasUnoData:
                             var UnoMasUnoFreqs = MSResources.Select(r => new
                             {
+                                idDestino = r.IdDestino,
                                 fr = r.Frecuency,
                                 id = r.ID,
                                 site = r.Site,
@@ -469,6 +471,7 @@ namespace U5ki.RdService
                                     Frequencies = from f in Frecuencies.Values
                                                   select new
                                                   {
+                                                      idDestino = f.IdDestino,
                                                       Id = f.Frecuency,
                                                       Status = f.Status,
                                                       NewParams = new
@@ -1684,7 +1687,7 @@ namespace U5ki.RdService
                                 rdFrToRemove.Remove(rdLinkId);
                             else
                             {
-                                rdFr = new RdFrecuency(rdLink.Literal);
+                                rdFr = new RdFrecuency(rdLink.Literal, rdLink.DescDestino);
                                 rdFr.TimerElapsed += OnRdFrecuencyTimerElapsed;
                                 rdFr.SupervisionPortadora = rdLink.SupervisionPortadora;
                             }
@@ -1767,7 +1770,7 @@ namespace U5ki.RdService
                 if (!_UsrFreq.ContainsKey(clave))
                 {
                     RdFrecuency rdFr;
-                    rdFr = new RdFrecuency(rdLink.Literal);
+                    rdFr = new RdFrecuency(rdLink.Literal, rdLink.DescDestino);
                     rdFr.TimerElapsed += OnRdFrecuencyTimerElapsed;
                     rdFr.SupervisionPortadora = rdLink.SupervisionPortadora;
                     _UsrFreq[clave] = rdFr;

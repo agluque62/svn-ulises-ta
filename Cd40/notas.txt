@@ -5,6 +5,17 @@
 		1. Actualizar la referencia al servicio WEB...
 			Actualizará las clases de referencia SOAP.
 
+		1.1 Se obtiene el fichero WSDL de 
+			http://192.168.1.4/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx
+			En el link "Service description" (en la parte de arriba)
+
+			El contenido de ese fichero se pega en el fichero ulises-ta\Sources\Cd40\Source\CfgService\Web References\SoapCfg\InterfazSoapConfiguracion.wsdl
+
+			Se modifica a mano el fichero de esta solucion 'Cd40Cfg.proto'. y Se genera con ulises-ta\Tools\protobuf-net\protogen.exe el Cd40Cfg.proto.cs
+
+			Se modifica el ficher CfgTranslators.cs
+
+
 		2. Actualizar fichero 'protobuf'
 			Actualizar ficheros '.proto'
 			Compilar ficheros. Generan las clases de referencia 'protobuf'.
@@ -70,6 +81,19 @@ Envio 18-11-2014
 	10. Nuevo parámetro 'AdaptadorRed'. Marca la interfaz de red a supervisar...
 	11. Estado Equipo HF => stdNoResource solo si no estaba en 'stdNoinfo'
 	12. 'RdRegistry'. Activate <= ON. Retraso un segundo entre Dispose e INIT
+
+
+	GRUPO DE RETRANSMISION
+	----------------------
+
+	El mensaje para formarlo es RTX_GROUP_CHANGE_ASK_MSG
+	Cuando llega ese mensaje se llama a ProcessRtxGroupChangeAsk
+	Con el requisito RQF-36 hay que permitir sólo que se deshaga completamente la retransmisión con squelch en el hmi. Y cuando se llama 
+	ProcessRtxGroupChangeAsk, la estructura RtxGroupChangeAsk, tiene que tener todos los change en delete
+
+
+
+
 	
 	
 	

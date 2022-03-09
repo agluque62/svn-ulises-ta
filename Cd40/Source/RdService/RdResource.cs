@@ -232,12 +232,13 @@ namespace U5ki.RdService
         // JOI FREC_DES
         //public RdResource(string id, string uri, RdRsType type, string frecuency)
         //public RdResource(string id, string uri, RdRsType type, string frecuency, string site, RdFrecuency.NewRdFrequencyParams confParams = null)
-        public RdResource(string id, string uri, RdRsType type, bool isTIFX, string frecuency, string site, RdFrecuency.NewRdFrequencyParams confParams = null, RdResource.NewRdResourceParams newRDRP = null) //JOI 201709 NEWRDRP        
+        public RdResource(string id, string uri, RdRsType type, bool isTIFX, string idDestino, string frecuency, string site, RdFrecuency.NewRdFrequencyParams confParams = null, RdResource.NewRdResourceParams newRDRP = null) //JOI 201709 NEWRDRP        
 		// JOI FREC_DES FIN
 		{
 			_Id = id;
 			_Uri1 = seturi(uri);
 			_Type = type;
+            _IdDestino = idDestino;
 			_Frecuency = frecuency;
             // JOI FREC_DES
             _Site = site;
@@ -268,12 +269,13 @@ namespace U5ki.RdService
 		/// <param name="uri2"></param>
 		/// <param name="type"></param>
 		/// <param name="frecuency"></param>
-        public RdResource(string id, string uri1, string uri2, RdRsType type, string frecuency, string site, bool selected)
+        public RdResource(string id, string uri1, string uri2, RdRsType type, string idDestino, string frecuency, string site, bool selected)
         {
             _Id = id;
             _Uri1 = seturi(uri1);
             _Uri2 = seturi(uri2);
             _Type = type;
+            _IdDestino = idDestino;
             _Frecuency = frecuency;
             _Site = site;
             _SelectedSite = selected;
@@ -297,12 +299,13 @@ namespace U5ki.RdService
         /// <param name="uri2"></param>
         /// <param name="type"></param>
         /// <param name="frecuency"></param>
-        public RdResource(string id, string uri1, string uri2, RdRsType type, bool isTIFX, string frecuency, string site, bool selected, RdFrecuency.NewRdFrequencyParams newFreqParams, CfgRecursoEnlaceExterno rs, bool connect = true)
+        public RdResource(string id, string uri1, string uri2, RdRsType type, bool isTIFX, string idDestino, string frecuency, string site, bool selected, RdFrecuency.NewRdFrequencyParams newFreqParams, CfgRecursoEnlaceExterno rs, bool connect = true)
         {
             _Id = id;
             _Uri1 = seturi(uri1);
             _Uri2 = seturi(uri2);
             _Type = type;
+            _IdDestino = idDestino;
             _Frecuency = frecuency;
             _Site = site;
             _SelectedSite = selected;
@@ -329,11 +332,12 @@ namespace U5ki.RdService
         /// <param name="uri2"></param>
         /// <param name="type"></param>
         /// <param name="frecuency"></param>
-        public RdResource(string id, string uri1, RdRsType type, string frecuency, bool toCheck)
+        public RdResource(string id, string uri1, RdRsType type, string idDestino, string frecuency, bool toCheck)
         {
             _Id = id;
             _Uri1 = seturi(uri1);
             _Type = type;
+            _IdDestino = idDestino;
             _Frecuency = frecuency;
             ResourceInInTIFXGW = false;
 
@@ -404,7 +408,7 @@ namespace U5ki.RdService
                     PorcentajeRSSI = 0;
                 }
 
-                _SipCallId = SipAgent.MakeRdCall(null, _LastUri, _Frecuency, flags, Settings.Default.McastIp, _McastPort,
+                _SipCallId = SipAgent.MakeRdCall(null, _LastUri, _Frecuency, _IdDestino, flags, Settings.Default.McastIp, _McastPort,
                     _FreqParams.Priority, new_params.zona, _FreqParams.FrequencyType,
                     _FreqParams.CLDCalculateMethod, _FreqParams.BssWindows, _FreqParams.AudioSync,
                     _FreqParams.AudioInBssWindow, _FreqParams.NotUnassignable, _FreqParams.Cld_supervision_time, 
@@ -641,6 +645,16 @@ namespace U5ki.RdService
         {
             get { return _Frecuency; }            
         }
+        /// <summary>
+        /// Identificador unico del distino radio. Puede haber 2 destinos con el mismo identificador de la frecuencia. 
+        /// Pero este parametro es unico para un destino radio
+        /// </summary>
+		private string _IdDestino;
+        public string IdDestino
+        {
+            get { return _IdDestino; }
+        }
+
         /// <summary>
         /// 
         /// </summary>

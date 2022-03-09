@@ -266,13 +266,15 @@
                                     <td>{{eq.sip==0 ? "" : eq.sip==1 ? "No" : eq.sip==2 ? "Disc" : "Conn"}}</td>
                                     <td>
                                         <button class="btn btn-default"
-                                                data-ng-click="ctrl.EnableDisable(eq)"
+                                                ng-click="ctrl.EnableDisable(eq)"
+                                                ng-disabled="false"
                                                 data-ng-show="{{ctrl.gearEnableDisableShow(eq.std)}}">
                                             {{ctrl.txtHabilitar(eq)}}
                                         </button>
                                         <button class="btn btn-default"
-                                                data-ng-click="ctrl.Asignar(eq)"
-                                                data-ng-show="{{ctrl.gearAsignarShow(eq)}}">
+                                                ng-click="ctrl.Asignar(eq)"
+                                                ng-disabled="false"
+                                                ng-show="{{ctrl.gearAsignarShow(eq)}}">
                                             {{ctrl.gearAsignarText(eq)}}
                                         </button>
                                     </td>
@@ -400,7 +402,11 @@
                         <td>{{eq.fre}}</td>
                         <td>{{eq.uri}}</td>
                         <td>
-                            <button class="btn btn-default" data-ng-click="ctrl.hfLiberar(eq)" data-ng-show="{{ctrl.hfEnableDisableShow(eq.std)}}" translate>Liberar</button>
+                            <button class="btn btn-default" 
+                                    ng-click="ctrl.hfLiberar(eq)" 
+                                    ng-disabled="false"
+                                    ng-show="{{ctrl.hfEnableDisableShow(eq.std)}}" 
+                                    translate>Liberar</button>
                         </td>
                     </tr>
                 </tbody>
@@ -417,12 +423,13 @@
                         <div class="col-md-10"><label class="form-control">{{ctrl.translate("Seleccione la Frecuencia")}}</label></div>
                         <div class="col-sm-2">
                             <select class="form-control" data-ng-model="ctrl.dtUnoMasUnoSelectedFrec">
-                                <option data-ng-repeat="fr in ctrl.dtUnoMasUno" value="{{fr.fr}}">
+                                <option data-ng-repeat="fr in ctrl.dtUnoMasUno" value="{{fr.idDestino}}">
                                     {{fr.fr}}
                                 </option>
                             </select>
                         </div>
                     </div>
+                    <!--<div class="row"><div class="col-md-3">{{ctrl.dtUnoMasUnoSelectedFrec}}</div></div>-->
                 </li>
 
                 <li class="list-group-item">
@@ -433,11 +440,11 @@
                         <div class="col-md-4 level-1">{{ctrl.translate("Receptores")}}</div>
                     </div>
                 </li>
-                <li class="list-group-item text-primary" ng_repeat="fr in ctrl.dtUnoMasUno | filter: {fr: ctrl.dtUnoMasUnoSelectedFrec}" ng-init="ifrec = $index">
+                <li class="list-group-item text-primary" ng_repeat="fr in ctrl.dtUnoMasUno | filter: ctrl.rdUnoMasUnoHtmlFilter" ng-init="ifrec = $index">
                     <div class="row">
                         <div class="col-md-2">{{fr.fr}}<br />
-                                                       <label>{{ctrl.rdUnoMasUnoFrMode(fr)}}</label><br />
-                                                                                                    <label ng-class="ctrl.rdUnoMasUnoFrTxMode(fr).clx">{{ctrl.rdUnoMasUnoFrTxMode(fr).txt}}</label></div>
+                            <label>{{ctrl.rdUnoMasUnoFrMode(fr)}}</label><br />
+                            <label ng-class="ctrl.rdUnoMasUnoFrTxMode(fr).clx">{{ctrl.rdUnoMasUnoFrTxMode(fr).txt}}</label></div>
                         <div class="col-md-10">
                             <ul class="list-group">
                                 <li class="list-group-item" ng-repeat="site in fr.sites">
@@ -453,6 +460,7 @@
                                                         <div class="col-md-5" style="padding-left:5px; padding-right:5px;">
                                                             <button class="btn btn-sm btn-info" style="font-size:90%; padding-right:5px;"
                                                                     ng-click="ctrl.rdUnoMasUnoSelectMain(tx)"
+                                                                    ng-disabled="false"
                                                                     ng-show="{{tx.sel==0}}">
                                                                 {{ctrl.translate("Reserva=>Sel")}}
                                                             </button>
@@ -471,7 +479,9 @@
                                                             <label class="btn btn-sm" ng-class="ctrl.rdUnoMasUnoRxIdClass(rx)" style="font-size:90%; padding-right:5px; margin-left:10px;">{{ctrl.rdUnoMasUnoId(rx)}}</label>
                                                         </div>
                                                         <div class="col-md-5" style="padding-left:5px; padding-right:5px;">
-                                                            <button class="btn btn-sm btn-info" style="font-size:90%; padding-right:5px;"
+                                                            <button class="btn btn-sm btn-info" 
+                                                                    style="font-size:90%; padding-right:5px;"
+                                                                    ng-disabled="false"
                                                                     ng-click="ctrl.rdUnoMasUnoEnable(rx)">
                                                                 {{rx.ab==0 ? ctrl.translate("Habilitar") : ctrl.translate("Deshabilitar")}}
                                                             </button>
