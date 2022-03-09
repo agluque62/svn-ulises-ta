@@ -445,10 +445,10 @@ namespace U5ki.RdService
                                 fdata = new
                                 {
                                     // Tipo de Frecuencia => 0: Normal, 1: 1+1, 2: FD, 3: EM
-                                    tp = this[r.Frecuency]?.GetParam.FrequencyType,
+                                    tp = this[r.IdDestino]?.GetParam.FrequencyType,
                                     // Modo de TX para FD => 0: Climax, 1: Ultimo RX, 2: Manual, 3: Ninguno.
-                                    txm = this[r.Frecuency]?.TxMode,
-                                    txs = this[r.Frecuency]?.SelectedTxSiteString
+                                    txm = this[r.IdDestino]?.TxMode,
+                                    txs = this[r.IdDestino]?.SelectedTxSiteString
                                 }
                             })
                                 .OrderBy(r => r.fr).ThenBy(r => r.id)

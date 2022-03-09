@@ -1,4 +1,5 @@
 ﻿#define _TESTING_STDOUT_
+#undef _TEST_SPREAD
 
 using System;
 using System.IO;
@@ -26,6 +27,7 @@ namespace U5ki.Mcast
 	/// </summary>
 	public partial class McastSrv : ServiceBase
 	{
+#if _TEST_SPREAD
 		public const int TestSP_MAX_PROCS = 128;
 		public const int TestSP_MAX_NAME_SIZE = 256;
 		public const int TestSP_MAX_IP_SIZE = 22;
@@ -90,6 +92,7 @@ namespace U5ki.Mcast
 			}
 			_Logger.Info("---------------------");
 		};
+#endif
 
 		/// <summary>
 		/// 
@@ -162,7 +165,7 @@ namespace U5ki.Mcast
 			base.OnStop();
 		}
 
-		#region Private Members
+#region Private Members
 
         /// <summary>
         /// 
@@ -197,7 +200,7 @@ namespace U5ki.Mcast
 			StartMcast();
 			_Logger.Info("MCAST: "+"Nodo iniciado");
 
-			//StringBuilder sp_config_file = new StringBuilder("C:\\Program Files (x86)\\NUCLEOCC\\Ulises5000I-MCast\\spread.conf");
+#if _TEST_SPREAD
 			StringBuilder sp_config_file = new StringBuilder("spread.conf");
 			StringBuilder error = new StringBuilder(256);
 			StringBuilder proc_name = new StringBuilder(_HostId);
@@ -207,6 +210,7 @@ namespace U5ki.Mcast
 			}
 
 			int count_get_spread_status = 58;
+#endif
 
 			while (!_EndEvent.WaitOne(2000, false))
 			{
@@ -224,14 +228,18 @@ namespace U5ki.Mcast
                 {
                 }
 
+#if _TEST_SPREAD
 				if (++count_get_spread_status >= 60)
 				{
 					Get_Spread_Status(error, error.Length); //Get_Spread_Status se ejecuta cada 2 minutos
 					count_get_spread_status = 0;
 				}
+#endif
 			}
 
+#if _TEST_SPREAD
 			End_Spread_Status();
+#endif
 
 			if (_Process != null)
 			{
@@ -345,6 +353,6 @@ namespace U5ki.Mcast
             _Logger.Info("MCAST: Saliendo...");            
         }
 
-		#endregion
+#endregion
 	}
 }
