@@ -2737,7 +2737,21 @@ namespace U5ki.RdService
                 try
                 {
                     /** Obtener la Frecuencia */
-                    RdFrecuency frecuency = Frecuencies.Values.Where(e => e.Frecuency == frec).FirstOrDefault();
+                    RdFrecuency frecuency = null;
+                    foreach (RdFrecuency frq in Frecuencies.Values)
+                    {
+                        if (frq.Frecuency == frec)
+                        {
+                            foreach (IRdResource res in frq.RdRs.Values)
+                            {
+                                if (res.ID == gearId)
+                                {
+                                    frecuency = frq;
+                                }
+                            }
+                        }
+                    }
+
                     if (null == frecuency)
                     {
                         LogInfo<RdService>("Frecuencia no Encontrada y asignada a Equipo " + gearId,

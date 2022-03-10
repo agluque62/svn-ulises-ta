@@ -162,7 +162,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 //SipAgent.PictRecordingCfg(tv.IpGrabador1, tv.IpGrabador2, tv.RtspPort);
                 //RQF-24
                 bool EnableGrabacionEd137ant = SipAgent.GetEnableGrabacionED137();
-                SipAgent.PictRecordingCfg(tv.IpGrabador1, tv.IpGrabador2, tv.RtspPort,
+                SipAgent.PictRecordingCfg(tv.IpGrabador1, tv.IpGrabador2, tv.RtspPort, tv.RtspPort2,
                                           tv.EnableGrabacionEd137);
 
                 //RQF24

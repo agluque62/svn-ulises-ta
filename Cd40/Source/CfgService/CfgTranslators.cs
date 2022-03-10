@@ -298,12 +298,14 @@ namespace U5ki.CfgService
 			cfg.IdHost = soapCfg.IdHost ?? "";
             cfg.IpGrabador1 = soapCfg.IpGrabador1;
             cfg.IpGrabador2 = soapCfg.IpGrabador2;
-            cfg.RtspPort = soapCfg.RtspPort;
-			//RQF22
+			cfg.RtspPort = soapCfg.RtspPort;
+			cfg.RtspPort2 = soapCfg.RtspPort1;
 			cfg.TipoGrabacionAnalogica = soapCfg.TipoGrabacionAnalogica;
 			cfg.EnableGrabacionEd137 = soapCfg.EnableGrabacionEd137;
 			cfg.EnableGrabacionAnalogica = soapCfg.EnableGrabacionAnalogica;
-
+			//RQF-36 Mejoras funcionalidad retransmisión radio (RETRANS)
+			//cfg.QuitarRTXSQ = soapCfg.EnableQuitarRTXSQ;
+			//cfg.MantRTXSect = soapCfg.EnableMantRTXSect;
 		}
         /// <summary>
         /// 

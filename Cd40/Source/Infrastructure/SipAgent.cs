@@ -1141,6 +1141,13 @@ namespace U5ki.Infrastructure
 		[DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int CORESIP_CallHangup(int call, int code, out CORESIP_Error error);
 
+        //lalm 220201
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_Set_Ed137_version(char ED137Radioversion, char ED137Phoneversion, out CORESIP_Error error);
+
+
+
+
         /**
          *	CORESIP_CallAnswer
          *	@param	call		Identificador de Llamada
@@ -1720,7 +1727,11 @@ namespace U5ki.Infrastructure
             _Logger.Debug("Saliendo de SipAgent.Init");
 #endif
             }
-		}
+
+            CORESIP_Error error;
+            CORESIP_Set_Ed137_version('B','C',out error );
+
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -1902,25 +1913,26 @@ namespace U5ki.Infrastructure
             _Logger.Debug("Saliendo de SipAgent.CreateAccountAndRegisterInProxy");
 #endif
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        public static void DestroyAccount(string accId)
-        {
-#if _TRACEAGENT_
-            _Logger.Debug("Entrando en SipAgent.DestroyAccount");
-#endif
-            CORESIP_Error err;
 
-            if (CORESIP_DestroyAccount(_Accounts[accId], out err) != 0)
+           /// <summary>
+           /// 
+           /// </summary>
+           public static void DestroyAccount(string accId)
             {
-                _Logger.Error("SipAgent.DestroyAccount: " + err.Info);
-            }
+        #if _TRACEAGENT_
+                    _Logger.Debug("Entrando en SipAgent.DestroyAccount");
+        #endif
+                    CORESIP_Error err;
 
-            _Accounts.Remove(accId);
-#if _TRACEAGENT_
-            _Logger.Debug("Saliendo de SipAgent.DestroyAccount");
-#endif
+                    if (CORESIP_DestroyAccount(_Accounts[accId], out err) != 0)
+                    {
+                        _Logger.Error("SipAgent.DestroyAccount: " + err.Info);
+                    }
+
+                    _Accounts.Remove(accId);
+        #if _TRACEAGENT_
+                    _Logger.Debug("Saliendo de SipAgent.DestroyAccount");
+        #endif
         }
         /// <summary>
         /// 
@@ -2367,7 +2379,7 @@ namespace U5ki.Infrastructure
             string toTag, string fromTag)
         {
 #if _TRACEAGENT_
-            _Logger.Debug("Entrando en SipAgent.MakTlfCall {0}, {1}, {2}, {3}, {4}", accId, dst, referBy, priority, flags);
+            _Logger.Debug("Entrando en SipAgent.MakTlfCall {0}, {1}, {2}, {3}, {4}", accId, dst, priority, flags, callIdReplace);
 #endif
             int acc;
             if (string.IsNullOrEmpty(accId) || !_Accounts.TryGetValue(accId, out acc))
@@ -2996,8 +3008,8 @@ namespace U5ki.Infrastructure
 
             StringBuilder callid_ = new StringBuilder(CORESIP_MAX_CALLID_LENGTH + 1);
 #if CALLFORWARD
-#if _TRACEAGENT_
             CORESIP_Error err;
+#if _TRACEAGENT_
             _Logger.Debug("Entrando en SipAgent.SendOptionsCFWD {0}", dst);
 #endif
             if (CORESIP_SendOptionsCFWD(_Accounts[accId], dst, cfwr_options_type, body, callid_, by_proxy, out err) != 0)
@@ -3231,9 +3243,9 @@ namespace U5ki.Infrastructure
 
         // JCAM. 20170324
         /* GRABACION VOIP CFG */
-        //#3267 RQF22 211217
+        //#3267 RQF22 211217 RQF2
         public static void PictRecordingCfg(string ipRecorder1, string ipRecorder2,
-                           int rtspPort, bool EnableGrabacionED137)
+                           int rtspPort, int rtspPort2, bool EnableGrabacionED137)
         {
             CORESIP_Error err;
             bool result = false;
@@ -3253,11 +3265,13 @@ namespace U5ki.Infrastructure
                 string ip_rec_a = GetSeccionClave("RTSP", "IP_REC_A", fullRecorderFileName);
                 string ip_rec_b = GetSeccionClave("RTSP", "IP_REC_B", fullRecorderFileName);
                 string port_rtsp = GetSeccionClave("RTSP", "PORT_RTSP", fullRecorderFileName);
+                string port_rtsp2 = GetSeccionClave("RTSP", "PORT_RTSP2", fullRecorderFileName);
                 bool enablegrabacionED137 = GetSeccionClave("RTSP", "EnableGrabacionED137", fullRecorderFileName).CompareTo("False") == 0 ? false :true;
                 if (ip_rec_a != ipRecorder1 ||
                     ip_rec_b != ipRecorder2 ||
-                    port_rtsp != rtspPort.ToString()||
-                    enablegrabacionED137!= EnableGrabacionED137)
+                    port_rtsp != rtspPort.ToString() ||
+                    port_rtsp2 != rtspPort2.ToString() ||
+                    enablegrabacionED137 != EnableGrabacionED137)
                     changes = true;
                 
                 result |= Native.Kernel32.WritePrivateProfileString("GENERAL", "MAX_SESSIONS", "2", fullRecorderFileName);
@@ -3266,6 +3280,7 @@ namespace U5ki.Infrastructure
                 result |= Native.Kernel32.WritePrivateProfileString("RTSP", "IP_REC_A", ipRecorder1 ?? string.Empty, fullRecorderFileName);
                 result |= Native.Kernel32.WritePrivateProfileString("RTSP", "IP_REC_B", ipRecorder2 ?? string.Empty, fullRecorderFileName);
                 result |= Native.Kernel32.WritePrivateProfileString("RTSP", "PORT_RTSP", rtspPort.ToString(), fullRecorderFileName);
+                result |= Native.Kernel32.WritePrivateProfileString("RTSP", "PORT_RTSP2", rtspPort2.ToString(), fullRecorderFileName);
                 //RQF24
                 result |= Native.Kernel32.WritePrivateProfileString("RTSP ", "EnableGrabacionED137 ", EnableGrabacionED137.ToString(), fullRecorderFileName);
             }
@@ -3273,7 +3288,7 @@ namespace U5ki.Infrastructure
             {
                 _Logger.Error("Error escribiendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
             }
-            _Logger.Debug("Modificado fichero {4} IP_REC_A:{0} IP_REC_B:{1} PORT_RTSP:{2} DUAL_RECORDER:{3}", ipRecorder1 ?? string.Empty, ipRecorder2 ?? string.Empty, rtspPort, (ipRecorder1 == null && ipRecorder2 == null) ? "0" : "1", fullRecorderFileName);
+            _Logger.Debug("Modificado fichero {4} IP_REC_A:{0} IP_REC_B:{1} PORTS_RTSP:{2}{3} DUAL_RECORDER:{4}", ipRecorder1 ?? string.Empty, ipRecorder2 ?? string.Empty, rtspPort, rtspPort2, (ipRecorder1 == null && ipRecorder2 == null) ? "0" : "1", fullRecorderFileName);
             if (result == false)
             {
                 _Logger.Error("Error escribiendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
@@ -3293,7 +3308,8 @@ namespace U5ki.Infrastructure
         public static int GetGrabacionED137()
         {
             uint result = 0;
-            int resultado;
+            bool bresultado;
+            int resultado=0;
             String fullRecorderFileName = Settings.Default.RecorderServicePath + "\\" + SipAgent.UG5K_REC_CONF_FILE;
             StringBuilder sGrabaciónED137 = new StringBuilder(10);
             try
@@ -3305,12 +3321,14 @@ namespace U5ki.Infrastructure
                 _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
             }
             _Logger.Debug("Leyendo fichero {1} :{0}", sGrabaciónED137, fullRecorderFileName);
-            if (result != 1)
+            if (result == 0)
             {
                 _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
             }
 
-            Int32.TryParse(sGrabaciónED137.ToString(), out resultado);
+            bool.TryParse(sGrabaciónED137.ToString(), out bresultado);
+            if (bresultado == true) return resultado=1;
+            else resultado=0;
             return resultado;
         }
 
@@ -3322,7 +3340,7 @@ namespace U5ki.Infrastructure
             StringBuilder sEnableGrabacionED137 = new StringBuilder(10);
             try
             {
-                result = Native.Kernel32.GetPrivateProfileString("EnableGrabacionED137 ", "EnableGrabacionED137 ", "", sEnableGrabacionED137, 10, fullRecorderFileName);
+                result = Native.Kernel32.GetPrivateProfileString("RTSP ", "EnableGrabacionED137 ", "", sEnableGrabacionED137, 10, fullRecorderFileName);
             }
             catch (Exception exc)
             {

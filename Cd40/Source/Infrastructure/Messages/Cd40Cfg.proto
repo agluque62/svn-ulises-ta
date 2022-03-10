@@ -202,6 +202,7 @@ message AsignacionUsuariosTV
 	//#RQF24
 	optional bool EnableGrabacionEd137 = 7;
 	optional bool EnableGrabacionAnalogica = 8;
+	optional int32 RtspPort2 = 9;
 }
 
 message AsignacionUsuariosDominantesTV 

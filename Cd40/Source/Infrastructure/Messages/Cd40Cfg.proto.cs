@@ -489,9 +489,18 @@ namespace U5ki.Infrastructure
       set { _RtspPort = value; }
     }
 
-    //#3267 RQF22 211217
-    
-    private int _TipoGrabacionAnalogica = 0;
+    private int _RtspPort2 = default(int);//RQF2
+    [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name = @"RtspPort", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int RtspPort2
+    {
+        get { return _RtspPort2; }
+        set { _RtspPort2 = value; }
+    }
+
+        //#3267 RQF22 211217
+
+        private int _TipoGrabacionAnalogica = 0;
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name = @"TipoGrabacionAnalogica", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int TipoGrabacionAnalogica
