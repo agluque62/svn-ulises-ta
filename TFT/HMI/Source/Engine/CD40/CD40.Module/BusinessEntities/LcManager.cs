@@ -77,7 +77,20 @@ namespace HMI.CD40.Module.BusinessEntities
             }
 		}
 
-		public void SetLc(int id, bool on)
+        public bool ring_activo = false;
+        public bool lc_activo = false;
+
+        // lalm 20201214 nueva función para saber si el led tiene que estar encendido o apagado
+        public void UpdateLcSpeakerLed()
+        {
+            if (ring_activo || lc_activo)
+                Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+            else
+                Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
+        }
+
+
+        public void SetLc(int id, bool on)
 		{
 			Debug.Assert(id < _LcPositions.Length);
 

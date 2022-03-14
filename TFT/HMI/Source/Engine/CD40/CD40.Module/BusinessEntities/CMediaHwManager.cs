@@ -659,33 +659,35 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="Type"></param>
         /// <param name="ON"></param>
-        public override void EnciendeLed(CORESIP_SndDevType Type, byte ON)
+        public override void OnOffLed(CORESIP_SndDevType Type, byte OnOff)
         {
             switch (Type)
             {
                 case CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER:
-                    if ((_dev4_alt != null) && (ledState[Type] != (LastStateGpio)ON))
+                    if ((_dev4_alt != null) && (ledState[Type] != (LastStateGpio)OnOff))
                     {
-                        _dev4_alt.SetGpio(4, ON);
-                        ledState[Type] = (LastStateGpio)ON;
+                        _dev4_alt.SetGpio(4, OnOff);
+                        ledState[Type] = (LastStateGpio)OnOff;
                     }
                     break;
                 case CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER:
-                    if ((_dev3_alr != null) && (ledState[Type] != (LastStateGpio)ON))
+                    if ((_dev3_alr != null) && (ledState[Type] != (LastStateGpio)OnOff))
                     {
-                        _dev3_alr.SetGpio(4, ON);
-                        ledState[Type] = (LastStateGpio)ON;
+                        _dev3_alr.SetGpio(4, OnOff);
+                        ledState[Type] = (LastStateGpio)OnOff;
                     }
                     break;
                 case CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER:
-                    if ((_dev3_alr != null)&& (ledState[Type] != (LastStateGpio)ON))
+                    if ((_dev3_alr != null)&& (ledState[Type] != (LastStateGpio)OnOff))
                     {
-                        _dev3_alr.SetGpio(5, ON);
-                        ledState[Type] = (LastStateGpio)ON;
+                        _dev3_alr.SetGpio(5, OnOff);
+                        ledState[Type] = (LastStateGpio)OnOff;
+                        //LALM Trazas
+                        _Logger.Info("Queda en estado {0} {1} {2} ", ledState[CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER], ledState[CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER], ledState[CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER]);
                     }
                     break;
                 default:
-                    _Logger.Error("HidCMediaHwManager.EnciendeLed. Tipo Altavoz No Soportado: {0}", Type);
+                    _Logger.Error("HidCMediaHwManager.OnOffLed. Tipo Altavoz No Soportado: {0}", Type);
                     break;
             }
         }
@@ -694,9 +696,9 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         public override void ApagarSndSpeaker()
         {
-            EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, 0);
-            EnciendeLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, 0);
-            EnciendeLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, 0);
+            OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, 0);
+            OnOffLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, 0);
+            OnOffLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, 0);
         }
 
         /// <summary>

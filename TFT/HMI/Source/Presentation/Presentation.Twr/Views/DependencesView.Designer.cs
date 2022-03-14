@@ -67,12 +67,16 @@ namespace HMI.Presentation.Twr.Views
 			this._FunctionTB = new System.Windows.Forms.TextBox();
 			this._TypeTB = new System.Windows.Forms.TextBox();
 			_DependencesTLP = new System.Windows.Forms.TableLayoutPanel();
-			_TitleLB = new System.Windows.Forms.Label();
+			//LALM 210303 creo que no hace falta
+			//_TitleLB = new System.Windows.Forms.Label();
+			
 			panel1 = new System.Windows.Forms.Panel();
-			label4 = new System.Windows.Forms.Label();
-			label3 = new System.Windows.Forms.Label();
-			label2 = new System.Windows.Forms.Label();
-			label1 = new System.Windows.Forms.Label();
+			//LALM 210303 creo que no hace falta
+			//label4 = new System.Windows.Forms.Label();
+			//label3 = new System.Windows.Forms.Label();
+			//label2 = new System.Windows.Forms.Label();
+			//label1 = new System.Windows.Forms.Label();
+
 			_DependencesTLP.SuspendLayout();
 			panel1.SuspendLayout();
 			this.SuspendLayout();
@@ -160,9 +164,9 @@ namespace HMI.Presentation.Twr.Views
 			// _CloseBT
 			// 
 			this._CloseBT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this._CloseBT.Location = new System.Drawing.Point(355, 66);
+			this._CloseBT.Location = new System.Drawing.Point(355, 74);
 			this._CloseBT.Name = "_CloseBT";
-			this._CloseBT.Size = new System.Drawing.Size(70, 48);
+			this._CloseBT.Size = new System.Drawing.Size(70, 38);
 			this._CloseBT.TabIndex = 9;
 			this._CloseBT.Text = "Cerrar";
 			this._CloseBT.Click += new System.EventHandler(this._CloseBT_Click);
@@ -171,9 +175,9 @@ namespace HMI.Presentation.Twr.Views
 			// 
 			this._CallBT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this._CallBT.Enabled = false;
-			this._CallBT.Location = new System.Drawing.Point(355, 15);
+			this._CallBT.Location = new System.Drawing.Point(355, 25);
 			this._CallBT.Name = "_CallBT";
-			this._CallBT.Size = new System.Drawing.Size(70, 48);
+			this._CallBT.Size = new System.Drawing.Size(70, 38);
 			this._CallBT.TabIndex = 8;
 			this._CallBT.Text = "Llamar";
 			this._CallBT.Click += new System.EventHandler(this._CallBT_Click);
@@ -249,7 +253,7 @@ namespace HMI.Presentation.Twr.Views
 			this._TypeTB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this._TypeTB.BackColor = System.Drawing.SystemColors.Window;
 			this._TypeTB.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this._TypeTB.Location = new System.Drawing.Point(65, 25);
+			this._TypeTB.Location = new System.Drawing.Point(65, 26);
 			this._TypeTB.Name = "_TypeTB";
 			this._TypeTB.ReadOnly = true;
 			this._TypeTB.Size = new System.Drawing.Size(160, 20);
@@ -260,7 +264,7 @@ namespace HMI.Presentation.Twr.Views
 			label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			label1.AutoSize = true;
 			label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			label1.Location = new System.Drawing.Point(3, 25);
+			label1.Location = new System.Drawing.Point(3, 29);
 			label1.Name = "label1";
 			label1.Size = new System.Drawing.Size(36, 13);
 			label1.TabIndex = 0;

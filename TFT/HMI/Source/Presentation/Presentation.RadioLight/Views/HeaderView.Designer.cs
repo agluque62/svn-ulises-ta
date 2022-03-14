@@ -42,12 +42,24 @@ namespace HMI.Presentation.RadioLight.Views
 		/// </summary>
 		private void InitializeComponent()
 		{
+            this._MsgLB = new System.Windows.Forms.TextBox();
             this._InfoBT = new HMI.Model.Module.UI.HMIButton();
             this._TitleBT = new HMI.Model.Module.UI.HMIButton();
-            this._MsgLB = new System.Windows.Forms.TextBox();
             this._BrightnessUDB = new HMI.Presentation.RadioLight.UI.UpDownButton();
             this._BuzzerUDB = new HMI.Presentation.RadioLight.UI.UpDownButton();
             this.SuspendLayout();
+            // 
+            // _MsgLB
+            // 
+            this._MsgLB.AcceptsReturn = true;
+            this._MsgLB.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._MsgLB.Location = new System.Drawing.Point(415, 3);
+            this._MsgLB.MaxLength = 8276;
+            this._MsgLB.Multiline = true;
+            this._MsgLB.Name = "_MsgLB";
+            this._MsgLB.Size = new System.Drawing.Size(200, 66);
+            this._MsgLB.TabIndex = 5;
+            this._MsgLB.Visible = false;
             // 
             // _InfoBT
             // 
@@ -76,19 +88,15 @@ namespace HMI.Presentation.RadioLight.Views
             this._TitleBT.TabIndex = 4;
             this._TitleBT.Text = "PuestoPuesto0123";
             this._TitleBT.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this._TitleBT.Click += new System.EventHandler(this._TitleBT_Click);
-            // 
-            // _MsgLB
-            // 
-            this._MsgLB.AcceptsReturn = true;
-            this._MsgLB.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._MsgLB.Location = new System.Drawing.Point(415, 3);
-            this._MsgLB.MaxLength = 8276;
-            this._MsgLB.Multiline = true;
-            this._MsgLB.Name = "_MsgLB";
-            this._MsgLB.Size = new System.Drawing.Size(200, 66);
-            this._MsgLB.TabIndex = 5;
-            this._MsgLB.Visible = false;
+
+            //this._TitleBT.Click += new System.EventHandler(this._TitleBT_Click);
+
+            // LALM:No existe modo limpieza en Monitor Radio
+            // Errores #4738
+            // Al pulsar el botón del icono de AENA MODO LIMPIEZA, el puesto se queda bloqueado y al no tener jacks, no se puede desbloquear.
+            // 20200121 Anulo la llamada a la función.
+            // this._TitleBT.Click += new System.EventHandler(this._TitleBT_Click);
+
             // 
             // _BrightnessUDB
             // 
@@ -135,12 +143,18 @@ namespace HMI.Presentation.RadioLight.Views
             this.Size = new System.Drawing.Size(800, 86);
             this.ResumeLayout(false);
             this.PerformLayout();
+            // LALM 20210122
+            // petición #4739 
+            // El control de brillo en un portátil no tiene mucho sentido. Si no afecta mucho al proyecto se podría anular.
+            // Reduzco el tamaño del control a 0 porque se hace visible a través
+            // de una función común a todos los proyectos.
+            // Deberia cambiarse en setup....instalación
+            this._BrightnessUDB.Size = new System.Drawing.Size(0, 0);
+        }
 
-		}
+        #endregion
 
-		#endregion
-
-		private HMI.Model.Module.UI.HMIButton _TitleBT;
+        private HMI.Model.Module.UI.HMIButton _TitleBT;
         private HMI.Model.Module.UI.HMIButton _InfoBT;
 		private HMI.Presentation.RadioLight.UI.UpDownButton _BrightnessUDB;
 		private HMI.Presentation.RadioLight.UI.UpDownButton _BuzzerUDB;

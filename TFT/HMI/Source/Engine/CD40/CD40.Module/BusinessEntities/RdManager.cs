@@ -508,8 +508,8 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         public void UpdateRadioSpeakerLed()
         {
-            Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.Speaker) ? HwManager.ON : HwManager.OFF);
-            Top.Hw.EnciendeLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.HfSpeaker) ? HwManager.ON : HwManager.OFF);
+            Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.Speaker) ? HwManager.ON : HwManager.OFF);
+            Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.HfSpeaker) ? HwManager.ON : HwManager.OFF);
         }
 
 
@@ -632,6 +632,9 @@ namespace HMI.CD40.Module.BusinessEntities
                             RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, (FrequencyState)rd.Estado, rd.RxOnly);
                             /** 20180321. AGL. ALIAS a mostrar en la tecla... */
                             posInfo.KeyAlias = rd.KeyAlias;
+
+                            //LALM 210223 Errores #4756 prioridad.
+                            posInfo.Priority = rd.Priority;
 						rdPositions.Info[pos] = posInfo;
 					}
 				}
@@ -647,6 +650,8 @@ namespace HMI.CD40.Module.BusinessEntities
                         RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, (FrequencyState)rd.Estado, rd.RxOnly);
                         /** 20180321. AGL. ALIAS a mostrar en la tecla... */
                         posInfo.KeyAlias = rd.KeyAlias;
+                        //LALM 210223 Errores #4756 prioridad
+                        posInfo.Priority = (int)rd.GetPttPriority();
 
 					rdPositions.Info[i] = posInfo;
 				}

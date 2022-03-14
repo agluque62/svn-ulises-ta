@@ -219,7 +219,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="Type"></param>
         /// <param name="ON"></param>
-        public virtual void EnciendeLed(CORESIP_SndDevType Type, byte ON) 
+        public virtual void OnOffLed(CORESIP_SndDevType Type, byte ON) 
         {
         }
 
@@ -887,7 +887,7 @@ namespace HMI.CD40.Module.BusinessEntities
 #else
 	class SndDev
 	{
-		#region Uac2 Dll Interface
+    #region Uac2 Dll Interface
         /// <summary>
         /// 
         /// </summary>
@@ -913,7 +913,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		[DllImport("uac2", EntryPoint = "_UacSetXDFP@12", CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int UacSetXDFP(IntPtr uacHandle, int addr, int data);
 
-		#endregion
+    #endregion
 
         /// <summary>
         /// 
@@ -1130,7 +1130,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			return 0;
 		}
 
-		#region Private Members
+    #region Private Members
         /// <summary>
         /// 
         /// </summary>
@@ -1199,7 +1199,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 		}
 
-		#endregion
+    #endregion
 	}
 
     /// <summary>
@@ -1214,7 +1214,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		public const byte OFF = 0;
 		public const byte OUT = 0;
 
-		#region Uac2 Dll Interface
+    #region Uac2 Dll Interface
         /// <summary>
         /// 
         /// </summary>
@@ -1235,9 +1235,9 @@ namespace HMI.CD40.Module.BusinessEntities
 		[DllImport("uac2", EntryPoint = "_UacGetDirectShowDeviceName_A@12", CharSet = CharSet.Ansi, ExactSpelling = true)]
 		static extern int UacGetDirectShowDeviceName(IntPtr uacHandle, StringBuilder id, int size);
 		
-		#endregion
+    #endregion
 
-		#region Hid Dll Interface
+    #region Hid Dll Interface
         /// <summary>
         /// 
         /// </summary>
@@ -1245,7 +1245,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		[DllImport("hid.dll", SetLastError = true)]
 		static extern void HidD_GetHidGuid(ref Guid hidGuid);
 
-		#endregion
+    #endregion
 
         /// <summary>
         /// 
@@ -1484,14 +1484,14 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="Type"></param>
         /// <param name="ON"></param>
-        public void EnciendeLed(CORESIP_SndDevType Type, byte ON)//Miguel
+        public void OnOffLed(CORESIP_SndDevType Type, byte ON)//Miguel
         {
             SndDev sndDev = null;
             if (_SndDevs.TryGetValue(Type, out sndDev))
                 sndDev.SetGpio(HwManager.OUT_ALTAVOZ,  ON);       
         }
 
-		#region Private Members
+    #region Private Members
         /// <summary>
         /// 
         /// </summary>
@@ -1693,7 +1693,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			});
 		}
 
-		#endregion
+    #endregion
 	}
     
 #endif

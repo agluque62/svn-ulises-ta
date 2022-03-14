@@ -675,7 +675,10 @@ namespace HMI.Presentation.RadioLight.Views
                 // string alias = dst.Alias;
                 string alias = dst.KeyAlias;
 
-				if (!dst.Unavailable)
+                //LALM 210223 Errores #4756 Prioridad
+                int priority = dst.Priority;
+				
+                if (!dst.Unavailable)
 				{
 					rtxGroup = dst.RtxGroup;
                     // alias = (dst.TempAlias != string.Empty && dst.TempAlias != dst.Alias) ? dst.TempAlias : alias;
@@ -816,15 +819,20 @@ namespace HMI.Presentation.RadioLight.Views
                 {
                     /** 20180321. AGL. ALIAS a mostrar en la tecla... */
                     // bt.Reset(dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? string.Empty : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    //LALM 210223  Errores #4756  prioridad
+                    // Aqui Paso tambien la prioridad.
+                    //bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    //dst.State );
                     bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
-                    dst.State );
+                    dst.State, dst.Priority);
+
                 }
                 // Las frecuencias co solo RX (RxOnly), tienen deshabilitada la parte TX de la tecla
                 //if (dst.RxOnly)
                 //    bt.EnableTx(false);
                 //else
                 //    bt.EnableTx(true);
-				bt.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative && !dst.Unavailable;                
+                bt.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative && !dst.Unavailable;                
 			}
 
 			bt.Visible = dst.IsConfigurated;

@@ -105,5 +105,8 @@
     <Setting Name="BigFonts" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="ConfCambioPagRad" Type="System.Boolean" Scope="Application">
+	  <Value Profile="(Default)">True</Value>
+	</Setting>
   </Settings>
 </SettingsFile>

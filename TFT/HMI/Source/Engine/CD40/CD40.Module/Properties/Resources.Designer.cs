@@ -86,16 +86,29 @@ namespace HMI.CD40.Module.Properties {
                 return ResourceManager.GetString("BadNumberError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Busca una cadena traducida similar a Falsa maniobra.
         /// </summary>
-        internal static string BadOperation {
-            get {
+        internal static string BadOperation
+        {
+            get
+            {
                 return ResourceManager.GetString("BadOperation", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        /// 20201120 LALM Errores #4534 sustituir el mensaje de error “Número Erróneo” por “Número No Accesible”
+        /// </summary>
+        internal static string BadNumberATS
+        {
+            get
+            {
+                return ResourceManager.GetString("BadNumberATS", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Busca una cadena traducida similar a Error en captura porque se ha sobrepasado la capacidad de llamadas o no hay permiso de red.
         /// </summary>

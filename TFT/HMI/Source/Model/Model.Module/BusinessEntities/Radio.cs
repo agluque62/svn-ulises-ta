@@ -73,6 +73,9 @@ namespace HMI.Model.Module.BusinessEntities
 		private string _Alias = "";
         /** 20180321. AGL. ALIAS a mostrar en la tecla... */
         private string _KeyAlias = "";
+		//LALM 210223 Errores #4756 prioridad
+		private int _Priority = 0;
+
 		private bool _Tx = false;
 		private bool _Rx = false;
 		private PttState _Ptt = PttState.NoPtt;
@@ -116,8 +119,14 @@ namespace HMI.Model.Module.BusinessEntities
             get { return _TempAlias; }
             set { _TempAlias = value; }
         }
-        /** 20180321. AGL. ALIAS a mostrar en la tecla... */
-        public string KeyAlias { get { return _KeyAlias; } }
+		/** 20180321. AGL. ALIAS a mostrar en la tecla... */
+		public string KeyAlias { get { return _KeyAlias; } }
+
+		// 210223 LALM Errores #4756 Prioridad
+		public int  Priority { 
+			get { return _Priority; }
+			set { _Priority = value; }
+		}
 
 		public bool Tx
 		{
@@ -269,7 +278,9 @@ namespace HMI.Model.Module.BusinessEntities
                 {
                     _KeyAlias = (_TempAlias != string.Empty && _TempAlias != _Alias) ? _TempAlias : _Alias;
                 }
-                /** */
+				/** */
+				//LALM 210223 Errores #4756 prioridad
+				_Priority = dst.Priority;
 
                 if (!Restored && Unavailable && (dst.Ptt != PttState.Unavailable || dst.Squelch != SquelchState.Unavailable))
                     _Restored = true;

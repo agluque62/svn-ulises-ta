@@ -199,8 +199,8 @@ namespace HMI.OPE.Module.Services
 		[EventPublication(EventTopicNames.ShowNotifMsgEngine, PublicationScope.Global)]
 		public event EventHandler<NotifMsg> ShowNotifMsgEngine;
 
-		//[EventPublication(EventTopicNames.HideNotifMsgEngine, PublicationScope.Global)]
-		//public event EventHandler<EventArgs<string>> HideNotifMsgEngine;
+		[EventPublication(EventTopicNames.HideNotifMsgEngine, PublicationScope.Global)]
+		public event EventHandler<EventArgs<string>> HideNotifMsgEngine;
 
 		[EventPublication(EventTopicNames.RemoteListenStateEngine, PublicationScope.Global)]
 		public event EventHandler<ListenPickUpMsg> RemoteListenStateEngine;

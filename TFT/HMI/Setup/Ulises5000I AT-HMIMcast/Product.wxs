@@ -17,11 +17,11 @@
     <MediaTemplate EmbedCab="yes" />
 
     <!-- Propiedades Estaticas -->
-    <Property Id="INSTALLFOLDER_NAME" Value="Ulises5000I-TA"></Property>
+    <Property Id="INSTALLFOLDER_NAME" Value="Ulises5000I-TALight"></Property>
     <Property Id="CONFIG_FILE" Value="HMI.exe.config"></Property>
     <Property Id='RECDUAL' Value='0'></Property>
-    <Property Id="PVERSION" Value="2.5.9"></Property>
-    <Property Id="MCAST_INSTALLFOLDER_NAME" Value="Ulises5000I-MCast"></Property>
+    <Property Id="PVERSION" Value="2.6.0"></Property>
+    <Property Id="MCAST_INSTALLFOLDER_NAME" Value="Ulises5000I-MCastLight"></Property>
     <!-- Propiedades para los directorios de Instalacion -->
     <Property Id="MCAST_FOLDER">
       <RegistrySearch Id="UV5KI_MCAST_FOLDER" Root="HKLM" Key='SOFTWARE\Wix\UV5KI_MCAST' Name='FOLDER_Property' Type='raw'  />
@@ -223,8 +223,8 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="COMPANYFOLDER" Name="NucleoCC">
-          <Directory Id="U5ki.MCast.INSTALLFOLDER" Name="Ulises5000I-MCast"/>
-          <Directory Id="INSTALLFOLDER" Name="Ulises5000I-TA">
+          <Directory Id="U5ki.MCast.INSTALLFOLDER" Name="Ulises5000I-MCastLight"/>
+          <Directory Id="INSTALLFOLDER" Name="Ulises5000I-TALight">
             <Directory Id="EN" Name="en-GB" />
             <Directory Id="FR" Name="fr-FR" />
             <Directory Id="RESOURCES" Name="Resources">
@@ -406,11 +406,12 @@
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/U5ki.Infrastructure.Properties.Settings/setting[\[]@name='RecordingEd137'[\]]/value"
                         Value="[ED137REC]"/>
-        <!-- Brillo -->
-        <util:XmlFile Id="Brillo" Action="setValue"
+		  <!-- Brillo -->
+		  <!-- Brillo -->
+		  <util:XmlFile Id="Brillo" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='BrightnessVersion'[\]]/value"
-                        Value="2"/>
+                        Value="0"/>
         <!-- Radio Alias-->
         <util:XmlFile Id="RadioAliasProperty" Action="setValue"
                         File = "[#HMI.config]"

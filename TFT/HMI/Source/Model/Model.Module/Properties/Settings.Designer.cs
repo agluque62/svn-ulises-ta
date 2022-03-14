@@ -434,6 +434,16 @@ namespace HMI.Model.Module.Properties {
         }
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ConfCambioPagRad
+        {
+            get
+            {
+                return ((bool)(this["ConfCambioPagRad"]));
+            }
+        }
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("DirectorioGLPRxRadio/")]
         public string DirectorioGLPRxRadio
         {

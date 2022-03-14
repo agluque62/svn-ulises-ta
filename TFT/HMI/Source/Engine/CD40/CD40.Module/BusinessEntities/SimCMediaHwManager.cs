@@ -345,24 +345,24 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="Type"></param>
         /// <param name="ON"></param>
-        public override void EnciendeLed(CORESIP_SndDevType Type, byte ON)
+        public override void OnOffLed(CORESIP_SndDevType Type, byte OnOff)
         {
             switch (Type)
             {
                 case CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER:
                     if (_dev4_alt != null)
-                        _dev4_alt.SetGpio(4, ON);
+                        _dev4_alt.SetGpio(4, OnOff);
                     break;
                 case CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER:
                     if (_dev3_alr != null)
-                        _dev3_alr.SetGpio(4, ON);
+                        _dev3_alr.SetGpio(4, OnOff);
                     break;
                 case CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER:
                     if (_dev3_alr != null)
-                        _dev3_alr.SetGpio(5, ON);
+                        _dev3_alr.SetGpio(5, OnOff);
                     break;
                 default:
-                    _Logger.Error("SimCMediaHwManager.EnciendeLed. Tipo Altavoz No Soportado: {0}", Type);
+                    _Logger.Error("SimCMediaHwManager.OnOffLed. Tipo Altavoz No Soportado: {0}", Type);
                     break;
             }
         }
@@ -371,9 +371,9 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         public override void ApagarSndSpeaker()
         {
-            EnciendeLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, 0);
-            EnciendeLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, 0);
-            EnciendeLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, 0);
+            OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, 0);
+            OnOffLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, 0);
+            OnOffLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, 0);
         }
 
         /// <summary>

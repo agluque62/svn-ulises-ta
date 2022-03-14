@@ -19,6 +19,13 @@ namespace HMI.Model.Module.UI
 		protected BtnInfo _BtnInfo = new BtnInfo();
 		private int _LongClickMs = 2000;
         private Rectangle _TypeRect = new Rectangle(4, 4, 24, 24);
+		//Errores #4805 Las funciones no permitidas no deberian  presentarse
+		private bool _Permitted = true;
+		public bool Permitted
+		{
+			get { return _Permitted; }
+			set { _Permitted = value; }
+		}
 
 		public new event EventHandler Click;
 		public event EventHandler LongClick;

@@ -151,9 +151,12 @@ namespace HMI.Model.Module.Services
 				{
 					_StateManager.Tlf.Listen.State = FunctionState.Idle;
 				}
+				// LALM 210527 #2518 Pérdida de función ESCUCHA al extraer jacks
+				// Cuando el P.O. está haciendo ESCUCHA a otro P.O. y saca los Jacks,
+				// OJO: SE PIERDE la Función de Escucha y esto no es COHERENTE con el comportamiento de la extracción de Jacks cuando se está en CONV
 				else if (_StateManager.Tlf.Listen.State == FunctionState.Executing)
 				{
-					_EngineCmdManager.CancelListen();
+					//_EngineCmdManager.CancelListen();
 				}
 
 				else if (_StateManager.Tlf.Listen.State == FunctionState.Error)
@@ -162,7 +165,7 @@ namespace HMI.Model.Module.Services
 				}
 
 				if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
-				{
+					{
 					_StateManager.Tlf.Transfer.State = FunctionState.Idle;
 				}
 				else if (_StateManager.Tlf.Transfer.State == FunctionState.Executing)
@@ -172,6 +175,11 @@ namespace HMI.Model.Module.Services
 				else if (_StateManager.Tlf.Transfer.State == FunctionState.Error)
 				{
 					_EngineCmdManager.RecognizeTransferState();
+				}
+				//LALM: 210316 Errores #4798 Se comprueba la funcion captura.
+				else if (_StateManager.Tlf.PickUp.State == FunctionState.Ready)
+				{
+					_StateManager.Tlf.PickUp.State = FunctionState.Idle;
 				}
 
 				_HangupCallsTimer.Enabled = true;

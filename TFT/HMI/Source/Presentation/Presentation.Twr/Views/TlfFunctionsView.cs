@@ -168,7 +168,13 @@ namespace HMI.Presentation.Twr.Views
         {
             get
             {
-                return _StateManager.Tft.Enabled && Settings.Default.EnableMore;
+				//Errores #4805 Las funciones no permitidas no deberian  presentarse
+				// si estoy en pagina 1 y no hay funciones en papaso a pagina 0.
+				if (!_ListenBT.Permitted && !_PickUpBT.Permitted && !_ForwardBT.Permitted)//ningun boton Permitted en pagina 1
+					return false;
+				if (!_PriorityBT.Permitted && !_HoldBT.Permitted && !_TransferBT.Permitted)//ningun boton permitido en pagina 0
+					return false;
+				return _StateManager.Tft.Enabled && Settings.Default.EnableMore;
             }
         }
 		private bool _CancelEnabled
@@ -277,6 +283,9 @@ namespace HMI.Presentation.Twr.Views
             {
                 _FunctionsPage = 0;
                 ChangeFunctionsTlfPage();
+				//LALM 210622 
+				//Errores #4805 Compruebo si hay funciones habilitadas en la pagina cambiada
+				CheckPagina();
             }
 		}
 
@@ -369,6 +378,7 @@ namespace HMI.Presentation.Twr.Views
 					break;
 			}
 		}
+
         [EventSubscription(EventTopicNames.TlfPickUpChanged, ThreadOption.Publisher)]
         public void OnTlfPickUpChanged(object sender, EventArgs e)
         {
@@ -412,6 +422,7 @@ namespace HMI.Presentation.Twr.Views
                     break;
             }
         }
+
 		[EventSubscription(EventTopicNames.TlfListenChanged, ThreadOption.Publisher)]
         public void OnTlfListenChanged(object sender, EventArgs e)
 		{
@@ -563,7 +574,39 @@ namespace HMI.Presentation.Twr.Views
 			_HoldBT.Enabled = _HoldEnabled;
 			_TransferBT.Enabled = _TransferEnabled;
             _PickUpBT.Enabled = _PickUpEnabled;
-            _ForwardBT.Enabled = _ForwardEnabled;
+			_ForwardBT.Enabled = _ForwardEnabled;
+
+
+			//Errores #4805 Las funciones no permitidas no deberian  presentarse
+			_PriorityBT.Permitted = _PriorityBTPermitted;
+			_ListenBT.Permitted = _ListenBTPermitted;
+			_HoldBT.Permitted = _HoldBTPermitted;
+			_TransferBT.Permitted = _TransferBTPermitted;
+			_PickUpBT.Permitted = _PickUpBTPermitted;
+			_ForwardBT.Permitted = _ForwardBTPermitted;
+
+			CheckPagina();
+
+			//Errores #4805 Las funciones no permitidas no deberian  presentarse
+			/*if (!_PriorityBT.Permitted) _PriorityBT.Visible = false;
+			if (!_ListenBT.Permitted) _ListenBT.Visible=false;
+			if (!_HoldBT.Permitted) _HoldBT.Visible=false;
+			if (!_TransferBT.Permitted) _TransferBT.Visible=false;
+			if (!_PickUpBT.Permitted) _PickUpBT.Visible=false;
+			if (!_ForwardBT.Permitted) _ForwardBT.Visible = false;
+			*/
+
+			//Visibles en pagina 0
+			//Errores #4805 Las funciones no permitidas no deberian  presentarse
+			_PriorityBT.Visible = (_FunctionsPage == 0) && (Settings.Default.EnablePriority) && (_PriorityBT.Permitted);
+			_HoldBT.Visible = (_FunctionsPage == 0) && (Settings.Default.EnableHold) && (_HoldBT.Permitted);
+			_TransferBT.Visible = (_FunctionsPage == 0) && (Settings.Default.EnableTransfer) && (_TransferBT.Permitted);
+			//Visibles en pagina 1
+			_ListenBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableListen) && (_ListenBT.Permitted);
+			_PickUpBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnablePickUp) && (_PickUpBT.Permitted);
+			_ForwardBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableForward) && (_ForwardBT.Permitted);
+			ChangeColorMore();
+
 		}
 
 		[EventSubscription(EventTopicNames.TlfChanged, ThreadOption.Publisher)]
@@ -597,6 +640,7 @@ namespace HMI.Presentation.Twr.Views
                 this._TlfSpeakerBT.ImageNormal = global::HMI.Presentation.Twr.Properties.Resources.HeadPhonesTlf;
             }
         }
+
         /// <summary>
         /// Este evento llega cuando hay un cambio en la presencia del altavoz
         /// se usa habilitar o no el botón de seleción de altavoz de telefonía
@@ -621,6 +665,7 @@ namespace HMI.Presentation.Twr.Views
 
             _TlfSpeakerBT.Enabled = _TlfSpeakerBtEnabled;
         }
+
         [EventSubscription(EventTopicNames.TlfIntrudedByChanged, ThreadOption.Publisher)]
         public void OnTlfIntrudedByChanged(object sender, EventArgs e)
         {
@@ -860,7 +905,45 @@ namespace HMI.Presentation.Twr.Views
             Settings.Default.Save();
         }
 
-        private void ChangeFunctionsTlfPage()
+		//LALM 210622 
+		//Errores #4805 Las funciones no permitidas no deberian  presentarse quito tambien el boton more.
+		private void CheckMore()
+        {
+			if (_FunctionsPage == 0)
+            {
+				if (!_ListenBTPermitted && !_PickUpBTPermitted && !_ForwardBTPermitted)
+					_MoreBT.Visible = false;
+				else
+					_MoreBT.Visible = true;
+			}
+			else if (_FunctionsPage == 1)
+			{
+				if (!_PriorityBTPermitted && !_HoldBTPermitted && !_TransferBTPermitted)
+					_MoreBT.Visible = false;
+				else
+					_MoreBT.Visible = true;
+			}
+		}
+
+		//LALM 210622 
+		//Errores #4805 //cambio de pagina si la activa no tiene botones
+		void CheckPagina()
+        {
+			// si estoy en pagina 1 y no hay funciones paso a pagina 0.
+			if (_FunctionsPage == 1)
+				if (!_ListenBTPermitted && !_PickUpBTPermitted && !_ForwardBTPermitted)//ningun boton Permitted en pagina 1
+					if (_PriorityBTPermitted || _HoldBTPermitted || _TransferBTPermitted)//algun boton permitido en pagina 0
+						ChangeFunctionsTlfPage();
+			// Si estoy en pagina 0 y no hay funciones y si las hay en pagina 1 cambio de pagina
+			if (_FunctionsPage == 0)
+				if (!_PriorityBTPermitted && !_HoldBTPermitted && !_TransferBTPermitted)//ningun boton Permitted de pagina 0
+					if (_ListenBTPermitted || _PickUpBTPermitted || _ForwardBTPermitted)// algun boton permitido en pagina 1
+						ChangeFunctionsTlfPage();
+
+			CheckMore();// Quito o pongo boton more
+		}
+
+		private void ChangeFunctionsTlfPage()
         {
             if (_FunctionsPage == 0)
             {
@@ -882,18 +965,21 @@ namespace HMI.Presentation.Twr.Views
                 this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 2, 2);
                 _FunctionsPage = 0;
             }
-            //Visibles en pagina 0
-            _PriorityBT.Visible = (_FunctionsPage == 0)  && (Settings.Default.EnablePriority);
-            _HoldBT.Visible = (_FunctionsPage == 0) && (Settings.Default.EnableHold);
-            _TransferBT.Visible = (_FunctionsPage == 0) && (Settings.Default.EnableTransfer);
-            //Visibles en pagina 1
-            _ListenBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableListen);
-            _PickUpBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnablePickUp);
-            _ForwardBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableForward);
-            ChangeColorMore();
-        }
 
-        private void ChangeColorMore()
+			//Visibles en pagina 0
+			//LALM 210622
+			//Errores #4805 Las funciones no permitidas no deberian  presentarse, la visibilidad depende de Permitted
+			_PriorityBT.Visible = (_FunctionsPage == 0)  && (Settings.Default.EnablePriority) && (_PriorityBT.Permitted);
+            _HoldBT.Visible = (_FunctionsPage == 0) && (Settings.Default.EnableHold) && (_HoldBT.Permitted);
+            _TransferBT.Visible = (_FunctionsPage == 0) && (Settings.Default.EnableTransfer) && (_TransferBT.Permitted);
+            //Visibles en pagina 1
+            _ListenBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableListen) && (_ListenBT.Permitted);
+			_PickUpBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnablePickUp) && (_PickUpBT.Permitted);
+            _ForwardBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableForward) && (_ForwardBT.Permitted);
+            ChangeColorMore();
+		}
+
+		private void ChangeColorMore()
         {
             bool otherPageActive = ((_FunctionsPage == 0) &&
                 ((_StateManager.Tlf.Listen.State != FunctionState.Idle) ||
@@ -943,6 +1029,62 @@ namespace HMI.Presentation.Twr.Views
                 _Logger.Error("ERROR pulsando tecla de captura", ex);
             }
         }
-    }
+
+		public bool _PriorityBTPermitted
+		{
+			get
+			{
+				if ((_StateManager.Permissions & Permissions.Priority) == Permissions.Priority)
+					return true;
+				return false;
+			}
+		}
+		private bool _ListenBTPermitted
+		{
+			get
+			{
+				if ((_StateManager.Permissions & Permissions.Listen) == Permissions.Listen)
+					return true;
+				return false;
+			}
+		}
+		private bool _HoldBTPermitted
+		{
+			get
+			{
+				if ((_StateManager.Permissions & Permissions.Hold) == Permissions.Hold)
+					return true;
+				return false;
+			}
+		}
+		private bool _TransferBTPermitted
+		{
+			get
+			{
+				if ((_StateManager.Permissions & Permissions.Transfer) == Permissions.Transfer)
+					return true;
+				return false;
+			}
+		}
+		private bool _PickUpBTPermitted
+		{
+			get
+			{
+				if ((_StateManager.Permissions & Permissions.Capture) == Permissions.Capture)
+					return true;
+				return false;
+			}
+		}
+		private bool _ForwardBTPermitted
+		{
+			get
+			{
+				if ((_StateManager.Permissions & Permissions.Forward) == Permissions.Forward)
+					return true;
+				return false;
+			}
+		}
+
+	}
 }
 

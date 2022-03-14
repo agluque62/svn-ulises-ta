@@ -14,8 +14,11 @@ namespace HMI.Presentation.Twr.Constants
 	/// <summary>
 	/// Constants for event topic names.
 	/// </summary>
+	//LALM 210224 Errores #4755 confirmación de cambio de página radio
 	public class EventTopicNames : HMI.Model.Module.Constants.EventTopicNames
 	{
 		public const string DependencesNumberCalled = "DependencesNumberCalled";
+		public const string CambioPaginaRadioUp = "CambioPaginaRadioUp";
+		public const string CambioPaginaRadioDown = "CambioPaginaRadioDown";
 	}
 }

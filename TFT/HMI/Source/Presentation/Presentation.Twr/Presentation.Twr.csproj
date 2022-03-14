@@ -444,6 +444,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\logo_AENA_URV-7.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\logo_enaire.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\play.png" />
     <None Include="Resources\SpeakerTlf.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -203,10 +203,12 @@ namespace HMI.Model.Module.Messages
         public readonly bool Monitoring;
         public readonly FrequencyState Estado;
         public readonly bool RxOnly;
-        /** 20180321. AGL. ALIAS a mostrar en la tecla... */
-        public string KeyAlias { get; set; }
+		/** 20180321. AGL. ALIAS a mostrar en la tecla... */
+		public string KeyAlias { get; set; }
+		//LALM 210223 hay que pasar la prioridad.
+		public int Priority { get; set; }
 
-        public RdInfo(string dst, string alias, bool tx, bool rx, PttState ptt, SquelchState squelch,
+		public RdInfo(string dst, string alias, bool tx, bool rx, PttState ptt, SquelchState squelch,
             RdRxAudioVia audioVia, int rtxGroup, TipoFrecuencia_t tipoFrecuencia, bool monitoring, FrequencyState estado, bool rxOnly)
 		{
 			Dst = dst;

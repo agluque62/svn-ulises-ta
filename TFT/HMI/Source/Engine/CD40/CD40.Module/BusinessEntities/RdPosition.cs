@@ -45,7 +45,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /** 20180321. AGL. Alias Mostrado */
         public string KeyAlias { get { return _KeyAlias; } }
 
-		public bool Tx
+        // LALM 210223 Errores #4756  prioridad
+        public int Priority { get { return (int)_Priority; } }
+
+        public bool Tx
 		{
 			get { return (_Tx == AssignState.Set); }
 			private set
@@ -258,8 +261,11 @@ namespace HMI.CD40.Module.BusinessEntities
             var Alias = cfg.GetType().GetProperty("Alias");
             _KeyAlias = Alias == null ? "NoAlias" : Alias.GetValue(cfg) as string;
             // _KeyAlias = cfg.Alias;
-			//_Alias = cfg.ListaRecursos.Count > 0 ? cfg.ListaRecursos[0].IdEmplazamiento : "";
-			_Priority = cfg.Prioridad;
+            //_Alias = cfg.ListaRecursos.Count > 0 ? cfg.ListaRecursos[0].IdEmplazamiento : "";
+
+            //LALM 210223 Errores #4756 prioridad 
+            _Priority = cfg.Prioridad;
+
             _TipoFrecuencia = (TipoFrecuencia_t)cfg.TipoFrecuencia;
             _Monitoring = cfg.EstadoAsignacion == "M";
             _RxOnly = false;
@@ -347,11 +353,11 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 			if ((_Tx != AssignState.Idle) && (_Priority != oldPriority))
 			{
-				Top.Registry.SetTx(_Literal, true, _Priority, _Tx == AssignState.Trying);
+                Top.Registry.SetTx(_Literal, true, _Priority, _Tx == AssignState.Trying);
 			}
 		}
 
-		public void SetRx(bool on, bool forced = false)
+        public void SetRx(bool on, bool forced = false)
 		{
 			if (Available && (forced || Top.Rd.PttSource == PttSource.NoPtt))
 			{
