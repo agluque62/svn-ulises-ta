@@ -2,6 +2,12 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="U5ki.PresenceService.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
+    <Setting Name="MulticastGroupIp" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">224.100.10.1</Value>
+    </Setting>
+    <Setting Name="MulticastGroupPort" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">1001</Value>
+    </Setting>
     <Setting Name="TimeoutOnConnected" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">5</Value>
     </Setting>
@@ -24,13 +30,10 @@
       <Value Profile="(Default)">sa</Value>
     </Setting>
     <Setting Name="MulticastGroupInterfazIp" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">10.12.60.35</Value>
+      <Value Profile="(Default)">10.12.35.130</Value>
     </Setting>
     <Setting Name="MonitorAllUsersOfDependencies" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="MulticastGroupPort" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">1001</Value>
     </Setting>
   </Settings>
 </SettingsFile>
