@@ -604,7 +604,8 @@ namespace HMI.Presentation.Twr.Views
 			//Visibles en pagina 1
 			_ListenBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableListen) && (_ListenBT.Permitted);
 			_PickUpBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnablePickUp) && (_PickUpBT.Permitted);
-			_ForwardBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableForward) && (_ForwardBT.Permitted);
+			//Visibles en pagina 2
+			_ForwardBT.Visible = (_FunctionsPage == 2) && (Settings.Default.EnableForward) && (_ForwardBT.Permitted);
 			ChangeColorMore();
 
 		}
@@ -929,6 +930,11 @@ namespace HMI.Presentation.Twr.Views
 		//Errores #4805 //cambio de pagina si la activa no tiene botones
 		void CheckPagina()
         {
+			// si estoy en pagina 2 y no hay funciones paso a pagina 0.
+			if (_FunctionsPage == 2)
+				if (!_ForwardBTPermitted)//ningun boton Permitted en pagina 2
+					if (_PriorityBTPermitted || _HoldBTPermitted || _TransferBTPermitted)//algun boton permitido en pagina 0
+						ChangeFunctionsTlfPage();
 			// si estoy en pagina 1 y no hay funciones paso a pagina 0.
 			if (_FunctionsPage == 1)
 				if (!_ListenBTPermitted && !_PickUpBTPermitted && !_ForwardBTPermitted)//ningun boton Permitted en pagina 1
@@ -955,16 +961,28 @@ namespace HMI.Presentation.Twr.Views
                 this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 1, 1);
                 _FunctionsPage = 1;
             }
-            else
-            {
-                this._TlfFunctionsTLP.Controls.Add(this._PriorityBT, 0, 0);
-                this._TlfFunctionsTLP.Controls.Add(this._ListenBT, 1, 2);
-                this._TlfFunctionsTLP.Controls.Add(this._HoldBT, 0, 1);
-                this._TlfFunctionsTLP.Controls.Add(this._PickUpBT, 1, 3);
-                this._TlfFunctionsTLP.Controls.Add(this._TransferBT, 1, 1);
-                this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 2, 2);
-                _FunctionsPage = 0;
+			// Paso a pagina 2 solo en el caso de funcion devio habilitada.
+            else if ((_FunctionsPage == 1) && (Settings.Default.EnableForward) && (_ForwardBT.Permitted))
+
+			{
+				this._TlfFunctionsTLP.Controls.Add(this._PriorityBT, 1, 2);
+				this._TlfFunctionsTLP.Controls.Add(this._ListenBT, 1, 2);
+				this._TlfFunctionsTLP.Controls.Add(this._HoldBT, 1, 2);
+				this._TlfFunctionsTLP.Controls.Add(this._PickUpBT, 1, 2);
+				this._TlfFunctionsTLP.Controls.Add(this._TransferBT, 1, 2);
+				this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 1, 1);
+				_FunctionsPage = 2;
             }
+			else
+            {
+				this._TlfFunctionsTLP.Controls.Add(this._PriorityBT, 0, 0);
+				this._TlfFunctionsTLP.Controls.Add(this._ListenBT, 1, 2);
+				this._TlfFunctionsTLP.Controls.Add(this._HoldBT, 0, 1);
+				this._TlfFunctionsTLP.Controls.Add(this._PickUpBT, 1, 3);
+				this._TlfFunctionsTLP.Controls.Add(this._TransferBT, 1, 1);
+				this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 1, 1);
+				_FunctionsPage = 0;
+			}
 
 			//Visibles en pagina 0
 			//LALM 210622
@@ -975,8 +993,10 @@ namespace HMI.Presentation.Twr.Views
             //Visibles en pagina 1
             _ListenBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableListen) && (_ListenBT.Permitted);
 			_PickUpBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnablePickUp) && (_PickUpBT.Permitted);
-            _ForwardBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableForward) && (_ForwardBT.Permitted);
-            ChangeColorMore();
+            //_ForwardBT.Visible = (_FunctionsPage == 1) && (Settings.Default.EnableForward) && (_ForwardBT.Permitted);
+			//Visibles en pagina 2
+			_ForwardBT.Visible = (_FunctionsPage == 2) && (Settings.Default.EnableForward) && (_ForwardBT.Permitted);
+			ChangeColorMore();
 		}
 
 		private void ChangeColorMore()
@@ -1026,7 +1046,7 @@ namespace HMI.Presentation.Twr.Views
             }
             catch (Exception ex)
             {
-                _Logger.Error("ERROR pulsando tecla de captura", ex);
+                _Logger.Error("ERROR pulsando tecla de desvio", ex);
             }
         }
 

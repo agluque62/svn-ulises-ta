@@ -156,7 +156,8 @@ namespace HMI.CD40.Module.BusinessEntities
             // JCAM. 20170324
             // Incorporar las direcciones de los grabadores en la configuración 
             // y hacer que el módulo de grabación se entere del cambio de configuración
-            AsignacionUsuariosTV tv = Top.Cfg.GetUserTv(Top.Cfg.MainId);
+            //AsignacionUsuariosTV tv = Top.Cfg.GetUserTv(Top.Cfg.MainId);
+            AsignacionUsuariosTV tv = Top.Cfg.GetHostTv(Top.HostId);
             if (tv != null)
             {
                 //SipAgent.PictRecordingCfg(tv.IpGrabador1, tv.IpGrabador2, tv.RtspPort);
@@ -393,7 +394,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
         private void OnCfwrOptReceived(string accId, string from_uri, CORESIP_CFWR_OPT_TYPE cfwr_options_type, string body, uint hresp)
         {
-            _Logger.Debug("Recibido options call forward");
+            _Logger.Debug("Recibido options call forward:"+"::"+body);
 
             Top.WorkingThread.Enqueue("OnCfwrOpt", delegate ()
             {
@@ -403,7 +404,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
         private void OnCfwrOptResponse(string accId, string dstUri, string callid, int st_code, CORESIP_CFWR_OPT_TYPE cfwr_options_type, string body)
         {
-            _Logger.Debug("Recibido options call forward");
+            _Logger.Debug("Recibido options call forward"+ ":"+body);
 
             Top.WorkingThread.Enqueue("OnCfwrOpt", delegate ()
             {

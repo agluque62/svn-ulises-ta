@@ -3288,7 +3288,7 @@ namespace U5ki.Infrastructure
             {
                 _Logger.Error("Error escribiendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
             }
-            _Logger.Debug("Modificado fichero {4} IP_REC_A:{0} IP_REC_B:{1} PORTS_RTSP:{2}{3} DUAL_RECORDER:{4}", ipRecorder1 ?? string.Empty, ipRecorder2 ?? string.Empty, rtspPort, rtspPort2, (ipRecorder1 == null && ipRecorder2 == null) ? "0" : "1", fullRecorderFileName);
+            _Logger.Debug("Modificado fichero {4} IP_REC_A:{0} IP_REC_B:{1} PORTS_RTSP:{2},{3} DUAL_RECORDER:{4}", ipRecorder1 ?? string.Empty, ipRecorder2 ?? string.Empty, rtspPort, rtspPort2, (ipRecorder1 == null && ipRecorder2 == null) ? "0" : "1", fullRecorderFileName);
             if (result == false)
             {
                 _Logger.Error("Error escribiendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());

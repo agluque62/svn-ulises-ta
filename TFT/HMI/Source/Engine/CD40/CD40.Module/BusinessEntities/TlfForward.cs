@@ -150,10 +150,14 @@ namespace HMI.CD40.Module.BusinessEntities
             public string _AccNumber;
             private bool _UseProxy = false;
             private readonly bool _UnitTest = false;
+            //public event GenericEventHandler<string> SipMessageReceived;
             public TlfForward(string signature)
             {
                 _AccNumber = signature;
                  Top.Cfg.ProxyStateChangeCfg += OnProxyStateChange;
+                //lalm 220211 capturo funcion message
+                Top.Sip.SipMessage += OnSipMessageReceived;
+
             }
 #if DEBUG
             /// <summary>
@@ -168,7 +172,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 Top.Tlf = tlfManager;
             }
 #endif
-#region HeadNode
+            #region HeadNode
             private string MyUri()
             {
                 if (_UseProxy)
@@ -795,6 +799,47 @@ namespace HMI.CD40.Module.BusinessEntities
                     }
                 }
             }
+            /// <summary>
+            /// Receive a text message.
+            /// Only implemented in pick Up scenarioss
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="textMessage"></param>
+            /// lalm 220111
+            /// tramiento de mensajes.
+            private void OnSipMessageReceived(object sender, string textMessage)
+            {
+                if (textMessage.StartsWith(ForwardTag))
+                {
+                    //it's for me
+                    //General.SafeLaunchEvent(SipMessageReceived, this, textMessage.Substring(ForwardTag.Length));
+                    //General.SafeLaunchEvent(ForwardChanged, this, new ListenPickUpMsg(_State, _Peer.Literal, _TailName));
+                    _Logger.Warn("OnSipMessageReceived: {0}",textMessage);
+
+                    string texto = textMessage.Substring(ForwardTag.Length);
+                    if (texto.Split(',').Length==4)
+                    {
+                        string dst = texto.Split(',')[1];
+                        string number = texto.Split(',')[2];
+                        string literal = texto.Split(',')[3];
+                        List<DiversionSet> affectedDs = new List<DiversionSet>();
+                        // busco la posicion correspondiente
+                        foreach (DiversionSet ds in _LocalDiversionSet)
+                        {
+                            if (ds.TailUser == dst)
+                            {
+                            }
+                        }
+                        TlfPosition target = Top.Tlf.SearchTlfPosition(0, dst, number, literal, false);
+                        if (target != null)
+                            affectedDs = _LocalDiversionSet.FindAll(x => x.TlfParticipantsObj.Contains(target));
+                        if ((affectedDs != null) && affectedDs.Count>0)
+                            this.AutoRemoveDiversionSet(affectedDs[0].HeadUser);
+
+                    }
+                }
+
+            }
         }
 
         public event GenericEventHandler<ListenPickUpMsg> ForwardChanged;
@@ -817,6 +862,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// name of tail in diversionSet when is different from Peer 
         /// </summary>
         string _TailName = null;
+        private const string ForwardTag = "-Forward-";
         public FunctionState State
         {
             get { return _State; }
@@ -898,10 +944,10 @@ namespace HMI.CD40.Module.BusinessEntities
                     General.SafeLaunchEvent(SetSnmpString, this, new SnmpStringMsg<string, string>(Settings.Default.TlfFacilityOid, snmpString));
                 });
 
-            if (_Peer.Pos == Tlf.NumDestinations + Tlf.NumIaDestinations)
-                _Peer.Dispose();
-            _Peer = null;
-        }
+                if (_Peer.Pos == Tlf.NumDestinations + Tlf.NumIaDestinations)
+                    _Peer.Dispose();
+                _Peer = null;
+            }
         }
 
         public string GetDiversionTail(string account)
@@ -1000,6 +1046,25 @@ namespace HMI.CD40.Module.BusinessEntities
                 _Logger.Error("OnCallForwardReceived: no call forward for accId: "+accId);
         }
 
+        // lalm 220211
+        private void mensaje(string AccId, TlfForward forward, string texto)
+        {
+            // Pruebo a enviar un mensaje a todos los elemntos que tienen desvio conmigo.
+            //SipAgent.SendInstantMessage(_Target.Channels[0].AccId, _Target.Uri, ForwardTag + Top.Cfg.PositionId + Resources.HasCaptured + _Captured.Literal, _UseProxy);
+            //string AccId = forward._AccNumber;
+            if (forward._LocalDiversionSet.Count > 0)
+            {
+                string dst_uri = forward._LocalDiversionSet[0].Head;
+                string uri = forward._LocalDiversionSet[0].Tail;
+                string user = forward._LocalDiversionSet[0].TailUser;
+                string number = "03" + user;
+                string literal = Top.Cfg.PositionId;
+                bool proxy = true;
+                SipAgent.SendInstantMessage(AccId, dst_uri, ForwardTag + uri +
+                                            "," + user + "," + number + "," +
+                                            literal, proxy);
+            }
+        }
         /// <summary>
         /// Receive an options with a command response for Call forward
         /// </summary>
@@ -1044,12 +1109,34 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="sender"></param>
         private void OnConfigChanged(object sender)
         {
-            //Cancel through negotiation first
-            Cancel(false);
-            //Cancel resto of forwards if any
-            Cancel(true);
+            //LALM 220208 No cancelo ningun desvio si no estoy fuera de sectorización
+            if (Top.Cfg != null && Top.Cfg.MainId == "__FS__")
+            {
 
+                //Cancel through negotiation first
+                Cancel(false);
+                //Cancel resto of forwards if any
+                Cancel(true);
+            }
             Dictionary<string, TlfForward> oldForwardsAcc = new Dictionary<string, TlfForward>(_ForwardAcc);
+
+            //LALM 220214
+            //TODO si el otro cambia de host o de IP, habría que borrarlo
+            //TODO Falta comprobar si han cambiado todos los participantes
+            foreach (string cuenta2 in _MyAccounts)
+            {
+                foreach (StrNumeroAbonado cuenta1 in Top.Cfg.HostAddresses)
+                {
+                    if (!_MyAccounts.Any(x => x == cuenta1.NumeroAbonado))
+                    foreach (TlfForward forward in _ForwardAcc.Values)
+                    {
+                        mensaje(forward._AccNumber , forward, "OnCallForwardResponse");
+                    }
+
+                }
+            }
+
+
             _MyAccounts.Clear();
             _ForwardAcc.Clear();
             foreach (StrNumeroAbonado num in Top.Cfg.HostAddresses)
@@ -1057,30 +1144,31 @@ namespace HMI.CD40.Module.BusinessEntities
                 //Solo para numeracion ATS del sector (se excluyen cuentas RTB por ejemplo)
                 if (num.Prefijo == Cd40Cfg.ATS_DST)
                 {
-                _MyAccounts.Add(num.NumeroAbonado);
-                TlfForward newForward;
-                if (oldForwardsAcc.TryGetValue(num.NumeroAbonado, out newForward) == false)
-                {
-                    newForward = new TlfForward(num.NumeroAbonado);
-                    newForward.DiversionSetAutoRemoved += OnAutoDiversionSetRemoved;
-                }
+                    _MyAccounts.Add(num.NumeroAbonado);
+                    TlfForward newForward;
+                    if (oldForwardsAcc.TryGetValue(num.NumeroAbonado, out newForward) == false)
+                    {
+                        newForward = new TlfForward(num.NumeroAbonado);
+                        newForward.DiversionSetAutoRemoved += OnAutoDiversionSetRemoved;
+                    }
                 _ForwardAcc.Add(num.NumeroAbonado, newForward);
                 oldForwardsAcc.Remove(num.NumeroAbonado);
+                }
             }
+            
+            // LALM 220208 Cancelo desvios solo si no soy afectado.
+            // Si han cambiado mis numeros de usuario, borro todos mis desvios
+            if (oldForwardsAcc.Count > 0)
+            {
+                //Borra los desvios de la cuenta existente
+                //Cancel();
+                //Borra los desvios de la cuenta que ya no está
+                foreach (TlfForward forward in oldForwardsAcc.Values)
+                {
+                    forward.AutoRemoveDiversionSet(forward._AccNumber);
+                    forward.DiversionSetAutoRemoved -= OnAutoDiversionSetRemoved;
+                }
             }
-
-            //Si han cambiado mis numeros de usuario, borro todos mis desvios 
-            //if (oldForwardsAcc.Count > 0)
-            //{
-            //    //Borra los desvios de la cuenta existente
-            //    //Cancel();
-            //    //Borra los desvios de la cuenta que ya no está
-            //    foreach (TlfForward forward in oldForwardsAcc.Values)
-            //    {                    
-            //        forward.AutoRemoveDiversionSet(forward._AccNumber);
-            //        forward.DiversionSetAutoRemoved -= OnAutoDiversionSetRemoved;
-            //    }
-            //}
             //TODO si el otro cambia de host o de IP, habría que borrarlo
             //TODO Falta comprobar si han cambiado todos los participantes
             //foreach (TlfForward forward in _ForwardAcc.Values)
@@ -1088,6 +1176,10 @@ namespace HMI.CD40.Module.BusinessEntities
             //    forward.OnConfigChanged();
             //}
 
+            //lalm 150222 Se podria en cada cambio de configuración si no soy afectado (o siempre)
+            //si yo soy el tail del desvio volverlo a generar, consecuencia si el tail se queda fuera de sectorizacion, los desvio tampoco se desharian.
+            //PrepareCommon(Top.Tlf[1]);
+            //Thread.Sleep(2000);
         }
         /// <summary>
         /// Evento enviado por el TlfForward para avisar de que se ha detectado 
@@ -1107,7 +1199,7 @@ namespace HMI.CD40.Module.BusinessEntities
             else
                 General.SafeLaunchEvent(RemoteForwardChanged, this, new ListenPickUpMsg(_State));
 
-			}                
+			}
 
     }
 

@@ -468,7 +468,21 @@ namespace HMI.CD40.Module.BusinessEntities
             return null;
         }
 
-		public List<StrNumeroAbonado> GetHostAddresses(string host)
+        public AsignacionUsuariosTV GetHostTv(string IdHost)
+        {
+            foreach (AsignacionUsuariosTV tv in _SystemCfg.PlanAsignacionUsuarios)
+            {
+                if (string.Compare(tv.IdHost, IdHost, true) == 0)
+                {
+                    return tv;
+                }
+            }
+
+            return null;
+        }
+
+
+        public List<StrNumeroAbonado> GetHostAddresses(string host)
 		{
             return _SystemCfg.GetHostAddresses(host);
 				}
@@ -1385,20 +1399,24 @@ namespace HMI.CD40.Module.BusinessEntities
         //RQF-22
         void CheckCfgAnalogica()
         {
-            AsignacionUsuariosTV tv = Top.Cfg.GetUserTv(Top.Cfg.MainId);
-            bool changes = PictGrabacionAnalogicaCfg(tv.TipoGrabacionAnalogica, tv.EnableGrabacionAnalogica);
-
-            //RQF-22
-            if (changes)//comento para pruebas
+            //AsignacionUsuariosTV tv = Top.Cfg.GetUserTv(Top.Cfg.MainId);
+            AsignacionUsuariosTV tv = Top.Cfg.GetHostTv(Top.HostId);
+            //LALM 220208 si no hay configuración no hago nada.
+            if (tv != null)
             {
-                Top.WorkingThread.Enqueue("TipoGrabacionAnalogica", delegate ()
-                {
-                    Top.Mixer.SetTipoGrabacionAnalogica(tv.TipoGrabacionAnalogica);
-                    Top.Mixer.SetGrabacionAnalogica(tv.TipoGrabacionAnalogica,tv.EnableGrabacionAnalogica);
-                    //Top.Mixer.Init();
-                    //Top.Mixer.Start();
-                });
+                bool changes = PictGrabacionAnalogicaCfg(tv.TipoGrabacionAnalogica, tv.EnableGrabacionAnalogica);
 
+                //RQF-22
+                if (changes)//comento para pruebas
+                {
+                    Top.WorkingThread.Enqueue("TipoGrabacionAnalogica", delegate ()
+                    {
+                        Top.Mixer.SetTipoGrabacionAnalogica(tv.TipoGrabacionAnalogica);
+                        Top.Mixer.SetGrabacionAnalogica(tv.TipoGrabacionAnalogica, tv.EnableGrabacionAnalogica);
+                        //Top.Mixer.Init();
+                        //Top.Mixer.Start();
+                    });
+                }
             }
         }
 

@@ -262,6 +262,9 @@
             <Component Id="cmp1AB011678818BF5B44125904F1EA7219" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
                 <File Id="fil5C17851D633C543E63BC249928E08A7A" KeyPath="yes" Source="$(var.SourcePath)\Tones\Congestion.wav" />
             </Component>
+            <Component Id="cmp0B1794D50D4A5E46524C0006554B3BAD" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil36C1A45EA86539708F7A61709329D786" KeyPath="yes" Source="$(var.SourcePath)\Tones\Descolgado.wav" />
+            </Component>
             <Component Id="cmpBBABED17146EE973E2FC8EC2F1B5166D" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
                 <File Id="fil920A8B0380E782E4CEC7905972430895" KeyPath="yes" Source="$(var.SourcePath)\Tones\Falsa_Maniobra.wav" />
             </Component>
@@ -288,6 +291,9 @@
             </Component>
             <Component Id="cmpD9699E6F06A899383FC0DD9E9570DCC2" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
                 <File Id="fil78820D819F6508F00CAF44B0D5124936" KeyPath="yes" Source="$(var.SourcePath)\Tones\ring.wav" />
+            </Component>
+            <Component Id="cmpB3E0C4908B4D67A7CCEB8DF5A4B300B5" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil60FF028904D655DDB16B57ABBD27CE4C" KeyPath="yes" Source="$(var.SourcePath)\Tones\RingNoIntrusivo.wav" />
             </Component>
             <Component Id="cmpDE5838E26F7552652CA39136E8CCED09" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
                 <File Id="fil4B26C3DEF3F26537892AEDF6CD56D1AA" KeyPath="yes" Source="$(var.SourcePath)\Tones\RingPrio.wav" />

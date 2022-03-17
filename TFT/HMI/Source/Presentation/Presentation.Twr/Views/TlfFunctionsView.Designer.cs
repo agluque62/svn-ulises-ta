@@ -66,7 +66,7 @@ namespace HMI.Presentation.Twr.Views
             this._TlfFunctionsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 28F));
             this._TlfFunctionsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
             this._TlfFunctionsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
-            this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 0, 2);
+            this._TlfFunctionsTLP.Controls.Add(this._ForwardBT, 1, 1);
             this._TlfFunctionsTLP.Controls.Add(this._PickUpBT, 0, 2);
             this._TlfFunctionsTLP.Controls.Add(this._MoreBT, 1, 0);
             this._TlfFunctionsTLP.Controls.Add(this._TlfSpeakerBT, 3, 1);

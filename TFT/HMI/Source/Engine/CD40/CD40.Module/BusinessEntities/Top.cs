@@ -75,18 +75,20 @@ namespace HMI.CD40.Module.BusinessEntities
             get
             {
                 //lalm
+                bool ip_configurada=false;
                 List<string> lista = GetOperationalV4Ips();
                 foreach (String ip in lista)
                     if (ip == _SipIp)
-                        return _SipIp;
+                    {
+                    	ip_configurada=true;
+                    	break;
+                	}
+                //220216 perdida de memoria si no se borra la lisa.
+                lista.Clear();
                 // Peticion #4618
-                _Logger.Fatal("IP No configurada {0} \n", _SipIp);
+                if (ip_configurada==false)
+                	_Logger.Fatal("IP No configurada {0} \n", _SipIp);
                 return _SipIp;
-                /*
-                _Logger.Fatal("IP No configurada {0} \n", _SipIp);
-                // Devolviendo esto funcionará el programa pero dara error a la larga
-                return "0.0.0.0";
-                */
             }
         }
 

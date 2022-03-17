@@ -185,8 +185,12 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 		}
 
+        static bool dentro_TimerNetworkStatus_Elapsed = false;
         void _TimerNetworkStatus_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (dentro_TimerNetworkStatus_Elapsed == true)
+                return;
+            dentro_TimerNetworkStatus_Elapsed = true;
             // if (_StatusNetworkOn && !System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
             // LALM 210521 
             // Peticiones #4816 Comprobar si hay varios interfaces de red activos
@@ -204,6 +208,7 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 _StatusNetworkOn = true;
             }
+            dentro_TimerNetworkStatus_Elapsed = false;
         }
 
         /// <summary>
