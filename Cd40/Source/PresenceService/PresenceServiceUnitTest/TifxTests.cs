@@ -6,9 +6,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Windows.Forms;
 using System.Diagnostics;
 
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
-//using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
 
 //using U5ki.PresenceService;
 //using U5ki.PresenceService.Interfaces;
@@ -17,7 +17,6 @@ using System.Diagnostics;
 
 using U5ki.Infrastructure;
 using U5ki.TifxService;
-using Utilities;
 
 namespace PresenceServiceUnitTest
 {
@@ -29,7 +28,7 @@ namespace PresenceServiceUnitTest
         {
 #if DEBUG
             var jcfg = File.ReadAllText("u5ki.LastCfg.json");
-            var cfg = JsonHelper.Parse<Cd40Cfg>(jcfg);
+            var cfg = JsonConvert.DeserializeObject<Cd40Cfg>(jcfg);
             var service = new TifxService();
 
             var prxInfo = new GwInfo()

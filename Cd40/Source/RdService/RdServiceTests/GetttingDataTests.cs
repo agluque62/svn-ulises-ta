@@ -25,7 +25,7 @@ namespace RadioServiceTest
             for (var frec=0; frec<nFrec; frec++)
             {
                 var strFrec = $"123.0{frec}0";
-                var Frec = new RdFrecuency(strFrec);
+                var Frec = new RdFrecuency(strFrec, strFrec);
                 var nEmpl = Rnd.Next(1, 4);
                 for (var empl = 0; empl<nEmpl; empl++)
                 {
@@ -34,19 +34,32 @@ namespace RadioServiceTest
                     var EsUnoMasUno = Rnd.Next(2) == 1;
                     if (EsUnoMasUno)
                     {
+#if __VERSION_0__
                         var tx1 = new RdResource("Tx1"+IdBase, $"sip:Tx1{IdBase}@10.11.12.13", RdRsType.Tx, strFrec, strSite);
                         var tx2 = new RdResource("Tx2"+IdBase, $"sip:Tx2{IdBase}@10.11.12.13", RdRsType.Tx, strFrec, strSite);
                         var rTxPair = new RdResourcePair(tx1, tx2, null);
                         var rx1 = new RdResource("Rx1"+IdBase, $"sip:Rx1{IdBase}@10.11.12.13", RdRsType.Rx, strFrec, strSite);
                         var rx2 = new RdResource("Rx2"+IdBase, $"sip:Rx2{IdBase}@10.11.12.13", RdRsType.Rx, strFrec, strSite);
+#else
+                        var tx1 = new RdResource("Tx1" + IdBase, $"sip:Tx1{IdBase}@10.11.12.13", RdRsType.Tx, false, strFrec, strFrec, strSite);
+                        var tx2 = new RdResource("Tx2" + IdBase, $"sip:Tx2{IdBase}@10.11.12.13", RdRsType.Tx, false, strFrec, strFrec, strSite);
+                        var rTxPair = new RdResourcePair(tx1, tx2, null);
+                        var rx1 = new RdResource("Rx1" + IdBase, $"sip:Rx1{IdBase}@10.11.12.13", RdRsType.Rx, false, strFrec, strFrec, strSite);
+                        var rx2 = new RdResource("Rx2" + IdBase, $"sip:Rx2{IdBase}@10.11.12.13", RdRsType.Rx, false, strFrec, strFrec, strSite);
                         var rRxPair = new RdResourcePair(rx1, rx2, null);
+#endif
                         Frec.RdRs["tx"+IdBase] = rTxPair;
                         Frec.RdRs["rx"+IdBase] = rRxPair;
                     }
                     else
                     {
+#if __VERSION_0__
                         Frec.RdRs["tx"+IdBase] = new RdResource("tx"+IdBase, $"sip:tx{IdBase}@10.11.12.13", RdRsType.Tx, strFrec, strSite);
                         Frec.RdRs["rx"+IdBase] = new RdResource("rx"+IdBase, $"sip:rx{IdBase}@10.11.12.13", RdRsType.Rx, strFrec, strSite);
+#else
+                        Frec.RdRs["tx" + IdBase] = new RdResource("tx" + IdBase, $"sip:tx{IdBase}@10.11.12.13", RdRsType.Tx, false, strFrec, strFrec, strSite);
+                        Frec.RdRs["rx" + IdBase] = new RdResource("rx" + IdBase, $"sip:rx{IdBase}@10.11.12.13", RdRsType.Rx, false, strFrec, strFrec, strSite);
+#endif
                     }
                 }
                 Frequencies[strFrec] = Frec;
