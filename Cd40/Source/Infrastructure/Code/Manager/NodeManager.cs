@@ -17,7 +17,7 @@ namespace U5ki.Infrastructure
         /// <summary>
         /// Parsea un nodo de tipo Y en tipo T.
         /// </summary>
-        protected abstract TManaged NodeParse(TInput node);
+        protected abstract TManaged NodeParse(TInput node, string idDestino);
 
         /// <summary>
         /// Función basica de asignación de un nodo existente o nuevo.

@@ -238,6 +238,7 @@ namespace U5ki.RdService
 			_Id = id;
 			_Uri1 = seturi(uri);
 			_Type = type;
+            _Callflags = 0;
             _IdDestino = idDestino;
 			_Frecuency = frecuency;
             // JOI FREC_DES
@@ -279,6 +280,7 @@ namespace U5ki.RdService
             _Frecuency = frecuency;
             _Site = site;
             _SelectedSite = selected;
+            _Callflags = 0;
             ResourceInInTIFXGW = false;
 
             for (_McastPort = Settings.Default.McastPortBegin; _Ports.ContainsKey(_McastPort); _McastPort++) ;
@@ -309,6 +311,7 @@ namespace U5ki.RdService
             _Frecuency = frecuency;
             _Site = site;
             _SelectedSite = selected;
+            _Callflags = 0;
 
             _FreqParams = newFreqParams;
 
@@ -339,6 +342,7 @@ namespace U5ki.RdService
             _Type = type;
             _IdDestino = idDestino;
             _Frecuency = frecuency;
+            _Callflags = 0;
             ResourceInInTIFXGW = false;
 
             for (_McastPort = Settings.Default.McastPortBegin; _Ports.ContainsKey(_McastPort); _McastPort++) ;
@@ -408,6 +412,7 @@ namespace U5ki.RdService
                     PorcentajeRSSI = 0;
                 }
 
+                _Callflags = (uint) flags;
                 _SipCallId = SipAgent.MakeRdCall(null, _LastUri, _Frecuency, _IdDestino, flags, Settings.Default.McastIp, _McastPort,
                     _FreqParams.Priority, new_params.zona, _FreqParams.FrequencyType,
                     _FreqParams.CLDCalculateMethod, _FreqParams.BssWindows, _FreqParams.AudioSync,
@@ -422,7 +427,20 @@ namespace U5ki.RdService
             return true;
 		}
 
-        
+        //Envia un Reinvite con type coupling
+        public bool CouplingReinvite()
+        {
+            SipAgent.CallReinvite(_SipCallId, ReinviteType.Coupling);            
+            return true;
+        }
+
+        //Envia un reinvite no coupling
+        public bool Reinvite()
+        {
+            SipAgent.CallReinvite(_SipCallId, ReinviteType.RadioTxRx);
+            return true;
+        }
+
 
         /// <summary>
         /// 
@@ -495,18 +513,34 @@ namespace U5ki.RdService
         /// </summary>
         /// <param name="stateInfo"></param>
         /// <returns></returns>
-		public bool HandleChangeInCallState(int sipCallId, CORESIP_CallStateInfo stateInfo)
+		public bool HandleChangeInCallState(int sipCallId, CORESIP_CallInfo info, CORESIP_CallStateInfo stateInfo)
         {
             if (sipCallId != _SipCallId)
                 return false;
-			if (stateInfo.State != _SipCallSt)
+
+            if (stateInfo.isRadReinvite != 0)
+            {
+                //Es un re-invite del tipo radio.
+                if (stateInfo.radReinvite_accepted != 0)
+                {
+                    if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED)
+                    {
+                        _PttId = stateInfo.PttId;
+                    }
+                    _Callflags = stateInfo.radRreinviteCallFlags;
+                }
+                
+                return true;
+            }
+
+            if (stateInfo.State != _SipCallSt)
 			{
 				if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED)
 				{
 					_SipCallSt = stateInfo.State;
 					_PttId = stateInfo.PttId;
 
-					if (isRx)
+                    if (isRx)
 					{
 						RdSrvRxRs rs = new RdSrvRxRs();
 						rs.ClkRate = stateInfo.ClkRate;
@@ -637,6 +671,11 @@ namespace U5ki.RdService
 		/// 
 		/// </summary>
 		private RdRsType _Type;
+        private uint _Callflags;                
+        public uint Callflags
+        {
+            get { return _Callflags; }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -764,7 +803,8 @@ namespace U5ki.RdService
 				}
 			}
 
-			_SipCallId = -1;
+            _Callflags = 0;
+            _SipCallId = -1;
 			_SipCallSt = CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED;
             _PttId = 0;
             _Ptt = RdRsPttType.NoPtt;

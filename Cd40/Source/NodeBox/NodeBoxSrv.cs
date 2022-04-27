@@ -438,11 +438,12 @@ namespace U5ki.NodeBox
 
                 if (_isNetworkOnline == true)
                 {
-                    /** 20180309. Arranque del Sip AGENT y del Servicio WEB ... */
+                    /** 20180309. Arranque del Sip AGENT y del Servicio WEB ... */                
                     if (SipAgentStarted == false)
                     {
                         SipAgentStart();
                     }
+
                     if (WebServerStarted == false)
                     {
                         WebServerStart();

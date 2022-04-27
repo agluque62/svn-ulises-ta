@@ -1529,7 +1529,7 @@ namespace U5ki.RdService
         /// <param name="stateInfo"></param>
         /// <param name="rdResOut"> Es el recurso (RdResource o RdResourcePair) correspondiente al sipcallID</param>
         /// <returns></returns>
-        public bool HandleChangeInCallState(int sipCallId, CORESIP_CallStateInfo stateInfo, out IRdResource rdResOut)
+        public bool HandleChangeInCallState(int sipCallId, CORESIP_CallInfo info, CORESIP_CallStateInfo stateInfo, out IRdResource rdResOut)
         {            
             rdResOut = null;
             try
@@ -1548,12 +1548,35 @@ namespace U5ki.RdService
                     else if (!rdRs.isRx && rdRs.isTx) NumTxResources++;
                     else if (rdRs.isRx && rdRs.isTx) NumTxRxResources++;
 
-                    if (!sipCallId_found && rdRs.HandleChangeInCallState(sipCallId, stateInfo))
+                    if (!sipCallId_found && rdRs.HandleChangeInCallState(sipCallId, info, stateInfo))
                     {
                         sipCallId_found = true;
                         if (rdRs.Connected)
                         {
-                            publish = AddSipCall(rdRs);
+                            if (stateInfo.isRadReinvite != 0)
+                            {
+                                if (stateInfo.isRadReinvite != 0 && stateInfo.radReinvite_accepted == 0)
+                                {                                   
+                                    //Se ha rechazado in re-invite del tipo radio.
+                                    if ((stateInfo.radRreinviteCallFlags & (uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING) == (uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING)
+                                    {
+                                        //Se ha rechazado re-invite del tipo coupling.
+
+                                        LogInfo<RdService>(String.Format("Coupling re-INVITE rechazado. IdDestino {0} Frecuencia {1}, Equipo {2} codigo {3} reason {4}", 
+                                            IdDestino, Frecuency, rdRs.ID, stateInfo.LastCode, stateInfo.LastReason),
+                                            U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "RdService",
+                                            CTranslate.translateResource(String.Format("Coupling re-INVITE rejected. Frequency {0}, radio device {1} code {2}", 
+                                            Frecuency, rdRs.ID, stateInfo.LastCode)));
+
+                                        uint ErrorCode_RTX_rejected = 1;
+                                        RemoveFromRtxGroup(true, ErrorCode_RTX_rejected);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                publish = AddSipCall(rdRs);
+                            }
                         }
                         else
                         {
@@ -2426,6 +2449,8 @@ namespace U5ki.RdService
             Debug.Assert(rdRs.Connected);
             bool publish = false;
 
+            CouplingReinviteToRTXGroup();
+
             if (rdRs.isRx)
             {
                 if (_SendingPttToRtxGroup)
@@ -2649,6 +2674,8 @@ namespace U5ki.RdService
                 rtxGroupRdFr.Add(this);
                 RdRegistry.Publish(_IdDestino, _FrRs);
 
+                CouplingReinviteToRTXGroup();
+
                 if (_FrRs.RtxGroupId > 0 && _RtxGroups[owner].Count > 1)
                 {
                     if (!_SendingPttToRtxGroup && (_FrRs.Squelch != RdSrvFrRs.SquelchType.NoSquelch) &&
@@ -2668,7 +2695,7 @@ namespace U5ki.RdService
         /// <summary>
         /// 
         /// </summary>
-        private void RemoveFromRtxGroup(bool publish)
+        private void RemoveFromRtxGroup(bool publish, uint ErrorCode = 0)
         {
             LogTrace<RdFrecuency>("IdDestino" + _IdDestino + "Frequency" + _Frecuency + " RemoveFromRtxGroup ");
             if ((_FrRs != null) && (_FrRs.RtxGroupId > 0))
@@ -2679,8 +2706,10 @@ namespace U5ki.RdService
                 if (_FrRs.Squelch != RdSrvFrRs.SquelchType.NoSquelch)
                     SendPttToRtxGroup(false, false);
 
+                ReinviteToRTXGroup();
+
                 bool removed = rtxGroupFr.Remove(this);
-                Debug.Assert(removed);
+                Debug.Assert(removed);               
 
                 PttInfo pttInfo = _SrcPtts.Find(delegate (PttInfo p)
                 {
@@ -2717,9 +2746,68 @@ namespace U5ki.RdService
 
                 if (publish)
                 {
+                    _FrRs.ErrorCode = ErrorCode;
                     RdRegistry.Publish(_IdDestino, _FrRs);
+                    _FrRs.ErrorCode = 0;
                 }
             }
+        }
+
+        private bool CouplingReinviteToRTXGroup()
+        {
+            if (_FrRs != null && _FrRs.RtxGroupId > 0)
+            {
+                foreach (IRdResource res in RdRs.Values)
+                {
+                    if (res is RdResourcePair)
+                    {
+                        RdResourcePair rpair = res as RdResourcePair;
+                        if (rpair.ActiveResource != null && rpair.ActiveResource.Connected && 
+                            ((rpair.ActiveResource.Callflags & ((uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING)) != (uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING))
+                        {
+                            rpair.ActiveResource.CouplingReinvite();
+                        }
+                        if (rpair.StandbyResource != null && rpair.StandbyResource.Connected &&
+                            ((rpair.StandbyResource.Callflags & ((uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING)) != (uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING))
+                        {
+                            rpair.StandbyResource.CouplingReinvite();
+                        }
+                    }
+                    else if (res.Connected && (((res as RdResource).Callflags & ((uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING)) != (uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING))
+                    {
+                        (res as RdResource).CouplingReinvite();
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private bool ReinviteToRTXGroup()
+        {
+            foreach (IRdResource res in RdRs.Values)
+            {
+                if (res is RdResourcePair)
+                {
+                    RdResourcePair rpair = res as RdResourcePair;
+                    if (rpair.ActiveResource != null && rpair.ActiveResource.Connected &&
+                        ((rpair.ActiveResource.Callflags & ((uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING)) == (uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING))
+                    {
+                        rpair.ActiveResource.Reinvite();
+                    }
+                    if (rpair.StandbyResource != null && rpair.StandbyResource.Connected &&
+                        ((rpair.StandbyResource.Callflags & ((uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING)) == (uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING))
+                    {
+                        rpair.StandbyResource.Reinvite();
+                    }
+                }
+                else if (res.Connected && (((res as RdResource).Callflags & ((uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING)) == (uint)CORESIP_CallFlags.CORESIP_CALL_RD_COUPLING))
+                {
+                    (res as RdResource).Reinvite();
+                }
+            }
+
+            return true;
         }
 
         /// <summary>

@@ -65,6 +65,10 @@ namespace U5ki.RdService
         { get; set; }
 
         bool Connect();
+
+       // bool CouplingReinvite();
+       // bool Reinvite();
+
         void PttOff();
 
         void PttOn(CORESIP_PttType srcPtt);
@@ -74,7 +78,7 @@ namespace U5ki.RdService
         RdResource GetRxSelected();
 
         List<RdResource> GetListResources();
-        bool HandleChangeInCallState(int sipCallId, CORESIP_CallStateInfo stateInfo);
+        bool HandleChangeInCallState(int sipCallId, CORESIP_CallInfo info, CORESIP_CallStateInfo stateInfo);
 
         bool ActivateResource(string IdResource);
     }

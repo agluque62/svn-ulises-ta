@@ -317,7 +317,10 @@ namespace u5ki.RemoteControlService
                 try
                 {
 #if DEBUG
-                    LogManager.GetCurrentClassLogger().Fatal("DeviceConfigure {0}, Invoke {1}", Id, output);
+                    if (output != GearOperationStatus.OK)
+                        LogManager.GetCurrentClassLogger().Fatal("DeviceConfigure {0}, Invoke {1}", Id, output);
+                    else
+                        LogManager.GetCurrentClassLogger().Info("DeviceConfigure {0}, Invoke {1}", Id, output);
 #endif
                     _response.Invoke(output);
                 }

@@ -722,7 +722,7 @@ namespace U5ki.RdService
         {
             if (gear.Status == GearStatus.Assigned)
             {
-                RdFrecuency frec = Frecuencies.Values.Where(f => f.Frecuency == gear.Frecuency).FirstOrDefault();
+                RdFrecuency frec = Frecuencies.Values.Where(f => f.IdDestino == gear.idDestino).FirstOrDefault();
                 if (frec == null)
                     return 2;
                 /* RdResource rec = frec.RdRs.Values.Where(r => (r.Type == RdRsType.Rx && gear.IsEmitter == false) ||
@@ -2187,7 +2187,7 @@ namespace U5ki.RdService
                 }
                 catch (Exception x)
                 {
-                    LogException<RdService>(String.Format("Disposing FR [{0}]", fr.Frecuency), x, false);
+                    LogException<RdService>(String.Format("Disposing FR [{0}] IdDestino [{1}]", fr.Frecuency, fr.IdDestino), x, false);
                 }
                 finally { }
             }
@@ -2218,7 +2218,7 @@ namespace U5ki.RdService
                     if (rdFr.HandleKaTimeout(call, out rdRes))
                     {
                         /** 20170126. AGL. Generar Historico KEEP-ALIVE TIMEOUT */
-                        LogInfo<RdService>(String.Format("KeepAlive Timeout. Frecuencia {0}, Equipo {1}", rdFr.Frecuency, rdRes.ID),
+                        LogInfo<RdService>(String.Format("KeepAlive Timeout. IdDestino {0} Frecuencia {1}, Equipo {2}", rdFr.IdDestino, rdFr.Frecuency, rdRes.ID),
                             U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR,
                             rdFr.Frecuency,
                             "Recurso: " + rdRes.ID + " KeepAlive Timeout.");
@@ -2331,7 +2331,7 @@ namespace U5ki.RdService
 
                         // Comprobar el estado de los recursos 
                         // que dan servicio a los equipos de HF
-                        _gestorHF.ActualizaEquipo(call, stateInfo);
+                        _gestorHF.ActualizaEquipo(call, info, stateInfo);
 
                         /** */
                         bool eventZombie = true;
@@ -2341,7 +2341,7 @@ namespace U5ki.RdService
 
                             IRdResource simpleRdRes = rdFr.Value.GetSimpleResource(call);
                             IRdResource rdRes;
-                            if (rdFr.Value.HandleChangeInCallState(call, stateInfo, out rdRes))
+                            if (rdFr.Value.HandleChangeInCallState(call, info, stateInfo, out rdRes))
                             {
                                 if (rdFr.Value.TipoDeFrecuencia == "HF" && stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED)
                                 {
@@ -2636,7 +2636,7 @@ namespace U5ki.RdService
                 if (gear.Status != GearStatus.Forbidden)
                     //EnqueueFrecAllocate(gear.Frecuency, gearId, gear.ResourceType, gear.SipUri, (gear.Status != GearStatus.Fail), gear.IsMaster);
                     //JOI FREC_DES
-                    EnqueueFrecAllocate(gear.Frecuency, gearId, gear.ResourceType, gear.SipUri, (gear.Status != GearStatus.Fail), gear.IsMaster, gear.IdEmplazamiento, uriGearToReplace);
+                    EnqueueFrecAllocate(gear.idDestino, gear.Frecuency, gearId, gear.ResourceType, gear.SipUri, (gear.Status != GearStatus.Fail), gear.IsMaster, gear.IdEmplazamiento, uriGearToReplace);
                 //JOI FREC_DES FIN
 #else
 
@@ -2690,7 +2690,7 @@ namespace U5ki.RdService
                 // JOI FREC_DES
                 //EnqueueFrecDeallocate(gear.LastFrecuency, gear.ResourceType, gear.SipUri, gear.Status);
                 //EnqueueFrecDeallocate(gear.LastFrecuency, gear.ResourceType, gear.SipUri, gear.Status, gear.IdEmplazamiento);
-                EnqueueFrecDeallocate(gear.LastFrecuency, gear.ResourceType, gear.SipUri, gear.Status, gear.IdEmplazamiento, gear.IsSlave);
+                EnqueueFrecDeallocate(gear.idDestino, gear.LastFrecuency, gear.ResourceType, gear.SipUri, gear.Status, gear.IdEmplazamiento, gear.IsSlave);
                 // JOI FREC_DES FIN
 #else
                 // Optener la frecuancia.
@@ -2729,28 +2729,15 @@ namespace U5ki.RdService
         /// <param name="uri"></param>
         //internal void EnqueueFrecAllocate(string frec, string gearId, RdRsType tipo, string uri, bool generaLogAsignacion, bool isMaster)
         //JOI FREC_DES
-        internal void EnqueueFrecAllocate(string frec, string gearId, RdRsType tipo, string uri, bool generaLogAsignacion, bool isMaster, string idEmplazamiento, string uriGearToReplace)
+        internal void EnqueueFrecAllocate(string idDestino, string frec, string gearId, RdRsType tipo, string uri, bool generaLogAsignacion, bool isMaster, string idEmplazamiento, string uriGearToReplace)
         //JOI FREC_DES FIN 
         {
-            _EventQueue.Enqueue("FrecAllocate " + frec, delegate()
+            _EventQueue.Enqueue("FrecAllocate " + frec + " idDestino " + idDestino, delegate()
             {
                 try
                 {
                     /** Obtener la Frecuencia */
-                    RdFrecuency frecuency = null;
-                    foreach (RdFrecuency frq in Frecuencies.Values)
-                    {
-                        if (frq.Frecuency == frec)
-                        {
-                            foreach (IRdResource res in frq.RdRs.Values)
-                            {
-                                if (res.ID == gearId)
-                                {
-                                    frecuency = frq;
-                                }
-                            }
-                        }
-                    }
+                    RdFrecuency frecuency = Frecuencies.Values.Where(e => e.IdDestino == idDestino).FirstOrDefault();
 
                     if (null == frecuency)
                     {
@@ -2867,15 +2854,15 @@ namespace U5ki.RdService
         //  internal void EnqueueFrecDeallocate(string frec, RdRsType tipo, string uri, GearStatus Status)
         //JOI FREC_DES
         //internal void EnqueueFrecDeallocate(string frec, RdRsType tipo, string uri, GearStatus Status, string idEmplazamiento)
-        internal void EnqueueFrecDeallocate(string frec, RdRsType tipo, string uri, GearStatus Status, string idEmplazamiento, bool IsSlave)
+        internal void EnqueueFrecDeallocate(string idDestino, string frec, RdRsType tipo, string uri, GearStatus Status, string idEmplazamiento, bool IsSlave)
         //JOI FREC_DES FIN
         {
-            _EventQueue.Enqueue("FrecDeallocate: " + frec, delegate()
+            _EventQueue.Enqueue("FrecDeallocate " + frec + " idDestino " + idDestino, delegate()
             {
                 try
                 {
                     // Obtener la frecuancia.
-                    RdFrecuency frecuency = Frecuencies.Values.Where(e => e.Frecuency == frec).FirstOrDefault();
+                    RdFrecuency frecuency = Frecuencies.Values.Where(e => e.IdDestino == idDestino).FirstOrDefault();
                     if (null == frecuency)
                     {
                         if (Status != GearStatus.Initial)

@@ -3,10 +3,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartArguments>-console</StartArguments>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-    <RemoteDebugEnabled>false</RemoteDebugEnabled>
+    <RemoteDebugEnabled>true</RemoteDebugEnabled>
     <RemoteDebugMachine>DF1680:4024</RemoteDebugMachine>
     <StartAction>Project</StartAction>
-    <StartProgram>C:\Program Files %28x86%29\NucleoCC\Ulises5000I-NodeBox\U5ki.NodeBox.exe</StartProgram>
+    <StartProgram>C:\EDUARDO\Debug\U5ki.NodeBox.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <StartArguments>-console</StartArguments>

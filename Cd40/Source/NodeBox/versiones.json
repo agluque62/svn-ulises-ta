@@ -1,6 +1,6 @@
 {
-	"Version" : "2.6.2.(sp4)",
-	"Fecha": "14-02-2022",
+	"Version" : "2.6.2.(sp6)",
+	"Fecha": "18-04-2022",
 	"Components" : [
 		{
 			"Name": "UV5K-MCAST",

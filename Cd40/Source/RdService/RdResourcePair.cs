@@ -264,9 +264,9 @@ namespace U5ki.RdService
 
         public RdResource GetSimpleResource(int sipCallId)
         {
-            if (_ActiveResource.SipCallId == sipCallId)
+            if (_ActiveResource != null && _ActiveResource.SipCallId == sipCallId)
                 return _ActiveResource;
-            else if (_StandbyResource.SipCallId == sipCallId)
+            else if (_StandbyResource != null && _StandbyResource.SipCallId == sipCallId)
                 return _StandbyResource;
             else return null;
         }
@@ -375,7 +375,7 @@ namespace U5ki.RdService
             });
         }
 
-        public bool HandleChangeInCallState(int sipCallId, CORESIP_CallStateInfo stateInfo)
+        public bool HandleChangeInCallState(int sipCallId, CORESIP_CallInfo info, CORESIP_CallStateInfo stateInfo)
         {
             RdResource resChange;
             if (_ActiveResource.SipCallId == sipCallId)
@@ -434,7 +434,7 @@ namespace U5ki.RdService
                 }
             }
 
-            resChange.HandleChangeInCallState(sipCallId, stateInfo);
+            resChange.HandleChangeInCallState(sipCallId, info, stateInfo);
             LastRdResourceChanged = resChange;
             return true;
         }

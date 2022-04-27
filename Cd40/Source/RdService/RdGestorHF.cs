@@ -700,7 +700,7 @@ namespace U5ki.RdService
             /// 
             /// </summary>
             /// <param name="state"></param>
-            public void DesasignaFrToCheck(CORESIP_CallStateInfo state)
+            public void DesasignaFrToCheck(CORESIP_CallInfo info, CORESIP_CallStateInfo state)
             {
                 if (_frToCheck != null)
                 {
@@ -710,7 +710,7 @@ namespace U5ki.RdService
                     if (_frToCheck.RdRs.TryGetValue(rsId, out iRes))
                     {
                         RdResource res = (RdResource)iRes;
-                        res.HandleChangeInCallState(res.SipCallId, state);
+                        res.HandleChangeInCallState(res.SipCallId, info, state);
                         res.Dispose();
                         _frToCheck.RdRs.Remove(rsId);
                     }
@@ -1634,7 +1634,7 @@ namespace U5ki.RdService
         /// 
         /// </summary>
         /// <param name="fr"></param>
-        public void ActualizaEquipo(int sipCallId, CORESIP_CallStateInfo stateInfo)
+        public void ActualizaEquipo(int sipCallId, CORESIP_CallInfo info, CORESIP_CallStateInfo stateInfo)
         {
 #if __VERSION_0__
             lock (_equipos)
@@ -1720,7 +1720,7 @@ namespace U5ki.RdService
                                                        )
                                                     {
                                                         HFHelper.Trace();
-                                                        equipo.DesasignaFrToCheck(stateInfo);
+                                                        equipo.DesasignaFrToCheck(info, stateInfo);
 
                                                         //rs.HandleChecked();
                                                         //fr.RemoveSipCall(fr.RdRs[rsId]);

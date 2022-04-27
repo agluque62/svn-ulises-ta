@@ -40,6 +40,7 @@ message RdSrvFrRs
 	optional string QidxMethod = 7;
 	optional uint32 QidxValue = 8;
 	optional FrequencyStatusType FrequencyStatus = 9;
+	optional uint32 ErrorCode = 10;
 }
 
 message FrChangeResponse

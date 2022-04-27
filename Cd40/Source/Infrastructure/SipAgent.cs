@@ -421,6 +421,17 @@ namespace U5ki.Infrastructure
         CORESIP_REDIRECT_ACCEPT
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+	public enum ReinviteType
+    {
+        Coupling = 9,
+        RadioRxonly = 7,
+        RadioTxRx = 5,
+        Idle = 6
+    }
+
     public class WG67Info
 	{
 		public struct SubscriberInfo
@@ -647,8 +658,12 @@ namespace U5ki.Infrastructure
 	{
 		public CORESIP_CallState State;
 		public CORESIP_CallRole Role;
+        public uint isRadReinvite;                  //Si vale distinto de 0 indica que el estado ha isdo provocado por un reinvite del ripo radio
+        public uint radReinvite_accepted;           //Este parametro solo se tiene en cuenta si isRadReinvite=1. si reinvite_accepted=1 entonces ha habido un reinvite aceptado
+                                                    //si reinvite_accepted=0 entonces ha habido un reinvite rechazado
+        public uint radRreinviteCallFlags;          //Este parametro solo se tiene en cuenta si isRadReinvite=1. Son los flags del re-invite.
 
-		public int LastCode;										// Util cuando State == PJSIP_INV_STATE_DISCONNECTED
+        public int LastCode;						// Util cuando State == PJSIP_INV_STATE_DISCONNECTED
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_REASON_LENGTH + 1)]
 		public string LastReason;
 
@@ -1723,14 +1738,15 @@ namespace U5ki.Infrastructure
                     _Logger.Error("CreateAccount", exc);
                 }
 
+                if (CORESIP_Set_Ed137_version('C', 'C', out err) != 0)
+                {
+                    _Logger.Error("CORESIP_Set_Ed137_version "+err.Info);
+                }
+
 #if _TRACEAGENT_
             _Logger.Debug("Saliendo de SipAgent.Init");
 #endif
             }
-
-            CORESIP_Error error;
-            CORESIP_Set_Ed137_version('B','C',out error );
-
         }
         /// <summary>
         /// 
@@ -2720,6 +2736,27 @@ namespace U5ki.Infrastructure
             _Logger.Debug("Saliendo de SipAgent.HoldCall");
 #endif
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="callId"></param>
+        public static void CallReinvite(int callId, ReinviteType type)
+        {
+            CORESIP_Error err;
+
+#if _TRACEAGENT_
+            _Logger.Debug("Entrando en SipAgent.CallCouplingReinvite {0}", callId);
+#endif
+            if (CORESIP_CallReinvite(callId, out err, (int) type, 22, null) != 0)
+            {
+                throw new Exception(err.Info);
+            }
+#if _TRACEAGENT_
+            _Logger.Debug("Saliendo de SipAgent.CallCouplingReinvite");
+#endif
+        }
+
         /// <summary>
         /// 
         /// </summary>

@@ -83,6 +83,11 @@ namespace U5ki.RdService.Gears
         //JOI FREC_DES FIN
 
         /// <summary>
+        /// Identificador unico del destino radio
+        /// </summary>
+        public string idDestino       { get; set; }
+
+        /// <summary>
         /// Representa la "FrecuenciaClave" que vienen en el proto, es decir, el ID de la frecuencia que se utiliza en el HMI para gestionar las frecuencias. 
         /// <para>Para que al hacer Allocate y Deallocate en una frecuencia el resto de los miembros se enteren, se ha de utilizar esta Clave.</para>
         /// </summary>
@@ -389,7 +394,7 @@ namespace U5ki.RdService.Gears
         /// <param name="reserveFrecuency">La funcion remota que se va a utilziar para pedir que se reserve una frecuencia para este nodo.</param>
         /// <param name="reserveFrecuency">La funcion remota que se va a utilziar para liberar una frecuencia para uso externo.</param>
         public BaseGear(
-            Node input, 
+            Node input, string idDestino,
             Func<BaseGear, bool> reserveFrecuency,
             Func<BaseGear, bool> unReserveFrecuency,
             BaseGearOperation onGearAllocated,
@@ -440,6 +445,8 @@ namespace U5ki.RdService.Gears
 
             this.IsReceptor = input.EsReceptor;
             //this.IsEmitter = input.EsTransmisor;
+
+            this.idDestino = idDestino;
 
             this.FrecuencyKey = input.FrecuenciaClave;
 
@@ -671,6 +678,7 @@ namespace U5ki.RdService.Gears
         /// <param name="priority"></param>
         /// <param name="onOkOperationForbidden"></param>
         protected virtual void Allocate(
+            String idDestino,
             String frecuency, 
             GearCarrierOffStatus offset,
             GearChannelSpacings channeling,
@@ -698,6 +706,7 @@ namespace U5ki.RdService.Gears
             }
 
             // Logica de asignación.
+            this.idDestino = idDestino;
             this.Frecuency = frecuency;
             this.Channeling = channeling;
             this.Modulation = modulation;
@@ -732,6 +741,7 @@ namespace U5ki.RdService.Gears
 
             SetReplacements(gearToReplace);
             Allocate(
+                gearToReplace.idDestino,
                 gearToReplace.Frecuency,
                 gearToReplace.Offset,
                 gearToReplace.Channeling,
@@ -748,6 +758,7 @@ namespace U5ki.RdService.Gears
             _semaphore.WaitOne();
             ClearReplacements();
             Allocate(
+                this.idDestino,
                 this.Frecuency,
                 this.Offset,
                 this.Channeling,
@@ -927,10 +938,11 @@ namespace U5ki.RdService.Gears
         {
             if (shortText)
             {
-                return " Node: " + this.Id
+                return " Node: " + this.Id                    
                     + " {IP=" + this.IP + "}"
                     + " {S=" + _status + "}"
                     + " {F=" + this.Frecuency + "}"
+                    + " {idDestino=" + this.idDestino + "}"
 #if !DEBUG
                     + " {FT=" + this.FrecuencyType + "}"
                     + " {RT=" + this.ResourceType + "}"
@@ -947,6 +959,7 @@ namespace U5ki.RdService.Gears
                     builder.Append(" {RId=" + this.ReplaceBy.Id + "}");
                 builder.Append(
                     " {F=" + this.Frecuency + "}"
+                    + " {idDest=" + this.idDestino + "}"
                     + " {P=" + this.Priority + "}"
                     + " {WF=" + this.WorkingFormat + "}"
                     + " {IP=" + this.IP + "}");

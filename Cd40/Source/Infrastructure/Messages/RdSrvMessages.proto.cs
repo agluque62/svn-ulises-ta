@@ -159,6 +159,15 @@ namespace U5ki.Infrastructure
       get { return _FrequencyStatus; }
       set { _FrequencyStatus = value; }
     }
+
+    private uint _ErrorCode = default(uint);
+    [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"ErrorCode", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint ErrorCode
+    {
+      get { return _ErrorCode; }
+      set { _ErrorCode = value; }
+    }
     [global::ProtoBuf.ProtoContract(Name=@"SquelchType")]
     public enum SquelchType
     {

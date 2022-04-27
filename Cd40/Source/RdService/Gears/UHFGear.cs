@@ -9,14 +9,14 @@ namespace U5ki.RdService.Gears
     {
 
         public UHFGear(
-            Node input, 
+            Node input, string idDestino,
             Func<BaseGear, bool> reserveFrecuency,
             Func<BaseGear, bool> freeFrecuency,
             BaseGearOperation onGearAllocated,
             BaseGearOperation onGearDeallocated,
             BaseGearDelegate onGearStatusUpdated,
             BaseGearOperation onGearChecked)
-            : base(input, reserveFrecuency, freeFrecuency, onGearAllocated, onGearDeallocated, onGearStatusUpdated, onGearChecked)
+            : base(input, idDestino, reserveFrecuency, freeFrecuency, onGearAllocated, onGearDeallocated, onGearStatusUpdated, onGearChecked)
         {
         }
 

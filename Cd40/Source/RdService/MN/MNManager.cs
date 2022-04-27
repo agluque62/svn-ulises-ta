@@ -218,13 +218,35 @@ namespace U5ki.RdService.NM
                     //20180208 #3136
                     NodePoolChangeKeys.Add(gear.Id, false);
                 };
-               
+
                 // Gestionar los nodos recibidos.
-                //foreach (Node node in input.Nodes.OrderBy(e => e.Prioridad))
+                //foreach (Node node in input.Nodes.OrderBy(e => e.Prioridad))         
+
                 foreach (Node node in input.NodesMN/*.OrderBy(e => e.Prioridad)*/)
                 {
-                    NodeSet(
-                        NodeParse(node));
+                    string idDestino = "";
+                    bool idDestino_found = false;
+                    foreach (ConfiguracionUsuario userCfg in input.ConfiguracionUsuarios)
+                    {
+                        foreach (CfgEnlaceExterno rdLink in userCfg.RdLinks)
+                        {
+                            foreach(U5ki.Infrastructure.CfgRecursoEnlaceExterno resex in rdLink.ListaRecursos)
+                            {
+                                if (resex.IdRecurso == node.Id)
+                                {
+                                    idDestino = rdLink.Literal;
+                                    idDestino_found = true;
+                                    break;
+                                }
+                            }
+
+                            if (idDestino_found) break;
+                        }
+                        if (idDestino_found) break;
+                    }
+
+                    BaseGear parsed_node = NodeParse(node, idDestino);
+                    NodeSet(parsed_node);
                 }
 
                 // Eliminar del pool todos los gears no encontrados en la nueva configuracion.
@@ -416,7 +438,7 @@ namespace U5ki.RdService.NM
         /// <remarks>
         /// Para hacer que el NMmanager gesione todos los nodos, y no ignore los HF, descomentar el codigo de creacion del HFGear.
         /// </remarks>
-        protected override BaseGear NodeParse(Node inputNode)
+        protected override BaseGear NodeParse(Node inputNode, string idDestino)
         {
             BaseGear parsedNode = null;
 
@@ -424,22 +446,22 @@ namespace U5ki.RdService.NM
             {
                 case Tipo_Frecuencia.Basica:
                     parsedNode = new BasicGear(
-                        inputNode, ReserveFrecuency, UnReserveFrecuency, OnGearAllocated, OnGearDeallocated, OnGearStatusUpdated, OnGearChecked);
+                        inputNode, idDestino, ReserveFrecuency, UnReserveFrecuency, OnGearAllocated, OnGearDeallocated, OnGearStatusUpdated, OnGearChecked);
                     break;
 
                 case Tipo_Frecuencia.HF:
                     parsedNode = new HFGear(
-                        inputNode, ReserveFrecuency, UnReserveFrecuency, OnGearAllocated, OnGearDeallocated, OnGearStatusUpdated, OnGearChecked);
+                        inputNode, idDestino, ReserveFrecuency, UnReserveFrecuency, OnGearAllocated, OnGearDeallocated, OnGearStatusUpdated, OnGearChecked);
                     break;
 
                 case Tipo_Frecuencia.VHF:
                     parsedNode = new VHFGear(
-                        inputNode, ReserveFrecuency, UnReserveFrecuency, OnGearAllocated, OnGearDeallocated, OnGearStatusUpdated, OnGearChecked);
+                        inputNode, idDestino, ReserveFrecuency, UnReserveFrecuency, OnGearAllocated, OnGearDeallocated, OnGearStatusUpdated, OnGearChecked);
                     break;
 
                 case Tipo_Frecuencia.UHF:
                     parsedNode = new UHFGear(
-                        inputNode, ReserveFrecuency, UnReserveFrecuency, OnGearAllocated, OnGearDeallocated, OnGearStatusUpdated, OnGearChecked);
+                        inputNode, idDestino, ReserveFrecuency, UnReserveFrecuency, OnGearAllocated, OnGearDeallocated, OnGearStatusUpdated, OnGearChecked);
                     break;
             }
 
@@ -1137,7 +1159,7 @@ namespace U5ki.RdService.NM
                     String replacementFrecuency = replacement.Frecuency;
                     LogWarn<MNManager>("Se desasigna por Prioridad: " + replacement.ToString(),
                         replacement.IsReceptor ? U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_FRECUENCY_RX_NONPRIORITY_ONERROR : U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_FRECUENCY_TX_NONPRIORITY_ONERROR,
-                        replacement.Frecuency, "Equipo: " + replacement.Id);
+                        replacement.Frecuency, "IdDestino: " + replacement.idDestino, "Equipo: " + replacement.Id);
 
                     replacement.Deallocate(GearStatus.AssignationInProgress);
 
@@ -1383,7 +1405,8 @@ namespace U5ki.RdService.NM
 
             BaseGear foundButAssigned = null;
             // Buscar entre el pool de reservas validas.
-            foreach (BaseGear gear in NodePoolSelect(input, Tipo_Formato_Trabajo.Reserva))
+            IEnumerable<BaseGear> nodepoolselected = NodePoolSelect(input, Tipo_Formato_Trabajo.Reserva);
+            foreach (BaseGear gear in nodepoolselected)
             {
                 // JOI FREC_DES
                 if (gear.IdEmplazamiento != input.IdEmplazamiento)
@@ -1456,23 +1479,21 @@ namespace U5ki.RdService.NM
                     continue;
                 // JOI FREC_DES FIN 
 
-                if (gear.Frecuency == input.Frecuency && gear.Status == GearStatus.Assigned)
+                if (gear.Frecuency == input.Frecuency && gear.idDestino == input.idDestino && gear.Status == GearStatus.Assigned)
                 {
                     bAsignado = true;
                     break;
                 }
                 // No se admite GearStatus.Initial porque no está bien gestionado casos 
                 // de N apagado en los arranques de Nodebox
-                if (gear.Status == GearStatus.Ready /*|| gear.Status == GearStatus.Initial*/)
+                else if (gear.Status == GearStatus.Ready /*|| gear.Status == GearStatus.Initial*/)
                 {
                    HayReservas = true;
-                   break;
                 }    
-                if ((gear.Status == GearStatus.Assigned) && (gear.Priority > input.Priority))
+                else if ((gear.Status == GearStatus.Assigned) && (gear.Priority > input.Priority))
                 {
                     //Hay un reserva asignado a otra frecuencia con menos prioridad
                     HayReservas = true;
-                    break;
                 }    
             }
             if (bAsignado == true || HayReservas == false)
