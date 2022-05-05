@@ -118,7 +118,15 @@ namespace HMI.Model.Module.Services
 					_EngineCmdManager.ConfirmRdTx(info.RdId);
 				}
 			}
-            else if (msg.Id == Resources.BriefingFunction)
+			else if (msg.Id == "RdFrAsignedRtxToOtherConfirmation")
+			{
+				if (response == NotifMsgResponse.Ok)
+				{
+					RdFrAsignedToOtherMsg info = (RdFrAsignedToOtherMsg)msg.Info;
+					_EngineCmdManager.ConfirmRdTx(info.RdId);//LALM220328 
+				}
+			}
+			else if (msg.Id == Resources.BriefingFunction)
             {
                 if (response == NotifMsgResponse.Ok)
                 {
@@ -1118,7 +1126,7 @@ namespace HMI.Model.Module.Services
 								subItem.Lenght = f.Length;
 								subItem.Text = f.DirectoryName + "/" + f.Name;
 								subItem.Datetime = File.GetCreationTime(subItem.Text);
-								if (subItem.Lenght>1600)
+								if (subItem.Lenght>16000)
 									ListViewItem.Add(subItem);
 								break;
 						}
@@ -1140,6 +1148,21 @@ namespace HMI.Model.Module.Services
 			return ret;
 		}
 
+		public bool CanReplayRadio()
+        {
+			item item = FilterLastFile();
+			if (item != null)
+				return true;
+			return false;
+
+		}
+
+		public void StopAudioReproduccion()
+        {
+			FunctionReplay function = BusinessEntities.FunctionReplay.Stop;
+			ViaReplay via = BusinessEntities.ViaReplay.SpeakerLc;
+			FunctionReplay(function, via, "", 0);
+		}
 
 		public void PlayRadioClick()
 		{
@@ -1154,9 +1177,15 @@ namespace HMI.Model.Module.Services
 					string fileName = item.Text;
 					long fileLength = item.Lenght;
 					FunctionReplay(function, via, fileName, fileLength);
+					_StateManager.Radio.SetTiempoReplay((int)(fileLength / 16000));
+				}
+				else
+                {
+					//  Envio tiempo a cero para inhabilitar botón
+					_StateManager.Radio.SetTiempoReplay(0);
 				}
 			}
-			General.SafeLaunchEvent(PlayRadio, this);
+			//General.SafeLaunchEvent(PlayRadio, this);
 			//this._BtnPlay.Click += new System.EventHandler(this._BtnPlay_Click);
 
 			;//	Directory.Delete(Settings.Default.DirectorioGLP, true);

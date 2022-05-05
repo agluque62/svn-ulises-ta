@@ -141,6 +141,8 @@
     <Compile Include="BusinessEntities\RdPosition.cs" />
     <Compile Include="BusinessEntities\TlfPosition.cs" />
     <Compile Include="BusinessEntities\RegistryManager.cs" />
+    <Compile Include="BusinessEntities\WaveIO.cs" />
+    <Compile Include="BusinessEntities\WindowsSoundDevices.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="ModuleController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

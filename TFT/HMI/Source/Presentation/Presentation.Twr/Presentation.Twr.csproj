@@ -40,7 +40,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -75,12 +75,19 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="Presentation.Rabat, Version=2.6.2.2, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\bin\Release\Presentation.Rabat.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
@@ -125,11 +132,23 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Compile Include="UI\ControlRecord.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ControlRecord.Designer.cs">
+      <DependentUpon>ControlRecord.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\MemUC.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UI\MemUC.Designer.cs">
       <DependentUpon>MemUC.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\newControlRecord.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\newControlRecord.Designer.cs">
+      <DependentUpon>newControlRecord.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\RdPageButton.cs">
       <SubType>Component</SubType>
@@ -245,9 +264,15 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.en-GB.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\ControlRecord.resx">
+      <DependentUpon>ControlRecord.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\MemUC.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MemUC.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\newControlRecord.resx">
+      <DependentUpon>newControlRecord.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\SplitUC.resx">
       <DependentUpon>SplitUC.cs</DependentUpon>
@@ -451,6 +476,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\play.png" />
+    <None Include="Resources\Tecla verde.png" />
+    <None Include="Resources\play_no_disponible.png" />
+    <None Include="Resources\play_reproduccion_disponible.png" />
+    <None Include="Resources\play_reproduccion_en_curso.png" />
+    <None Include="Resources\play_disabled.png" />
+    <None Include="Resources\stop_32_50.png" />
+    <None Include="Resources\stop.png" />
     <None Include="Resources\SpeakerTlf.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -37,6 +37,7 @@ namespace HMI.Model.Module.Services
 		private Permissions _Permissions;
         private HistoricOfLocalCalls _HistoricalOfCalls;
         private bool _ManagingSite;
+		private PlayState _PlayBt;
 
 		[EventPublication(EventTopicNames.ShowNotifMsgUI, PublicationScope.Global)]
 		public event EventHandler<NotifMsg> ShowNotifMsgUI;
@@ -196,6 +197,13 @@ namespace HMI.Model.Module.Services
             get { return _ManagingSite; }
             set { _ManagingSite = value; }
         }
+
+		[CreateNew]
+		public PlayState PlayBt
+		{
+			get { return _PlayBt; }
+			set { _PlayBt = value; }
+		}
 
 		public Permissions Permissions
 		{

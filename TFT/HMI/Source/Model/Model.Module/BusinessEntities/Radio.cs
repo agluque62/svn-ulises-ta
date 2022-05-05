@@ -69,8 +69,9 @@ namespace HMI.Model.Module.BusinessEntities
 	public sealed class RdDst
 	{
 		private int _Id;
-		private string _Frecuency = "";
+		private string _Frecuency = "";//RQF 34 en realidad es IdFrecuency
 		private string _Alias = "";
+		private string _NameFrecuency;//RQF34 DescDestino; En realidad es _NameFrecuency.
         /** 20180321. AGL. ALIAS a mostrar en la tecla... */
         private string _KeyAlias = "";
 		//LALM 210223 Errores #4756 prioridad
@@ -105,10 +106,34 @@ namespace HMI.Model.Module.BusinessEntities
 			get { return _Id; }
 		}
 
+		// RQF34 devuelvo una clave.
+		public string IdFrecuency
+        {
+			get 
+			{ 
+				return _Frecuency; 
+			}
+            set { _Frecuency = value; }
+        }
+
 		public string Frecuency
 		{
 			get { return _Frecuency; }
 		}
+		
+		// RQF34 Se define NameFrecuency
+		public string NameFrecuency
+		{
+			get {
+				return _Frecuency; 
+				}
+            set { _NameFrecuency = value; }
+		}
+
+		public string Literal
+        {
+            get { return _NameFrecuency; }
+        }
 
 		public string Alias
 		{
@@ -215,7 +240,7 @@ namespace HMI.Model.Module.BusinessEntities
             get { return _RxOnly; }
         }
 
-        public RdDst(int id)
+		public RdDst(int id)
 		{
 			_Id = id;
 		}
@@ -243,6 +268,8 @@ namespace HMI.Model.Module.BusinessEntities
 		{
 			_Frecuency = "";
 			_TempAlias = _Alias = "";
+			IdFrecuency = "";// RQF34
+			_NameFrecuency = "";//RQF34
 			ResetToIdle();
 		}
 
@@ -255,8 +282,29 @@ namespace HMI.Model.Module.BusinessEntities
 			else
 			{
 				_Frecuency = dst.Dst;
+				IdFrecuency = dst.KeyAlias;//RQF34 se debe usar idfrecuency y NameFrecuency en lugar de _Frecuency
+											  // keyalias es el identificador único
+											  // dst es el numero de frecuencia antiguamente se usaba como clave
+
+				//rqf34
+				IdFrecuency = dst.KeyAlias;
+				NameFrecuency = dst.Dst;
 				_Alias = dst.Alias;
-                _TempAlias = string.Empty;
+				//lalm 220311 RQF34
+				//lalm 220329 intercambio DescDestino por KeyAlias cuando son distintos.
+				if (dst.KeyAlias==dst.DescDestino)
+                {
+					//_NameFrecuency = dst.IdFrecuency;
+					dst.KeyAlias = "";
+				}
+                else 
+				{
+					string tmp = dst.KeyAlias;
+					dst.KeyAlias = dst.DescDestino;
+					dst.DescDestino = tmp;
+				}
+
+				_TempAlias = string.Empty;
 				_Ptt = dst.Ptt;
 				_Squelch = dst.Squelch;
 				_Tx = dst.Tx;
@@ -350,9 +398,12 @@ namespace HMI.Model.Module.BusinessEntities
 			}
 			else
 			{
-				_Frecuency = dst.Dst;
+				//_Frecuency = dst.Dst;// RQF34 desaparecerá
 				_Alias = dst.Alias;
                 _TempAlias = string.Empty;
+				//RQF34 _Frecuency es NameFrecuency IdFrecuency es nuevo
+				_NameFrecuency = dst.Dst;
+				IdFrecuency = dst.IdFrecuency;
 			}
 		}
 
@@ -427,22 +478,28 @@ namespace HMI.Model.Module.BusinessEntities
 
 	public sealed class Radio
 	{
-		public static int NumDestinations =  Settings.Default.NumRdDestinations;
+		public static int NumDestinations = Settings.Default.NumRdDestinations;
 
 		private RdDst[] _Dst = new RdDst[NumDestinations];
 		private int _Page = 0;
 		private bool _PttOn = false;
 		private int _Rtx = 0;
 		private int _NumRtx = 0;
-        private bool _SiteManager = false;
-        // valor configurado a true significa que hay doble altavoz de radio para todas las frecuencias
-        // a false, el segundo altavoz de radio sólo está disponible para las frecuencias HF
-        private bool _DoubleRadioSpeaker = Settings.Default.DoubleRadioSpeaker;
+		private bool _SiteManager = false;
+		private bool _CanReleaseRtxSqu = false;//lalm 220316
+		private bool _CanReleaseRtxSect = true;//lalm 220316
+		private ParametrosReplay _ParametrosReplay = new ParametrosReplay(0);
+		// valor configurado a true significa que hay doble altavoz de radio para todas las frecuencias
+		// a false, el segundo altavoz de radio sólo está disponible para las frecuencias HF
+		private bool _DoubleRadioSpeaker = Settings.Default.DoubleRadioSpeaker;
 
-        private static Logger _Logger = LogManager.GetCurrentClassLogger();
+		private static Logger _Logger = LogManager.GetCurrentClassLogger();
 
 		[EventPublication(EventTopicNames.RadioChanged, PublicationScope.Global)]
 		public event EventHandler<RangeMsg> RadioChanged;
+
+		[EventPublication(EventTopicNames.TempReplayChanged, PublicationScope.Global)]
+		public event EventHandler<ParametrosReplay> TempReplayChanged;
 
 		[EventPublication(EventTopicNames.RdPageChanged, PublicationScope.Global)]
 		public event EventHandler RdPageChanged;
@@ -450,24 +507,25 @@ namespace HMI.Model.Module.BusinessEntities
 		[EventPublication(EventTopicNames.PttOnChanged, PublicationScope.Global)]
 		public event EventHandler PttOnChanged;
 
-        [EventPublication(EventTopicNames.SiteManagerChanged, PublicationScope.Global)]
-        public event EventHandler SiteManagerChanged;
-        
-        [EventPublication(EventTopicNames.RtxChanged, PublicationScope.Global)]
-        public event EventHandler RtxChanged;
+		[EventPublication(EventTopicNames.SiteManagerChanged, PublicationScope.Global)]
+		public event EventHandler SiteManagerChanged;
 
-        [EventPublication(EventTopicNames.SelCalResponse, PublicationScope.Global)]
-        public event EventHandler<StateMsg<string>> SelCalResponse;
+		[EventPublication(EventTopicNames.RtxChanged, PublicationScope.Global)]
+		public event EventHandler RtxChanged;
 
-        [EventPublication(EventTopicNames.SiteChanged, PublicationScope.Global)]
-        public event EventHandler<StateMsg<string>> SiteChanged;
+		[EventPublication(EventTopicNames.SelCalResponse, PublicationScope.Global)]
+		public event EventHandler<StateMsg<string>> SelCalResponse;
+
+		[EventPublication(EventTopicNames.SiteChanged, PublicationScope.Global)]
+		public event EventHandler<StateMsg<string>> SiteChanged;
+
 
 #if _HF_GLOBAL_STATUS_
-        [EventPublication(EventTopicNames.HfGlobalStatus, PublicationScope.Global)]
-        public event EventHandler<StateMsg<string>> HfGlobalStatus;
+		[EventPublication(EventTopicNames.HfGlobalStatus, PublicationScope.Global)]
+		public event EventHandler<StateMsg<string>> HfGlobalStatus;
 #endif
 
-        public RdDst this[int i]
+		public RdDst this[int i]
 		{
 			get { return _Dst[i]; }
 		}
@@ -484,15 +542,15 @@ namespace HMI.Model.Module.BusinessEntities
 			{
 				if (_Page != value)
 				{
-					SetRtx(0,0);
+					SetRtx(0, 0);
 
 					_Page = value;
 					General.SafeLaunchEvent(RdPageChanged, this);
 				}
 			}
 		}
-        /** 20180425. RSR */
-        public int PageSize { get; set; }
+		/** 20180425. RSR */
+		public int PageSize { get; set; }
 
 		public bool PttOn
 		{
@@ -505,7 +563,7 @@ namespace HMI.Model.Module.BusinessEntities
 
 					if (_PttOn)
 					{
-						SetRtx(0,0);
+						SetRtx(0, 0);
 					}
 
 					General.SafeLaunchEvent(PttOnChanged, this);
@@ -522,34 +580,46 @@ namespace HMI.Model.Module.BusinessEntities
 		{
 			get { return _NumRtx; }
 		}
-        public bool RadioMonitoring
-        {
-            get
-            {
-                for (int i = 0; i < NumDestinations; i++)
-                {
-                    if (_Dst[i].Monitoring)
-                        return true;
-                }
+		public bool RadioMonitoring
+		{
+			get
+			{
+				for (int i = 0; i < NumDestinations; i++)
+				{
+					if (_Dst[i].Monitoring)
+						return true;
+				}
 
-                return false;
-            }
-        }
+				return false;
+			}
+		}
 
-        public bool SiteManager
-        {
-            get { return _SiteManager; }
-            set
-            {
-                _SiteManager = value;
+		public bool SiteManager
+		{
+			get { return _SiteManager; }
+			set
+			{
+				_SiteManager = value;
 
-                General.SafeLaunchEvent(SiteManagerChanged, this);
-            }
-        }
-        public bool DoubleRadioSpeaker
-        {
-            get { return _DoubleRadioSpeaker; }
-        }
+				General.SafeLaunchEvent(SiteManagerChanged, this);
+			}
+		}
+		public bool DoubleRadioSpeaker
+		{
+			get { return _DoubleRadioSpeaker; }
+		}
+
+		public bool CanReleaseRtxSqu
+		{
+			get
+			{
+				return _CanReleaseRtxSqu;
+			}
+			set
+			{
+				_CanReleaseRtxSqu = value;
+			}
+		}
 
 		public Radio()
 		{
@@ -562,7 +632,7 @@ namespace HMI.Model.Module.BusinessEntities
 		public void Reset()
 		{
 			PttOn = false;
-			SetRtx(0,0);
+			SetRtx(0, 0);
 
 			for (int i = 0; i < NumDestinations; i++)
 			{
@@ -664,10 +734,10 @@ namespace HMI.Model.Module.BusinessEntities
 			General.SafeLaunchEvent(RadioChanged, this, (RangeMsg)msg);
 		}
 
-        public void ResetAssignatedState()
-        {
-            General.SafeLaunchEvent(RadioChanged, this, new RangeMsg(0, NumDestinations));
-        }
+		public void ResetAssignatedState()
+		{
+			General.SafeLaunchEvent(RadioChanged, this, new RangeMsg(0, NumDestinations));
+		}
 
 		public NotifMsg SwitchTempGroupIfRtxOn(int id, bool someJack)
 		{
@@ -684,7 +754,7 @@ namespace HMI.Model.Module.BusinessEntities
 						NotifMsg msg = new NotifMsg(Resources.NoJacksError, Resources.BadOperation, Resources.NoJacksError, 0, MessageType.Error, MessageButtons.Ok);
 						return msg;
 					}
-					
+
 					if (_NumRtx == 10)
 					{
 						NotifMsg msg = new NotifMsg(Resources.RtxMaxFrError, Resources.MessageErrorCaption, Resources.RtxMaxFrError, 0, MessageType.Error, MessageButtons.Ok);
@@ -696,14 +766,17 @@ namespace HMI.Model.Module.BusinessEntities
 				}
 				else
 				{
-                    // No está permitido sacar un elemento del grupo de RTX si hay una retransmisión en curso
-                    //Ver Incidencia #2852
-                    if ((dst.Ptt == PttState.ExternPtt) ||
-                        (dst.Squelch== SquelchState.SquelchOnlyPort) || (dst.Squelch == SquelchState.SquelchPortAndMod))
-                    {                      
-                        NotifMsg msg = new NotifMsg(Resources.RtxActiveNoRemove, Resources.MessageErrorCaption, Resources.RtxActiveNoRemove, 0, MessageType.Error, MessageButtons.Ok);
-                        return msg;
-                    }
+					// No está permitido sacar un elemento del grupo de RTX si hay una retransmisión en curso
+					//Ver Incidencia #2852
+					// RQF36 Posibilidad de deshacer el grupo RETRANS aun existiendo un SQ activo en una de las frecuencias que forman
+					// parte del grupo
+					if (((dst.Ptt == PttState.ExternPtt) ||
+						(dst.Squelch == SquelchState.SquelchOnlyPort) || (dst.Squelch == SquelchState.SquelchPortAndMod))
+						&& !_CanReleaseRtxSqu)
+					{
+						NotifMsg msg = new NotifMsg(Resources.RtxActiveNoRemove, Resources.MessageErrorCaption, Resources.RtxActiveNoRemove, 0, MessageType.Error, MessageButtons.Ok);
+						return msg;
+					}
 					dst.TempRtxGroup = 0;
 					_NumRtx--;
 				}
@@ -744,8 +817,8 @@ namespace HMI.Model.Module.BusinessEntities
 				if (group > 0)
 				{
 					for (int i = _Page * numPositionsByPage, to = (_Page + 1) * numPositionsByPage; i < to; i++)
-						//for (int i = 0, to = NumDestinations; i < to; i++)
-						{
+					//for (int i = 0, to = NumDestinations; i < to; i++)
+					{
 						RdDst dst = _Dst[i];
 
 						if (dst.RtxGroup == group)
@@ -786,59 +859,59 @@ namespace HMI.Model.Module.BusinessEntities
 			return prevRtxGroup;
 		}
 
-        public bool ChangingSite(int i)
-        {
-            if (i < NumDestinations)
-                return _Dst[i].TempAlias != string.Empty && _Dst[i].TempAlias != _Dst[i].Alias;
+		public bool ChangingSite(int i)
+		{
+			if (i < NumDestinations)
+				return _Dst[i].TempAlias != string.Empty && _Dst[i].TempAlias != _Dst[i].Alias;
 
-            return false;
-        }
+			return false;
+		}
 
-        public string GetTmpAlias(int i)
-        {
-            if (i < NumDestinations)
-                return _Dst[i].TempAlias;
+		public string GetTmpAlias(int i)
+		{
+			if (i < NumDestinations)
+				return _Dst[i].TempAlias;
 
-            return string.Empty;
-        }
+			return string.Empty;
+		}
 
-        public void SetSelCalMessage(StateMsg<string> msg)
-        {
-            General.SafeLaunchEvent(SelCalResponse, this, msg);
-        }
+		public void SetSelCalMessage(StateMsg<string> msg)
+		{
+			General.SafeLaunchEvent(SelCalResponse, this, msg);
+		}
 
-        public void SetSiteChanged(StateMsg<string> msg)
-        {
-            // 0: Alias
-            // 1: Frequency
-            // 2: resultado
-            string[] changeSiteRsp = msg.State.Split(',');
+		public void SetSiteChanged(StateMsg<string> msg)
+		{
+			// 0: Alias
+			// 1: Frequency
+			// 2: resultado
+			string[] changeSiteRsp = msg.State.Split(',');
 
-            for (int i = 0; i < Radio.NumDestinations; i++)
-            {
-                if (ChangingSite(i))
-                {
-                    if (changeSiteRsp[2].ToUpper() == "TRUE")
-                        _Dst[i].Reset(_Dst[i].TempAlias);
-                    else
-                        _Dst[i].TempAlias = _Dst[i].Alias;
-                }
-                else if (_Dst[i].Frecuency == changeSiteRsp[1])
-                {
-                    if (changeSiteRsp[2].ToUpper() == "TRUE")
-                        _Dst[i].Reset(changeSiteRsp[0]);
-                    else
-                        _Dst[i].TempAlias = _Dst[i].Alias;
-                }
-            }
-            General.SafeLaunchEvent(SiteChanged, this, msg);
-        }
+			for (int i = 0; i < Radio.NumDestinations; i++)
+			{
+				if (ChangingSite(i))
+				{
+					if (changeSiteRsp[2].ToUpper() == "TRUE")
+						_Dst[i].Reset(_Dst[i].TempAlias);
+					else
+						_Dst[i].TempAlias = _Dst[i].Alias;
+				}
+				else if (_Dst[i].Frecuency == changeSiteRsp[1])
+				{
+					if (changeSiteRsp[2].ToUpper() == "TRUE")
+						_Dst[i].Reset(changeSiteRsp[0]);
+					else
+						_Dst[i].TempAlias = _Dst[i].Alias;
+				}
+			}
+			General.SafeLaunchEvent(SiteChanged, this, msg);
+		}
 
 #if _HF_GLOBAL_STATUS_
-        public void SetHfGlobalStatus(StateMsg<string> status)
-        {
-            General.SafeLaunchEvent(HfGlobalStatus, this, status);
-        }
+		public void SetHfGlobalStatus(StateMsg<string> status)
+		{
+			General.SafeLaunchEvent(HfGlobalStatus, this, status);
+		}
 #endif
 
 		public int GetNumFrAvalilablesForRtx(int from, int count)
@@ -860,26 +933,33 @@ namespace HMI.Model.Module.BusinessEntities
 			return numTx;
 		}
 
-        public bool EnableSelCal()
-        {
-            for (int i = 0; i < _Dst.Length; i++)
-            {
-                RdDst dst = _Dst[i];
+		public bool EnableSelCal()
+		{
+			for (int i = 0; i < _Dst.Length; i++)
+			{
+				RdDst dst = _Dst[i];
 
-                if (dst.TipoFrecuencia == TipoFrecuencia_t.HF && dst.Tx)
-                {
-                    return true;
-                }
-            }
+				if (dst.TipoFrecuencia == TipoFrecuencia_t.HF && dst.Tx)
+				{
+					return true;
+				}
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        public void ChangingPositionSite(int id, string alias)
-        {
-            _Dst[id].TempAlias = alias;
+		public void ChangingPositionSite(int id, string alias)
+		{
+			_Dst[id].TempAlias = alias;
 
-            General.SafeLaunchEvent(RadioChanged, this, new RangeMsg(id, 1));
-        }
+			General.SafeLaunchEvent(RadioChanged, this, new RangeMsg(id, 1));
+		}
+
+
+		public void SetTiempoReplay(int segundos)
+		{
+			_ParametrosReplay.Tiempo = segundos;
+			General.SafeLaunchEvent(TempReplayChanged, this, _ParametrosReplay);
+		}
 	}
 }

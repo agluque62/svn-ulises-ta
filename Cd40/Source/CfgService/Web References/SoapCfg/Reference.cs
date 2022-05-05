@@ -1607,6 +1607,9 @@ namespace U5ki.CfgService.SoapCfg {
         
         private int rtspPort1Field;
         
+        //RQF-36 Mejoras funcionalidad retransmisión radio (RETRANS)
+        private bool EnableQuitarRTXSQfield;
+        private bool EnableMantRTXSectfield;
         /// <remarks/>
         public string IdUsuario {
             get {
@@ -1694,6 +1697,31 @@ namespace U5ki.CfgService.SoapCfg {
             }
             set {
                 this.rtspPort1Field = value;
+            }
+        }
+
+        //RQF-36 Mejoras funcionalidad retransmisión radio (RETRANS)
+        public bool EnableQuitarRTXSQ
+        {
+            get
+            {
+                return this.EnableQuitarRTXSQfield;
+            }
+            set
+            {
+                this.EnableQuitarRTXSQfield = value;
+            }
+        }
+
+        public bool EnableMantRTXSect
+        {
+            get
+            {
+                return this.EnableMantRTXSectfield;
+            }
+            set
+            {
+                this.EnableMantRTXSectfield = value;
             }
         }
     }
@@ -7862,7 +7890,11 @@ namespace U5ki.CfgService.SoapCfg {
         private bool inhabilitacionRedirecField;
         
         private bool glpField;
-        
+
+        private bool PermisoRTXSQField;
+
+        private bool PermisoRTXSectField;
+
         /// <remarks/>
         public bool TransConConsultaPrev {
             get {
@@ -8064,16 +8096,45 @@ namespace U5ki.CfgService.SoapCfg {
         }
         
         /// <remarks/>
-        public bool Glp {
-            get {
+        public bool Glp
+        {
+            get
+            {
                 return this.glpField;
             }
-            set {
+            set
+            {
                 this.glpField = value;
             }
         }
+
+        /// <remarks/>
+        public bool PermisoRTXSQ
+        {
+            get
+            {
+                return this.PermisoRTXSQField;
+            }
+            set
+            {
+                this.PermisoRTXSQField = value;
+            }
+        }
+
+        /// <remarks/>
+        public bool PermisoRTXSect
+        {
+            get
+            {
+                return this.PermisoRTXSectField;
+            }
+            set
+            {
+                this.PermisoRTXSectField = value;
+            }
+        }
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
     [System.SerializableAttribute()]

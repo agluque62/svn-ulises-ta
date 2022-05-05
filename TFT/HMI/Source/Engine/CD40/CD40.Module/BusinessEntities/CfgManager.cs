@@ -140,6 +140,12 @@ namespace HMI.CD40.Module.BusinessEntities
                         p |= Permissions.Capture;
                     if (_UserCfg.User.TeclasDelSector.Redireccion)
                         p |= Permissions.Forward;
+                    if (_UserCfg.User.TeclasDelSector.RepeticionUltLlamada)
+                        p |= Permissions.ReplayOnlyRadio;
+                    if (_UserCfg.User.TeclasDelSector.PermisoRTXSQ )//RQF36  //deberia estar en cd40cfg.proto.cs
+                        p |= Permissions.PermisoRTXSQ;
+                    if (_UserCfg.User.TeclasDelSector.PermisoRTXSect )//RQF36 //deberia estar en cd40cfg.proto.cs
+                        p |= Permissions.PermisoRTXSect;
                 }
 
                 return p;
@@ -857,11 +863,24 @@ namespace HMI.CD40.Module.BusinessEntities
             return recurso;
         }
 
-		#region Private Members
+        // RQF36 Permisos RTX
+        public bool PermisoRTXSQ()
+        {
+            // Esperando a que se defina.
+            return _UserCfg == null ? false : _UserCfg.User.TeclasDelSector.PermisoRTXSQ;
+        }
+
+        public bool PermisoRTXSect()
+        {
+            // Esperando a que se defina.
+            return _UserCfg == null ? false : _UserCfg.User.TeclasDelSector.PermisoRTXSect;
+        }
+
+        #region Private Members
         /// <summary>
         /// Flag que indica si el puesto de operador ha cambiado de usuario por configuración
         /// </summary>
-		private bool _ResetUsuario = false;
+        private bool _ResetUsuario = false;
 		private ConfiguracionSistema _SystemCfg;
 		private ConfiguracionUsuario _UserCfg;
         private List<PoolHfElement> _PoolHf;
@@ -919,7 +938,8 @@ namespace HMI.CD40.Module.BusinessEntities
             CreateOperatorsData();
             //RQF-22
             CheckCfgAnalogica();
-
+            //RQF35
+            
             General.SafeLaunchEvent(ConfigChanged, this);
         }
         /// <summary>

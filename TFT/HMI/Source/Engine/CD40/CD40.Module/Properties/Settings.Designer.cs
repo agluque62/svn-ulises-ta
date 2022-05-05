@@ -461,6 +461,64 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CWP USB Device # 03")]
+        public string RdSpkWindowsId {
+            get {
+                return ((string)(this["RdSpkWindowsId"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CWP USB Device # 02")]
+        public string InstructorCasWindowsId
+        {
+            get
+            {
+                return ((string)(this["InstructorCasWindowsId"]));
+            }
+        }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CWP USB Device # 01")]
+        public string CasWindowsId
+        {
+            get
+            {
+                return ((string)(this["CasWindowsId"]));
+            }
+        }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CWP USB Device # 04")]
+        public string LcSpkWindowsId {
+            get {
+                return ((string)(this["LcSpkWindowsId"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Cascos Alumno windows")]
+        public string CasAlumnoId {
+            get {
+                return ((string)(this["CasAlumnoId"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Cascos Instructor windows")]
+        public string CasInstructorId {
+            get {
+                return ((string)(this["CasInstructorId"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("HD Audio output 2")]
         public string LcSpkAsioId {
             get {
@@ -710,7 +768,7 @@ namespace HMI.CD40.Module.Properties {
                 return ((bool)(this["GLP"]));
             }
         }
-
+        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("false")]
@@ -719,6 +777,17 @@ namespace HMI.CD40.Module.Properties {
             get
             {
                 return ((bool)(this["GLPOnlyRadio"]));
+            }
+        }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int TempMinRecorderRadio
+        {
+            get
+            {
+                return ((int)(this["TempMinRecorderRadio"]));
             }
         }
 

@@ -570,7 +570,7 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 {CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, false},
                 {CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, false},
-                {CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, false}        
+                {CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, false}
             };
 
             /// <summary>
@@ -626,7 +626,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <summary>
         /// 
         /// </summary>
-        public HidGenericHwManager(bool bHIDDevice) : base ()
+        public HidGenericHwManager(bool bHIDDevice) : base()
         {
             PTTDevice = bHIDDevice;
         }
@@ -668,7 +668,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     StartDevice(_dev);
                 }
             }
-            
+
             PostStart(PTTDevice);
 
             /** 20180626. #3609. Se anidan eventos y no se tratan bien en la cola.*/
@@ -687,7 +687,7 @@ namespace HMI.CD40.Module.BusinessEntities
             // Fuerza la presencia del altavoz TF/LC
             _Logger.Info("CheckPresencia LcSpeakerSimul={0}", Settings.Default.LcSpeakerSimul);
             //if (Settings.Default.LcSpeakerSimul)
-                SetPresenceLcSpeaker(true);
+            SetPresenceLcSpeaker(true);
         }
 
         /// <summary>
@@ -756,7 +756,14 @@ namespace HMI.CD40.Module.BusinessEntities
                 _output_channels[_nchannel++] = new DevData { TipoDev = tipo, AsioName = name };
                 _Logger.Info("Encontrado Canal de Audio. Salida {0}: {1} = {2} {3}", _nchannel, tipo, name, AsioChannels.SampleRate);
             }
+            //RQF20
+            //canales de windows
 
+            SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, Settings.Default.CasInstructorId);
+            SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, Settings.Default.CasAlumnoId);
+            SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, Settings.Default.LcSpkWindowsId);
+            SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, Settings.Default.RdSpkWindowsId);
+            //SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, Settings.Default.RdSpkWindowsId);
         }
 
         /// <summary>
@@ -819,6 +826,58 @@ namespace HMI.CD40.Module.BusinessEntities
                 return CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER;
 
             return CORESIP_SndDevType.CORESIP_SND_UNKNOWN;
+        }
+
+        public struct sIAO
+        {
+            public string name;
+            public CORESIP_SndDevType UlisesDev;
+            public sIAO(string n, CORESIP_SndDevType c)
+            {
+                name = n;
+                UlisesDev = c;
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        /// RQF20 aqui se añadiran todos los tipos de dispositivos.
+        static private void SetTipoOutWindows(CORESIP_SndDevType UlisesDev, string namewindows)
+        {
+            bool EsIAO = false;
+            _Logger.Trace("SetTipoOutWindows (si es IAO envio los 8 dipositivos");
+            sIAO[] IAO = {
+                new sIAO("CWP USB Device # 01 b", CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP),
+                new sIAO("CWP USB Device # 02 b", CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP),
+                new sIAO("CWP USB Device # 03 b", CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER),
+                new sIAO("CWP USB Device # 04 b", CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER),
+                // tambien los de grabacion
+                new sIAO("CWP USB Device # 01 a", CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER),
+                new sIAO("CWP USB Device # 02 a", CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER),
+                new sIAO("CWP USB Device # 03 a", CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER),
+                new sIAO("CWP USB Device # 04 a", CORESIP_SndDevType.CORESIP_SND_LC_RECORDER)
+            };
+            // de momento hf speaker no hago nada.
+            //if (Settings.Default.HfSpeaker)
+            //{
+            //    int _HfSpeakerDev = SipAgent.AddSndDevice(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, -1, Settings.Default.HfSpeakerChannel);
+            //    if (_HfSpeakerDev >= 0)
+            //    {
+            //        sIAO elem_IAO = new sIAO("CWP USB Device # 03 2", CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER);
+            //        IAO[IAO.Length] = elem_IAO;
+            //    }
+            //}
+            foreach (sIAO s in IAO) if (namewindows!=null && namewindows!="" && namewindows.Contains(s.name))
+            {
+                EsIAO = true;
+                SipAgent.Asignacion(s.UlisesDev, s.name);
+            }
+            if (!EsIAO)
+                SipAgent.Asignacion(UlisesDev, namewindows);
         }
         /// <summary>
         /// 

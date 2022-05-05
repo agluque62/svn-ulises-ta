@@ -1110,7 +1110,8 @@ namespace HMI.CD40.Module.BusinessEntities
         private void OnConfigChanged(object sender)
         {
             //LALM 220208 No cancelo ningun desvio si no estoy fuera de sectorización
-            if (Top.Cfg != null && Top.Cfg.MainId == "__FS__")
+            // LALM 220314 Cancelo los desvios siempre, este o no fuera de sectorización.
+            //if (Top.Cfg != null && Top.Cfg.MainId == "__FS__")
             {
 
                 //Cancel through negotiation first
@@ -1118,6 +1119,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 //Cancel resto of forwards if any
                 Cancel(true);
             }
+            //220315 Anulo el intento de mantener el desvio en cambio de configuración
+            return;
+#if  MANTENER_DESVIO_CAMBIO_CONF
             Dictionary<string, TlfForward> oldForwardsAcc = new Dictionary<string, TlfForward>(_ForwardAcc);
 
             //LALM 220214
@@ -1169,6 +1173,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     forward.DiversionSetAutoRemoved -= OnAutoDiversionSetRemoved;
                 }
             }
+#endif
             //TODO si el otro cambia de host o de IP, habría que borrarlo
             //TODO Falta comprobar si han cambiado todos los participantes
             //foreach (TlfForward forward in _ForwardAcc.Values)

@@ -166,7 +166,6 @@ namespace HMI.CD40.Module.BusinessEntities
             Top.Hw.SpeakerChangedHw += OnHwChanged;
             Top.Lc.ActivityChanged += OnLcActivityChanged;
 			Top.Mixer.SplitModeChanged += OnSplitModeChanged;
-
 			for (int i = 0, to = _RdPositions.Length; i < to; i++)
 			{
 				_RdPositions[i] = new RdPosition(i);
@@ -566,6 +565,9 @@ namespace HMI.CD40.Module.BusinessEntities
         private bool _ScreenSaver = false;
         private bool _SiteManager = false;
         private bool _SiteManaging = false;
+        private bool _RTXConSQU = false;
+        private bool _RTXEnSect = false;
+        private bool _LocalRecordinOnlyRadio = false;
         // JCAM. 20170314
         //Timer que controla el estado de la red. Si no hay red, resetear las posiciones de radio
         private Timer _TimerNetworkStatus = new Timer(1000);
@@ -619,8 +621,15 @@ namespace HMI.CD40.Module.BusinessEntities
             _TimerNetworkStatus.Enabled = true;
 
             _SiteManager = Top.Cfg.SitesConfiguration();
-
-			RangeMsg<RdInfo> rdPositions = new RangeMsg<RdInfo>(0, Radio.NumDestinations);
+            _RTXConSQU = Top.Cfg.PermisoRTXSQ();//RQF36
+            _RTXEnSect = Top.Cfg.PermisoRTXSect();//RQF36
+            _LocalRecordinOnlyRadio = Top.Recorder.LocalRecordingOnlyRadio;
+            if ((Top.Cfg.Permissions & Permissions.ReplayOnlyRadio) == Permissions.ReplayOnlyRadio)
+                Top.Recorder.LocalRecordingOnlyRadio = true;
+            else
+                Top.Recorder.LocalRecordingOnlyRadio = false;
+            
+            RangeMsg<RdInfo> rdPositions = new RangeMsg<RdInfo>(0, Radio.NumDestinations);
 
 			foreach (CfgEnlaceExterno link in Top.Cfg.RdLinks)
 			{
@@ -637,10 +646,12 @@ namespace HMI.CD40.Module.BusinessEntities
                             RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, (FrequencyState)rd.Estado, rd.RxOnly);
                             /** 20180321. AGL. ALIAS a mostrar en la tecla... */
                             posInfo.KeyAlias = rd.KeyAlias;
+                            //LALM 220329 introduzco DescDestino.
+                            posInfo.DescDestino = rd.DescDestino;
 
                             //LALM 210223 Errores #4756 prioridad.
                             posInfo.Priority = rd.Priority;
-						rdPositions.Info[pos] = posInfo;
+						    rdPositions.Info[pos] = posInfo;
 					}
 				}
 			}
@@ -657,12 +668,19 @@ namespace HMI.CD40.Module.BusinessEntities
                         posInfo.KeyAlias = rd.KeyAlias;
                         //LALM 210223 Errores #4756 prioridad
                         posInfo.Priority = (int)rd.GetPttPriority();
+                        //LALM 220329 introduzco DescDestino.
+                        posInfo.DescDestino = rd.DescDestino;
 
-					rdPositions.Info[i] = posInfo;
+                        rdPositions.Info[i] = posInfo;
 				}
 			}
-			General.SafeLaunchEvent(NewPositions, this, rdPositions);
-		}
+            
+                // RQF35 20220317
+                if (_LocalRecordinOnlyRadio != Top.Recorder.LocalRecordingOnlyRadio)
+                    _LocalRecordinOnlyRadio = Top.Recorder.LocalRecordingOnlyRadio;
+            
+                General.SafeLaunchEvent(NewPositions, this, rdPositions);
+            }
             catch (Exception exc)
             {
                 _Logger.Error(String.Format("RdManager:OnConfigChanged exception {0}, {1}", exc.Message, exc.StackTrace));
@@ -1027,7 +1045,14 @@ namespace HMI.CD40.Module.BusinessEntities
                 /* GRABACION VOIP END */
 
 			}
-		}
+			//LALM 220922
+            // Si esta en reproduccion y hay squelch se debe parar
+            if (AnySquelch && Top.Recorder.LocalRecordingOnlyRadio  /*&& Top.Replay.Replaying*/)
+            {
+                if (Top.Replay.Replaying)
+                Top.Replay.DoFunction(FunctionReplay.Stop, ViaReplay.SpeakerRadio, "", 0);
+            }
+        }
 
         /// <summary>
         /// 

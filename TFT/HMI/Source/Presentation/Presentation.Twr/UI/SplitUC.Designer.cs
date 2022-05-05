@@ -129,6 +129,7 @@ namespace HMI.Presentation.Twr.UI
             this._SplitBT.Location = new System.Drawing.Point(84, 2);
             this._SplitBT.Margin = new System.Windows.Forms.Padding(2);
             this._SplitBT.Name = "_SplitBT";
+            this._SplitBT.Permitted = true;
             this._SplitBT.Size = new System.Drawing.Size(106, 96);
             this._SplitBT.TabIndex = 4;
             this._SplitBT.Click += new System.EventHandler(this._SplitBT_Click);
@@ -161,6 +162,7 @@ namespace HMI.Presentation.Twr.UI
             this._SplitOffBT.Location = new System.Drawing.Point(1, 2);
             this._SplitOffBT.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this._SplitOffBT.Name = "_SplitOffBT";
+            this._SplitOffBT.Permitted = true;
             this._SplitOffBT.Size = new System.Drawing.Size(90, 96);
             this._SplitOffBT.TabIndex = 0;
             this._SplitOffBT.Click += new System.EventHandler(this._SplitModeBT_Click);
@@ -173,6 +175,7 @@ namespace HMI.Presentation.Twr.UI
             this._SplitRdLcBT.Location = new System.Drawing.Point(93, 2);
             this._SplitRdLcBT.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this._SplitRdLcBT.Name = "_SplitRdLcBT";
+            this._SplitRdLcBT.Permitted = true;
             this._SplitRdLcBT.Size = new System.Drawing.Size(90, 96);
             this._SplitRdLcBT.TabIndex = 1;
             this._SplitRdLcBT.Click += new System.EventHandler(this._SplitModeBT_Click);
@@ -185,6 +188,7 @@ namespace HMI.Presentation.Twr.UI
             this._SplitLcTfBT.Location = new System.Drawing.Point(185, 2);
             this._SplitLcTfBT.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this._SplitLcTfBT.Name = "_SplitLcTfBT";
+            this._SplitLcTfBT.Permitted = true;
             this._SplitLcTfBT.Size = new System.Drawing.Size(90, 96);
             this._SplitLcTfBT.TabIndex = 2;
             this._SplitLcTfBT.Click += new System.EventHandler(this._SplitModeBT_Click);

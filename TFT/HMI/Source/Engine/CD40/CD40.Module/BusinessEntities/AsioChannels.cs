@@ -4,11 +4,54 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Collections;
 
 using Microsoft.Win32;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
+    //RQF20
+    public class WindowsChannels
+    {
+        class Disp
+        {
+            public string device;
+            public string name;
+        }
+        private List<Disp> _disp;
+        public WindowsChannels()
+        {
+            _disp = new List<Disp>();
+        }
+        public void AddDisp(string device,string name)
+        {
+            foreach(Disp item in _disp)
+            {
+                if (item.name == name)
+                    return;
+            }
+            Disp d = new Disp();
+            d.device = device;
+            d.name = name;
+            _disp.Add(d);
+        }
+
+        public string getname(string device)
+        {
+            foreach(Disp d in _disp)
+                if (d.device == device)
+                    return d.name;
+            return null;
+        }
+
+        public string getdevice(string name)
+        {
+            foreach(Disp d in _disp)
+                if (d.name == name)
+                    return d.device;
+            return null;
+        }
+    }
     public class AsioChannels
     {
         /// <summary>
@@ -631,17 +674,17 @@ namespace HMI.CD40.Module.BusinessEntities
                out IntPtr rReturnedComObject);
         }
 
-        #region IMPORT
+    #region IMPORT
 
-        #endregion
+    #endregion
 
-        
-        #region PRIVATE
 
-        /// <summary>
-        /// 
-        /// </summary>
-        static List<InstalledDriver> _drivers=null;
+    #region PRIVATE
+
+    /// <summary>
+    /// 
+    /// </summary>
+    static List<InstalledDriver> _drivers=null;
         static ASIODriver SelectDriver(InstalledDriver _drvinf)
         {
             ASIODriver _drv = ASIODriver.GetASIODriverByGuid(new Guid(_drvinf.ClsId));

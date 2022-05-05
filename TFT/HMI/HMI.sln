@@ -23,6 +23,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CD40", "CD40", "{FFB9AF51-83B9-42A2-BF4E-9E0A252446A7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{4F616123-4552-4F9A-8114-85EB4C6B5BF2}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Cd40\Lib\coresip-voter.dll = ..\..\Cd40\Lib\coresip-voter.dll
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shell", "Source\Infrastructure\Shell\Shell.csproj", "{E474BEE1-DFEF-439F-A15F-9B3CFC77589E}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -112,6 +115,14 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Ulises5000I AT-HMIMCast", "
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "u5ki.Mcast", "..\..\Cd40\Source\MCast\u5ki.Mcast.csproj", "{47E41CF6-13A4-4E38-B318-A86586FEF0FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notas", "Notas", "{731D530C-8751-4E86-9959-3C341180A7F0}"
+	ProjectSection(SolutionItems) = preProject
+		Configuracion.proto.txt = Configuracion.proto.txt
+		notas.txt = notas.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadDevicesWindows", "Source\LoadDevicesWindows\LoadDevicesWindows.csproj", "{50D45785-C741-469D-BF4F-BC625098F975}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2024,6 +2035,90 @@ Global
 		{47E41CF6-13A4-4E38-B318-A86586FEF0FD}.Release|x64.Build.0 = Release|Any CPU
 		{47E41CF6-13A4-4E38-B318-A86586FEF0FD}.Release|x86.ActiveCfg = Release|Any CPU
 		{47E41CF6-13A4-4E38-B318-A86586FEF0FD}.Release|x86.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Pocket PC 2003 (ARMV4).Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Smartphone 2003 (ARMV4).ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Smartphone 2003 (ARMV4).Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|Win32.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|x64.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Debug|x86.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Any CPU.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Any CPU.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Mixed Platforms.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Pocket PC 2003 (ARMV4).Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Smartphone 2003 (ARMV4).ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Smartphone 2003 (ARMV4).Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Win32.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|Win32.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|x64.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|x64.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|x86.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugPhoneService|x86.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Any CPU.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Any CPU.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Mixed Platforms.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Pocket PC 2003 (ARMV4).Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Smartphone 2003 (ARMV4).ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Smartphone 2003 (ARMV4).Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Win32.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|Win32.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|x64.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|x64.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|x86.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.DebugRadioService|x86.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Any CPU.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Mixed Platforms.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Pocket PC 2003 (ARMV4).ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Pocket PC 2003 (ARMV4).Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Smartphone 2003 (ARMV4).ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Smartphone 2003 (ARMV4).Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Win32.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|Win32.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|x64.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|x64.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|x86.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhRelease|x86.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Any CPU.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Mixed Platforms.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Pocket PC 2003 (ARMV4).Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Smartphone 2003 (ARMV4).ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Smartphone 2003 (ARMV4).Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Win32.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|Win32.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|x64.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|x64.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|x86.ActiveCfg = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.PhUnitTest|x86.Build.0 = Debug|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Pocket PC 2003 (ARMV4).ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Pocket PC 2003 (ARMV4).Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Smartphone 2003 (ARMV4).ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Smartphone 2003 (ARMV4).Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Win32.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|Win32.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|x64.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|x64.Build.0 = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|x86.ActiveCfg = Release|Any CPU
+		{50D45785-C741-469D-BF4F-BC625098F975}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2060,11 +2155,12 @@ Global
 		{49537E20-8DCA-4025-A12E-E5765E62750A} = {AF750C6A-98C4-4168-9939-402EB179F989}
 		{92CA432E-C30E-4893-B1D9-7BEEBF471C83} = {4F616123-4552-4F9A-8114-85EB4C6B5BF2}
 		{47E41CF6-13A4-4E38-B318-A86586FEF0FD} = {80441FC6-56B1-4D5D-B3A6-9B918660E28E}
+		{50D45785-C741-469D-BF4F-BC625098F975} = {38E02DAE-3828-4255-8D0E-2BD859D560D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {1B4B8C15-13DE-4B82-BD78-04D096308C24}
-		RootNamespace = HMI
-		CommonProjectGuid = c45ad2ca-b6bd-4e4a-8cc2-34c8f895ed46
 		ShellProjectGuid = e474bee1-dfef-439f-a15f-9b3cfc77589e
+		CommonProjectGuid = c45ad2ca-b6bd-4e4a-8cc2-34c8f895ed46
+		RootNamespace = HMI
+		SolutionGuid = {1B4B8C15-13DE-4B82-BD78-04D096308C24}
 	EndGlobalSection
 EndGlobal

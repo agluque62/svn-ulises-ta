@@ -60,5 +60,6 @@ namespace HMI.Model.Module.Services
 		//LALM 210324
 		void SetCambioRadio(bool up);
 		void PlayRadioClick();
+		void StopAudioReproduccion();
 	}
 }

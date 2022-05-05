@@ -188,6 +188,22 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='BRILLO_Property' Type='raw' />
     </Property>
+    
+    <!-- Tipo de dispositivo standard -->
+    <Property Id="STDAUDIODEV" Value="False">
+    </Property>
+    <Property Id="STD_WIN_INSTRUCTOR_DEV" Value="-none-"/>
+    <Property Id="STD_WIN_ALUMN_DEV" Value="-none-"/>
+    <Property Id="STD_WIN_RD_DEV" Value="-none-"/>
+    <Property Id="STD_WIN_LC_DEV" Value="-none-"/>
+    <Property Id="ASIO_DEVS" Value="-none-"/>
+    <Property Id="STD_ASIO_INSTRUCTOR_DEV" Value="-none-"/>
+    <Property Id="STD_ASIO_ALUMN_DEV" Value="-none-"/>
+    <Property Id="STD_ASIO_RD_DEV" Value="-none-"/>
+    <Property Id="STD_ASIO_LC_DEV" Value="-none-"/>
+    <Property Id="TIPOAUDIOUSB" Value="1"/>
+
+	<Property Id="NEXT_BUTTON_DIALOG3" Value="False"/>
 
     <!---->
 
@@ -207,8 +223,8 @@
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
 
     <!-- DLL Custom Actions -->
-    <!--<Binary Id="Ulises5000I_CustomActions" 
-            SourceFile="..\Ulises5000-AT-HMI-CustomActions\bin\$(var.Configuration)\Ulises5000-AT-HMI-CustomActions.CA.dll" />-->  
+    <Binary Id="Ulises5000_AT_HMI_CustomActions" 
+            SourceFile="..\Ulises5000-AT-HMI-CustomActions\bin\$(var.Configuration)\Ulises5000-AT-HMI-CustomActions.CA.dll" />
 
   </Product>
 
@@ -369,8 +385,71 @@
         <util:XmlFile Id="MaxVolume" Action="setValue"
                 File = "[#HMI.config]"
                 ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='MaxVolume'[\]]/value"
-                Value="50"/>        
-        <!-- Nuevos OIDs a partir de la version 2.5.2 -->
+                Value="50"/>
+
+		  <!--RQF20 CONFIGURACION DISPOSITIVOS DE AUDIO-->
+		  <util:XmlFile Id="CasAlumnoId" Action="setValue"
+				File = "[#HMI.config]"
+				ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='CasAlumnoId'[\]]/value"
+			Value="[STD_WIN_ALUMN_DEV]"/>
+
+		  <util:XmlFile Id="CasInstructorId" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='CasInstructorId'[\]]/value"
+		  Value="[STD_WIN_INSTRUCTOR_DEV]"/>
+		  <!--Value="[STD_WIN_INSTRUCTOR_DEV]"/>-->
+
+		  <util:XmlFile Id="RdSpkWindowsId" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='RdSpkWindowsId'[\]]/value"
+			  Value="[STD_WIN_RD_DEV]"/>
+
+		  <util:XmlFile Id="LcSpkWindowsId" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='LcSpkWindowsId'[\]]/value"
+			  Value="[STD_WIN_LC_DEV]"/>
+
+          <!--******************-->
+		  <!--<util:XmlFile Id="CasAsioId" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='CasAsioId'[\]]/value"
+			  Value="[STD_ASIO_INSTRUCTOR_DEV]"/>-->
+
+		  <util:XmlFile Id="CasAsioId" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='CasAsioId'[\]]/value"
+			  Value="[STD_ASIO_ALUMN_DEV]"/>
+
+		  <util:XmlFile Id="RdSpkAsioId" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='RdSpkAsioId'[\]]/value"
+			  Value="[STD_ASIO_RD_DEV]"/>
+
+		  <util:XmlFile Id="LcSpkAsioId" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='LcSpkAsioId'[\]]/value"
+			  Value="[STD_ASIO_LC_DEV]"/>
+		  
+
+		  <util:XmlFile Id="AudioCardStandard" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='AudioCardStandard'[\]]/value"
+			  Value="[STDAUDIODEV]"/>
+
+
+
+		  <!--<Condition><![CDATA[STDAUDIODEV="True"]]>
+			  TIPOAUDIOUSB="3"
+		  </Condition>
+
+		  <util:XmlFile Id="TipoAudioUsb" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='TipoAudioUsb'[\]]/value"
+			  Value='[TIPOAUDIOUSB]'/>-->
+
+
+
+		  <!-- Nuevos OIDs a partir de la version 2.5.2 -->
         <util:XmlFile Id="TopOid" Action="setValue"
                 File = "[#HMI.config]"
                 ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='TopOid'[\]]/value"
@@ -1026,6 +1105,8 @@
                   Impersonate='no'
                   ExeCommand='"[INSTALLFOLDER]uv5ki-scripts.cmd" "[COMPANYFOLDER]" "[INSTALLFOLDER]" [PVERSION]'
                   Return='ignore' />
+    <CustomAction Id="CustomActionGetWindowsSndDevs" Return="check" Execute="immediate" BinaryKey="Ulises5000_AT_HMI_CustomActions" DllEntry="CustomActionGetWindowsSndDevs" />
+    <CustomAction Id="CustomActionCheckSndDevs" Return="check" Execute="immediate" BinaryKey="Ulises5000_AT_HMI_CustomActions" DllEntry="CustomActionCheckSndDevs" />
     
     <!--<CustomAction Id="CustomActionEd137Rec" Return="check" Execute="immediate" BinaryKey="Ulises5000I_CustomActions" DllEntry="Ed137RecVar" />-->
    
@@ -1053,9 +1134,11 @@
     
     <InstallExecuteSequence>
       <!--<Custom Action="Md5Mark" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>-->
+
+      <!--<Custom Action="CustomActionGetWindowsSndDevs" Before='InstallInitialize'>NOT Installed OR REINSTALL</Custom>-->
       
       <!-- 20190217. SCRIPT de alto rendimiento. Correr el Script -->
-      <Custom Action="ScriptsRun" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
+      <Custom Action="ScriptsRun" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>      
 
       <!--<Custom Action="StartHMITaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
       <Custom Action="StartWATaskV2" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
@@ -1104,7 +1187,7 @@
       <Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="SetupTypeDlg" Order="2">WixUI_InstallMode = "InstallCustom"</Publish>
       <Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
-      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="OptionsDlg" Order="3">1</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="OptionsDlg3" Order="3">1</Publish>
 
       <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
 
@@ -1118,8 +1201,12 @@
       <Publish Dialog="OptionsDlg" Control="Cancel" Event="SpawnDialog" Value="CancelDlg">1</Publish>
 
       <Publish Dialog="OptionsDlg2" Control="Back" Event="NewDialog" Value="OptionsDlg">1</Publish>
-      <Publish Dialog="OptionsDlg2" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="OptionsDlg2" Control="Next" Event="NewDialog" Value="OptionsDlg3">1</Publish>
       <Publish Dialog="OptionsDlg2" Control="Cancel" Event="SpawnDialog" Value="CancelDlg">1</Publish>
+
+      <Publish Dialog="OptionsDlg3" Control="Back" Event="NewDialog" Value="OptionsDlg2">1</Publish>
+      <Publish Dialog="OptionsDlg3" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="OptionsDlg3" Control="Cancel" Event="SpawnDialog" Value="CancelDlg">1</Publish>
 
       <!-- Dialogo de Opciones -->
       <Dialog Id="OptionsDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="yes">
@@ -1385,11 +1472,169 @@
 
         <!---->
         <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
-        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
+          <Publish Event="DoAction" Value="CustomActionGetWindowsSndDevs">1</Publish>
+        </Control>
         <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)" />
 
         <Control Id="BottomLine" Type="Line" X="0" Y="238" Width="370" Height="0" />
       </Dialog>
+
+
+
+
+
+      <!-- Tercer Dialogo de Opciones -->
+      <Dialog Id="OptionsDlg3" Width="450" Height="270" Title="[ProductName] Options" NoMinimize="yes">
+
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Configuracion del Puesto</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Introduzca la informacion del Puesto</Text>
+        </Control>
+
+        <Control Id="StandardDevicesAsk_Label" Type="Text" X="10"  Y="52" Width="130" Height="18" TabSkip="no" Text="Dispositivos de salida standard" />
+          
+        <Control Id="StandardDevicesAsk_Value"  Type="ComboBox" X="135" Y="52" Width="50"  Height="18" Property="STDAUDIODEV" ComboList="yes" >          
+          <ComboBox Property="STDAUDIODEV" >
+            <ListItem Value="True"  Text="Si" />
+            <ListItem Value="False" Text="No" />
+          </ComboBox>          
+        </Control>
+
+        <!--Dispositivos de salida de audio de Windows-->
+        <Control Id="WinDevicesAsk_Label" Type="Text" X="95"  Y="80" Width="150" Height="18" TabSkip="no" Text="Dispositivos salida audio Windows" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        
+        <!--Se quita (oculta) instructor-->
+		<Control Id="SpkInstructor_Label"   Type="Text" X="10" Y="90" Width="100" Height="18" TabSkip="no" Text="Cascos Instructor" >          
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>          
+        </Control>
+        <Control Id="StdWinInstructorDevAsk_Value"  Type="ComboBox" X="95" Y="90" Width="150"  Height="18" Property="STD_WIN_INSTRUCTOR_DEV" ComboList="yes" >
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="SpkAlumno_Label"   Type="Text" X="10" Y="110" Width="100" Height="18" TabSkip="no" Text="Cascos Alumno" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="StdWinAlumnDevAsk_Value"  Type="ComboBox" X="95" Y="110" Width="150"  Height="18" Property="STD_WIN_ALUMN_DEV" ComboList="yes" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="SpkRD_Label"   Type="Text" X="10" Y="130" Width="100" Height="18" TabSkip="no" Text="Altavoz Radio" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="StdWinRDDevAsk_Value"  Type="ComboBox" X="95" Y="130" Width="150"  Height="18" Property="STD_WIN_RD_DEV" ComboList="yes" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="SpkLC_Label"   Type="Text" X="10" Y="150" Width="100" Height="18" TabSkip="no" Text="Altavoz LC" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="StdWinLCDevAsk_Value"  Type="ComboBox" X="95" Y="150" Width="150"  Height="18" Property="STD_WIN_LC_DEV" ComboList="yes" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+
+        <!--Dispositivos de salida de audio de ASIO-->
+        <Control Id="ASIODevicesAsk_Label" Type="Text" X="270"  Y="80" Width="150" Height="18" TabSkip="no" Text="Dispositivos de ASIO" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+
+		  <!--Se quita (oculta) instructor-->
+		  <Control Id="StdASIOInstructorDevAsk_Value"  Type="ComboBox" X="270" Y="90" Width="150"  Height="18" Property="STD_ASIO_INSTRUCTOR_DEV" ComboList="yes" >
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="StdASIOAlumnDevAsk_Value"  Type="ComboBox" X="270" Y="110" Width="150"  Height="18" Property="STD_ASIO_ALUMN_DEV" ComboList="yes" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="StdAsioRDDevAsk_Value"  Type="ComboBox" X="270" Y="130" Width="150"  Height="18" Property="STD_ASIO_RD_DEV" ComboList="yes" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="StdASIOLCDevAsk_Value"  Type="ComboBox" X="270" Y="150" Width="150"  Height="18" Property="STD_ASIO_LC_DEV" ComboList="yes" >
+          <Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)"/>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
+          <Publish Event="DoAction" Value="CustomActionCheckSndDevs"><![CDATA[STDAUDIODEV = "True"]]></Publish>
+          <Publish Event="NewDialog" Value="OptionsDlg2"><![CDATA[NEXT_BUTTON_DIALOG3 = "False" AND STDAUDIODEV = "True"]]></Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)" />
+
+        <Control Id="BottomLine" Type="Line" X="0" Y="238" Width="370" Height="0" />
+      </Dialog>
+      
     </UI>
 
 

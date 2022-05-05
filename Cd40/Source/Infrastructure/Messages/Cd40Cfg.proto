@@ -290,6 +290,9 @@ message TeclasSectorSCV
 	optional bool SayAgain = 19;
 	optional bool InhabilitacionRedirec = 20;
 	optional bool Glp = 21;
+	//RQF-36 Mejoras funcionalidad retransmisión radio (RETRANS)
+	optional bool PermisoRTXSQ = 22;
+	optional bool PermisoRTXSect = 23;
 }
 
 message NivelesSCV

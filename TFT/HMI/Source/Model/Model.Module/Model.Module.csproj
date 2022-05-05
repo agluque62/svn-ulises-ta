@@ -105,6 +105,7 @@
     <Compile Include="BusinessEntities\Lc.cs" />
     <Compile Include="BusinessEntities\NumberBook.cs" />
     <Compile Include="BusinessEntities\Permissions.cs" />
+    <Compile Include="BusinessEntities\PlayState.cs" />
     <Compile Include="BusinessEntities\Radio.cs" />
     <Compile Include="BusinessEntities\RdHeadPhones.cs" />
     <Compile Include="BusinessEntities\Replay.cs" />

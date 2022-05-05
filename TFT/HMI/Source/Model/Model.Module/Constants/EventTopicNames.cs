@@ -68,7 +68,10 @@ namespace HMI.Model.Module.Constants
         public const string TlfRemoteForwardChanged = "TlfRemoteForwardChanged";
         /** 20190205 */
         public const string TxInProgressError = "RtxInProgressError";
-        #endregion
+		public const string RecorderChanged = "RecorderChanged";
+		public const string TempReplayChanged = "TempReplayChanged";
+		public const string CouplingInProgressError = "CouplingInProgressError";
+		#endregion
 
 		#region Presentation Events
 
@@ -147,6 +150,8 @@ namespace HMI.Model.Module.Constants
         public const string HfGlobalStatusEngine = "HfGlobalStatusEngine";
         public const string SiteManagerEngine = "SiteManagerEngine";
         public const string SiteChangedResultEngine = "SiteChangedResultEngine";
+        public const string ChangedRTXSQU= "ChangedRTXSQU";//RQF36
+        public const string ChangedRTXConf= "ChangedRTXConf";
 
 		public const string AgendaChangedEngine = "AgendaChangedEngine";
 		public const string NumberBookChangedEngine = "NumberBookChangedEngine";

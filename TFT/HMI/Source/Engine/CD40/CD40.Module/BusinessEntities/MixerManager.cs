@@ -1,3 +1,5 @@
+//#define _MEZCLADOR_ASECNA_
+#define _MEZCLADOR_TWR_
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -64,6 +66,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
 		public event GenericEventHandler<SplitMode> SplitModeChanged;
+        public event GenericEventHandler<string> RecorderChanged;
 
         /// <summary>
         /// 
@@ -337,6 +340,13 @@ namespace HMI.CD40.Module.BusinessEntities
             _AlumnRecorderDevOut = _AlumnRecorderDevOutHw;
         }
 
+        /// RQF20 aqui se añadiran todos los tipos de dispositivos.
+        static private void SetTipoOutWindows(CORESIP_SndDevType UlisesDev, string namewindows)
+        {
+            //string nameWindows = 
+            SipAgent.Asignacion(UlisesDev, namewindows);
+        }
+
         //#3267 RQF22
         public void RecordMode2()
         {
@@ -378,6 +388,62 @@ namespace HMI.CD40.Module.BusinessEntities
 
         }
 
+#if _AUDIOGENERIC_
+        public void AsignacionAudioVolumen()
+#else
+        public void AsignacionAudioVolumen()
+#endif
+        {
+            string alumno = Settings.Default.CasAlumnoId;
+            string altavozlc = Settings.Default.LcSpkWindowsId;
+            string instructor = Settings.Default.CasInstructorId;
+            string altavozrd = Settings.Default.RdSpkWindowsId;
+            string altavozhf = "";// Settings.Default.HfSpkWindowsId;
+                                  //SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, Settings.Default.RdSpkWindowsId);
+
+
+            // busco si hay IAO
+            bool hayiao = false;
+            if (SipAgent.GetNameDevice(0, "CWP USB Device # 01") != null)
+                hayiao = true;
+            if (!hayiao)
+            {
+                // busco dispositivos por su nombre
+                string dispositivo0_ins = SipAgent.GetNameDevice(0, instructor);//radio
+                string dispositivo1_alu = SipAgent.GetNameDevice(0, alumno);//cascos
+                string dispositivo2_rad = SipAgent.GetNameDevice(0, altavozrd);//radio
+                string dispositivo3_lc = SipAgent.GetNameDevice(0, altavozlc);//LC
+                string dispositivo4_hf = SipAgent.GetNameDevice(0, altavozhf);//HF
+
+                if (alumno!="-none-" && dispositivo1_alu != null)
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, dispositivo1_alu);
+                else
+                    _Logger.Info("Dispositivo alumno {0} no encontrado", dispositivo1_alu);
+                if (instructor != "-none-" && dispositivo0_ins != null)
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, dispositivo0_ins);
+                else
+                    _Logger.Info("Dispositivo instructor {0} no encontrado", dispositivo0_ins);
+                if (altavozlc != "-none-" && dispositivo3_lc != null)
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, dispositivo3_lc);
+                else
+                    _Logger.Info("Dispositivo altavoz lc {0} no encontrado", dispositivo3_lc);
+                if (altavozrd != "-none-" && dispositivo2_rad != null)
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, dispositivo2_rad);
+                else
+                    _Logger.Info("Dispositivo altavoz radio {0} no encontrado", dispositivo2_rad);
+                if (altavozhf!="-none-" && Settings.Default.HfSpeaker)
+                {
+                    //if (dispositivo4_hf!=null)
+                    //    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, dispositivo4_hf);
+                    //else
+                    //    _Logger.Info("Dispositivo HF no encontrado", dispositivo1_alu);
+
+                }
+            }
+        }
+
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -401,11 +467,20 @@ namespace HMI.CD40.Module.BusinessEntities
             Top.Hw.SpeakerChangedHw += OnHwChanged;
             Top.Tlf.Listen.ListenChanged += OnListenChanged;
             Top.Tlf.HangToneChanged += OnTlfToneChanged;
-            _UnlinkGlpRadioTimer.AutoReset = false;
+#if _MEZCLADOR_ASECNA_
+    _UnlinkGlpRadioTimer.AutoReset = true;
+#endif
+#if _MEZCLADOR_TWR_
+    _UnlinkGlpRadioTimer.AutoReset = true;
+#endif
+
             _UnlinkGlpRadioTimer.Elapsed += OnUnlinkGlpRadioTimerElapsed;
 
             /** AGL */
 #if _AUDIOGENERIC_
+
+            //RQF20
+            AsignacionAudioVolumen();
             eAudioDeviceTypes tipoAudio = HwManager.AudioDeviceType;
             if (tipoAudio==eAudioDeviceTypes.GENERIC || tipoAudio==eAudioDeviceTypes.GENERIC_PTT)     // Microcascos y altavoces USB comerciales...
             {
@@ -421,6 +496,72 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             else if (tipoAudio==eAudioDeviceTypes.CMEDIA)    // IAU-CMEDIA
             {
+                bool hayiao = false;
+                //RQF-20
+                // Lo saco de .config
+                //RQF-20
+                // Lo saco de .config
+                string alumno = Settings.Default.CasAlumnoId;
+                string altavozlc = Settings.Default.LcSpkWindowsId;
+                string instructor = Settings.Default.CasInstructorId;
+                string altavozrd = Settings.Default.RdSpkWindowsId;
+                string altavozhf = "";// Settings.Default.HfSpkWindowsId;
+                //SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, Settings.Default.RdSpkWindowsId);
+
+
+                // busco si hay IAO
+                if (SipAgent.GetNameDevice(0, "CWP USB Device # 01") != null)
+                    hayiao = true;
+                if (!hayiao)
+                {
+                    // busco dispositivos por su nombre
+                    string dispositivo0_ins = SipAgent.GetNameDevice(0, instructor);//radio
+                    string dispositivo1_alu = SipAgent.GetNameDevice(1, alumno);//cascos
+                    string dispositivo2_rad = SipAgent.GetNameDevice(2, altavozrd);//radio
+                    string dispositivo3_lc = SipAgent.GetNameDevice(3, altavozlc);//LC
+                    string dispositivo4_hf = SipAgent.GetNameDevice(3, altavozhf);//HF
+
+                    if (dispositivo1_alu != null) 
+                        SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, dispositivo1_alu);
+                    else
+                        _Logger.Info("Dispositivo alumno {0} no encontrado", dispositivo1_alu);
+                    if (dispositivo0_ins !=null) 
+                        SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, dispositivo0_ins);
+                    else
+                        _Logger.Info("Dispositivo instructor {0} no encontrado", dispositivo0_ins);
+                    if (dispositivo3_lc != null) 
+                        SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, dispositivo3_lc);
+                    else
+                        _Logger.Info("Dispositivo altavoz lc {0} no encontrado", dispositivo3_lc);
+                    if (dispositivo2_rad != null) 
+                        SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, dispositivo2_rad);
+                    else
+                        _Logger.Info("Dispositivo altavoz radio {0} no encontrado", dispositivo2_rad);
+                    if (Settings.Default.HfSpeaker)
+                    {
+                        //if (dispositivo4_hf!=null)
+                        //    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, dispositivo4_hf);
+                        //else
+                        //    _Logger.Info("Dispositivo HF no encontrado", dispositivo1_alu);
+
+                    }
+                }
+                else
+                {
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, "CWP USB Device # 01 b");
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, "CWP USB Device # 02 b");
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, "CWP USB Device # 03 b");
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, "CWP USB Device # 04 b");
+
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, "CWP USB Device # 01 a");
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, "CWP USB Device # 02 a");
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, "CWP USB Device # 03 a");
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, "CWP USB Device # 04 a");
+
+                    SetTipoOutWindows(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, "CWP USB Device # 04 1");
+                }
+
+
 
                 //#3267 RQF22
                 LoadDevices();
@@ -1007,9 +1148,18 @@ namespace HMI.CD40.Module.BusinessEntities
                                 alreadySessionOpen = true;
                                 if (Top.Rd.AnySquelch)
                                 {
+#if _MEZCLADOR_ASECNA_
                                     Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
                                     Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true);
                                     _UnlinkGlpRadioTimer.Enabled = false;
+#endif
+#if _MEZCLADOR_TWR_
+                                    //LALM:Pongo finalizar a false para que no corte la grabacion
+                                    bool finalizar = false;
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false,finalizar);
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true, finalizar);
+                                    _UnlinkGlpRadioTimer.Enabled = true;
+#endif
                                 }
                                 else
                                     Top.Recorder.SetIdSession(id, FuentesGlp.RxRadio);
@@ -1022,9 +1172,18 @@ namespace HMI.CD40.Module.BusinessEntities
                             {
                                 if (Top.Rd.AnySquelch)
                                 {
+#if _MEZCLADOR_ASECNA_
                                     Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
                                     Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true);
-                                    _UnlinkGlpRadioTimer.Enabled = false;
+                                    _UnlinkGlpRadioTimer.Enabled = true;
+#endif
+#if _MEZCLADOR_TWR_
+                                    //Pongo finalizar a false para que no corte la grabacion.
+                                    bool finalizar = false;
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false, finalizar);
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true, finalizar);
+                                    _UnlinkGlpRadioTimer.Enabled = true;
+#endif                          
                                 }
                                 else
                                     Top.Recorder.SetIdSession(id, FuentesGlp.RxRadio);
@@ -1046,9 +1205,19 @@ namespace HMI.CD40.Module.BusinessEntities
                             {
                                 if (Top.Rd.AnySquelch)
                                 {
+                                    //lalm 220225
+#if _MEZCLADOR_ASECNA_
                                     Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
                                     Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true);
                                     _UnlinkGlpRadioTimer.Enabled = false;
+#endif
+#if _MEZCLADOR_TWR_
+                                    //Pongo finalizar a false para que no corte la grabacion.
+                                    bool finalizar = false;
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false, finalizar);
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true,finalizar);
+                                    _UnlinkGlpRadioTimer.Enabled = true;
+#endif
                                 }
                                 else
                                     Top.Recorder.SetIdSession(id, FuentesGlp.RxRadio);
@@ -1122,9 +1291,20 @@ namespace HMI.CD40.Module.BusinessEntities
 
                         if (Top.Rd.AnySquelch)
                         {
+#if _MEZCLADOR_ASECNA_
                             Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
                             Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true);
                             _UnlinkGlpRadioTimer.Enabled = false;
+#endif
+#if _MEZCLADOR_TWR_
+                            //lalm 220222
+                            // LALM: Se corta solo por squelch
+                            //Pongo finalizar a false para que no corte la grabacion.
+                            bool finalizar = false;
+                            Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false, finalizar);
+                            Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true, finalizar);
+                            _UnlinkGlpRadioTimer.Enabled = true;
+#endif
                         }
                         else
                             Top.Recorder.SetIdSession(id, FuentesGlp.RxRadio);
@@ -1149,9 +1329,19 @@ namespace HMI.CD40.Module.BusinessEntities
 
                         if (Top.Rd.AnySquelch)
                         {
+#if _MEZCLADOR_ASECNA
                             Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
                             Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true);
                             _UnlinkGlpRadioTimer.Enabled = false;
+
+#endif
+#if _MEZCLADOR_TWR_
+                            //Pongo finalizar a false para que no corte la grabacion
+                            bool finalizar = false;
+                            Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false, finalizar);
+                            Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true, finalizar);
+                            _UnlinkGlpRadioTimer.Enabled = true;
+#endif
                         }
                         else
                             Top.Recorder.SetIdSession(id, FuentesGlp.RxRadio);
@@ -1191,7 +1381,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
         /// <param name="id"></param>
-        public void Unlink(int id)
+        public void Unlink(int id,bool temporal=false)
 		{
             List<LinkInfo> listToRemove = _LinksList.FindAll (link => link._CallId == id);
             int removed = _LinksList.RemoveAll(link => link._CallId == id);
@@ -1211,9 +1401,34 @@ namespace HMI.CD40.Module.BusinessEntities
 						Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, false);
                         * */
                         //_UnlinkGlpRadioTimer.Enabled = true;
+#if _MEZCLADOR_ASECNA_
                         Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
                         Top.Rd.UpdateRadioSpeakerLed();
-						break;
+#endif
+#if _MEZCLADOR_TWR_
+                        // El parametro temporal es para no cortar la grabacion en algun caso
+                        //lalm 220225 quit el temporal
+                        _UnlinkGlpRadioTimer.Enabled = true;
+                        if (temporal == false)
+                        {
+                            // Corto  grabacion si solo hay un recurso en squelch, tiene que ser el mio.
+                            Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false, false);
+                            Top.WorkingThread.Enqueue("RecorderChanged", delegate ()
+                            {
+                                General.SafeLaunchEvent(RecorderChanged, this, "mensaje");
+                            });
+
+                        }
+                        else
+                        {
+                            bool finalizar = false;
+                            Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false, finalizar);
+                            Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true, finalizar);
+
+                        }
+                        Top.Rd.UpdateRadioSpeakerLed();
+#endif
+                        break;
 
 					case MixerDev.SpkLc:
                        ManageECHandsFreeByLC();
@@ -1223,15 +1438,25 @@ namespace HMI.CD40.Module.BusinessEntities
                         //#3267 RQF22
                         if (TipoGrabacionAnalogica == 0)
                         //if (Settings.Default.RecordMode == 0)
-                        Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, false);
+                            Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, false);
 
                         Top.Recorder.SessionGlp(info._TipoFuente, false);
                         Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
 						break;
 
-					case MixerDev.MhpRd:
+					case MixerDev.MhpRd://cascos
                         //_UnlinkGlpRadioTimer.Enabled = true;
+#if _MEZCLADOR_ASECNA_
                         Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
+#endif
+#if _MEZCLADOR_TWR_
+                        //lalm 220225
+                        // MhpRd es cascos
+                        _UnlinkGlpRadioTimer.Enabled = true;
+                        // LALM dejo que se corte solo por squelch
+
+
+#endif
 						break;
 
 					case MixerDev.MhpTlf:
@@ -1275,7 +1500,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 _Mixer.Unlink(id);
                 Top.Rd.UpdateRadioSpeakerLed();
             }
-			_TlfListens.Remove(id);
+            _TlfListens.Remove(id);
 
             /** */
             RingLedToOff(id);
@@ -1503,20 +1728,32 @@ namespace HMI.CD40.Module.BusinessEntities
             switch (via)
             {
                 case ViaReplay.HeadphonesAlumn:
-                    link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
-                    Link(file,_AlumnDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
+                    if (_AlumnDev > 0)
+                    {
+                        link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
+                        Link(file, _AlumnDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
+                    }
                     break;
                 case ViaReplay.HeadphonesInstructor:
-                    link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
-                    Link(file,_InstructorDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
+                    if (_InstructorDev > 0)
+                    {
+                        link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
+                        Link(file, _InstructorDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
+                    }
                     break;
                 case ViaReplay.SpeakerRadio:
-                    link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
-                    Link(file,_RdSpeakerDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
+                    if (_RdSpeakerDev > 0)
+                    {
+                        link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
+                        Link(file, _RdSpeakerDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
+                    }
                     break;
                 case ViaReplay.SpeakerLc:
-                    link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
-                    Link(file,_LcSpeakerDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
+                    if (_LcSpeakerDev > 0)
+                    {
+                        link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
+                        Link(file, _LcSpeakerDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
+                    }
                     break;
             }
             _LinksList.Add(link);
@@ -1582,7 +1819,7 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 #endif
 
-		#region Private Members
+#region Private Members
 
 		class LinkInfo
 		{
@@ -1706,10 +1943,16 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="e"></param>
         private void OnUnlinkGlpRadioTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            _UnlinkGlpRadioTimer.Enabled = false;
-
+#if _MEZCLADOR_ASECNA
+	_UnlinkGlpRadioTimer.Enabled = false;
+#endif
             if (!Top.Rd.AnySquelch)
+            {
+#if _MEZCLADOR_TWR
+                _UnlinkGlpRadioTimer.Enabled = false;
+#endif
                 Top.Recorder.SessionGlp(FuentesGlp.RxRadio, false);
+            }
         }
 
         /// <summary>
@@ -2350,7 +2593,7 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             _ECHandsFreeManager.fullDuplexLC = sendLc && receiveLc;
         }
-		#endregion
+#endregion
 
         //LALM 211029 
         //# Error 3629 Terminal de Audio -> Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV

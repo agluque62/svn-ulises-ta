@@ -34,6 +34,10 @@ namespace HMI.Model.Module.UI
 		private Image _SquelchImage = null;
 		private string _Frecuency = "";
 		private string _Alias = "";
+		//RQF34 
+		private string _IdFrecuency = "";
+		private string _NameFrecuency = "";
+
 		private int _RtxGroup = 0;
 		private Timer _Timer = new Timer();
 		private bool _DrawX = false;
@@ -169,13 +173,24 @@ namespace HMI.Model.Module.UI
 			_RxBtnInfo.Font = _BigFont;
         }
 
+		// RQF34 Esta funcion hay que dejar por compatibilidad con otros entornos.
         public void Reset(string frecuency, string alias, bool drawX, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor, Color rxForeColor, Color titleForeColor, 
             string qidxResource, uint qidxValue, FrequencyState state)
         {
             //_Alias = qidxResource;
             _QidxValue = (int)qidxValue;
-
             Reset(frecuency, alias, drawX, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor, state);
+        }
+
+		// RQF34 nueva funcion con los pararametros idfrecuency en dos parametros
+        public void Reset(string idfrecuency,string frecuency, string alias, bool drawX, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor, Color rxForeColor, Color titleForeColor, 
+            string qidxResource, uint qidxValue, FrequencyState state)
+        {
+            //_Alias = qidxResource;
+            _QidxValue = (int)qidxValue;
+			// RQF34 este modulo puede tener conflictos con las distintas instalaciones.
+
+            Reset(idfrecuency,frecuency, alias, drawX, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor, state);
         }
 
 		//LALM 210223  Errores #4756 prioridad.
@@ -188,6 +203,7 @@ namespace HMI.Model.Module.UI
 			_RtxGroup = rtxGroup;
 			_PttImage = ptt;
 			_SquelchImage = squelch;
+
 			
 
             ForeColor = titleForeColor;
@@ -241,7 +257,75 @@ namespace HMI.Model.Module.UI
 			Invalidate();
 		}
 
-        public void EnableTx(bool enable)
+		//LALM 210223  Errores #4756 prioridad.
+		// Inserto un nuevo parametro prioridad.
+		// RQF34, Inserto nuevo parametro idfrecuency
+		public void Reset(string idfrecuency,string namefrecuency, string alias, bool drawX, bool allAsOneBt, int rtxGroup, Image ptt, Image squelch, Image audio, Color title, Color tx, Color rx, Color txForeColor,
+			Color rxForeColor, Color titleForeColor, FrequencyState state = FrequencyState.Available, int prioridad = 0, bool bloqueo = false)
+		{
+			_Frecuency = namefrecuency;//RQF34 desaparecerá esta linea se sustituye por las dos ultimas
+			_Alias = alias.Length > 11 ? (alias.Substring(0, 8) + "...") : alias;
+			_RtxGroup = rtxGroup;
+			_PttImage = ptt;
+			_SquelchImage = squelch;
+
+			_IdFrecuency = idfrecuency;// RQF34
+			_NameFrecuency = namefrecuency;// RQF34
+
+
+			ForeColor = titleForeColor;
+			//            BackColor = titleForeColor;
+			if (drawX)
+				_CurrentBackColor = VisualStyle.ButtonColor;
+			else
+			{
+				if ((title == VisualStyle.Colors.Yellow) || (title == VisualStyle.Colors.Red))
+					_CurrentBackColor = title; //error cases and rtx formation with priority over other colors
+				else if (state == FrequencyState.Degraded)
+					_CurrentBackColor = Color.OrangeRed;
+				else if (state == FrequencyState.Available)
+				{
+					_CurrentBackColor = VisualStyle.ButtonColor;
+					////LALM 210223  Errores #4756 prioridad.
+					// Cambio el color de la tecla cuando la prioridad es 3=prio violet, cuando es 4=emergencia blue
+					if (prioridad == 3)
+						_CurrentBackColor = VisualStyle.Colors.Violet;
+					else if (prioridad == 4)
+						_CurrentBackColor = VisualStyle.Colors.Blue;
+				}
+				else //FrequencyState.NotAvailable
+				{
+					_CurrentBackColor = title;
+				}
+				//LALM 210707 nuevo parametro bloqueo para pintar otro color.
+				if (bloqueo)
+					_CurrentBackColor = VisualStyle.Colors.Orange;
+			}
+
+			_BtnInfo.SetBackColor(BtnState.Normal, _CurrentBackColor);
+			_TxBtnInfo.SetBackColor(BtnState.Normal, tx);
+			_TxBtnInfo.SetForeColor(BtnState.Normal, txForeColor);
+			_RxBtnInfo.SetBackColor(BtnState.Normal, rx);
+			_RxBtnInfo.SetForeColor(BtnState.Normal, rxForeColor);
+			_RxBtnInfo.SetImage(BtnState.Normal, audio);
+			_RxBtnInfo.Text = audio == null ? "Rx" : "";
+
+			_DrawX = drawX;
+
+			if (allAsOneBt != _AllAsOneBt)
+			{
+				_Timer.Enabled = false;
+				_State = BtnState.Normal;
+				_StateBT1 = BtnState.Normal;
+				_StateBT2 = BtnState.Normal;
+				_AllAsOneBt = allAsOneBt;
+			}
+
+			Invalidate();
+		}
+
+
+		public void EnableTx(bool enable)
         {
             _StateBT1 = enable ? BtnState.Normal : BtnState.Inactive;
             _TxBtnInfo.SetBackColor(BtnState.Inactive, _TxBtnInfo.GetBackColor(BtnState.Inactive));
@@ -452,10 +536,13 @@ namespace HMI.Model.Module.UI
             BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Frecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
 #else
             textRect.Offset(0, -5);
-            Font fontToUse = _Frecuency.Length > 7 ? _SmallFontBold1 : _MediumFontBold;
+			//Font fontToUse = _Frecuency.Length > 7 ? _SmallFontBold1 : _MediumFontBold;// RQF34 se cambia esta linea por la siguiente
+			Font fontToUse = _NameFrecuency.Length > 7 ? _SmallFontBold1 : _MediumFontBold;
             if (global::HMI.Model.Module.Properties.Settings.Default.BigFonts)
                 fontToUse = _BigFont;
-            BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Frecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
+			// RQF 35 cambio esta linea por la siguiente
+			//BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Frecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
+			BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _NameFrecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
 #endif
             if (global::HMI.Model.Module.Properties.Settings.Default.BigFonts)
             {

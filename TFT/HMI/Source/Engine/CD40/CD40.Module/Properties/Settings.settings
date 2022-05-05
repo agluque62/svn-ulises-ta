@@ -143,11 +143,23 @@
     <Setting Name="SelCalPttTimeOut" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">1000</Value>
     </Setting>
-    <Setting Name="RdSpkAsioId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">HD Audio output 1</Value>
+	  <Setting Name="RdSpkAsioId" Type="System.String" Scope="Application">
+		  <Value Profile="(Default)">HD Audio output 1</Value>
     </Setting>
-    <Setting Name="LcSpkAsioId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">HD Audio output 2</Value>
+	<Setting Name="RdSpkWindowsId" Type="System.String" Scope="Application">
+		  <Value Profile="(Default)">Realtek(R) Audio</Value>
+	</Setting>
+	<Setting Name="LcSpkWindowsId" Type="System.String" Scope="Application">
+		<Value Profile="(Default)">Linea lc</Value>
+	</Setting>
+	  <Setting Name="CasAlumnoId" Type="System.String" Scope="Application">
+		  <Value Profile="(Default)">Cascos Alumno windows</Value>
+	  </Setting>
+	  <Setting Name="CasInstructorId" Type="System.String" Scope="Application">
+		  <Value Profile="(Default)">Cascos Instructor windows</Value>
+	  </Setting>
+	  <Setting Name="LcSpkAsioId" Type="System.String" Scope="Application">
+          <Value Profile="(Default)">HD Audio output 2</Value>
     </Setting>
     <Setting Name="ExpireInProxy" Type="System.UInt32" Scope="Application">
       <Value Profile="(Default)">60</Value>

@@ -9,7 +9,7 @@
 //
 // Latest version of this Guidance Package: http://go.microsoft.com/fwlink/?LinkId=62182
 //----------------------------------------------------------------------------------------
-#define PLAY_OUT_TIME
+
 
 namespace HMI.Presentation.Twr.Views
 {
@@ -47,19 +47,17 @@ namespace HMI.Presentation.Twr.Views
             System.Windows.Forms.TableLayoutPanel _RadioTLP;
             System.Windows.Forms.Panel _RadioHeadP;
             this._RtxBT = new HMI.Model.Module.UI.HMIButton();
-            this._PlayBT = new HMI.Model.Module.UI.HMIButton();
-            this._OutBT = new HMI.Model.Module.UI.HMIButton();
-            this._TimeBT = new HMI.Model.Module.UI.HMIButton();
+            this._PlayBT = new HMI.Presentation.Twr.UI.ControlRecord();
             this._PttBT = new HMI.Model.Module.UI.HMIButton();
+            this._RdHfSpeakerUDB = new HMI.Presentation.Twr.UI.UpDownButton();
             this._SiteManagerBT = new HMI.Model.Module.UI.HMIButton();
+            this._RdPageBT = new HMI.Presentation.Twr.UI.RdPageButton();
+            this._RdHeadPhonesUDB = new HMI.Presentation.Twr.UI.UpDownButton();
+            this._RdSpeakerUDB = new HMI.Presentation.Twr.UI.UpDownButton();
             this._RdButtonsTLP = new System.Windows.Forms.TableLayoutPanel();
             this._PttBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SquelchBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._RtxBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            this._RdHfSpeakerUDB = new HMI.Presentation.Twr.UI.UpDownButton();
-            this._RdPageBT = new HMI.Presentation.Twr.UI.RdPageButton();
-            this._RdHeadPhonesUDB = new HMI.Presentation.Twr.UI.UpDownButton();
-            this._RdSpeakerUDB = new HMI.Presentation.Twr.UI.UpDownButton();
             _RadioTLP = new System.Windows.Forms.TableLayoutPanel();
             _RadioHeadP = new System.Windows.Forms.Panel();
             _RadioTLP.SuspendLayout();
@@ -85,8 +83,6 @@ namespace HMI.Presentation.Twr.Views
             // 
             _RadioHeadP.Controls.Add(this._RtxBT);
             _RadioHeadP.Controls.Add(this._PlayBT);
-            _RadioHeadP.Controls.Add(this._OutBT);
-            _RadioHeadP.Controls.Add(this._TimeBT);
             _RadioHeadP.Controls.Add(this._PttBT);
             _RadioHeadP.Controls.Add(this._RdHfSpeakerUDB);
             _RadioHeadP.Controls.Add(this._SiteManagerBT);
@@ -106,7 +102,7 @@ namespace HMI.Presentation.Twr.Views
             this._RtxBT.DrawX = false;
             this._RtxBT.Enabled = false;
             this._RtxBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._RtxBT.Location = new System.Drawing.Point(271, 3);
+            this._RtxBT.Location = new System.Drawing.Point(238, 3);
             this._RtxBT.Name = "_RtxBT";
             this._RtxBT.Permitted = true;
             this._RtxBT.Size = new System.Drawing.Size(50, 72);
@@ -118,52 +114,19 @@ namespace HMI.Presentation.Twr.Views
             // 
             this._PlayBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this._PlayBT.DrawX = false;
-            this._PlayBT.Enabled = true;
-            this._PlayBT.Location = new System.Drawing.Point(325, 3);
+            this._PlayBT.AutoSize = true;
+            this._PlayBT.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._PlayBT.BackColor = System.Drawing.SystemColors.ControlDark;
+            this._PlayBT.Estado = 0;
+            this._PlayBT.FileGrabado = false;
+            this._PlayBT.Jacks = false;
+            this._PlayBT.Location = new System.Drawing.Point(295, 3);
             this._PlayBT.Name = "_PlayBT";
-            this._PlayBT.Permitted = true;
-            this._PlayBT.Size = new System.Drawing.Size(30, 52);
-            this._PlayBT.TabIndex = 1;
-            this._PlayBT.Text = "|>";
-            this._PlayBT.Click += new System.EventHandler(this._PlayBT_Click);
-            //LALM 210120 de momento no aparece
-            this._PlayBT.Visible = false;
-            // 
-            // _OutBT
-            // 
-            this._OutBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._OutBT.DrawX = false;
-            this._OutBT.Enabled = false;
-            this._OutBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._OutBT.Location = new System.Drawing.Point(355, 3);
-            this._OutBT.Name = "_OutBT";
-            this._OutBT.Permitted = true;
-            this._OutBT.Size = new System.Drawing.Size(20, 52);
-            this._OutBT.TabIndex = 4;
-            this._OutBT.Text = "A";
-            this._OutBT.Click += new System.EventHandler(this._OutBT_Click);
-            //LALM 210120 de momento no aparece
-            this._OutBT.Visible = false;
-            // 
-            // _TimeBT
-            // 
-            this._TimeBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._TimeBT.DrawX = false;
-            this._TimeBT.Enabled = false;
-            this._TimeBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._TimeBT.Location = new System.Drawing.Point(325, 35);
-            this._TimeBT.Name = "_TimeBT";
-            this._TimeBT.Permitted = true;
-            this._TimeBT.Size = new System.Drawing.Size(50, 40);
-            this._TimeBT.TabIndex = 4;
-            this._TimeBT.Text = "--->";
-            this._TimeBT.Click += new System.EventHandler(this._TimeBT_Click);
-            //LALM 210120 de momento no aparece
-            this._TimeBT.Visible = false;
-
+            this._PlayBT.Size = new System.Drawing.Size(40, 54);
+            this._PlayBT.TabIndex = 5;
+            this._PlayBT.TiempoMax = 0;
+            this._PlayBT.LevelUp += new System.EventHandler(this._PlayBTStopAudio);
+            this._PlayBT.LevelUpReproduce += new System.EventHandler(this._PlayBT_Reproduce);
             // 
             // _PttBT
             // 
@@ -172,7 +135,7 @@ namespace HMI.Presentation.Twr.Views
             this._PttBT.DrawX = false;
             this._PttBT.Enabled = false;
             this._PttBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._PttBT.Location = new System.Drawing.Point(215, 3);
+            this._PttBT.Location = new System.Drawing.Point(185, 3);
             this._PttBT.Name = "_PttBT";
             this._PttBT.Permitted = true;
             this._PttBT.Size = new System.Drawing.Size(50, 72);
@@ -180,55 +143,6 @@ namespace HMI.Presentation.Twr.Views
             this._PttBT.Text = "PTT";
             this._PttBT.MouseDown += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseDown);
             this._PttBT.MouseUp += new System.Windows.Forms.MouseEventHandler(this._PttBT_MouseUp);
-            // 
-            // _SiteManagerBT
-            // 
-            this._SiteManagerBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this._SiteManagerBT.DrawX = false;
-            this._SiteManagerBT.Font = new System.Drawing.Font("Arial Black", 10F, System.Drawing.FontStyle.Bold);
-            this._SiteManagerBT.Location = new System.Drawing.Point(327, 3);
-            this._SiteManagerBT.Name = "_SiteManagerBT";
-            this._SiteManagerBT.Permitted = true;
-            this._SiteManagerBT.Size = new System.Drawing.Size(50, 72);
-            this._SiteManagerBT.TabIndex = 5;
-            this._SiteManagerBT.Text = "Empl";
-            this._SiteManagerBT.Visible = false;
-            this._SiteManagerBT.Click += new System.EventHandler(this._SiteManagerBT_Click);
-            // 
-            // _RdButtonsTLP
-            // 
-            this._RdButtonsTLP.ColumnCount = 5;
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this._RdButtonsTLP.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._RdButtonsTLP.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
-            this._RdButtonsTLP.Location = new System.Drawing.Point(3, 87);
-            this._RdButtonsTLP.Name = "_RdButtonsTLP";
-            this._RdButtonsTLP.RowCount = 3;
-            this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this._RdButtonsTLP.Size = new System.Drawing.Size(594, 380);
-            this._RdButtonsTLP.TabIndex = 1;
-            // 
-            // _PttBlinkTimer
-            // 
-            this._PttBlinkTimer.Interval = 500;
-            this._PttBlinkTimer.Tick += new System.EventHandler(this._PttBlinkTimer_Tick);
-            // 
-            // _SquelchBlinkTimer
-            // 
-            this._SquelchBlinkTimer.Interval = 500;
-            this._SquelchBlinkTimer.Tick += new System.EventHandler(this._SquelchBlinkTimer_Tick);
-            // 
-            // _RtxBlinkTimer
-            // 
-            this._RtxBlinkTimer.Interval = 500;
-            this._RtxBlinkTimer.Tick += new System.EventHandler(this._RtxBlinkTimer_Tick);
             // 
             // _RdHfSpeakerUDB
             // 
@@ -246,6 +160,21 @@ namespace HMI.Presentation.Twr.Views
             this._RdHfSpeakerUDB.Visible = false;
             this._RdHfSpeakerUDB.LevelDown += new System.EventHandler(this._HfSpeakerUDB_LevelDown);
             this._RdHfSpeakerUDB.LevelUp += new System.EventHandler(this._HfSpeakerUDB_LevelUp);
+            // 
+            // _SiteManagerBT
+            // 
+            this._SiteManagerBT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this._SiteManagerBT.DrawX = false;
+            this._SiteManagerBT.Font = new System.Drawing.Font("Arial Black", 10F, System.Drawing.FontStyle.Bold);
+            this._SiteManagerBT.Location = new System.Drawing.Point(357, 3);
+            this._SiteManagerBT.Name = "_SiteManagerBT";
+            this._SiteManagerBT.Permitted = true;
+            this._SiteManagerBT.Size = new System.Drawing.Size(51, 72);
+            this._SiteManagerBT.TabIndex = 5;
+            this._SiteManagerBT.Text = "Empl";
+            this._SiteManagerBT.Visible = false;
+            this._SiteManagerBT.Click += new System.EventHandler(this._SiteManagerBT_Click);
             // 
             // _RdPageBT
             // 
@@ -296,6 +225,40 @@ namespace HMI.Presentation.Twr.Views
             this._RdSpeakerUDB.LevelDown += new System.EventHandler(this._RdSpeakerUDB_LevelDown);
             this._RdSpeakerUDB.LevelUp += new System.EventHandler(this._RdSpeakerUDB_LevelUp);
             // 
+            // _RdButtonsTLP
+            // 
+            this._RdButtonsTLP.ColumnCount = 5;
+            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this._RdButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this._RdButtonsTLP.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._RdButtonsTLP.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
+            this._RdButtonsTLP.Location = new System.Drawing.Point(3, 87);
+            this._RdButtonsTLP.Name = "_RdButtonsTLP";
+            this._RdButtonsTLP.RowCount = 3;
+            this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this._RdButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this._RdButtonsTLP.Size = new System.Drawing.Size(594, 380);
+            this._RdButtonsTLP.TabIndex = 1;
+            // 
+            // _PttBlinkTimer
+            // 
+            this._PttBlinkTimer.Interval = 500;
+            this._PttBlinkTimer.Tick += new System.EventHandler(this._PttBlinkTimer_Tick);
+            // 
+            // _SquelchBlinkTimer
+            // 
+            this._SquelchBlinkTimer.Interval = 500;
+            this._SquelchBlinkTimer.Tick += new System.EventHandler(this._SquelchBlinkTimer_Tick);
+            // 
+            // _RtxBlinkTimer
+            // 
+            this._RtxBlinkTimer.Interval = 500;
+            this._RtxBlinkTimer.Tick += new System.EventHandler(this._RtxBlinkTimer_Tick);
+            // 
             // RadioView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -305,6 +268,7 @@ namespace HMI.Presentation.Twr.Views
             this.BackColorChanged += new System.EventHandler(this.RadioView_BackColorChanged);
             _RadioTLP.ResumeLayout(false);
             _RadioHeadP.ResumeLayout(false);
+            _RadioHeadP.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -313,10 +277,7 @@ namespace HMI.Presentation.Twr.Views
 
 		private System.Windows.Forms.TableLayoutPanel _RdButtonsTLP;
 		private HMI.Model.Module.UI.HMIButton _RtxBT;
-		private HMI.Model.Module.UI.HMIButton _PlayBT;
-        //private HMI.Presentation.Twr.UI.UpDownButton _PlayBT;
-        private HMI.Model.Module.UI.HMIButton _OutBT;
-		private HMI.Model.Module.UI.HMIButton _TimeBT;
+        private HMI.Presentation.Twr.UI.ControlRecord _PlayBT;
 		private HMI.Model.Module.UI.HMIButton _PttBT;
 		private HMI.Presentation.Twr.UI.RdPageButton _RdPageBT;
 		private HMI.Presentation.Twr.UI.UpDownButton _RdHeadPhonesUDB;
@@ -328,6 +289,6 @@ namespace HMI.Presentation.Twr.Views
         private UI.UpDownButton _RdHfSpeakerUDB;
         //private System.Windows.Forms.Timer _TxConfirmationDetectionTimer;
         //private System.Windows.Forms.Timer _CarrierDetectionTimer;
-	}
+    }
 }
 

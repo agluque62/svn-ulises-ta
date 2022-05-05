@@ -135,11 +135,21 @@ namespace HMI.Model.Module.Messages
 	{
 		public readonly string Dst;
 		public readonly string Alias;
+		public readonly string IdFrecuency;//RQF34 Nuevo parametro IdFrecuency, Dst es NameFrecuency
 
+		// RQF34 Este constructor desaparecerá
 		public RdDestination(string dst, string alias)
 		{
 			Dst = dst;
 			Alias = alias;
+		}
+
+		// RQF34 
+		public RdDestination(string idfrecuency, string dst, string alias)
+		{
+			Dst = dst;
+			Alias = alias;
+			IdFrecuency = idfrecuency;
 		}
 
 		public override string ToString()
@@ -192,7 +202,8 @@ namespace HMI.Model.Module.Messages
         // Informacion para poder pintar la poscion de una radio.
         // Incluye el estado de la frecuencia (degradada, disponible o no).
 		public readonly string Dst;
-        public readonly string Alias;
+		public readonly string Alias;
+		public string DescDestino;//RQF34
 		public readonly bool Tx;
 		public readonly bool Rx;
 		public readonly PttState Ptt;
@@ -207,6 +218,7 @@ namespace HMI.Model.Module.Messages
 		public string KeyAlias { get; set; }
 		//LALM 210223 hay que pasar la prioridad.
 		public int Priority { get; set; }
+		public readonly string IdFrecuency;//RQF34
 
 		public RdInfo(string dst, string alias, bool tx, bool rx, PttState ptt, SquelchState squelch,
             RdRxAudioVia audioVia, int rtxGroup, TipoFrecuencia_t tipoFrecuencia, bool monitoring, FrequencyState estado, bool rxOnly)
@@ -226,7 +238,7 @@ namespace HMI.Model.Module.Messages
         }
 		public override string ToString()
 		{
-            return string.Format("[Dst={0}] [Alias={1}] [Rx={2}] [Tx={3}] [Ptt={4}] [Squelch={5}] [AudioVia={6}] [RxtGroup={7}] [TipoFrecuencia={8}] [Monitoring={9}] [Estado={10}] [RxOnly={11}]", Dst, Alias, Rx, Tx, Ptt, Squelch, AudioVia, RtxGroup, TipoFrecuencia, Monitoring, Estado, RxOnly);
+            return string.Format("[Dst={0}] [Alias={1}] [Rx={2}] [Tx={3}] [Ptt={4}] [Squelch={5}] [AudioVia={6}] [RxtGroup={7}] [TipoFrecuencia={8}] [Monitoring={9}] [Estado={10}] [RxOnly={11}] [DescDestino={11}]", Dst, Alias, Rx, Tx, Ptt, Squelch, AudioVia, RtxGroup, TipoFrecuencia, Monitoring, Estado, RxOnly,DescDestino);
 		}
 	}
 
@@ -319,6 +331,34 @@ namespace HMI.Model.Module.Messages
 		public override string ToString()
 		{
 			return string.Format("[From={0}] [Count={1}]", From, Count);
+		}
+	}
+
+	public class ParametrosReplay : EventArgs
+	{
+        private long tiempo;
+        private bool _HaveFiles;
+
+		public ParametrosReplay(long tiempo)
+		{
+			Tiempo= tiempo;
+			HaveFiles = false;
+		}
+
+        public bool HaveFiles { get => _HaveFiles; set => _HaveFiles = value; }
+        public long Tiempo
+		{
+			get => tiempo;
+			set
+			{
+				tiempo = value;
+				HaveFiles = (tiempo > 0);
+			}
+		}
+		
+        public int GetTiempo()
+		{
+			return (int)Tiempo;
 		}
 	}
 

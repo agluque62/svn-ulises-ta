@@ -135,7 +135,14 @@ namespace HMI.CD40.Module.BusinessEntities
             var array = file_out_content.ToCharArray();
             array[pos] = estado == 0 ? '0' : '1';
             file_out_content = new string(array);
-            File.WriteAllText(FileOutPath, file_out_content);
+            try
+            {
+                File.WriteAllText(FileOutPath, file_out_content);
+            }
+            catch (Exception x)
+            {
+                LogManager.GetCurrentClassLogger().Debug("No se puede escribir Fichero: ", FileOutPath);
+            }
             return 0;
         }
 

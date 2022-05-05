@@ -47,6 +47,13 @@ namespace HMI.CD40.Module.BusinessEntities
 
         // LALM 210223 Errores #4756  prioridad
         public int Priority { get { return (int)_Priority; } }
+        //LALM 220329
+        private string _DescDestino;
+        public string DescDestino
+        {
+            get { return _DescDestino; }
+            set { _DescDestino = value; }
+        }
 
         public bool Tx
 		{
@@ -257,6 +264,8 @@ namespace HMI.CD40.Module.BusinessEntities
             _AssociateFrRs.SiteChanged += OnSiteChanged;
 
 			_Literal = cfg.Literal;
+            //220329
+            DescDestino = cfg.DescDestino;
             /** 20180321. AGL. ALIAS a mostrar en la tecla... */
             var Alias = cfg.GetType().GetProperty("Alias");
             _KeyAlias = Alias == null ? "NoAlias" : Alias.GetValue(cfg) as string;
@@ -449,7 +458,8 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     foreach (int port in _RxPorts.Values)
                     {
-                        Top.Mixer.Unlink(port);
+                        // LALM 220307 En el cambio de via de audio, pongo temporal a true, para no cortar el audio.
+                        Top.Mixer.Unlink(port,true);
                         MixerDev dev = (audioVia == RdRxAudioVia.HeadPhones ? MixerDev.MhpRd : (audioVia == RdRxAudioVia.HfSpeaker ? MixerDev.SpkHf : MixerDev.SpkRd));
                         Top.Mixer.Link(port, dev, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
                     }
@@ -467,7 +477,9 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             RdRxAudioVia newAudio = NextRxAudioVia();
             if (newAudio == RdRxAudioVia.NoAudio)
+            {
                 SetRx(false);
+            }
             else
                 SetAudioVia(newAudio);
         }
@@ -1132,7 +1144,12 @@ namespace HMI.CD40.Module.BusinessEntities
 				{
 					_RtxGroup = rtxGroup;
 					changed = true;
-				}
+                    //lalm 280322
+                    if (frRs.ErrorCode != 0)
+                    {
+                        General.SafeLaunchEvent(TxHfAlreadyAssigned, this, (uint)0xFc);
+                    }
+                }
 
                 //
                 // Tratamiento del cambio en el estado de disponibilidad de la frecuencia.

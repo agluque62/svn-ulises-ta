@@ -166,6 +166,7 @@ namespace HMI.Model.Module.Services
         int CurrentConfigHasCode = default(int);
         bool InitWindow = false;
 
+
 #if _RDPAGESTIMING_
         private Task RdPageChangeDeallocationTask = null;
         private PageSetMsg PageSetPending = null;
@@ -205,7 +206,6 @@ namespace HMI.Model.Module.Services
                     General.SafeLaunchEvent(TxInProgressError, this, new TxInProgressErrorCode(code) { });
                 });
             });
-
             LogManager.GetLogger("RSFService").Trace("Starting RadioStatusRecoveryService");
         }
         /// <summary>
@@ -219,8 +219,14 @@ namespace HMI.Model.Module.Services
             var configData = msg.Info.ToList().Select(i => new { i.Dst, i.Alias });
             var newConfig = Newtonsoft.Json.JsonConvert.SerializeObject(configData);
             var newConfigHashCode = newConfig.GetHashCode();
+            bool RdRtxStatusRetrieveEnabledanterior = RdRtxStatusRetrieveEnabled;
             Log.Trace("Processing Event {0} Config Hash Code {1}", EventTopicNames.RdInfoEngine, newConfigHashCode);
-
+            //RQF36
+            RdRtxStatusRetrieveEnabled = ((StateManager.Permissions & Permissions.PermisoRTXSect) == Permissions.PermisoRTXSect);
+            if (RdRtxStatusRetrieveEnabledanterior!=RdRtxStatusRetrieveEnabled)
+            {
+                RdRtxStatusRetrieveEnabledanterior = RdRtxStatusRetrieveEnabled;
+            }
             //if (newConfigHashCode != CurrentConfigHasCode)
             //{
             //    CurrentConfigHasCode = newConfigHashCode;
@@ -348,7 +354,8 @@ namespace HMI.Model.Module.Services
         {
             if (RdStatusRecoveryEnabled == false)
                 return;
-
+            if (RPS.LastRdStatus.Count <= pos)
+                return;
             RdPositionStatus lastStatus = new RdPositionStatus(RPS.LastRdStatus[pos]);
             bool assignEvent = lastStatus.RxStatus != NewState.Rx || lastStatus.TxStatus != NewState.Tx || lastStatus.AudioVia != NewState.AudioVia;
             if (assignEvent == true)
@@ -420,9 +427,10 @@ namespace HMI.Model.Module.Services
                         var laststatus = Newtonsoft.Json.JsonConvert.DeserializeObject<List<RdFrecStatus>>(
                             System.IO.File.ReadAllText("RadioFrecStatus.json"));
 
+                        // RQF34 ------Cambiado Frecuency por Literal por los cambios de identificadores.
                         /** Rellenar las posiciones que coincidan en la página activa. */
                         var affected = (from fr in laststatus
-                                        join ds in StateManager.Radio.Destinations on fr.frec equals ds.Frecuency
+                                        join ds in StateManager.Radio.Destinations on fr.frec equals ds.Literal                                        
                                         join ps in RPS.LastRdStatus on ds.Id equals ps.Position
                                         where OnPage(ps.Position, StateManager.Radio.Page, RPS.PageSize) == true
                                         select new { pos = ps.Position, Tx = fr.Tx, Rx = fr.Rx, Via = fr.Via }).ToList();
@@ -440,8 +448,9 @@ namespace HMI.Model.Module.Services
                     {
                         var lastfrec = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(
                             System.IO.File.ReadAllText("RadioRtxStatus.json"));
+                        // RQF34 Cambiado Frecuency por Literal por los cambios de identificadores.
                         var currpos = (from dst in StateManager.Radio.Destinations
-                                       join fr in lastfrec on dst.Frecuency equals fr
+                                       join fr in lastfrec on dst.Literal equals fr
                                        where OnPage(dst.Id, 0, StateManager.Radio.PageSize) == true
                                        select (dst.Id)).ToList();
                         RPS.LastRtxStatus[1] = currpos;
@@ -450,6 +459,7 @@ namespace HMI.Model.Module.Services
                 }
             }
         }
+
 
         /// <summary>
         /// 
@@ -484,14 +494,15 @@ namespace HMI.Model.Module.Services
                     try
                     {
                         RPS.Page = StateManager.Radio.Page;
-
+                        // RQF34 Cambiado Frecuency por Literal por los cambios de identificadores.
                         var output1 = (from ps in RPS.LastRdStatus
                                        join ds in StateManager.Radio.Destinations
                                        on ps.Position equals ds.Id
                                        where ds.IsConfigurated == true && OnPage(ps.Position, StateManager.Radio.Page, RPS.PageSize)
                                        select new RdFrecStatus
                                        {
-                                           frec = ds.Frecuency,
+                                           //frec = ds.Frec,
+                                           frec = ds.Literal,
                                            Tx = ps.TxStatus,
                                            Rx = ps.RxStatus,
                                            Via = ps.AudioVia
@@ -602,7 +613,7 @@ namespace HMI.Model.Module.Services
             Task.Factory.StartNew(() =>
             {
                 Task.Delay(1000).Wait();
-
+                
                 int rtxGroup = 1;
 
                 /** Actualizo la tabla ONLINE */
@@ -613,13 +624,13 @@ namespace HMI.Model.Module.Services
                 RPS.LastRtxStatus[rtxGroup] = rtxPosList;
 
                 /** Actualizo el Fichero */
+                // RQF34 Cambiado Frecuency por Literal por los cambios de identificadores.
                 var rtxFrec = (from ds in StateManager.Radio.Destinations
-                               where ds.Tx == true && ds.RtxGroup == rtxGroup
-                               select ds.Frecuency).ToList();
-
+                                where ds.Tx == true && ds.RtxGroup == rtxGroup
+                                select ds.Literal).ToList();
                 System.IO.File.WriteAllText("RadioRtxStatus.json",
-                    Newtonsoft.Json.JsonConvert.SerializeObject(rtxFrec,
-                        Newtonsoft.Json.Formatting.Indented));
+                Newtonsoft.Json.JsonConvert.SerializeObject(rtxFrec,
+                    Newtonsoft.Json.Formatting.Indented));
             });
         }
         /// <summary>
@@ -636,6 +647,31 @@ namespace HMI.Model.Module.Services
                 RestoringRtxStatusTask = Task.Factory.StartNew(() =>
                 {
                     Task.Delay(1500).Wait();
+
+                    //LALM 220321 Espero a que se pongan en TX 10*1.5 segundos
+                    int cont = 0;
+                    while (cont < 10)
+                    {
+                        RPS.LastRtxStatus.ToList().ForEach(item =>
+                        {
+                            var rtxGrp = (from s in item.Value
+                                          join p in StateManager.Radio.Destinations on s equals p.Id
+                                          where p.Tx == true
+                                          select new { pos = p.Id, std = RtxState.Add })
+                                            .ToDictionary(e => e.pos, e => e.std);
+                            var rtxGrp1 = (from s in item.Value
+                                          join p in StateManager.Radio.Destinations on s equals p.Id
+                                          select new { pos = p.Id, std = RtxState.Add })
+                                            .ToDictionary(e => e.pos, e => e.std);
+                            if (rtxGrp.Count ==rtxGrp1.Count)
+                            {
+                                cont = 10;
+                            }
+                            cont++;
+                           Task.Delay(1500).Wait();
+                        });
+                    }
+
                     try
                     {
                         RPS.LastRtxStatus.ToList().ForEach(item =>
@@ -648,7 +684,7 @@ namespace HMI.Model.Module.Services
 
                             if (rtxGrp.Count > 1)
                             {
-                                EngineCmdManager.SetRtxGroup(item.Key, rtxGrp, true);   // Fuerza la formacion del grupo...
+                                 EngineCmdManager.SetRtxGroup(item.Key, rtxGrp, true);   // Fuerza la formacion del grupo...
                             }
                         });
                     }
@@ -750,6 +786,8 @@ namespace HMI.Model.Module.Services
 
         [EventPublication(EventTopicNames.TxInProgressError, PublicationScope.Global)]
         public event EventHandler<TxInProgressErrorCode> TxInProgressError;
+        [EventPublication(EventTopicNames.CouplingInProgressError, PublicationScope.Global)]
+        public event EventHandler<CouplingInProgressErrorCode> CouplingInProgressErrorCode;
 
         internal class TxInProgressControl
         {

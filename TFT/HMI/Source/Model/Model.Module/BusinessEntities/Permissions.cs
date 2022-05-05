@@ -17,5 +17,9 @@ namespace HMI.Model.Module.BusinessEntities
         Replay = 0x40,
         Capture = 0x80,
         Forward = 0x100,
+		ReplayOnlyRadio=0x200,
+		PermisoRTXSQ = 0x400,//RQF36
+		PermisoRTXSect = 0x800,
+
     }
 }

@@ -324,16 +324,25 @@ namespace HMI.Model.Module.Services
                 _EngineCmdManager.SetRdSpeakerLevel(level);
         }
 
-        [EventSubscription(EventTopicNames.SiteManagerEngine, ThreadOption.UserInterface)]
-        public void OnSiteManagerEngine(object sender, StateMsg<bool> msg)
-        {
-            _Logger.Trace("Procesando {0}: {1}", EventTopicNames.SiteManagerEngine, msg);
+		[EventSubscription(EventTopicNames.SiteManagerEngine, ThreadOption.UserInterface)]
+		public void OnSiteManagerEngine(object sender, StateMsg<bool> msg)
+		{
+			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.SiteManagerEngine, msg);
 
-            _StateManager.Radio.SiteManager = msg.State;
-            //_StateManager.SiteManager = msg.State;
-        }
-        
-        [EventSubscription(EventTopicNames.RdRtxModificationEndEngine, ThreadOption.UserInterface)]
+			_StateManager.Radio.SiteManager = msg.State;
+			//_StateManager.SiteManager = msg.State;
+		}
+
+		//RQF36
+		[EventSubscription(EventTopicNames.ChangedRTXSQU, ThreadOption.UserInterface)]
+		public void OnChangedRTXSQU(object sender, StateMsg<bool> msg)
+		{
+			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.ChangedRTXSQU, msg);
+
+			_StateManager.Radio.CanReleaseRtxSqu = msg.State;
+		}
+
+		[EventSubscription(EventTopicNames.RdRtxModificationEndEngine, ThreadOption.UserInterface)]
 		public void OnRdRtxModificationEndEngine(object sender, EventArgs msg)
 		{
 			_Logger.Trace("Procesando {0}", EventTopicNames.RdRtxModificationEndEngine);
@@ -416,6 +425,9 @@ namespace HMI.Model.Module.Services
                 case 0xFE:
                     text = string.Format(Resources.RdHfResourceError, rd.Frecuency);
                     break;
+				case 0xFC:
+					text = string.Format(Resources.RdFrAsignedRtxToOtherConfirmation, rd.Frecuency);
+					break;
                 default:
                     text = Resources.RdHfEquipment;
                     break;
@@ -751,7 +763,12 @@ namespace HMI.Model.Module.Services
             _Logger.Trace("Procesando {0}: {1}", EventTopicNames.PlayingStateEngine, msg);
 
             _StateManager.Tft.Playing = msg.State;
-        }
+			//lalm 220309
+			if (!msg.State)
+			{
+				_StateManager.Radio.SetTiempoReplay((int)(0));
+			}
+		}
 
 
         private void OnEngineStateChanged()
@@ -884,13 +901,12 @@ namespace HMI.Model.Module.Services
             _StateManager.Tlf.Forward.Reset(remoteName.Dst);
         }
 
-        [EventSubscription(EventTopicNames.RedirectedCallEngine, ThreadOption.UserInterface)]
-        public void OnRedirectedCallEngine(object sender, PositionIdMsg position)
-        {
-            _Logger.Trace("Procesando {0}: {1}", EventTopicNames.RedirectedCallEngine, position);
+		[EventSubscription(EventTopicNames.RedirectedCallEngine, ThreadOption.UserInterface)]
+		public void OnRedirectedCallEngine(object sender, PositionIdMsg position)
+		{
+			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.RedirectedCallEngine, position);
 
-            _StateManager.Tlf.Priority.RedirectCall(int.Parse( position.Id));
-        }
-
-    }
+			_StateManager.Tlf.Priority.RedirectCall(int.Parse(position.Id));
+		}
+	}
 }

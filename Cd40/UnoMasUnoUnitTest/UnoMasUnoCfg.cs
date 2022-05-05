@@ -376,6 +376,9 @@ namespace UnoMasUnoUnitTest
             i.TipoGrabacionAnalogica = 0;
             i.EnableGrabacionEd137 = false;
             i.EnableGrabacionAnalogica = false;
+            //RQF-36 Mejoras funcionalidad retransmisión radio (RETRANS)
+            i.QuitarRTXSQ = false;
+            i.MantRTXSect = false;
             cfg.ConfiguracionGeneral.PlanAsignacionUsuarios.Add(i);
         }
         private void ConfiguracionEquipos(ref Cd40Cfg cfg)

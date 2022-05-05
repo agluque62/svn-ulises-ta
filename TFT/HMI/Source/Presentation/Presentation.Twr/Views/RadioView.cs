@@ -72,7 +72,7 @@ namespace HMI.Presentation.Twr.Views
         private bool _CarrierDetectionEventFired = false;
         private bool _TxErrorEventFired = false;
         private List<EstadoAsignacion> _EstadosAsignacion = new List<EstadoAsignacion>();
-
+        
 		private bool _RdSpeakerEnabled
 		{
 			get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative; }
@@ -256,9 +256,25 @@ namespace HMI.Presentation.Twr.Views
 			{
 				bt.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative && !_StateManager.Radio[bt.Id].Unavailable;
 			}
-		}
+            //LALM 220223
+            // Todo obtener la configuracion para poder pintar el control playrecord.
+            // Vendrá en la configuracion. ahora mismo se pone y se quita con poner el nombre de DirectorioGLPRxRadio
+            if (_ReplayOnlyRadioVisible)
+                _PlayBT.Show();
+            else 
+                _PlayBT.Hide();
+            
+        }
 
-		[EventSubscription(EventTopicNames.RdSpeakerLevelChanged, ThreadOption.Publisher)]
+        private bool _ReplayOnlyRadioVisible
+        {
+            get
+            {
+                return ((_StateManager.Permissions & Permissions.ReplayOnlyRadio) == Permissions.ReplayOnlyRadio);
+            }
+        }
+
+        [EventSubscription(EventTopicNames.RdSpeakerLevelChanged, ThreadOption.Publisher)]
 		public void OnRdSpeakerLevelChanged(object sender, EventArgs e)
 		{
 			_RdSpeakerUDB.Level = _StateManager.RdSpeaker.Level;
@@ -335,7 +351,13 @@ namespace HMI.Presentation.Twr.Views
 			_PttBT.ButtonColor = _StateManager.Radio.PttOn ? VisualStyle.Colors.Blue : VisualStyle.ButtonColor;
 			_RtxBT.Enabled = _RtxEnabled;
 			_RdPageBT.Enabled = _RdPageEnabled;
-		}
+			// LALM 220309 
+            if (_PlayBT.Visible)
+            {
+                _PlayBT.StopReproducion();
+                _CmdManager.StopAudioReproduccion();
+            }
+        }
 
         [EventSubscription(EventTopicNames.SiteManagerChanged, ThreadOption.Publisher)]
         public void OnSiteManagerChanged(object sender, EventArgs e)
@@ -345,6 +367,7 @@ namespace HMI.Presentation.Twr.Views
             //_PttBT.ButtonColor = _StateManager.Radio.PttOn ? VisualStyle.Colors.Blue : VisualStyle.ButtonColor;
             //_RtxBT.Enabled = _RtxEnabled;
             //_RdPageBT.Enabled = _RdPageEnabled;
+            UpdatePlayBT();
         }
 
         [EventSubscription(EventTopicNames.SiteChanged, ThreadOption.Publisher)]
@@ -448,9 +471,37 @@ namespace HMI.Presentation.Twr.Views
             // Fin modificación 26/01/2017
 
             _RtxBT.Enabled = _RtxEnabled;
-		}
 
-		[EventSubscription(EventTopicNames.TitleIdChanged, ThreadOption.Publisher)]
+        }
+
+        public void UpdatePlayBT()
+        {
+            //LALM:Cuando hay cambio de configuracion llega hasta aqui
+            if (_ReplayOnlyRadioVisible)
+                _PlayBT.Show();
+            else
+                _PlayBT.Hide();
+        }
+
+        // LALM este evento esta duplicado en Radio.cs
+        // uno de los dos podria quitarse.
+        [EventSubscription(EventTopicNames.TempReplayChanged, ThreadOption.Publisher)]
+        public void OnTempReplayChanged(object sender, EventArgs e/*,TiempoReplay segundos*/)
+        {
+            ParametrosReplay pr = (ParametrosReplay)e;
+             _PlayBT.TiempoMax = pr.GetTiempo();
+            if (pr.HaveFiles)
+            {
+                _PlayBT.Reproduciendo();
+            }
+            else
+            {
+                //_PlayBT.CambiaFileGrabado(false);
+                //_PlayBT.Habilitado(false);
+            }
+        }
+
+        [EventSubscription(EventTopicNames.TitleIdChanged, ThreadOption.Publisher)]
 		public void OnTitleIdChanged(object sender, EventArgs e)
 		{
 			if (Settings.Default.Sector != _StateManager.Title.Id)
@@ -500,6 +551,42 @@ namespace HMI.Presentation.Twr.Views
                 else
                 {
                     _RdHfSpeakerUDB.DrawX = false;
+                }
+            }
+        }
+
+
+        //public event GenericEventHandler<JacksStateMsg> OnRecorderChanged;
+        // LALM 220309
+        [EventSubscription(EventTopicNames.RecorderChanged, ThreadOption.Publisher)]
+        public void OnRecorderChanged(object sender, EventArgs e)
+        {
+            _PlayBT.Enabled = true;
+            _PlayBT.Estado = 1;
+        }
+
+        //LALM 220223
+
+        [EventSubscription(EventTopicNames.JacksChanged, ThreadOption.Publisher)]
+        public void OnJacksChanged(object sender, EventArgs e)
+        {
+            if (_PlayBT.Visible)
+            {
+                Jacks jacks = _StateManager.Jacks;
+
+                if (jacks.LeftJack || jacks.RightJack)
+                {
+                    _StateManager.PlayBt.EstadoJacks = true;
+                    //_PlayBT.Habilitado(_StateManager.PlayBt.Estado);
+                    _PlayBT.CambiaJacks(true);
+                }
+                else
+                {
+                    //if (_StateManager.PlayBt.Estado == PlayState.estados.Visto)
+                     //_PlayBT.Habilitado(false);
+                    _StateManager.PlayBt.EstadoJacks = false;
+                    //_PlayBT.Habilitado(_StateManager.PlayBt.Estado);
+                    _PlayBT.CambiaJacks(false);
                 }
             }
         }
@@ -560,40 +647,40 @@ namespace HMI.Presentation.Twr.Views
         //}
 
         /** Esta funcion se ha trasladado al MODEL MODULE */
-  //      private void RecuperaEstadoAsignacionFrecuencias()
-		//{
-		//	int absPageBegin = _RdPageBT.Page * _NumPositionsByPage;
+        //      private void RecuperaEstadoAsignacionFrecuencias()
+        //{
+        //	int absPageBegin = _RdPageBT.Page * _NumPositionsByPage;
 
-		//	for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
-		//	{
-		//		if (i < Settings.Default.AssignatedStates.Count)
-		//		{
-		//			string[] estado = Settings.Default.AssignatedStates[i].Split(',');
+        //	for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
+        //	{
+        //		if (i < Settings.Default.AssignatedStates.Count)
+        //		{
+        //			string[] estado = Settings.Default.AssignatedStates[i].Split(',');
 
-		//			EstadoAsignacion eAsignacion = new EstadoAsignacion();
+        //			EstadoAsignacion eAsignacion = new EstadoAsignacion();
 
-		//			eAsignacion._Rx = estado[1] == "True";
-		//			eAsignacion._Tx = estado[2] == "True";
-		//			switch (estado[3])
-		//			{
-		//				case "HeadPhones":
-		//					eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
-		//					break;
-		//				case "Speaker":
-		//					eAsignacion._AudioVia = RdRxAudioVia.Speaker;
-		//					break;
-		//				case "NoAudio":
-		//					eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
-		//					break;
-		//			}
+        //			eAsignacion._Rx = estado[1] == "True";
+        //			eAsignacion._Tx = estado[2] == "True";
+        //			switch (estado[3])
+        //			{
+        //				case "HeadPhones":
+        //					eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
+        //					break;
+        //				case "Speaker":
+        //					eAsignacion._AudioVia = RdRxAudioVia.Speaker;
+        //					break;
+        //				case "NoAudio":
+        //					eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
+        //					break;
+        //			}
 
-  //                  _EstadosAsignacion[i - absPageBegin] = eAsignacion;
+        //                  _EstadosAsignacion[i - absPageBegin] = eAsignacion;
 
-		//		}
-		//	}
-		//}
+        //		}
+        //	}
+        //}
 
-		private void Reset(RdButton bt, RdDst dst, ref EstadoAsignacion estado)
+        private void Reset(RdButton bt, RdDst dst, ref EstadoAsignacion estado)
 		{
 			Reset(bt, dst);
 
@@ -820,7 +907,8 @@ namespace HMI.Presentation.Twr.Views
                 // Mostrar información Qidx sólo si en HMI.exe.config está habilitado
                 if (Settings.Default.ShowBssProperties)
                 {
-                    bt.Reset(dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? dst.QidxResource : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    // RQF34 _Inserto parametro idfrecuency
+                    bt.Reset(dst.IdFrecuency,dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? dst.QidxResource : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
                     dst.QidxResource, dst.QidxValue, dst.State);
                 }
                 else
@@ -833,7 +921,10 @@ namespace HMI.Presentation.Twr.Views
 
                     //LALM 210707 nuevo parametro bloqueo para pintar otro color.
                     bool bloqueado = (dst.Ptt == PttState.Blocked);
-                    bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    // RQF34 Se cambia la llamada, y se inserta idfrecuency
+                    //bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    //dst.State, priority, bloqueado);
+                    bt.Reset(dst.IdFrecuency,dst.NameFrecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
                     dst.State, priority, bloqueado);
                 }
                 // Las frecuencias co solo RX (RxOnly), tienen deshabilitada la parte TX de la tecla
@@ -949,8 +1040,8 @@ namespace HMI.Presentation.Twr.Views
             {
                 _CmdManager.PlayRadioClick();
                 ;//_CmdManager.RdPlayClick(_NumPositionsByPage);
-                //if (Directory.Exists(Settings.Default.DirectorioGLP))
-			    //	Directory.Delete(Settings.Default.DirectorioGLP, true);
+                 //if (Directory.Exists(Settings.Default.DirectorioGLP))
+                 //	Directory.Delete(Settings.Default.DirectorioGLP, true);
             }
             catch (Exception ex)
             {
@@ -958,48 +1049,21 @@ namespace HMI.Presentation.Twr.Views
             }
         }
 
-        private void _PlayBT_LevelDown(object sender, EventArgs e)
+        private void _PlayBT_Reproduce(object sender, EventArgs e)
         {
-            //TODO cambiar por play y stop
-            int level = _RdHeadPhonesUDB.Level - 1;
-
             try
             {
-                _CmdManager.RdSetHeadPhonesLevel(level);
+                _CmdManager.PlayRadioClick();
             }
             catch (Exception ex)
             {
-                _Logger.Error("ERROR bajando el nivel de los microcascos RD a " + level, ex);
+                _Logger.Error("ERROR iniciando operacion Play", ex);
             }
         }
 
-        private void _PlayBT_LevelUp(object sender, EventArgs e)
+        public void _PlayBTStopAudio(object sender, EventArgs e)
         {
-            //TODO cambiar por play y stop
-            int level = _RdHeadPhonesUDB.Level - 1;
-
-            try
-            {
-                _CmdManager.RdSetHeadPhonesLevel(level);
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error("ERROR bajando el nivel de los microcascos RD a " + level, ex);
-            }
-        }
-
-
-
-        private void _OutBT_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                ;//_CmdManager.RdOutClick(_NumPositionsByPage);
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error("ERROR iniciando operacion Out", ex);
-            }
+            _CmdManager.StopAudioReproduccion();
         }
 
         private void _TimeBT_Click(object sender, EventArgs e)
@@ -1305,6 +1369,21 @@ namespace HMI.Presentation.Twr.Views
 		{
 			Invalidate(true);
 		}
+
+        [EventSubscription(EventTopicNames.LcChanged, ThreadOption.Publisher)]
+        public void OnLcChanged(object sender, RangeMsg e)
+        {
+            //lalm 220223
+            // TODO comprobar que Settings.Default.GLPOnlyRadio esta activo
+            if (_PlayBT.Visible==true)
+            {
+                _PlayBT.StopReproducion();
+                _CmdManager.StopAudioReproduccion();
+            }
+        }
+
+
+
         /** 20190205. Pintar los errores de confirmacion de transmision */
         [EventSubscription(EventTopicNames.TxInProgressError, ThreadOption.Publisher)]
         public void OnTxInProgressError(object sender, TxInProgressErrorCode e)
@@ -1385,6 +1464,46 @@ namespace HMI.Presentation.Twr.Views
                     //}
                     break;
             }
+        }
+
+        //LALM 220328
+        [EventSubscription(EventTopicNames.TxInProgressError, ThreadOption.Publisher)]
+        public void CouplingInProgressError(object sender, TxInProgressErrorCode e)
+        {
+            var InGroupButtons = new Dictionary<RdButton, RdDst>(_PttPushedList);
+            switch (e.IdEvent)
+            {
+                case 0:             // ok
+                    break;
+                case 1:             // Error en recurso RTX  hacer algo parecido a lo que pone aqui
+                    {
+                        /*                        
+                        foreach (KeyValuePair<RdButton, RdDst> p in InGroupButtons)
+                        {
+                            if (p.Value.Ptt != PttState.PttOnlyPort &&
+                                p.Value.Ptt != PttState.PttPortAndMod &&
+                                p.Value.Ptt != PttState.ExternPtt &&
+                                p.Value.Ptt != PttState.Blocked)
+                            {
+                                General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.TxError));//VMG Invented por ahora
+                            }
+                        }
+                        NotifMsg msg = new NotifMsg("Bad Operation", Resources.BadOperation, Resources.TxConfirmationDetectionError, 3000, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                        */
+                    }
+                    break;
+
+            }
+        }
+
+        [EventSubscription(EventTopicNames.TempReplayChanged, ThreadOption.Publisher)]
+        public void OnReplayChanged(object sender, EventArgs e)
+        {
+            ParametrosReplay pr = (ParametrosReplay)e;
+            _PlayBT.TiempoMax = pr.GetTiempo();
+            if (pr.GetTiempo()== 0)
+                _PlayBT.StopReproducion();
         }
     }
 }

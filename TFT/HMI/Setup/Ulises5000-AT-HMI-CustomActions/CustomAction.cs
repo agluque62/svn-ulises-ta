@@ -6,6 +6,7 @@ using Microsoft.Deployment.WindowsInstaller;
 using HMI.CD40.Module.BusinessEntities;
 using System.Threading;
 using NAudio.CoreAudioApi;
+using System.Runtime.InteropServices;
 
 namespace Ulises5000_AT_HMI_CustomActions
 {
@@ -202,5 +203,263 @@ namespace Ulises5000_AT_HMI_CustomActions
             }
             return ActionResult.Success;
         }
+
+        
+
+        public const int CORESIP_MAX_FILE_PATH_LENGTH = 256;
+        public const int CORESIP_MAX_ERROR_INFO_LENGTH = 512;
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        struct CORESIP_Error
+        {
+            public int Code;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_FILE_PATH_LENGTH + 1)]
+            public string File;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_ERROR_INFO_LENGTH + 1)]
+            public string Info;
+        }
+        public const int CORESIP_MAX_SOUND_NAME_LENGTH = 512;
+        public const int CORESIP_MAX_SOUND_NAMES = 16;
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        struct CORESIP_SndWindowsDevices
+        {
+            public uint ndevices_found;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_SOUND_NAME_LENGTH * CORESIP_MAX_SOUND_NAMES)]
+            public string DeviceNames; //array con los nombres, separados por '<###>'.
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_SOUND_NAME_LENGTH * CORESIP_MAX_SOUND_NAMES)]
+            public string FriendlyName; //array con los nombres, separados por '<###>'
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_SOUND_NAME_LENGTH * CORESIP_MAX_SOUND_NAMES)]
+            public string GUID;			//array con los nombres, separados por '<###>'
+        }
+        [DllImport("coresip-voter", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_GetWindowsSoundDeviceNames(int captureType, out CORESIP_SndWindowsDevices Devices, out CORESIP_Error error);
+
+        
+        
+        [CustomAction]
+        public static ActionResult CustomActionGetWindowsSndDevs(Session session)
+        {
+            
+            CORESIP_Error err;
+            CORESIP_SndWindowsDevices Devices;
+            CORESIP_GetWindowsSoundDeviceNames(0, out Devices, out err);            
+            
+            session.Log("Begin CustomActionGetWindowsSndDevs");
+
+            List<string> DeviceList = new List<string>();
+
+            int index_name = 0;
+            for (int i = 0; i < Devices.ndevices_found; i++)
+            {
+                int index_separator = Devices.DeviceNames.IndexOf("<###>", index_name);
+                if (index_separator != -1)
+                {
+                    DeviceList.Add(Devices.DeviceNames.Substring(index_name, index_separator - index_name));
+                    index_name = index_separator + 5;
+                }
+                else
+                {
+                    DeviceList.Add(Devices.DeviceNames.Substring(index_name));
+                    break;
+                }
+            }
+
+            PopulateComboBox(session, "STD_WIN_INSTRUCTOR_DEV", DeviceList);
+            PopulateComboBox(session, "STD_WIN_ALUMN_DEV", DeviceList);
+            PopulateComboBox(session, "STD_WIN_RD_DEV", DeviceList);
+            PopulateComboBox(session, "STD_WIN_LC_DEV", DeviceList);
+
+            try
+            {
+                Thread thread = new Thread(AsioChannels.Init);
+                thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+                thread.Start();
+                thread.Join(); //Wait for the thread to end
+                //AsioChannels.Init();
+                session.Log("Custiom Action LoadAsioChannels num out channels {0}", AsioChannels.OutChannels.Count);
+
+                PopulateComboBox(session, "STD_ASIO_INSTRUCTOR_DEV", AsioChannels.OutChannels);
+                PopulateComboBox(session, "STD_ASIO_ALUMN_DEV", AsioChannels.OutChannels);
+                PopulateComboBox(session, "STD_ASIO_RD_DEV", AsioChannels.OutChannels);
+                PopulateComboBox(session, "STD_ASIO_LC_DEV", AsioChannels.OutChannels);
+
+            }
+            catch (Exception x)
+            {
+                session.Log("ERROR in custom action CustomActionGetWindowsSndDevs {0}", x.ToString());
+                System.Windows.Forms.MessageBox.Show(String.Format("ERROR in custom action LoadAsioChannels {0}", x.ToString()));
+                return ActionResult.Failure;
+            }
+
+            return ActionResult.Success;
+        }
+
+        private static void PopulateComboBox(Session session, string combobox_property, List<string> DeviceList)
+        {
+            string query;
+            query = "DELETE FROM ComboBox WHERE ComboBox.Property='"+combobox_property+"'";
+            View lView = session.Database.OpenView(query);
+            lView.Execute();
+
+            query = "SELECT * FROM ComboBox WHERE ComboBox.Property='" + combobox_property + "'";
+            lView = session.Database.OpenView(query);
+            lView.Execute();
+
+            int order = 2;
+            Record lRecord = session.Database.CreateRecord(4);
+            session.Log("Setting record details");
+            lRecord.SetString(1, combobox_property);
+            lRecord.SetInteger(2, order);
+            lRecord.SetString(3, "-none-");
+            lRecord.SetString(4, "-none-");
+
+            lView.Modify(ViewModifyMode.InsertTemporary, lRecord);
+            order++;
+            
+            foreach (string dev in DeviceList)
+            {
+                lRecord = session.Database.CreateRecord(4);
+                session.Log("Setting record details");
+                lRecord.SetString(1, combobox_property);
+                lRecord.SetInteger(2, order);
+                lRecord.SetString(3, dev);
+                lRecord.SetString(4, dev);
+
+                lView.Modify(ViewModifyMode.InsertTemporary, lRecord);
+
+                order++;
+            }
+        }
+
+        [CustomAction]
+        public static ActionResult CustomActionCheckSndDevs(Session session)
+        {
+            session.Log("Begin CustomActionCheckSndDevs");
+
+            //System.Windows.Forms.MessageBox.Show(String.Format("ENTRA {0} ", session["STD_WIN_INSTRUCTOR_DEV"]));
+
+            bool devices_iguales = false;
+            bool windows_asio_no_seleccionados = false;
+            string _none = "-none-";
+
+            if (session["STD_WIN_INSTRUCTOR_DEV"] == _none &&
+                session["STD_WIN_ALUMN_DEV"] == _none &&
+                session["STD_WIN_RD_DEV"] == _none &&
+                session["STD_WIN_LC_DEV"] == _none)
+            {
+                System.Windows.Forms.MessageBox.Show(String.Format("ERROR: Debe seleccionar los dispositivos de Windows"));
+                session["NEXT_BUTTON_DIALOG3"] = "False";
+                return ActionResult.Success;
+            }
+
+            if (session["STD_ASIO_INSTRUCTOR_DEV"] == _none &&
+                session["STD_ASIO_ALUMN_DEV"] == _none &&
+                session["STD_ASIO_RD_DEV"] == _none &&
+                session["STD_ASIO_LC_DEV"] == _none)
+            {
+                System.Windows.Forms.MessageBox.Show(String.Format("ERROR: Debe seleccionar los dispositivos de ASIO"));
+                session["NEXT_BUTTON_DIALOG3"] = "False";
+                return ActionResult.Success;
+            }
+
+            if (session["STD_WIN_INSTRUCTOR_DEV"] != _none)
+            {
+                if (session["STD_ASIO_INSTRUCTOR_DEV"] == _none) windows_asio_no_seleccionados = true;
+                if (session["STD_WIN_INSTRUCTOR_DEV"] == session["STD_WIN_ALUMN_DEV"]) devices_iguales = true;
+                else if (session["STD_WIN_INSTRUCTOR_DEV"] == session["STD_WIN_RD_DEV"]) devices_iguales = true;
+                else if (session["STD_WIN_INSTRUCTOR_DEV"] == session["STD_WIN_LC_DEV"]) devices_iguales = true;
+            }
+
+            if (session["STD_WIN_ALUMN_DEV"] != _none)
+            {
+                if (session["STD_ASIO_ALUMN_DEV"].Length == 0) windows_asio_no_seleccionados = true;
+                if (session["STD_WIN_ALUMN_DEV"] == session["STD_WIN_INSTRUCTOR_DEV"]) devices_iguales = true;
+                else if (session["STD_WIN_ALUMN_DEV"] == session["STD_WIN_RD_DEV"]) devices_iguales = true;
+                else if (session["STD_WIN_ALUMN_DEV"] == session["STD_WIN_LC_DEV"]) devices_iguales = true;
+            }
+
+            if (session["STD_WIN_RD_DEV"] != _none)
+            {
+                if (session["STD_ASIO_RD_DEV"] == _none) windows_asio_no_seleccionados = true;
+                if (session["STD_WIN_RD_DEV"] == session["STD_WIN_INSTRUCTOR_DEV"]) devices_iguales = true;
+                else if (session["STD_WIN_RD_DEV"] == session["STD_WIN_ALUMN_DEV"]) devices_iguales = true;
+                else if (session["STD_WIN_RD_DEV"] == session["STD_WIN_LC_DEV"]) devices_iguales = true;
+            }
+
+            if (session["STD_WIN_LC_DEV"] != _none)
+            {
+                if (session["STD_ASIO_LC_DEV"] == _none) windows_asio_no_seleccionados = true;
+                if (session["STD_WIN_LC_DEV"] == session["STD_WIN_INSTRUCTOR_DEV"]) devices_iguales = true;
+                else if (session["STD_WIN_LC_DEV"] == session["STD_WIN_ALUMN_DEV"]) devices_iguales = true;
+                else if (session["STD_WIN_LC_DEV"] == session["STD_WIN_RD_DEV"]) devices_iguales = true;
+            }
+
+            if (devices_iguales)
+            {
+                System.Windows.Forms.MessageBox.Show(String.Format("ERROR: Hay nombres de dispositivos Windows repetidos"));
+                session["NEXT_BUTTON_DIALOG3"] = "False";
+            }
+            else
+            {
+                session["NEXT_BUTTON_DIALOG3"] = "True";
+            }
+
+            devices_iguales = false;
+
+            if (session["STD_ASIO_INSTRUCTOR_DEV"] != _none)
+            {
+                if (session["STD_WIN_INSTRUCTOR_DEV"] == _none) windows_asio_no_seleccionados = true;
+                if (session["STD_ASIO_INSTRUCTOR_DEV"] == session["STD_ASIO_ALUMN_DEV"]) devices_iguales = true;
+                else if (session["STD_ASIO_INSTRUCTOR_DEV"] == session["STD_ASIO_RD_DEV"]) devices_iguales = true;
+                else if (session["STD_ASIO_INSTRUCTOR_DEV"] == session["STD_ASIO_LC_DEV"]) devices_iguales = true;
+            }
+
+            if (session["STD_ASIO_ALUMN_DEV"] != _none)
+            {
+                if (session["STD_WIN_ALUMN_DEV"] == _none) windows_asio_no_seleccionados = true;
+                if (session["STD_ASIO_ALUMN_DEV"] == session["STD_ASIO_INSTRUCTOR_DEV"]) devices_iguales = true;
+                else if (session["STD_ASIO_ALUMN_DEV"] == session["STD_ASIO_RD_DEV"]) devices_iguales = true;
+                else if (session["STD_ASIO_ALUMN_DEV"] == session["STD_ASIO_LC_DEV"]) devices_iguales = true;
+            }
+
+            if (session["STD_ASIO_RD_DEV"] != _none)
+            {
+                if (session["STD_WIN_RD_DEV"] == _none) windows_asio_no_seleccionados = true;
+                if (session["STD_ASIO_RD_DEV"] == session["STD_ASIO_INSTRUCTOR_DEV"]) devices_iguales = true;
+                else if (session["STD_ASIO_RD_DEV"] == session["STD_ASIO_ALUMN_DEV"]) devices_iguales = true;
+                else if (session["STD_ASIO_RD_DEV"] == session["STD_ASIO_LC_DEV"]) devices_iguales = true;
+            }
+
+            if (session["STD_ASIO_LC_DEV"] != _none)
+            {
+                if (session["STD_WIN_LC_DEV"] == _none) windows_asio_no_seleccionados = true;
+                if (session["STD_ASIO_LC_DEV"] == session["STD_ASIO_INSTRUCTOR_DEV"]) devices_iguales = true;
+                else if (session["STD_ASIO_LC_DEV"] == session["STD_ASIO_ALUMN_DEV"]) devices_iguales = true;
+                else if (session["STD_ASIO_LC_DEV"] == session["STD_ASIO_RD_DEV"]) devices_iguales = true;
+            }
+
+            if (devices_iguales)
+            {
+                System.Windows.Forms.MessageBox.Show(String.Format("ERROR: Hay nombres de dispositivos ASIO repetidos"));
+                session["NEXT_BUTTON_DIALOG3"] = "False";
+            }
+            else
+            {
+                session["NEXT_BUTTON_DIALOG3"] = "True";
+            }
+
+            if (windows_asio_no_seleccionados)
+            {
+                System.Windows.Forms.MessageBox.Show(String.Format("ERROR: Si asigna un dispositivo de Windows debe asignar otro de Asio y viceversa, para el mismo dispositivo del puesto"));
+                session["NEXT_BUTTON_DIALOG3"] = "False";
+            }
+            else
+            {
+                session["NEXT_BUTTON_DIALOG3"] = "True";
+            }
+
+            return ActionResult.Success;
+        }
+
+
     }
     }

@@ -12,6 +12,9 @@ using U5ki.Infrastructure.Properties;
 using NLog;
 using Utilities;
 using System.IO;
+using System.Collections;
+using System.Management;
+using VideoPlayerController;
 
 namespace U5ki.Infrastructure
 {
@@ -663,7 +666,7 @@ namespace U5ki.Infrastructure
                                                     //si reinvite_accepted=0 entonces ha habido un reinvite rechazado
         public uint radRreinviteCallFlags;          //Este parametro solo se tiene en cuenta si isRadReinvite=1. Son los flags del re-invite.
 
-        public int LastCode;						// Util cuando State == PJSIP_INV_STATE_DISCONNECTED
+		public int LastCode;										// Util cuando State == PJSIP_INV_STATE_DISCONNECTED
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = SipAgent.CORESIP_MAX_REASON_LENGTH + 1)]
 		public string LastReason;
 
@@ -1387,6 +1390,32 @@ namespace U5ki.Infrastructure
         [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
         static extern int CORESIP_SendInstantMessage(int acc_id, string dest_uri, string text, bool by_proxy, out CORESIP_Error error);
 
+        public const int CORESIP_MAX_SOUND_NAME_LENGTH = 512;
+        public const int CORESIP_MAX_SOUND_NAMES = 16;
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        struct CORESIP_SndWindowsDevices
+        {
+            public uint ndevices_found;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_SOUND_NAME_LENGTH * CORESIP_MAX_SOUND_NAMES)]
+            public string DeviceNames; //array con los nombres, separados por '<###>'.
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_SOUND_NAME_LENGTH * CORESIP_MAX_SOUND_NAMES)]
+            public string FriendlyName; //array con los nombres, separados por '<###>'.
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CORESIP_MAX_SOUND_NAME_LENGTH * CORESIP_MAX_SOUND_NAMES)]
+            public string GUID; //array con los nombres, separados por '<###>'.
+        }
+
+        /*
+	    Funcion que retorna los dispositivos de sonido en Windows (no en asio)
+	    @param captureType. Si vale distinto de cero retorna los de tipo entrada (capture), si vale cero los de tipo salida (play)
+	    @param Devices. Retorna la cantidad La lista de dispositivos encontrados.	 
+	    @return	CORESIP_OK OK, CORESIP_ERROR  error.
+	    */
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_GetWindowsSoundDeviceNames(int captureType, out CORESIP_SndWindowsDevices Devices, out CORESIP_Error error);
+        
+        [DllImport(coresip, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        static extern int CORESIP_SetSNDDeviceWindowsName(CORESIP_SndDevType UlisesDev, string DevWinName, out CORESIP_Error error);
+
         /**
          * CORESIP_EchoCancellerLCMic.	...
          * Activa/desactiva cancelador de eco altavoz LC y Microfonos. Sirve para el modo manos libres 
@@ -1643,7 +1672,151 @@ namespace U5ki.Infrastructure
 
         //Settings que se puedan acceder desde otros proyectos de la solución
         public static uint _KAPeriod = Settings.Default.KAPeriod;
-        
+        class clsPlayDevices
+        {
+            [StructLayout(LayoutKind.Sequential, Pack = 4)]
+            public struct WaveInCaps
+            {
+                public short wMid;
+                public short wPid;
+                public int vDriverVersion;
+                [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+                public char[] szPname;
+                public uint dwFormats;
+                public short wChannels;
+                public short wReserved1;
+            }
+
+            public struct WaveOutCaps
+            {
+                public short wMid;
+                public short wPid;
+                public int vDriverVersion;
+                [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+                public char[] szPname;
+                public uint dwFormats;
+                public short wChannels;
+                public short wReserved1;
+                public short dwSupport;
+            }
+
+            [DllImport("winmm.dll")]
+            public static extern int waveInGetNumDevs();
+            [DllImport("winmm.dll", EntryPoint = "waveOutGetDevCaps")]
+            public static extern int waveInGetDevCapsA(int uDeviceID,
+                                 ref WaveInCaps lpCaps, int uSize);
+            [DllImport("winmm.dll")]
+            public static extern int waveOutGetNumDevs();
+            [DllImport("winmm.dll", EntryPoint = "waveOutGetDevCaps")]
+            public static extern int waveOutGetDevCapsA(int uDeviceID,
+                                 ref WaveOutCaps lpCaps, int uSize);
+            ArrayList arrLst = new ArrayList();
+            ArrayList alias = new ArrayList();
+            ArrayList name = new ArrayList();
+            //using to store all sound recording devices strings 
+
+            public int Count
+            //to return total sound recording devices found
+            {
+                get { return arrLst.Count; }
+            }
+            public string this[int indexer]
+            //return spesipic sound recording device name
+            {
+                get { return (string)arrLst[indexer]; }
+            }
+            public clsPlayDevices() //fill sound recording devices array
+            {
+
+                int waveOutDevicesCount = waveOutGetNumDevs(); //get total
+                if (waveOutDevicesCount > 0)
+                {
+                    for (int uDeviceID = 0; uDeviceID < waveOutDevicesCount; uDeviceID++)
+                    {
+                        WaveOutCaps waveOutCaps = new WaveOutCaps();
+                        waveOutGetDevCapsA(uDeviceID, ref waveOutCaps,
+                                          Marshal.SizeOf(typeof(WaveInCaps)));
+                        if (!arrLst.Contains(waveOutCaps.szPname))
+                        {
+                            //string[] DevWinName1 = Devices.DeviceNames.Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
+                            string DevWinName = new string(waveOutCaps.szPname).Remove(
+                                       new string(waveOutCaps.szPname).IndexOf('\0'));
+                            string[] DevWinName1 = DevWinName.Split('(');
+                            alias.Add(DevWinName1[0]);
+
+                        }
+                        //clean garbage
+                    }
+                }
+
+
+
+
+                ManagementObjectSearcher objSearcher = new ManagementObjectSearcher(
+                "SELECT * FROM CIM_ManagedSystemElement");
+         //       ManagementObjectSearcher objSearcher = new ManagementObjectSearcher(
+         //"SELECT * FROM Win32_SoundDevice");
+          //      ManagementObjectSearcher objSearcher = new ManagementObjectSearcher(
+         //"SELECT * FROM Win32_PnPDevicePropertyString ");
+
+                ManagementObjectCollection objCollection = objSearcher.Get();
+
+              arrLst.Clear();
+                try 
+                {
+                    //int n = objCollection.Count;
+                    int cont = 0;
+                    foreach (ManagementObject obj in objCollection)
+                    {
+                        bool guardar = false;
+                        cont += 1;
+                        if (cont == 10000)
+                            break;
+                        foreach (PropertyData property in obj.Properties)
+                        {
+                            //Console.Out.WriteLine(String.Format("{0}:{1}", property.Name, property.Value));
+                            //string st = String.Format("{0}:{1}", property.Name, property.Value);
+                            if ((property.Name == "PNPClass") && property.Value != null && (property.Value.ToString() == "AudioEndpoint"))
+                            {
+                                guardar = true;
+                                //if (st.Contains("USB Headset"))
+                                //    arrLst.Add(st);
+                            }
+
+                        }
+                        if (guardar)
+                        {
+                            foreach (PropertyData property in obj.Properties)
+                            {
+                                //Console.Out.WriteLine(String.Format("{0}:{1}", property.Name, property.Value));
+                                string st = String.Format("{0}:{1}", property.Name, property.Value);
+                                if (property.Name == "Caption")
+                                    arrLst.Add(st);
+                                /*else if (property.Name == "Name")
+                                    arrLst.Add(st);
+                                else
+                                    arrLst.Add(st);*/
+                            }
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    _Logger.Error("explorando dispositivos: ", exc);
+                }
+                alias.Clear();
+                name.Clear();
+                foreach(string s in arrLst)
+                {
+                    string[] separatingStrings = { "capture","(" };
+                    string[] s1 = s.Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
+                    string s3 = s1[1];
+                    string hw = s1[2];
+                    alias.Add(s3);
+                    name.Add(hw);
+                }
+            }
+        }
         //RQF24
         public static void Record(bool on)
         {
@@ -1663,11 +1836,23 @@ namespace U5ki.Infrastructure
             _Logger.Debug("Notificado al módulo de CoreSip {0}",valor.ToString());
         }
 
+        class AudioDeviceInfo
+        {
+            public string id { get; set; }
+            public float vmax { get; set; }
+            public float vmin { get; set; }
+            public int channel { get; set; }
+            public bool speaker { get; set; }
+        }
+
+
+
         public static void Init(string accId, string ip, uint port, uint max_calls = 32, string proxyIP=null)
 		{
 #if _TRACEAGENT_
             _Logger.Debug("Entrando en SipAgent.Init");
 #endif
+
             /** 20180208 */
             if (!IsInitialized)
             {
@@ -1743,11 +1928,113 @@ namespace U5ki.Infrastructure
                     _Logger.Error("CORESIP_Set_Ed137_version "+err.Info);
                 }
 
+                CORESIP_SndWindowsDevices Devices;
+                List<string> DevWinName = new List<string>();
+                if (CORESIP_GetWindowsSoundDeviceNames(0, out Devices, out err) != 0)
+                {
+
+                }
+                else
+                {
+                    _Logger.Info("CORESIP_GetWindowsSoundDeviceNames  ndevices_found " + Devices.ndevices_found + " " + Devices.DeviceNames);
+                    string[] separatingStrings = { "<###>"};
+                    string[] DevWinName1 = Devices.DeviceNames.Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string device in DevWinName1)
+                    {
+                        _Logger.Info("CORESIP_GetWindowsSoundDeviceNames: " + device);
+                    }
+                    DevWinName.AddRange(DevWinName1);
+                }
+
+
+
 #if _TRACEAGENT_
             _Logger.Debug("Saliendo de SipAgent.Init");
 #endif
             }
+
+            CORESIP_Error error;
+            CORESIP_Set_Ed137_version('B','C',out error );
+
         }
+
+        public static bool Valid(string device)
+        {
+            if (GetNameDevice(-1, device)!=null)
+                return true;
+            return false;
+        }
+
+        public static void Asignacion(CORESIP_SndDevType tipo, string device)
+        {
+            // Asignacion
+            CORESIP_Error err;
+            if (!Valid(device))
+            {
+                _Logger.Info("CORESIP_SetSNDDeviceWindowsName: " + tipo + "Not valid device: " + device);
+
+            }
+            else if (CORESIP_SetSNDDeviceWindowsName(tipo, device, out err) != 0)
+            {
+                _Logger.Info("Error CORESIP_SetSNDDeviceWindowsName: " + tipo + "device: " + device + err.Info);
+            }
+            else
+            {
+                _Logger.Info("CORESIP_SetSNDDeviceWindowsName: " + tipo + "device: " + device);
+
+            }
+        }
+
+        public static string GetNameDevice(int indice,string mascara=null)
+        {
+            CORESIP_Error err;
+            CORESIP_SndWindowsDevices Devices;
+            List<string> DevWinName = new List<string>();
+            if (CORESIP_GetWindowsSoundDeviceNames(0, out Devices, out err) != 0)
+            {
+                return null;
+            }
+            else
+            {
+                _Logger.Info("CORESIP_GetWindowsSoundDeviceNames  ndevices_found " + Devices.ndevices_found + " " + Devices.DeviceNames);
+                string[] separatingStrings = { "<###>" };
+                string[] DevWinName1 = Devices.DeviceNames.Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
+                DevWinName.AddRange(DevWinName1);
+                if (mascara != null && mascara.Length>0)
+                {
+                    foreach (string dev in DevWinName1)
+                    {
+                        //_Logger.Info("GetNameDevice  " + mascara+ " "+ dev);
+                        try
+                        {
+                            if ((dev!=null) && (dev.Length > 0) && (dev.Contains(mascara)))
+                            {
+                                _Logger.Info("GetNameDevice  " + mascara);
+                                return dev;
+                            }
+                            else  if ((dev == null) || (dev.Length == 0))
+                            {
+                                if (mascara!= "-none-")
+                                    _Logger.Info("GetNameDevice  " + mascara + " No Encontrada");
+                                return null;
+                            }
+                        }
+                        catch (Exception excep)
+                        {
+                            return null;
+                        }
+                    }
+                }
+                if (mascara==null && DevWinName1.Length > indice)
+                {
+                    _Logger.Info("Buscando dispositivo + Devices.ndevices_found "+ indice.ToString() + " " + DevWinName1[indice]);
+                    return DevWinName[indice];
+                }
+                else
+                    return null;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1984,6 +2271,7 @@ namespace U5ki.Infrastructure
 #if _TRACEAGENT_
             _Logger.Debug("Entrando en SipAgent.AddSndDevice {0}, {1}, {2}", type.ToString(), inDevId, outDevId);
 #endif
+            _Logger.Debug("Entrando en SipAgent.AddSndDevice {0}, {1}, {2}", type.ToString(), inDevId, outDevId);
             CORESIP_SndDeviceInfo info = new CORESIP_SndDeviceInfo();
 
 			info.Type = type;
@@ -1992,6 +2280,7 @@ namespace U5ki.Infrastructure
 
 			int dev=0;
 			CORESIP_Error err;
+           
             if (CORESIP_AddSndDevice(info, out dev, out err) != 0)            
             {            
                 throw new Exception(err.Info);                
@@ -3384,7 +3673,7 @@ namespace U5ki.Infrastructure
                 _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
             }
             _Logger.Debug("Leyendo fichero {1} :{0}", sEnableGrabacionED137, fullRecorderFileName);
-            if (result != 1)
+            if (result <= 0)
             {
                 _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
             }
@@ -3408,9 +3697,9 @@ namespace U5ki.Infrastructure
                 _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
             }
             _Logger.Debug("Leyendo fichero {1} :{0}", retorno, fullRecorderFileName);
-            if (result != 1)
+            if (result < 0)
             {
-                _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} !!!", Marshal.GetLastWin32Error());
+                _Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} !!!", seccion,clave);
             }
 
             return retorno.ToString();

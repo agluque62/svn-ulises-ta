@@ -553,40 +553,40 @@ namespace HMI.Presentation.RadioLight.Views
         //}
 
         /** Esta funcion se ha trasladado al MODEL MODULE */
-  //      private void RecuperaEstadoAsignacionFrecuencias()
-		//{
-		//	int absPageBegin = _RdPageBT.Page * _NumPositionsByPage;
+        //      private void RecuperaEstadoAsignacionFrecuencias()
+        //{
+        //	int absPageBegin = _RdPageBT.Page * _NumPositionsByPage;
 
-		//	for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
-		//	{
-		//		if (i < Settings.Default.AssignatedStates.Count)
-		//		{
-		//			string[] estado = Settings.Default.AssignatedStates[i].Split(',');
+        //	for (int i = absPageBegin, to = absPageBegin + _NumPositionsByPage; i < to; i++)
+        //	{
+        //		if (i < Settings.Default.AssignatedStates.Count)
+        //		{
+        //			string[] estado = Settings.Default.AssignatedStates[i].Split(',');
 
-		//			EstadoAsignacion eAsignacion = new EstadoAsignacion();
+        //			EstadoAsignacion eAsignacion = new EstadoAsignacion();
 
-		//			eAsignacion._Rx = estado[1] == "True";
-		//			eAsignacion._Tx = estado[2] == "True";
-		//			switch (estado[3])
-		//			{
-		//				case "HeadPhones":
-		//					eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
-		//					break;
-		//				case "Speaker":
-		//					eAsignacion._AudioVia = RdRxAudioVia.Speaker;
-		//					break;
-		//				case "NoAudio":
-		//					eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
-		//					break;
-		//			}
+        //			eAsignacion._Rx = estado[1] == "True";
+        //			eAsignacion._Tx = estado[2] == "True";
+        //			switch (estado[3])
+        //			{
+        //				case "HeadPhones":
+        //					eAsignacion._AudioVia = RdRxAudioVia.HeadPhones;
+        //					break;
+        //				case "Speaker":
+        //					eAsignacion._AudioVia = RdRxAudioVia.Speaker;
+        //					break;
+        //				case "NoAudio":
+        //					eAsignacion._AudioVia = RdRxAudioVia.NoAudio;
+        //					break;
+        //			}
 
-  //                  _EstadosAsignacion[i - absPageBegin] = eAsignacion;
+        //                  _EstadosAsignacion[i - absPageBegin] = eAsignacion;
 
-		//		}
-		//	}
-		//}
+        //		}
+        //	}
+        //}
 
-		private void Reset(RdButton bt, RdDst dst, ref EstadoAsignacion estado)
+        private void Reset(RdButton bt, RdDst dst, ref EstadoAsignacion estado)
 		{
 			Reset(bt, dst);
 

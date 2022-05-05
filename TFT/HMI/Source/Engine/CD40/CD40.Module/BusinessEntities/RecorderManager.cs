@@ -62,8 +62,9 @@ namespace HMI.CD40.Module.BusinessEntities
         private string[] _SessionsFileName = { "", "", "", "", "", "" };
         private bool[] _GlpSessionsStarted = new bool[6];
         private List<int>[] _GlpCallId = new List<int>[6];
-        private bool _LocalRecordingEnabled = false;
-        private bool _LocalRecordingOnlyRadio = false;
+        private bool _LocalRecordingEnabled = true;//RQF35
+        private bool _LocalRecordingOnlyRadio = true;//RQF35
+        private int _TempMinRecorderRadio = 1000;//RQF35
         private object _Sync = new object();
 
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
@@ -72,14 +73,32 @@ namespace HMI.CD40.Module.BusinessEntities
         private Timer _SupervisorLengthRecording = new Timer(15000);
 
         public event GenericEventHandler<StateMsg<bool>> BriefingChanged;
+        public event GenericEventHandler<StateMsg<bool>> FileRecordedChanged;
         public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
-        
+
         public RecorderManager(bool enable, bool onlyradio = false)
         {
             // TODO: Complete member initialization
             this._LocalRecordingEnabled = enable;
             this._LocalRecordingOnlyRadio = onlyradio;
-            _Logger.Info("Grabacion habilitada: " + enable.ToString());
+            this._TempMinRecorderRadio = Settings.Default.TempMinRecorderRadio;
+            _Logger.Info("Grabacion habilitada: " + enable.ToString()+" Radio" + onlyradio.ToString());
+            if (onlyradio)
+                PurgeFilesRadio(true);
+
+        }
+
+        public bool LocalRecordingOnlyRadio
+        {
+            set 
+            { 
+                if (_LocalRecordingOnlyRadio != value)
+                {
+                    _LocalRecordingOnlyRadio = value;
+                   
+                }
+            }
+            get { return _LocalRecordingOnlyRadio; }
         }
 
         /// <summary>
@@ -122,6 +141,11 @@ namespace HMI.CD40.Module.BusinessEntities
                 if (Directory.Exists(Settings.Default.DirectorioGLP)) 
                     System.IO.Directory.Delete(Settings.Default.DirectorioGLP, true);
                 /* Fin Modificacion */
+                if (Directory.Exists(Settings.Default.DirectorioGLPRxRadio))
+                {
+                    // da problemas al borrar y crear
+                    //Directory.Delete(Settings.Default.DirectorioGLPRxRadio, true);
+                }
             }
             catch (System.IO.IOException /*e*/)
             {
@@ -323,23 +347,95 @@ namespace HMI.CD40.Module.BusinessEntities
             }
 		}
 
+        class item
+        {
+            public string Name;
+            public DateTime Datetime;
+            public long Lenght;
+            public int Seg;
+            public String Text;
+            item(string name, DateTime fecha, long len, int seg,String path)
+            {
+                Name = name;
+                Datetime = fecha;
+                Lenght = len;
+                Seg = seg;
+                Text = path;
+            }
+            item()
+            {
+            }
+        }
+
+        private void PurgeFilesRadio(bool allrecords = false)
+        {
+            try
+            {
+                string dirName = Settings.Default.DirectorioGLPRxRadio;
+                if (!System.IO.Directory.Exists(dirName))
+                    System.IO.Directory.CreateDirectory(dirName);
+                DirectoryInfo di = new DirectoryInfo(Settings.Default.DirectorioGLPRxRadio);
+                FileInfo[] fi;
+                fi = di.GetFiles("RxRadio_*.*", SearchOption.AllDirectories);
+                if (fi.Length == 0)
+                {
+                    General.SafeLaunchEvent(FileRecordedChanged, this, new StateMsg<bool>(false));// Deshabilito reproduccion
+                    return;
+                }
+                Array.Sort(fi, new FileComparer());
+                FileInfo lastInfo = fi[fi.Length - 1];
+                long ms = lastInfo.Length * 1000L / 16000L;
+                if (ms < (long)_TempMinRecorderRadio)
+                {
+                    _Logger.Info("Purge file", lastInfo.Name);
+                    File.Delete(lastInfo.Directory + "/" + lastInfo.Name);
+                    General.SafeLaunchEvent(FileRecordedChanged, this, new StateMsg<bool>(false));
+                }
+                else
+                {
+                    General.SafeLaunchEvent(FileRecordedChanged, this, new StateMsg<bool>(true));
+
+
+                    foreach (System.IO.FileInfo f in fi)
+                    {
+                        if (!f.Name.Contains("@") &&
+                            (allrecords || f.Name != lastInfo.Name))
+                        {
+                            {
+                                _Logger.Info("Purge file", f.Name);
+                                File.Delete(f.Directory + "/" + f.Name);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (System.IO.IOException /*e*/)
+            {
+                _Logger.Warn("Cannot purge files.");
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="idCall"></param>
         /// <param name="fuente"></param>
         /// <param name="iniciar"></param>
-        internal void SessionGlp(int idCall, FuentesGlp fuente, bool iniciar)
+        internal void SessionGlp(int idCall, FuentesGlp fuente, bool iniciar,bool finalizar=true)
         {
             if (!this._LocalRecordingEnabled)
                 return;
             //lalm 220110
             if (this._LocalRecordingOnlyRadio && !(fuente == FuentesGlp.RxRadio || fuente == FuentesGlp.RxRadio))
+            {
+                
                 return;
+            }
             lock (_Sync)
             {
                 try
                 {
+                // Si no está la grabación sobre radio arrancada.
                 if (iniciar && !_GlpSessionsStarted[(int)fuente])
                 {
                     _GlpSessionsStarted[(int)fuente] = !_GlpSessionsStarted[(int)fuente];
@@ -363,6 +459,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         _SessionsFile[(int)fuente] = SipAgent.CreateWavRecorder(fileName);
                         _SessionsFileName[(int)fuente] = fileName;
                         _Logger.Info("Recording GLP. Filename: " + _SessionsFileName[(int)fuente]);
+
                     }
 
                     Top.Mixer.Link(idCall, _SessionsFile[(int)fuente], MixerDir.Send, fuente);
@@ -372,20 +469,26 @@ namespace HMI.CD40.Module.BusinessEntities
                         Top.Mixer.LinkGlpTfl(_SessionsFile[(int)fuente]);
 
                 }
+                // Si la grabacion ya esta esta arrancada.
                 else if (iniciar && (fuente == FuentesGlp.RxRadio || fuente == FuentesGlp.Telefonia) && _SessionsFile[(int)fuente] != -1)
                 {
+                    // Comprueba si idcall no está y si es así lo incluye.
                     if (!_GlpCallId[(int)fuente].Contains(idCall))
                     {
                         Top.Mixer.Link(idCall, _SessionsFile[(int)fuente], MixerDir.Send, fuente);
                         _GlpCallId[(int)fuente].Add(idCall);
                     }
                 }
+                // si se envia quitar y la grabacion esta arrancada
                 else if (!iniciar && _GlpSessionsStarted[(int)fuente])
                 {
+                    // Comprueba si idcall esta en la llamada, y lo quita.
                     if (_GlpCallId[(int)fuente].Contains(idCall))
                         _GlpCallId[(int)fuente].Remove(idCall);
 
-                    if (_GlpCallId[(int)fuente].Count == 0)
+                    // si no quedan idcalls en la grabación Finaliza la grabación.
+                    // nuevo parametro finalizar=true para que finalice la llamada.
+                    if ((_GlpCallId[(int)fuente].Count == 0) && finalizar)
                     {
                         Top.Mixer.Unlink(_SessionsFile[(int)fuente]);
                         if (_SessionsFile[(int)fuente] >= 0)
@@ -405,11 +508,12 @@ namespace HMI.CD40.Module.BusinessEntities
                             }
                             
                             _SessionsFileName[(int)fuente] = string.Empty;
+                            }
+                            PurgeFilesRadio();
                         }
+                        //_GlpCallId[(int)fuente] = 0;
                     }
-                    //_GlpCallId[(int)fuente] = 0;
                 }
-            }
                 catch (Exception exc)
                 {
                     _Logger.Error("GLP.SesionGlp Excepcion "+ exc.Message);
@@ -427,120 +531,125 @@ namespace HMI.CD40.Module.BusinessEntities
             if (!this._LocalRecordingEnabled)
                 return;
             //lalm 220110
-            if (iniciar && this._LocalRecordingOnlyRadio && !(fuente == FuentesGlp.RxRadio || fuente == FuentesGlp.RxRadio))
+            // Solo permito Iniciar grabacion si estando habilitado onlyradio la fuente es RxRadio.
+            if (iniciar && this._LocalRecordingOnlyRadio && !(fuente == FuentesGlp.RxRadio))
                 return;
 
             lock (_Sync)
             {
                 try { 
-                if (iniciar != _GlpSessionsStarted[(int)fuente])
-                {
-                    _GlpSessionsStarted[(int)fuente] = !_GlpSessionsStarted[(int)fuente];
-
-                    if (fuente == FuentesGlp.Briefing)
+                    if (iniciar != _GlpSessionsStarted[(int)fuente])
                     {
-                        General.SafeLaunchEvent(BriefingChanged, this, new StateMsg<bool>(Briefing));
-                        _BriefingSessionTimer.Enabled = true;
+                        _GlpSessionsStarted[(int)fuente] = !_GlpSessionsStarted[(int)fuente];
 
-                        if (Settings.Default.SNMPEnabled == 1 && iniciar)
+                        if (fuente == FuentesGlp.Briefing)
                         {
-                            Top.WorkingThread.Enqueue("SetSnmp", delegate()
+                            General.SafeLaunchEvent(BriefingChanged, this, new StateMsg<bool>(Briefing));
+                            _BriefingSessionTimer.Enabled = true;
+
+                            if (Settings.Default.SNMPEnabled == 1 && iniciar)
                             {
-                                string evento = Top.Cfg.PositionId + "_1";
-                                General.SafeLaunchEvent(SetSnmpString, this, new SnmpStringMsg<string, string>(Settings.Default.StartingBriefingSessionOid, evento));
-                            });
-                        }
-                    }
-
-                    if (_GlpSessionsStarted[(int)fuente] && _SessionsFile[(int)fuente] == -1)
-                    {
-                        /* AGL.REC Directorio de Grabacion Local Configurable
-                        string dirName = "Recording/" + fuente.ToString();
-                         * */
-                        string dirName = Settings.Default.DirectorioGLP + fuente.ToString();
-                        /* Fin Modificacion */
-
-                        if (!System.IO.Directory.Exists(dirName))
-                            System.IO.Directory.CreateDirectory(dirName);
-
-                        string fileName = dirName + "/" + "@" + fuente.ToString() + "_" + Top.Cfg.MainId + "_" +
-                            DateTime.Now.TimeOfDay.Hours + "_" +
-                            DateTime.Now.TimeOfDay.Minutes + "_" +
-                            DateTime.Now.TimeOfDay.Seconds + ".wav";
-                        _SessionsFile[(int)fuente] = SipAgent.CreateWavRecorder(fileName);
-                        _SessionsFileName[(int)fuente] = fileName;
-                        _Logger.Info("Recording GLP. Filename: " + _SessionsFileName[(int)fuente]);
-
-                        switch (fuente)
-                        {
-                            case FuentesGlp.Briefing:
-                                Top.Mixer.LinkGlp(_SessionsFile[(int)fuente], MixerDev.MhpRd, fuente);
-                                Top.Mixer.LinkGlp(_SessionsFile[(int)fuente], MixerDev.MhpTlf, fuente);
-                                break;
-                            case FuentesGlp.TxRadio:
-                                Top.Mixer.LinkGlp(_SessionsFile[(int)fuente], MixerDev.MhpRd, fuente);
-                                break;
-                            case FuentesGlp.TxLc:
-                                Top.Mixer.LinkGlp(_SessionsFile[(int)fuente], MixerDev.MhpLc, fuente);
-                                break;
-                            case FuentesGlp.RxRadio:
-                                foreach (int idCall in _GlpCallId[(int)fuente])
+                                Top.WorkingThread.Enqueue("SetSnmp", delegate()
                                 {
-                                    try
+                                    string evento = Top.Cfg.PositionId + "_1";
+                                    General.SafeLaunchEvent(SetSnmpString, this, new SnmpStringMsg<string, string>(Settings.Default.StartingBriefingSessionOid, evento));
+                                });
+                            }
+                        }
+
+                        if (_GlpSessionsStarted[(int)fuente] && _SessionsFile[(int)fuente] == -1)
+                        {
+                            /* AGL.REC Directorio de Grabacion Local Configurable
+                            string dirName = "Recording/" + fuente.ToString();
+                             * */
+                            string dirName = Settings.Default.DirectorioGLP + fuente.ToString();
+                            /* Fin Modificacion */
+                            if (_LocalRecordingOnlyRadio)
+                                dirName = Settings.Default.DirectorioGLPRxRadio;
+
+                            if (!System.IO.Directory.Exists(dirName))
+                                System.IO.Directory.CreateDirectory(dirName);
+
+                            string fileName = dirName + "/" + "@" + fuente.ToString() + "_" + Top.Cfg.MainId + "_" +
+                                DateTime.Now.TimeOfDay.Hours + "_" +
+                                DateTime.Now.TimeOfDay.Minutes + "_" +
+                                DateTime.Now.TimeOfDay.Seconds + ".wav";
+                            _SessionsFile[(int)fuente] = SipAgent.CreateWavRecorder(fileName);
+                            _SessionsFileName[(int)fuente] = fileName;
+                            _Logger.Info("Recording GLP. Filename: " + _SessionsFileName[(int)fuente]);
+
+                            switch (fuente)
+                            {
+                                case FuentesGlp.Briefing:
+                                    Top.Mixer.LinkGlp(_SessionsFile[(int)fuente], MixerDev.MhpRd, fuente);
+                                    Top.Mixer.LinkGlp(_SessionsFile[(int)fuente], MixerDev.MhpTlf, fuente);
+                                    break;
+                                case FuentesGlp.TxRadio:
+                                    Top.Mixer.LinkGlp(_SessionsFile[(int)fuente], MixerDev.MhpRd, fuente);
+                                    break;
+                                case FuentesGlp.TxLc:
+                                    Top.Mixer.LinkGlp(_SessionsFile[(int)fuente], MixerDev.MhpLc, fuente);
+                                    break;
+                                case FuentesGlp.RxRadio:
+                                    foreach (int idCall in _GlpCallId[(int)fuente])
                                     {
-                                        //Top.Mixer.Unlink(idCall);
-                                        Top.Mixer.Link(idCall, _SessionsFile[(int)fuente], MixerDir.Send, fuente);
+                                        try
+                                        {
+                                            //Top.Mixer.Unlink(idCall);
+                                            Top.Mixer.Link(idCall, _SessionsFile[(int)fuente], MixerDir.Send, fuente);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            _Logger.Error("SessionGLP-Rx: ", e);
+                                        }
                                     }
-                                    catch (Exception e)
-                                    {
-                                        _Logger.Error("SessionGLP-Rx: ", e);
-                                    }
+
+                                    //if (_SessionsId[(int)FuentesGlp.RxRadio] != -1)
+                                    //    Top.Mixer.Link(_SessionsId[(int)FuentesGlp.RxRadio], _SessionsFile[(int)fuente], MixerDir.Send);
+                                    break;
+                                default:
+                                    break;
+
+                            }
+                        }
+                        else if (!_GlpSessionsStarted[(int)fuente] && (_SessionsFile[(int)fuente] >= 0))
+                        {
+                            _GlpCallId[(int)fuente].Clear();
+
+                            Top.Mixer.Unlink(_SessionsFile[(int)fuente]);
+                            if (_SessionsFile[(int)fuente] >= 0)
+                            {
+                                SipAgent.DestroyWavRecorder(_SessionsFile[(int)fuente]);
+                                _SessionsFile[(int)fuente] = -1;
+                                //_SessionsId[(int)fuente] = -1;
+                                _GlpSessionsStarted[(int)fuente] = false;
+
+                                try
+                                {
+                                    File.Move(_SessionsFileName[(int)fuente], _SessionsFileName[(int)fuente].Replace("@", ""));
+                                }
+                                catch (System.IO.IOException /*e*/)
+                                {
+                                    File.Delete(_SessionsFileName[(int)fuente]);
+                                    _Logger.Warn("GLP.SesionGlp. El fichero ya existe.");
                                 }
 
-                                //if (_SessionsId[(int)FuentesGlp.RxRadio] != -1)
-                                //    Top.Mixer.Link(_SessionsId[(int)FuentesGlp.RxRadio], _SessionsFile[(int)fuente], MixerDir.Send);
-                                break;
-                            default:
-                                break;
-
-                        }
-                    }
-                    else if (!_GlpSessionsStarted[(int)fuente] && (_SessionsFile[(int)fuente] >= 0))
-                    {
-                        _GlpCallId[(int)fuente].Clear();
-
-                        Top.Mixer.Unlink(_SessionsFile[(int)fuente]);
-                        if (_SessionsFile[(int)fuente] >= 0)
-                        {
-                            SipAgent.DestroyWavRecorder(_SessionsFile[(int)fuente]);
-                            _SessionsFile[(int)fuente] = -1;
-                            //_SessionsId[(int)fuente] = -1;
-                            _GlpSessionsStarted[(int)fuente] = false;
-
-                            try
-                            {
-                                File.Move(_SessionsFileName[(int)fuente], _SessionsFileName[(int)fuente].Replace("@", ""));
-                            }
-                            catch (System.IO.IOException /*e*/)
-                            {
-                                File.Delete(_SessionsFileName[(int)fuente]);
-                                _Logger.Warn("GLP.SesionGlp. El fichero ya existe.");
+                                _SessionsFileName[(int)fuente] = string.Empty;
                             }
 
-                            _SessionsFileName[(int)fuente] = string.Empty;
-                        }
-
-                        if (fuente == FuentesGlp.Briefing && Settings.Default.SNMPEnabled == 1)
-                        {
-                            Top.WorkingThread.Enqueue("SetSnmp", delegate()
+                            if (fuente == FuentesGlp.Briefing && Settings.Default.SNMPEnabled == 1)
                             {
-                                string evento = Top.Cfg.PositionId + "_0";
-                                General.SafeLaunchEvent(SetSnmpString, this, new SnmpStringMsg<string, string>(Settings.Default.StartingBriefingSessionOid, evento));
-                            });
+                                Top.WorkingThread.Enqueue("SetSnmp", delegate()
+                                {
+                                    string evento = Top.Cfg.PositionId + "_0";
+                                    General.SafeLaunchEvent(SetSnmpString, this, new SnmpStringMsg<string, string>(Settings.Default.StartingBriefingSessionOid, evento));
+                                });
+                            }
+                            //_GlpCallId[(int)fuente] = 0;
+                            PurgeFilesRadio();
                         }
                     }
                 }
-            }
                 catch (Exception exc)
                 {
                     _Logger.Error("GLP.SesionGlp Excepcion " + exc.Message);
@@ -625,6 +734,8 @@ namespace HMI.CD40.Module.BusinessEntities
                  * */
                 string dirName = Settings.Default.DirectorioGLP + fuente.ToString();
                 /* Fin Modificacion */
+                if (_LocalRecordingOnlyRadio)
+                    dirName = Settings.Default.DirectorioGLPRxRadio;
 
                 if (!System.IO.Directory.Exists(dirName))
                     System.IO.Directory.CreateDirectory(dirName);
@@ -672,17 +783,32 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="e"></param>
         private void OnSupervisorLengthRecordingTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            _SupervisorLengthRecording.Enabled = false;
-
-            for (FuentesGlp i = FuentesGlp.RxRadio; i <= FuentesGlp.TxLc; i++)
+            if (_LocalRecordingOnlyRadio)
             {
-                if (_GlpSessionsStarted[(int)i] && _SessionsFileName[(int)i] != string.Empty)
+                PurgeFilesRadio(false);
+                if (_GlpSessionsStarted[(int)FuentesGlp.RxRadio] && _SessionsFileName[(int)FuentesGlp.RxRadio] != string.Empty)
                 {
-                    FileInfo fi = new FileInfo(_SessionsFileName[(int)i]);
+                    FileInfo fi = new FileInfo(_SessionsFileName[(int)FuentesGlp.RxRadio]);
                     _Logger.Info("Supervisor GLP: GLP session started. Recording file: " + fi.FullName);
-                    int interval = (i == FuentesGlp.RxRadio || i == FuentesGlp.TxRadio) ? 1 : 30;
+                    int interval =  1 ;
                     if (fi != null && fi.Exists && fi.Length > interval * 60 * 16000 /*interval minutos, aprox. */)
-                        ResetRecording(i);
+                        ResetRecording(FuentesGlp.RxRadio);
+                    if (!Top.Rd.AnySquelch)
+                        ResetRecording(FuentesGlp.RxRadio);
+                }
+            }
+            else
+            {
+                for (FuentesGlp i = FuentesGlp.RxRadio; i <= FuentesGlp.TxLc; i++)
+                {
+                    if (_GlpSessionsStarted[(int)i] && _SessionsFileName[(int)i] != string.Empty)
+                    {
+                        FileInfo fi = new FileInfo(_SessionsFileName[(int)i]);
+                        _Logger.Info("Supervisor GLP: GLP session started. Recording file: " + fi.FullName);
+                        int interval = (i == FuentesGlp.RxRadio || i == FuentesGlp.TxRadio) ? 1 : 30;
+                        if (fi != null && fi.Exists && fi.Length > interval * 60 * 16000 /*interval minutos, aprox. */)
+                            ResetRecording(i);
+                    }
                 }
             }
 
@@ -703,6 +829,8 @@ namespace HMI.CD40.Module.BusinessEntities
                  * */
                 DirectoryInfo di = new System.IO.DirectoryInfo(Settings.Default.DirectorioGLP);
                 /* Fin Modificacion */
+                if (_LocalRecordingOnlyRadio)
+                    di = new System.IO.DirectoryInfo(Settings.Default.DirectorioGLPRxRadio);
 
                 FileInfo[] fi = di.GetFiles("*.*", SearchOption.AllDirectories);
 
@@ -736,10 +864,21 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="sender"></param>
         private void OnConfigChanged(object sender)
         {
-            if (!this._LocalRecordingEnabled)
-                return;
 
-            try
+            // Aqui se trata la variable que viene de configuración para informar si esta la grabacion habilitada.
+            if ( (Top.Cfg.Permissions & Permissions.ReplayOnlyRadio) == Permissions.ReplayOnlyRadio)
+            {
+                this._LocalRecordingEnabled = true;
+                this._LocalRecordingOnlyRadio = true;
+            }
+            else
+            {
+                this._LocalRecordingEnabled = false;
+                this._LocalRecordingOnlyRadio = false;
+            }
+
+
+           try
             {
                 /* AGL.REC Directorio de Grabacion Local Configurable
                 Directory.Delete("Recording", true);
@@ -747,6 +886,12 @@ namespace HMI.CD40.Module.BusinessEntities
                 if (Directory.Exists (Settings.Default.DirectorioGLP))
                     Directory.Delete(Settings.Default.DirectorioGLP, true);
                 /* Fin Modificacion */
+                if (Directory.Exists(Settings.Default.DirectorioGLPRxRadio))
+                {
+                    // Da problemas al borrar y crear
+                    //Directory.Delete(Settings.Default.DirectorioGLPRxRadio, true);
+                    Directory.Delete(Settings.Default.DirectorioGLPRxRadio, true);
+                }
             }
             catch (System.IO.IOException /*e*/)
             {
@@ -767,6 +912,7 @@ namespace HMI.CD40.Module.BusinessEntities
     {
         public event GenericEventHandler<StateMsg<bool>> PlayingChanged;
         public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
+        public event GenericEventHandler<StateMsg<bool>> FileRecordedChanged1;
 
         /// <summary>
         /// 
@@ -785,6 +931,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="fileLength"></param>
         public void DoFunction(FunctionReplay funcion, ViaReplay via, string fileName, long fileLength)
         {
+       
             switch (funcion)
             {
                 case FunctionReplay.Stop:
@@ -793,6 +940,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         Top.Mixer.Unlink(_ReplayTone);
                         SipAgent.DestroyWavPlayer(_ReplayTone);
                         _ReplayTone = -1;
+                        _Replaying = false;
                         _Replaying = false;
                         _StopPlaying.Enabled = false;
 
@@ -822,7 +970,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         _StopPlaying.Elapsed += new ElapsedEventHandler(StopPlayingElapsed);
                         _StopPlaying.AutoReset = false;
                         _StopPlaying.Enabled = true;
-
+                        
                         General.SafeLaunchEvent(PlayingChanged, this, new StateMsg<bool>(true));
                         if (Settings.Default.SNMPEnabled == 1)
                         {

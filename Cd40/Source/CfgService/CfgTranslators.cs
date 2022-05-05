@@ -303,9 +303,6 @@ namespace U5ki.CfgService
 			cfg.TipoGrabacionAnalogica = soapCfg.TipoGrabacionAnalogica;
 			cfg.EnableGrabacionEd137 = soapCfg.EnableGrabacionEd137;
 			cfg.EnableGrabacionAnalogica = soapCfg.EnableGrabacionAnalogica;
-			//RQF-36 Mejoras funcionalidad retransmisión radio (RETRANS)
-			//cfg.QuitarRTXSQ = soapCfg.EnableQuitarRTXSQ;
-			//cfg.MantRTXSect = soapCfg.EnableMantRTXSect;
 		}
         /// <summary>
         /// 
@@ -450,6 +447,8 @@ namespace U5ki.CfgService
 			cfg.SayAgain = soapCfg.SayAgain;
 			cfg.InhabilitacionRedirec = soapCfg.InhabilitacionRedirec;
 			cfg.Glp = soapCfg.Glp;
+			cfg.PermisoRTXSQ = soapCfg.PermisoRTXSQ;
+			cfg.PermisoRTXSect = soapCfg.PermisoRTXSect;
 		}
         /// <summary>
         /// 

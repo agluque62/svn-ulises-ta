@@ -1,5 +1,8 @@
 #define _HF_GLOBAL_STATUS_
 #define _AUDIOGENERIC_
+#define WT
+//#define _MEZCLADOR_ASECNA_
+#define _MEZCLADOR_TWR_
 using System;
 using System.IO;
 using System.Collections;
@@ -222,6 +225,10 @@ namespace HMI.CD40.Module.Services
         //#2629 Presentar via utilizada en llamada saliente.
         [EventPublication(EventTopicNames.TlfResStateEngine, PublicationScope.Global)]
         public event EventHandler<RangeMsg<TlfInfo>> TlfResStateEngine;
+
+        //RQF36
+        [EventPublication(EventTopicNames.ChangedRTXSQU, PublicationScope.Global)]
+        public event EventHandler<StateMsg<bool>> ChangedRTXSQU;
         #endregion
 
         public void Run()
@@ -308,6 +315,8 @@ namespace HMI.CD40.Module.Services
                 if (Top.Recorder != null) Top.Recorder.SetSnmpString += OnSetSnmpString;
                 if (Top.Replay != null) Top.Replay.SetSnmpString += OnSetSnmpString;
                 if (Top.Recorder != null) Top.Recorder.BriefingChanged += OnBriefingChanged;
+                if (Top.Recorder != null) Top.Recorder.FileRecordedChanged += OnFileRecorderChanged;
+
                 if (Top.Replay != null) Top.Replay.PlayingChanged += OnPlayingChanged;
 
                 Top.Start();
@@ -571,7 +580,7 @@ namespace HMI.CD40.Module.Services
             Top.WorkingThread.Enqueue("SetRdRx", delegate ()
             {
                 //if (!on || AllowRd())
-                if (forced || (AllowRd() && AllowBriefing()))
+                if (forced || (AllowRd() && (Twr() || AllowBriefing())))
                 {
                     Top.Rd.SetRx(id, on, forced);
                 }
@@ -583,7 +592,7 @@ namespace HMI.CD40.Module.Services
             Top.WorkingThread.Enqueue("SetRdTx", delegate ()
             {
                 //if (!on || AllowRd())
-                if (AllowRd(id) && AllowBriefing())
+                if (AllowRd(id) && (Twr() || AllowBriefing()))
                 {
                     Top.Rd.SetTx(id, on);
                 }
@@ -602,7 +611,7 @@ namespace HMI.CD40.Module.Services
         {
             Top.WorkingThread.Enqueue("ConfirmRdTx", delegate ()
             {
-                if (AllowRd() && AllowBriefing())
+                if (AllowRd() && (Twr() || AllowBriefing()))
                 {
                     Top.Rd.ConfirmTx(id);
                 }
@@ -621,18 +630,26 @@ namespace HMI.CD40.Module.Services
         {
             Top.WorkingThread.Enqueue("SetRdAudio", delegate ()
             {
-                if (forced || (AllowRd() && AllowBriefing()))
+                if (forced || (AllowRd() && (Twr() || AllowBriefing())))
                 {
                     Top.Rd.SetAudioVia(id, audioVia);
                 }
             });
         }
-
-        public void NextRdAudio(int id)
+        public bool Twr()
+        {
+#if _MEZCLADOR_ASECNA_
+            return false;
+#endif
+#if _MEZCLADOR_TWR_
+            return true;
+#endif
+        }
+            public void NextRdAudio(int id)
         {
             Top.WorkingThread.Enqueue("SetRdAudio", delegate ()
             {
-                if ((AllowRd() && AllowBriefing()))
+                if (AllowRd() && (Twr() || AllowBriefing()) )
                 {
                     Top.Rd.NextAudioVia(id);
                 }
@@ -1552,8 +1569,14 @@ namespace HMI.CD40.Module.Services
                 List<LlamadaHistorica> listaLlamadas = HistoricalManager.GetHistoricalCalls(id);
                 General.SafeLaunchEvent(HistoricalOfLocalCallsEngine, this, new RangeMsg<LlamadaHistorica>(listaLlamadas.ToArray()));
             });
+            //RQF36
+            Top.PublisherThread.Enqueue(EventTopicNames.ChangedRTXSQU, delegate ()
+            {
+                General.SafeLaunchEvent(ChangedRTXSQU, this, new StateMsg<bool>(Top.Cfg.PermisoRTXSQ()));
+            });
 
-			List<Number> ag = new List<Number>();
+
+            List<Number> ag = new List<Number>();
 			foreach (CfgEnlaceInterno agLink in Top.Cfg.AgLinks)
 			{
 				Debug.Assert(agLink.ListaRecursos.Count == 1);
@@ -1571,21 +1594,21 @@ namespace HMI.CD40.Module.Services
 				General.SafeLaunchEvent(AgendaChangedEngine, this, new RangeMsg<Number>(ag.ToArray()));
 			});
 
-			// Eliminar grupos de RTX si los hubiera
+            // Eliminar grupos de RTX si los hubiera
             // 20200909. Eliminar esta función.
-			//if (Top.Cfg.ResetUsuario)
-			//{
-			//	SetRdPtt(false);
+            //if (Top.Cfg.ResetUsuario)
+            //{
+            //	SetRdPtt(false);
 
-			//	Top.PublisherThread.Enqueue(EventTopicNames.RemoveRtxGroup, delegate()
-			//	{
-			//		General.SafeLaunchEvent(RemoveRtxGroup, this);
-			//	});
-			//}
+            //	Top.PublisherThread.Enqueue(EventTopicNames.RemoveRtxGroup, delegate()
+            //	{
+            //		General.SafeLaunchEvent(RemoveRtxGroup, this);
+            //	});
+            //}
 
-		}
+        }
 
-		private void OnTransferChanged(object sender)
+        private void OnTransferChanged(object sender)
 		{
 			FunctionState st = Top.Tlf.Transfer.State;
 
@@ -1899,10 +1922,15 @@ namespace HMI.CD40.Module.Services
 
         private void OnBriefingChanged(object sender, StateMsg<bool> briefingState)
         {
-            Top.PublisherThread.Enqueue(EventTopicNames.BriefingStateEngine, delegate()
+            Top.PublisherThread.Enqueue(EventTopicNames.BriefingStateEngine, delegate ()
             {
                 General.SafeLaunchEvent(BriefingStateEngine, this, briefingState);
             });
+        }
+
+        private void OnFileRecorderChanged(object sender, StateMsg<bool> fileState)
+        {
+            // No se puede llamar a esta funcion desde aqui.
         }
 
         private void OnPlayingChanged(object sender, StateMsg<bool> playing)
@@ -2069,7 +2097,7 @@ namespace HMI.CD40.Module.Services
 
         private bool AllowBriefing()
         {
-            if (Top.Recorder.Briefing || Top.Replay.Replaying)
+            if (Top.Recorder.Briefing || Top.Replay.Replaying )
             {
 
                 int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);

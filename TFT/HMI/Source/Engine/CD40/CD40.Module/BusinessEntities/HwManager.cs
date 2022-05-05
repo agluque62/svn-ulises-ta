@@ -802,7 +802,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     _InstructorJack = sndDev.Jack || Settings.Default.JumpJacksState;
                 else
                     _AlumnJack = sndDev.Jack || Settings.Default.JumpJacksState;
-
+                
                 Top.WorkingThread.Enqueue("JacksChanged", delegate()
                 {
                     General.SafeLaunchEvent(JacksChangedHw, this, new JacksStateMsg(_AlumnJack, _InstructorJack));

@@ -33,4 +33,19 @@ namespace HMI.Model.Module.Messages
             return string.Format("[IdEvent={0}]", IdEvent);
         }
     }
+
+    public sealed class CouplingInProgressErrorCode : EventArgs
+    {
+        public readonly int IdEvent;            /* 0: ok, 1: Error en Recurso RTX. */
+
+        public CouplingInProgressErrorCode(int idEvent)
+        {
+            IdEvent = idEvent;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[IdEvent={0}]", IdEvent);
+        }
+    }
 }

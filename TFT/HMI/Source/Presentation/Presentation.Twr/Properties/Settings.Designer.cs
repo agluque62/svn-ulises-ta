@@ -31,16 +31,18 @@ namespace HMI.Presentation.Twr.Properties {
                 return ((bool)(this["EnablePriority"]));
             }
         }
-        
+
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool EnableListen {
-            get {
+        public bool EnableListen
+        {
+            get
+            {
                 return ((bool)(this["EnableListen"]));
             }
         }
-        
+
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -374,6 +376,5 @@ namespace HMI.Presentation.Twr.Properties {
                 return ((string)(this["DirectorioGLPRxRadio"]));
             }
         }
-
     }
 }

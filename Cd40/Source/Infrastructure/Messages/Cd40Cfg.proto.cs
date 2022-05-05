@@ -489,49 +489,46 @@ namespace U5ki.Infrastructure
       set { _RtspPort = value; }
     }
 
-    private int _RtspPort2 = default(int);//RQF2
-    [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name = @"RtspPort", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(int))]
-    public int RtspPort2
-    {
-        get { return _RtspPort2; }
-        set { _RtspPort2 = value; }
-    }
-
-        //#3267 RQF22 211217
-
-        private int _TipoGrabacionAnalogica = 0;
-    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name = @"TipoGrabacionAnalogica", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    private int _TipoGrabacionAnalogica = default(int);
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"TipoGrabacionAnalogica", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int TipoGrabacionAnalogica
-        {
-        get { return _TipoGrabacionAnalogica; }
-        set { _TipoGrabacionAnalogica = value; }
+    {
+      get { return _TipoGrabacionAnalogica; }
+      set { _TipoGrabacionAnalogica = value; }
     }
 
-    private bool _EnableGrabacionAnalogica = false;
-    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name = @"EnableGrabacionAnalogica", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    private bool _EnableGrabacionEd137 = default(bool);
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"EnableGrabacionEd137", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool EnableGrabacionEd137
+    {
+      get { return _EnableGrabacionEd137; }
+      set { _EnableGrabacionEd137 = value; }
+    }
+
+    private bool _EnableGrabacionAnalogica = default(bool);
+    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"EnableGrabacionAnalogica", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool EnableGrabacionAnalogica
     {
-        get { return _EnableGrabacionAnalogica; }
-        set { _EnableGrabacionAnalogica = value; }
+      get { return _EnableGrabacionAnalogica; }
+      set { _EnableGrabacionAnalogica = value; }
     }
 
-        //RQF-24
-        private bool _EnableGrabacionEd137 = false;
-    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name = @"EnableGrabacionEd137", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(default(bool))]
-    public bool EnableGrabacionEd137
-        {
-        get { return _EnableGrabacionEd137; }
-        set { _EnableGrabacionEd137 = value; }
+    private int _RtspPort2 = default(int);
+    [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"RtspPort2", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int RtspPort2
+    {
+      get { return _RtspPort2; }
+      set { _RtspPort2 = value; }
     }
 
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-    { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-    }
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
   
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"AsignacionUsuariosDominantesTV")]
   public partial class AsignacionUsuariosDominantesTV : global::ProtoBuf.IExtensible
@@ -1065,6 +1062,24 @@ namespace U5ki.Infrastructure
     {
       get { return _Glp; }
       set { _Glp = value; }
+    }
+
+    private bool _PermisoRTXSQ = default(bool);
+    [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"PermisoRTXSQ", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool PermisoRTXSQ
+    {
+      get { return _PermisoRTXSQ; }
+      set { _PermisoRTXSQ = value; }
+    }
+
+    private bool _PermisoRTXSect = default(bool);
+    [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"PermisoRTXSect", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool PermisoRTXSect
+    {
+      get { return _PermisoRTXSect; }
+      set { _PermisoRTXSect = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
