@@ -2,8 +2,9 @@
 <html lang="es" data-ng-app="Uv5kinbx">
 <head>
     <meta name="generator"
-        content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
-    <meta charset="windows-1252" />
+        content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" 
+        />
+    <meta charset="utf-8" />
     <meta name="description" content="Plantilla Ulises 5000" />
     <meta name="keywords" content="HTML5, CSS3, JavaScript" />
     <title>UV5KI. Nodebox</title>
@@ -20,21 +21,16 @@
         <header id="cabecera">
             <div id="_contSupIzq">
                 <div id="_logo" style="width:90%;">
-                    <!-- <img src="./images/nucleo-df-new.jpg" /> -->
-                    <img src="./images/corporativo-a.png"
-                         style="width:100%; height: 100%; margin: 0;" />
+                    <img src="./images/corporativo-a.png" alt="logo"
+                         style="width:60%; height: 100%; margin-left: 20%;" />
                 </div>
             </div>
             <div id="_tit_ppal">{{ctrl.title}}</div>
             <div id="_contSupDrcha">
-                <!--                <div id="_usuario">
-                    Usuario: <b>{{ctrl.user}}</b>
-                </div>-->
                 <div id="_hfecha"><b>{{ctrl.date}}</b></div>
                 <div id="_hsolohora">{{ctrl.hora}}</div>
             </div>
         </header>
-        <!--<section id="_separador"></section>-->
         <nav id="_menu" class="container">
             <h3 translate>Opciones</h3>
             <ul class="nav nav-pills nav-stacked">
@@ -75,31 +71,6 @@
                         <td><div>{{ctrl.decodeHtml(inci.par)}}</div></td>
                     </tr>
                 </tbody>
-                <!--<tfoot>
-                    <tr style="padding: 0;">
-                        <td>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <button class="btn btn-default" data-ng-click="ctrl.logs()">LOGS</button>
-
-                                </div>
-                            </div>
-                        </td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <div class="row">
-                                <div class="col-md-2" style="float: right; margin: 1em; text-align:right">
-                                    <p>Pag. {{ctrl.inciCurrentPage}}-{{ctrl.inciPages}}</p>
-                                </div>
-                                <div class="col-md-3" style="float: right">
-                                    <uib-pager style="margin: 0.5em;" total-items="ctrl.listainci.length"
-                                               ng-model="ctrl.inciCurrentPage" items-per-page="ctrl.inciPageSize" next-text=">>" previous-text="<<"></uib-pager>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tfoot>-->
             </table>
             <div class="row">
                 <div class="col-md-8">
@@ -118,7 +89,7 @@
                 </div>
             </div>
         </div>
-        <footer id="_pie" translate>Nucleo Copyright @ 2015-2020. Todos los Derechos Reservados.</footer>
+        <div id="_pie" translate>Grupo Amper Copyright @ 2015-2022. Todos los Derechos Reservados.</div>
     </div>
 
     <!-- inject-vendor:js -->
