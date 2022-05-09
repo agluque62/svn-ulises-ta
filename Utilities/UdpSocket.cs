@@ -140,6 +140,8 @@ namespace Utilities
         {
             try
             {
+                if (_Udp == null)
+                    return;
                 DataGram dg = new DataGram();
                 IPEndPoint client = new IPEndPoint(IPAddress.Any, 0);
                 bool processData = false;
