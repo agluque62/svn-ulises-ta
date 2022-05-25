@@ -60,9 +60,24 @@ namespace PresenceServiceUnitTest
             service.RM4763_Test(cfg, prxInfo);
 #endif
         }
-        byte GlobalVersion = 0;
-        byte ResourceVersion = 0;
+        int GlobalVersion = 0;
+        int ResourceVersion = 0;
         int LastResourceStd = 0;
+        class ProxyDescription
+        {
+            int _Std = 3;
+            public string Ip { get; set; }
+            public int Version { get; set; } = 0;
+            public int Std
+            {
+                get { return _Std; }
+                set
+                {
+                    if (_Std != value) Version++;
+                    _Std = value;
+                }
+            }
+        };
         void PrepareTestTifx(Action<TifxService, UdpClient, IPEndPoint> next)
         {
             var cfg = JsonConvert.DeserializeObject<Cd40Cfg>(File.ReadAllText("u5ki.LastCfg.json"));
@@ -80,10 +95,24 @@ namespace PresenceServiceUnitTest
                 0, 0, 0, 4,
                 0x50, 0x52, 0x4f, 0x58, 0x49, 0x45, 0x53, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,
                 0, 0, 0, 0,
-                0, 0, 0, GlobalVersion
+                0, 0, 0, (byte)GlobalVersion
             };
             next(frame);
             GlobalVersion++;
+        }
+        void PrepareProxiesEmptyFrame(Action<byte[]> next)
+        {
+            using (var mem = new MemoryStream(0))
+                using(var bw = new BinaryWriter(mem))
+            {
+                bw.Write(IPAddress.HostToNetworkOrder((Int32)4));
+                bw.Write(Encoding.ASCII.GetBytes("PROXIES".PadRight(36,(char)0)));
+                bw.Write(IPAddress.HostToNetworkOrder((Int32)0));
+                bw.Write(IPAddress.HostToNetworkOrder((Int32)GlobalVersion));
+
+                var ret = mem.ToArray(); 
+                next?.Invoke(ret);
+            }
         }
         void PrepareProxyActiveFrame(Action<byte[]> next, string ipp, int std)
         {
@@ -93,12 +122,12 @@ namespace PresenceServiceUnitTest
                 0, 0, 0, 4,
                 0x50, 0x52, 0x4f, 0x58, 0x49, 0x45, 0x53, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,
                 0, 0, 0, 1,
-                0, 0, 0, GlobalVersion
+                0, 0, 0, (byte)GlobalVersion
             };
             var ippb = Encoding.ASCII.GetBytes(ipp);
             Array.Resize<byte>(ref ippb, 36 + 24);
             ippb[36 + 3] = 8;
-            ippb[36 + 4 + 3] = ResourceVersion;
+            ippb[36 + 4 + 3] = (byte)ResourceVersion;
             ippb[36 + 4 + 4 + 3] = (byte)std;//estado
 
             next(frame.Concat(ippb).ToArray());
@@ -106,31 +135,62 @@ namespace PresenceServiceUnitTest
             LastResourceStd = std;
             Debug.WriteLine($"{ResourceVersion}, {LastResourceStd}");
         }
+        void PrepareActiveProxiesFrame(Action<byte[]> next, List<ProxyDescription> proxies)
+        {
+            using (var mem = new MemoryStream(0))
+            using (var bw = new BinaryWriter(mem))
+            {
+                bw.Write(IPAddress.HostToNetworkOrder((Int32)4));
+                bw.Write(Encoding.ASCII.GetBytes("PROXIES".PadRight(36, (char)0)));
+                bw.Write(IPAddress.HostToNetworkOrder((Int32)proxies.Count()));
+                bw.Write(IPAddress.HostToNetworkOrder((Int32)GlobalVersion));
+
+                proxies.ForEach((proxy) =>
+                {
+                    bw.Write(Encoding.ASCII.GetBytes(proxy.Ip.PadRight(36, (char)0)));
+                    bw.Write(IPAddress.HostToNetworkOrder((Int32)8));
+                    bw.Write(IPAddress.HostToNetworkOrder((Int32)proxy.Version));
+                    bw.Write(IPAddress.HostToNetworkOrder((Int32)proxy.Std));
+                    bw.Write(IPAddress.HostToNetworkOrder((Int32)0));
+                    bw.Write(IPAddress.HostToNetworkOrder((Int32)0));
+                    bw.Write(IPAddress.HostToNetworkOrder((Int32)0));
+                });
+
+                var ret = mem.ToArray();
+                next?.Invoke(ret);
+            }
+        }
 
         [TestMethod]
         public void TifxForProxiesTest()
         {
+            var Proxies = new List<ProxyDescription>()
+            {
+                new ProxyDescription() { Ip = "10.99.60.36" },
+                new ProxyDescription() { Ip = "10.99.60.37" },
+                new ProxyDescription() { Ip = "192.168.0.56" }
+            };
             PrepareTestTifx((service, client, to) =>
             {
                 Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                PrepareProxiesEmptyFrame((data) => client.Send(data, data.Count(), to));
+                GlobalVersion++;
                 for (int i=0; i< 30; i++)
                 {
                     var std = i % 5 == 0 ? 3 : 0;
+                    Proxies.ForEach((proxy) => proxy.Std = std);
                     Debug.WriteLine($"Sending std => {std}");
-                    PrepareProxyActiveFrame((frame) => client.Send(frame, frame.Count(), to), "10.99.60.36", std);
+                    PrepareActiveProxiesFrame((frame) => client.Send(frame, frame.Count(), to), Proxies);
+                    GlobalVersion++;
                     Task.Delay(TimeSpan.FromSeconds(5)).Wait();
                 }
-
-                //Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                //PrepareProxyActiveFrame((frame) => client.Send(frame, frame.Count(), to), "10.99.60.36", 3);
-                //Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                //PrepareProxyActiveFrame((frame) => client.Send(frame, frame.Count(), to), "10.99.60.36", 1);
-                //Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                //PrepareProxyActiveFrame((frame) => client.Send(frame, frame.Count(), to), "10.99.60.36", 3);
-                ////PrepareEmptyFrame((frame) => client.Send(frame, frame.Count(), to));
-                //Task.Delay(TimeSpan.FromSeconds(5)).Wait();
                 service.Stop();
             });
+        }
+        [TestMethod]
+        public void BinaryWriterText()
+        {
+            PrepareProxiesEmptyFrame(null);
         }
     }
 }

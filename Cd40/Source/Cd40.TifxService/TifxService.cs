@@ -326,6 +326,7 @@ namespace U5ki.TifxService
         /// <param name="rsInfo"></param>
         private void SetGwResource(RsInfo rsInfo, string gwIp)
         {
+            //string RsId = GetGwResourceId(rsInfo);
             /** Linea Caliente */
             if (rsInfo.Type == 2)
             {
@@ -333,14 +334,13 @@ namespace U5ki.TifxService
 
                 rs.GwIp = gwIp;
 
-                _Registry.SetValue<GwLcRs>(Identifiers.GwTopic, rsInfo.RsId, rs);
-                LogDebug<TifxService>(String.Format("Publicando recurso lc [{0}]", rsInfo.RsId));
+                _Registry.SetValue<GwLcRs>(Identifiers.GwTopic, rsInfo.Key, rs);
+                LogDebug<TifxService>($"Publicando recurso LC [{rsInfo.Key}]: {rs}");
             } 
                 /** Los demas tipos se consideran Recursos de Telefonía */
             else if (rsInfo.Type /*== 1*/ <= 8)
             {
                 GwTlfRs rs = new GwTlfRs();
-                string RsId = GetGwResourceId(rsInfo);
                 /** 20180214 */
                 rs.GwIp = GetGwResourceIpInfo(rsInfo, gwIp);
                 rs.Priority = rsInfo.Priority;
@@ -363,16 +363,16 @@ namespace U5ki.TifxService
                         rs.St = GwTlfRs.State.NotAvailable;
                         break;
                     default:
-                        LogDebug<TifxService>(String.Format("Estado desconocido para recurso telefonico [{0}({2}):{1}]", rsInfo.RsId, rsInfo.State, rsInfo.Type));
+                        LogDebug<TifxService>($"Estado desconocido para recurso telefonico {rsInfo}");
                         return;
                 }
-                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, /*rsInfo.*/RsId, rs);
-                LogTrace<TifxService>(String.Format("Publicando RCTLF T:{2}, [{3}, {0}]: {1}", 
-                    /*rsInfo.*/RsId, rsInfo.State, rsInfo.Type, rs.GwIp));
+                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, rsInfo.Key, rs);
+
+                LogDebug<TifxService>($"Publicando Resource {rsInfo.Key} => [{rsInfo}");
             }
             else
             {
-                LogError<TifxService>(String.Format("Recibida INFO recurso [{0}({2}):{1}] no contemplado", rsInfo.Type, rsInfo.RsId, rsInfo.Type));
+                LogError<TifxService>($"Recibida INFO no contemplada al actualizar recurso. Recurso {rsInfo}");
             }
         }
         /// <summary>
@@ -381,28 +381,27 @@ namespace U5ki.TifxService
         /// <param name="rsInfo"></param>
         private void RemoveGwResource(RsInfo rsInfo, string motivo)
         {
+            //string RsId = GetGwResourceId(rsInfo);
             /** Linea Caliente */
             if (rsInfo.Type == 2)
             {
-                _Registry.SetValue<GwLcRs>(Identifiers.GwTopic, rsInfo.RsId, null);
-                LogDebug<TifxService>(String.Format("Eliminando recurso lc [{0}] por {1}", rsInfo.RsId, motivo));
+                _Registry.SetValue<GwLcRs>(Identifiers.GwTopic, rsInfo.Key, null);
+                LogDebug<TifxService>($"Eliminando recurso LC {rsInfo.Key} => [{rsInfo}] por {motivo}");
             }
             else if (rsInfo.Type == 1)
             {
-                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, rsInfo.RsId, null);
-                LogDebug<TifxService>(String.Format("Eliminando recurso telefonico [{0}] por {1}", rsInfo.RsId, motivo));
+                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, rsInfo.Key, null);
+                LogDebug<TifxService>($"Eliminando recurso TLF {rsInfo.Key} => [{rsInfo}] por {motivo}");
             }
             /** Los demas tipos se consideran Recursos de Telefonía */
             else if (rsInfo.Type < 9)
             {
-                string RsId = GetGwResourceId(rsInfo);
-                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, /*rsInfo.*/RsId, null);
-                LogDebug<TifxService>(String.Format("Eliminando RCTLF T:{2}, [{3}, {0}]: {1} por {4}",
-                    /*rsInfo.*/RsId, rsInfo.State, rsInfo.Type, rsInfo.GwIp, motivo));
+                _Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, rsInfo.Key, null);
+                LogDebug<TifxService>($"Eliminando recurso TLF {rsInfo.Key} => [{rsInfo}] por {motivo}");
             }
             else
             {
-                LogError<TifxService>(String.Format("Recibida INFO recurso [{0},{1}] no contemplada", rsInfo.Type, rsInfo.RsId));
+                LogError<TifxService>($"Recibida INFO no contemplada al eliminar recurso. Recurso {rsInfo}");
             }
         }
         /// <summary>
@@ -433,35 +432,65 @@ namespace U5ki.TifxService
                         if (oldGwInfo.Version != gwInfo.Version ||
                             oldGwInfo.GwIp != gwInfo.GwIp)
                         {
+                            var forDelete = new List<RsInfo>();
+                            var forActualize = new List<RsInfo>();
                             foreach (RsInfo rsInfo in gwInfo.Resources)
                             {
-                                RsInfo oldRsInfo = Array.Find(oldGwInfo.Resources, delegate(RsInfo rsi)
+                                try
                                 {
-                                    if ((rsInfo.Type == rsi.Type) && (string.Compare(rsInfo.RsId, rsi.RsId, true) == 0))
+                                    var oldRsInfo = oldGwInfo.Resources
+                                        .Where(r => r.Type == rsInfo.Type && r.Key == rsInfo.Key)
+                                        .FirstOrDefault();
+                                    if (oldRsInfo != null) oldRsInfo.Steps = uint.MaxValue;
+                                    //RsInfo oldRsInfo = Array.Find(oldGwInfo.Resources, delegate (RsInfo rsi)
+                                    //{
+                                    //    if ((rsInfo.Type == rsi.Type) && (string.Compare(rsInfo.RsId, rsi.RsId, true) == 0)) //agl
+                                    //    {
+                                    //        rsi.Steps = uint.MaxValue;
+                                    //        return true;
+                                    //    }
+                                    //    return false;
+                                    //});
+                                    if ((oldRsInfo == null) || (oldRsInfo.Version != rsInfo.Version))
                                     {
-                                        rsi.Steps = uint.MaxValue;
-                                        return true;
+                                        //SetGwResource(rsInfo, gwInfo.GwIp);
+                                        forActualize.Add(rsInfo);
                                     }
-                                    return false;
-                                });
-
-                                if ((oldRsInfo == null) || (oldRsInfo.Version != rsInfo.Version))
+                                }
+                                catch(Exception x)
                                 {
-                                    SetGwResource(rsInfo, gwInfo.GwIp);
+                                    LogException<TifxService>($"Excepcion procesesando Recurso {rsInfo}  de GwInfo => {gwInfo} => ", x, false);
                                 }
                             }
                             foreach (RsInfo rsInfo in oldGwInfo.Resources)
                             {
-                                if (rsInfo.Steps != uint.MaxValue)
+                                try
                                 {
-                                    RemoveGwResource(rsInfo, "mensaje recibido");
+                                    if (rsInfo.Steps != uint.MaxValue)
+                                    {
+                                        //RemoveGwResource(rsInfo, "mensaje recibido");
+                                        forDelete.Add(rsInfo);
+                                    }
+                                }
+                                catch(Exception x)
+                                {
+                                    LogException<TifxService>($"Excepcion eliminando Recurso {rsInfo}  de GwInfo => {gwInfo} => ", x, false);
                                 }
                             }
+                            // Primero los Borrados
+                            forDelete.ForEach((rsInfo) => RemoveGwResource(rsInfo, "mensaje recibido"));
+                            _Registry.Publish();
+                            // Despues los Modificados
+                            forActualize.ForEach((rsInfo) => SetGwResource(rsInfo, gwInfo.GwIp));
                             _Registry.Publish();
 #if DEBUG
                             LogDebug<TifxService>(String.Format("TIFX {0}. Mensaje Version {1,2} ({3} Users) Procesado. TickCount: {2}",
                                 gwInfo.GwId, gwInfo.Version, gwInfo.LastReceived, gwInfo.Resources.Length));
 #endif
+                        }
+                        else
+                        {
+
                         }
                     }
                     else
@@ -472,7 +501,7 @@ namespace U5ki.TifxService
                 }
                 catch (Exception ex)
                 {
-                    LogException<TifxService>("ERROR publicando recursos de gw " + gwInfo.GwId, ex, false);
+                    LogException<TifxService>($"Excepcion procesesando GwInfo => {gwInfo} => ", ex, false);
                     // TODO. Revisar esto...
                     // ExceptionManage<TifxService>("ProcessGwInfo", ex, "OnProcessGwInfo Exception: " + ex.Message);
                     // _WorkingThread.InternalStop();
@@ -483,8 +512,37 @@ namespace U5ki.TifxService
 
             gwInfo.LastReceived = Environment.TickCount;
             _LastGwInfo[gwInfo.GwId] = gwInfo;
+
             LogTrace<TifxService>(String.Format("{3}. TIFX {0}. Mensaje Version {1,2} Recibido. TickCount: {2}", 
                 gwInfo.GwId, gwInfo.Version, gwInfo.LastReceived, PabxFramesCount));
+        }
+
+        void ProcessInfo(GwInfo newInfo)
+        {
+            if (!_Master) return;
+            var CurrentTick = Environment.TickCount;
+            LogTrace<TifxService>($"Recibido Mensaje de {newInfo.GwId} => [Ver: {newInfo.Version}, ResCount: {newInfo.Resources.Length}], TickCount: {CurrentTick} ");
+
+            _LastGwInfo.TryGetValue(newInfo.GwId, out var oldInfo);
+            if (oldInfo == null)
+            {
+                _LastGwInfo[newInfo.GwId] = newInfo;
+                _Registry.Publish();
+            }
+            else
+            {
+                var changes = newInfo.Version != oldInfo.Version || newInfo.GwIp != oldInfo.GwIp;
+                if (changes)
+                {
+
+                }
+                else
+                {
+                    LogTrace<TifxService>($"No changes received de {newInfo.GwId}");
+                }
+
+            }
+            newInfo.LastReceived = CurrentTick;
         }
         /// <summary>
         /// 
@@ -544,7 +602,6 @@ namespace U5ki.TifxService
                 {
                     foreach (RsInfo rsInfo in gwInfo.Resources)
                     {
-                        //_Registry.SetValue<GwTlfRs>(Identifiers.GwTopic, rsInfo.RsId, rs);
                         SetGwResource(rsInfo, gwInfo.GwIp);
                     }
                 }
@@ -814,44 +871,55 @@ namespace U5ki.TifxService
         /// <param name="rsInfo"></param>
         /// 
         /// <returns></returns>
-        public string GetGwResourceId(RsInfo rsInfo)
-        {
-            /** Para recursos de pasarelas y abonados PBX, como hasta ahora */
-            if (rsInfo.Type == 1 || rsInfo.Type == 2 || rsInfo.Type == 3)
-                return rsInfo.RsId;
+//        public string GetGwResourceId(RsInfo rsInfo)
+//        {
+//            switch (rsInfo.Type)
+//            {
+//                case 4: // Para abonados ATS (Sip URI) => solo la parte de Usuario
+//                    return (new SipUtilities.SipUriParser(rsInfo.RsId)).User;
+//                case 7: // Para Proxies, combinación DEP##EP
+//                case 8:
+//                    return rsInfo.Key4ExternalProxies;
+//                default: // Para recursos de pasarelas y abonados PBX, como hasta ahora.
+//                    return rsInfo.RsId;
+//            }
 
-            if (last_cfg != null)
-            {
-                if (rsInfo.Type == 4)
-                {
-                    /** Para abonandos. El ID es el SIP-URI <sip:UUUUU@zzz.yyy.xxx.www:ppppp> 
-                        La ip debe contener la dependencia */
-                    return (new SipUtilities.SipUriParser(rsInfo.RsId)).User;
-                }
-                else if (rsInfo.Type < 9)
-                {
-#if _SBCs_VERSION_
-                    return rsInfo.RsId;
-#else
-                    /** Para proxies. El ID es el Endpoint zzz.yyy.xxx.www:ppppp , viene configurado con o sin puerto
-                        La ip debe contener la dependencia */
-                    string dominio = rsInfo.RsId;
+////            /** Para recursos de pasarelas y abonados PBX, como hasta ahora */
+////            if (rsInfo.Type == 1 || rsInfo.Type == 2 || rsInfo.Type == 3 || rsInfo.Type==5 || rsInfo.Type==6)
+////                return rsInfo.RsId;
 
-                    /** Busco la dependencia que contenga como proxy al dominio de la uri */
-                    var dependencia = last_cfg.ConfiguracionGeneral.PlanDireccionamientoIP
-                        .Where(dep => dep.TipoHost== Tipo_Elemento_HW.TEH_EXTERNO_TELEFONIA && (
-                            (dep.IpRed1 != "" && dominio.Contains(dep.IpRed1) == true) ||
-                            (dep.IpRed2 != "" && dominio.Contains(dep.IpRed2) == true) ||
-                            (dep.IpRed3 != "" && dominio.Contains(dep.IpRed3) == true) ))
-                        .FirstOrDefault();
-                    if (dependencia != null)
-                        return dependencia.IdHost;
-#endif
-                }
-            }
+////            if (last_cfg != null)
+////            {
+////                if (rsInfo.Type == 4)
+////                {
+////                    /** Para abonandos. El ID es el SIP-URI <sip:UUUUU@zzz.yyy.xxx.www:ppppp> 
+////                        La ip debe contener la dependencia */
+////                    return (new SipUtilities.SipUriParser(rsInfo.RsId)).User;
+////                }
+////                else if (rsInfo.Type == 7 || rsInfo.Type==8)
+////                {
+////#if _SBCs_VERSION_
+////                    return rsInfo.Key4ExternalProxies;
+////#else
+////                    /** Para proxies. El ID es el Endpoint zzz.yyy.xxx.www:ppppp , viene configurado con o sin puerto
+////                        La ip debe contener la dependencia */
+////                    string dominio = rsInfo.RsId;
 
-            return rsInfo.RsId;
-        }
+////                    /** Busco la dependencia que contenga como proxy al dominio de la uri */
+////                    var dependencia = last_cfg.ConfiguracionGeneral.PlanDireccionamientoIP
+////                        .Where(dep => dep.TipoHost== Tipo_Elemento_HW.TEH_EXTERNO_TELEFONIA && (
+////                            (dep.IpRed1 != "" && dominio.Contains(dep.IpRed1) == true) ||
+////                            (dep.IpRed2 != "" && dominio.Contains(dep.IpRed2) == true) ||
+////                            (dep.IpRed3 != "" && dominio.Contains(dep.IpRed3) == true) ))
+////                        .FirstOrDefault();
+////                    if (dependencia != null)
+////                        return dependencia.IdHost;
+////#endif
+////                }
+////            }
+
+////            return rsInfo.RsId;
+//        }
 
         /// <summary>
         /// 
