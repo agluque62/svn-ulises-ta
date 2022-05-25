@@ -21,8 +21,23 @@ namespace U5ki.TifxService
 {
     public class TifxService : BaseCode, IService
     {
+        string GroupIp { get; set; }
+        string AdapterIp { get; set; }
+        int GroupPort { get; set; }
         public TifxService()
         {
+            GroupIp = Settings.Default.tifxMcastIp;
+            AdapterIp = Settings.Default.tifxMcastSrc;
+            GroupPort = Settings.Default.tifxMcastPort;
+            last_cfg = null;
+        }
+
+        public TifxService(string groupIp, string adapterIp, int groupPort, Cd40Cfg cfg = null)
+        {
+            GroupIp = groupIp;
+            GroupPort = groupPort;
+            AdapterIp = adapterIp;
+            last_cfg = cfg;
         }
 
         #region IService Members
@@ -165,20 +180,19 @@ namespace U5ki.TifxService
                 _Timer.Enabled = true;
 
                 /** 20180220. Abro el puerto con la propiedad de comparticion */
-                _GwChangesListener = new UdpSocket(Settings.Default.tifxMcastPort, true);
+                _GwChangesListener = new UdpSocket(GroupPort, true);
                 _GwChangesListener.MaxReceiveThreads = 1;
                 _GwChangesListener.NewDataEvent += OnNewData;
 
                 /** AGL2014. Seleccion Fuente de Multicast */
                 // _GwChangesListener.Base.JoinMulticastGroup(IPAddress.Parse(Settings.Default.tifxMcastIp));
-                _GwChangesListener.Base.JoinMulticastGroup(IPAddress.Parse(Settings.Default.tifxMcastIp), IPAddress.Parse(Settings.Default.tifxMcastSrc));
+                _GwChangesListener.Base.JoinMulticastGroup(IPAddress.Parse(GroupIp), IPAddress.Parse(AdapterIp));
                 /** Fin de Modificacion */
 
+                /************************/
                 /** 20180709. Notifico el estado al Servicio de presencia antes de inicializar el registro ya que hay veces que los mensajes 
                  SLAVE (inicial) y MASTER llegan en orden incorrecto....*/
                 ipc.Raise<bool>(_Master);
-                /************************/
-
                 InitRegistry();
                 _GwChangesListener.BeginReceive();
                 _Timer.Enabled = true;
@@ -190,9 +204,8 @@ namespace U5ki.TifxService
             }
             catch (Exception ex)
             {
-                Stop();
-                //LogException<TifxService>("ERROR en Start", ex);
                 ExceptionManage<TifxService>("Start", ex, "OnStart Exception: " + ex.Message);
+                Stop();
             }
         }
 
@@ -208,8 +221,7 @@ namespace U5ki.TifxService
             _Registry.ResourceChanged += OnResourceChanged;
 
             _Registry.SubscribeToMasterTopic(Identifiers.GwMasterTopic);
-            _Registry.SubscribeToTopic<SrvMaster>(Identifiers.GwMasterTopic);
-            
+            _Registry.SubscribeToTopic<SrvMaster>(Identifiers.GwMasterTopic);            
             _Registry.SubscribeToTopic<Cd40Cfg>(Identifiers.CfgTopic);
 
             _Registry.Join(Identifiers.GwMasterTopic, Identifiers.GwTopic, Identifiers.CfgTopic);
