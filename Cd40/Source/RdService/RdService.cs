@@ -1677,13 +1677,9 @@ namespace U5ki.RdService
                     {
                         string rdLinkId = rdLink.Literal.ToUpper();
 
-                        //string pict = GeneraListaDeFrecuenciaPorTop(cfg.ConfiguracionGeneral.PlanAsignacionUsuarios, userCfg.User.IdIdentificador, rdLink);
-
                         if (!Frecuencies.ContainsKey(rdLinkId))
                         {
-                            RdFrecuency rdFr;
-
-                            if (rdFrToRemove.TryGetValue(rdLinkId, out rdFr))
+                            if (rdFrToRemove.TryGetValue(rdLinkId, out RdFrecuency rdFr))
                                 rdFrToRemove.Remove(rdLinkId);
                             else
                             {
@@ -1711,6 +1707,11 @@ namespace U5ki.RdService
                             Frecuencies[rdLinkId] = rdFr;
                             Frecuencies[rdLinkId].Picts = _Picts[rdLink.Literal];
                     
+                        }
+                        else
+                        {
+                            RdFrecuency rdFr = Frecuencies[rdLinkId];
+                            rdFr.Frecuency = rdLink.DescDestino;
                         }
                     }
 

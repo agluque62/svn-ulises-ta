@@ -210,6 +210,7 @@ namespace U5ki.RdService
         public string Frecuency
         {
             get { return _Frecuency; }
+            set { _Frecuency = value; }
         }
         /// <summary>
         /// 
