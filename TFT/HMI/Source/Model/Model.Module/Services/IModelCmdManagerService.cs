@@ -19,6 +19,7 @@ namespace HMI.Model.Module.Services
 		void RdSetSpeakerLevel(int level);
 		void RdSetHeadPhonesLevel(int level);
         void RdSetHfSpeakerLevel(int level);
+		void SetTonesLevel(int level);
         void RdRtxClick(int numPositionsByPage);
 		void RdSetPtt(bool on);
 		void RdLoadNextPage(int oldPage, int numPosByPage);
@@ -42,8 +43,8 @@ namespace HMI.Model.Module.Services
 		void HoldClick();
 		void TransferClick();
 		void SwitchTlfView(string view);
-		void CancelTlfClick();
-        void SpeakerTlfClick();
+		bool CancelTlfClick(bool test=false);//#2816 LALM 220615
+		void SpeakerTlfClick();
         void NewDigit(int id, char key);
         void BriefingFunction();
         void ConferenceClick();

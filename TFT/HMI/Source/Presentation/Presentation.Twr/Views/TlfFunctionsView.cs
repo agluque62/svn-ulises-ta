@@ -74,7 +74,7 @@ namespace HMI.Presentation.Twr.Views
         {
             get
             {
-                return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
+				return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
                     ((_StateManager.Tlf.PickUp.State != FunctionState.Idle) ||
                     _StateManager.Jacks.SomeJack &&
                     (((_StateManager.Permissions & Permissions.Capture) == Permissions.Capture) &&
@@ -179,7 +179,13 @@ namespace HMI.Presentation.Twr.Views
         }
 		private bool _CancelEnabled
 		{
-			get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative && (_StateManager.Tlf.Listen.State == FunctionState.Idle && !_StateManager.Tlf.ListenBy.IsListen); }
+			
+			get {
+				return _StateManager.Tft.Enabled && _StateManager.Engine.Operative &&
+				  _CmdManager.CancelTlfClick(true);//#2816 LALM 220615
+				//RQF-18# Permitir Anular en escucha.
+				//&& (_StateManager.Tlf.Listen.State == FunctionState.Idle && !_StateManager.Tlf.ListenBy.IsListen)
+				; }
 		}
         private bool _TlfSpeakerBtEnabled
         {
@@ -352,7 +358,8 @@ namespace HMI.Presentation.Twr.Views
 			_TransferBT.Enabled = _TransferEnabled;
             _PickUpBT.Enabled = _PickUpEnabled;
             _ForwardBT.Enabled = _ForwardEnabled;
-            ChangeColorMore();
+			_CancelBT.Enabled = _CancelEnabled;//#2816 LALM 220615
+			ChangeColorMore();
 			switch (_StateManager.Tlf.Priority.State)
 			{
 				case FunctionState.Idle:
@@ -388,7 +395,8 @@ namespace HMI.Presentation.Twr.Views
             _TransferBT.Enabled = _TransferEnabled;
             _PickUpBT.Enabled = _PickUpEnabled;
             _ForwardBT.Enabled = _ForwardEnabled;
-            ChangeColorMore();
+			_CancelBT.Enabled = _CancelEnabled;//#2816 LALM 220615
+			ChangeColorMore();
             switch (_StateManager.Tlf.PickUp.State)
             {
                 case FunctionState.Idle:
@@ -396,22 +404,25 @@ namespace HMI.Presentation.Twr.Views
                     {
                         _SlowBlinkTimer.Enabled = false;
                         _SlowBlinkOn = true;
-                    }
-                    _PickUpBT.ButtonColor = VisualStyle.ButtonColor;
+						_CancelBT.Enabled = false;//#2816 LALM 220615
+					}
+					_PickUpBT.ButtonColor = VisualStyle.ButtonColor;
                     break;
                 case FunctionState.Ready:
                     _PickUpBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
                     _SlowBlinkList[_PickUpBT] = VisualStyle.Colors.Yellow;
                     _SlowBlinkTimer.Enabled = true;
-                    break;
+					_CancelBT.Enabled = true;//#2816 LALM 220615
+					break;
                 case FunctionState.Executing:
                     if (_SlowBlinkList.Remove(_PickUpBT) && (_SlowBlinkList.Count == 0))
                     {
                         _SlowBlinkTimer.Enabled = false;
                         _SlowBlinkOn = true;
-                    }
-                    _PickUpBT.ButtonColor = VisualStyle.Colors.Yellow;
-                    break;
+					}
+					_PickUpBT.ButtonColor = VisualStyle.Colors.Yellow;
+					_CancelBT.Enabled = true;//#2816 LALM 220615
+					break;
                 case FunctionState.Error:
                     if (_SlowBlinkList.Remove(_PickUpBT) && (_SlowBlinkList.Count == 0))
                     {
@@ -419,7 +430,8 @@ namespace HMI.Presentation.Twr.Views
                         _SlowBlinkOn = true;
                     }
                     _PickUpBT.ButtonColor = VisualStyle.Colors.Red;
-                    break;
+					_CancelBT.Enabled = true;//#2816 LALM 220615
+					break;
             }
         }
 
@@ -525,7 +537,8 @@ namespace HMI.Presentation.Twr.Views
             _TransferBT.Enabled = _TransferEnabled;
             _PickUpBT.Enabled = _PickUpEnabled;
             _ForwardBT.Enabled = _ForwardEnabled;
-            ChangeColorMore();
+			_CancelBT.Enabled = _CancelEnabled;//#2816 #LALM 220615
+			ChangeColorMore();
             switch (_StateManager.Tlf.Forward.State)
             {
                 case FunctionState.Idle:
@@ -533,14 +546,16 @@ namespace HMI.Presentation.Twr.Views
                     {
                         _SlowBlinkTimer.Enabled = false;
                         _SlowBlinkOn = true;
-                    }
-                    _ForwardBT.ButtonColor = VisualStyle.ButtonColor;
+						_CancelBT.Enabled = false;//#2816 LALM 220615
+					}
+					_ForwardBT.ButtonColor = VisualStyle.ButtonColor;
                     break;
                 case FunctionState.Ready:
                     _ForwardBT.ButtonColor = _SlowBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
                     _SlowBlinkList[_ForwardBT] = VisualStyle.Colors.Yellow;
                     _SlowBlinkTimer.Enabled = true;
-                    break;
+					_CancelBT.Enabled = true;//#2816 LALM 220615
+					break;
                 case FunctionState.Executing:
                     if (_SlowBlinkList.Remove(_ForwardBT) && (_SlowBlinkList.Count == 0))
                     {
@@ -548,7 +563,8 @@ namespace HMI.Presentation.Twr.Views
                         _SlowBlinkOn = true;
                     }
                     _ForwardBT.ButtonColor = VisualStyle.Colors.Yellow;
-                    break;
+					_CancelBT.Enabled = true;//#2816 LALM 220615
+					break;
                 case FunctionState.Error:
                     if (_SlowBlinkList.Remove(_ForwardBT) && (_SlowBlinkList.Count == 0))
                     {
@@ -556,7 +572,8 @@ namespace HMI.Presentation.Twr.Views
                         _SlowBlinkOn = true;
                     }
                     _ForwardBT.ButtonColor = VisualStyle.Colors.Red;
-                    break;
+					_CancelBT.Enabled = true;//#2816 LALM 220615
+					break;
             }
         }
 
@@ -564,6 +581,12 @@ namespace HMI.Presentation.Twr.Views
 		public void OnTlfHangToneChanged(object sender, EventArgs e)
 		{
 			_CancelBT.ButtonColor = _StateManager.Tlf.HangTone.On ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
+			if (_StateManager.Tlf.HangTone.On)
+				_CancelBT.ButtonColor = VisualStyle.Colors.Yellow;
+			else if (_StateManager.Tlf.Unhang.State!=UnhangState.Idle)
+				_CancelBT.ButtonColor = VisualStyle.Colors.Yellow;
+			else
+				_CancelBT.ButtonColor = VisualStyle.ButtonColor;
 		}
 
 		[EventSubscription(EventTopicNames.PermissionsChanged, ThreadOption.Publisher)]
@@ -575,6 +598,7 @@ namespace HMI.Presentation.Twr.Views
 			_TransferBT.Enabled = _TransferEnabled;
             _PickUpBT.Enabled = _PickUpEnabled;
 			_ForwardBT.Enabled = _ForwardEnabled;
+			_CancelBT.Enabled = _CancelEnabled;//#2816 LALM 220615
 
 
 			//Errores #4805 Las funciones no permitidas no deberian  presentarse
@@ -620,6 +644,7 @@ namespace HMI.Presentation.Twr.Views
             _PickUpBT.Enabled = _PickUpEnabled;
             _ForwardBT.Enabled = _ForwardEnabled;
             _HoldBT.ButtonColor = _StateManager.Tlf[TlfState.Hold] == 0 ? VisualStyle.ButtonColor : VisualStyle.Colors.Yellow;
+			_CancelBT.Enabled = _CancelEnabled;//#2816 LALM 220615
 
 			ResetTlfViewBt(_AD);
 		}

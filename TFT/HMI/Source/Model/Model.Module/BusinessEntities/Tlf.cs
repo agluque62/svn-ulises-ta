@@ -1060,6 +1060,9 @@ namespace HMI.Model.Module.BusinessEntities
 					case TlfState.NotAllowed:
 						State = UnhangState.NotAllowed;
 						break;
+					case TlfState.offhook://#2855 220714
+						State = UnhangState.Descolgado;
+						break;
 					default:
 						_AssociatePosition = -1;
 						State = UnhangState.Idle;

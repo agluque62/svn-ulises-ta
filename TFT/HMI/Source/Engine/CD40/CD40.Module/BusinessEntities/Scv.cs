@@ -62,11 +62,14 @@ namespace HMI.CD40.Module.BusinessEntities
             set { esCentralIp = value; }
         }
  
-        public string GetProxyIp(out string id)
+        // RQF-49
+        public string GetProxyIp(out string id,int indice=0)
         {
             id = null;
             if (!EsCentralIp) return null;
             id = Id;
+            if (indice < 3 && indice >0)
+                return ipProxy[indice].ipAddr;
             return ipProxy[(int)RolScv.SCV_PRINCIPAL].ipAddr;
         }
 

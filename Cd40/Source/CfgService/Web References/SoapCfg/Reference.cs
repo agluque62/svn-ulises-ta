@@ -1607,9 +1607,6 @@ namespace U5ki.CfgService.SoapCfg {
         
         private int rtspPort1Field;
         
-        //RQF-36 Mejoras funcionalidad retransmisión radio (RETRANS)
-        private bool EnableQuitarRTXSQfield;
-        private bool EnableMantRTXSectfield;
         /// <remarks/>
         public string IdUsuario {
             get {
@@ -1697,31 +1694,6 @@ namespace U5ki.CfgService.SoapCfg {
             }
             set {
                 this.rtspPort1Field = value;
-            }
-        }
-
-        //RQF-36 Mejoras funcionalidad retransmisión radio (RETRANS)
-        public bool EnableQuitarRTXSQ
-        {
-            get
-            {
-                return this.EnableQuitarRTXSQfield;
-            }
-            set
-            {
-                this.EnableQuitarRTXSQfield = value;
-            }
-        }
-
-        public bool EnableMantRTXSect
-        {
-            get
-            {
-                return this.EnableMantRTXSectfield;
-            }
-            set
-            {
-                this.EnableMantRTXSectfield = value;
             }
         }
     }
@@ -6231,6 +6203,8 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string descDestinoField;
         
+        private bool pasivoRetransmisionField;
+        
         /// <remarks/>
         public int Fk_Metodosbss {
             get {
@@ -6469,6 +6443,16 @@ namespace U5ki.CfgService.SoapCfg {
             }
             set {
                 this.descDestinoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool PasivoRetransmision {
+            get {
+                return this.pasivoRetransmisionField;
+            }
+            set {
+                this.pasivoRetransmisionField = value;
             }
         }
     }
@@ -7890,11 +7874,11 @@ namespace U5ki.CfgService.SoapCfg {
         private bool inhabilitacionRedirecField;
         
         private bool glpField;
-
-        private bool PermisoRTXSQField;
-
-        private bool PermisoRTXSectField;
-
+        
+        private bool permisoRTXSQField;
+        
+        private bool permisoRTXSectField;
+        
         /// <remarks/>
         public bool TransConConsultaPrev {
             get {
@@ -8096,45 +8080,36 @@ namespace U5ki.CfgService.SoapCfg {
         }
         
         /// <remarks/>
-        public bool Glp
-        {
-            get
-            {
+        public bool Glp {
+            get {
                 return this.glpField;
             }
-            set
-            {
+            set {
                 this.glpField = value;
             }
         }
-
+        
         /// <remarks/>
-        public bool PermisoRTXSQ
-        {
-            get
-            {
-                return this.PermisoRTXSQField;
+        public bool PermisoRTXSQ {
+            get {
+                return this.permisoRTXSQField;
             }
-            set
-            {
-                this.PermisoRTXSQField = value;
+            set {
+                this.permisoRTXSQField = value;
             }
         }
-
+        
         /// <remarks/>
-        public bool PermisoRTXSect
-        {
-            get
-            {
-                return this.PermisoRTXSectField;
+        public bool PermisoRTXSect {
+            get {
+                return this.permisoRTXSectField;
             }
-            set
-            {
-                this.PermisoRTXSectField = value;
+            set {
+                this.permisoRTXSectField = value;
             }
         }
     }
-
+    
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
     [System.SerializableAttribute()]
@@ -8885,6 +8860,8 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string idSistemaField;
         
+        private bool agrupacionEspecialField;
+        
         /// <remarks/>
         public string IdAgrupacion {
             get {
@@ -8902,6 +8879,16 @@ namespace U5ki.CfgService.SoapCfg {
             }
             set {
                 this.idSistemaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool AgrupacionEspecial {
+            get {
+                return this.agrupacionEspecialField;
+            }
+            set {
+                this.agrupacionEspecialField = value;
             }
         }
     }
@@ -10258,6 +10245,8 @@ namespace U5ki.CfgService.SoapCfg {
         
         private string porcentajeRSSIField;
         
+        private bool pasivoRetransmisionField;
+        
         /// <remarks/>
         public string Literal {
             get {
@@ -10515,6 +10504,16 @@ namespace U5ki.CfgService.SoapCfg {
             }
             set {
                 this.porcentajeRSSIField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool PasivoRetransmision {
+            get {
+                return this.pasivoRetransmisionField;
+            }
+            set {
+                this.pasivoRetransmisionField = value;
             }
         }
     }

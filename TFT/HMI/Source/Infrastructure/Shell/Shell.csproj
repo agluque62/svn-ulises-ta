@@ -216,4 +216,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>if not exist "$(TargetDir)\WINAUDIO\" MkDir "$(TargetDir)\WINAUDIO\" &amp;&amp; copy /y $(SolutionDir)\Setup\WinAudio\winaudio.ini  $(TargetDir)\WINAUDIO\</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -244,7 +244,24 @@ namespace HMI.Model.Module.Services
         
             // Si la radio tiene alguna posición no desasignable, el volumen del altavoz no puede estar por debajo del 30%
             _EngineCmdManager.SetRdSpeakerLevel(_StateManager.Radio.RadioMonitoring ? Math.Max(_StateManager.RdSpeaker.Level, 3) : _StateManager.RdSpeaker.Level);
-        }
+
+			//RQF-14
+			// Si la radio tiene alguna posición no desasignable, el volumen del altavoz no puede estar por debajo del 30%
+			int numPositionsByPage =_StateManager.Radio.PageSize;
+			_EngineCmdManager.SetRdSpeakerLevel(_StateManager.Radio.FrecuenciaNoDesasignable(numPositionsByPage)? Math.Max(_StateManager.RdSpeaker.Level, 3) : _StateManager.RdSpeaker.Level);
+
+			int page = _StateManager.Radio.Page;
+			int pagesize = _StateManager.Radio.PageSize;
+
+			//RQF-14 Todos los canales frecuenciasnoasignables los asigno a RX.
+			for (int id = page * pagesize, to = Math.Min((page + 1) * pagesize, msg.Count); id < to; id++)
+			//for (int id = msg.From; id < msg.Count; id++)
+				if (msg.Info[id].FrecuenciaNoDesasignable)
+				{
+					if (!_StateManager.Radio[id].Rx)
+						_EngineCmdManager.SetRdRx(id, true);
+				}
+		}
 
 		[EventSubscription(EventTopicNames.RdPositionsEngine, ThreadOption.UserInterface)]
 		public void OnRdPositionsEngine(object sender, RangeMsg<RdDestination> msg)
@@ -322,7 +339,28 @@ namespace HMI.Model.Module.Services
             int level = _StateManager.Radio.RadioMonitoring ? Math.Max(_StateManager.RdSpeaker.Level, 3) : _StateManager.RdSpeaker.Level;
             if (level != _StateManager.RdSpeaker.Level)
                 _EngineCmdManager.SetRdSpeakerLevel(level);
-        }
+
+			//RQF-14 si la radio es no desasignable y esta desasignada, la asigno.
+			int numPositionsByPage = _StateManager.Radio.PageSize;
+			level = _StateManager.Radio.FrecuenciaNoDesasignable(numPositionsByPage) ? Math.Max(_StateManager.RdSpeaker.Level, 3) : _StateManager.RdSpeaker.Level;
+			if (level != _StateManager.RdSpeaker.Level)
+				_EngineCmdManager.SetRdSpeakerLevel(level);
+			int id = msg.From;
+			if (_StateManager.Radio.IdFrecuenciaNoDesasignable(id))
+				if (_StateManager.Radio[id].Rx)
+				{
+					if (_StateManager.Radio[id].AudioVia == RdRxAudioVia.NoAudio)
+					//Top.WorkingThread.Enqueue("SetRdAudio", delegate ()
+					{
+						{
+							//Top.Rd.SetAudioVia(id, audioVia);
+							//_EngineCmdManager.SetRdAudio(id, RdRxAudioVia.Speaker, true);
+							_EngineCmdManager.SetRdRx(id, true, true);
+							//_EngineCmdManager.SetRdAudio(id, RdRxAudioVia.Speaker, true);
+						}
+					}
+				}
+		}
 
 		[EventSubscription(EventTopicNames.SiteManagerEngine, ThreadOption.UserInterface)]
 		public void OnSiteManagerEngine(object sender, StateMsg<bool> msg)

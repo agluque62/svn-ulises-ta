@@ -41,7 +41,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;_VOTER_,CALLFORWARD,</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;_VOTER_,CALLFORWARD,_TRACEAGENT_</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -132,6 +132,7 @@
     <Compile Include="Code\Servers\SNMPListener.cs" />
     <Compile Include="Code\Servers\UDPListener.cs" />
     <Compile Include="GlobalTypes.cs" />
+    <Compile Include="SipAgentCoresip.cs" />
     <Compile Include="U5kiIncidencias.cs" />
     <Compile Include="Code\Globals.cs" />
     <Compile Include="Code\Helpers\DataHelper.cs" />

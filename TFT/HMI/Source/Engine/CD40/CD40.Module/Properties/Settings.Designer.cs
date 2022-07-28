@@ -173,6 +173,15 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int VolumeTones {
+            get {
+                return ((int)(this["VolumeTones"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool TlfInPrioAutoAnswer {
             get {
@@ -416,7 +425,7 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool HfSpeaker {
             get {
                 return ((bool)(this["HfSpeaker"]));
@@ -461,7 +470,7 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("CWP USB Device # 03")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Realtek(R) Audio")]
         public string RdSpkWindowsId {
             get {
                 return ((string)(this["RdSpkWindowsId"]));
@@ -470,29 +479,7 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("CWP USB Device # 02")]
-        public string InstructorCasWindowsId
-        {
-            get
-            {
-                return ((string)(this["InstructorCasWindowsId"]));
-            }
-        }
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("CWP USB Device # 01")]
-        public string CasWindowsId
-        {
-            get
-            {
-                return ((string)(this["CasWindowsId"]));
-            }
-        }
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("CWP USB Device # 04")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Linea lc")]
         public string LcSpkWindowsId {
             get {
                 return ((string)(this["LcSpkWindowsId"]));
@@ -771,28 +758,6 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("false")]
-        public bool GLPOnlyRadio
-        {
-            get
-            {
-                return ((bool)(this["GLPOnlyRadio"]));
-            }
-        }
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
-        public int TempMinRecorderRadio
-        {
-            get
-            {
-                return ((int)(this["TempMinRecorderRadio"]));
-            }
-        }
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(".1.3.6.1.4.1.7916.8.2.2.11.0")]
         public string NtpClientStatus_Oid {
             get {
@@ -886,7 +851,7 @@ namespace HMI.CD40.Module.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <string>{ ""TeamingType"": ""Marvell"", ""WindowsLog"": ""System"", ""EventSource"":""yukonw7"", ""UpEventId"": [121,123], ""DownEventId"": [83], ""PropertyIndex"": 0, ""LanInverted"" : 0 }</string>
-  <string>{ ""TeamingType"": ""Intel"", ""WindowsLog"": ""System"", ""EventSource"":""iANSMiniport"", ""UpEventId"": [15], ""DownEventId"": [11], ""PropertyIndex"": 1, ""LanInverted"" : 0 }</string>
+  <string>{ ""TeamingType"": ""Intel"", ""WindowsLog"": ""System"", ""EventSource"":""iANSMiniport"", ""UpEventId"": [15], ""DownEventId"": [11], ""PropertyIndex"": 1, ""LanInverted"" : 1 }</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection LanTeamConfigs {
             get {
@@ -918,6 +883,30 @@ namespace HMI.CD40.Module.Properties {
         public string CasAsioId {
             get {
                 return ((string)(this["CasAsioId"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int TempMinRecorderRadio {
+            get {
+                return ((int)(this["TempMinRecorderRadio"]));
+            }
+            set {
+                this["TempMinRecorderRadio"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool GLPOnlyRadio {
+            get {
+                return ((bool)(this["GLPOnlyRadio"]));
+            }
+            set {
+                this["GLPOnlyRadio"] = value;
             }
         }
     }

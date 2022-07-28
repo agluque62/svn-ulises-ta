@@ -27,17 +27,18 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
 		public event GenericEventHandler ActivityChanged;
-		public event GenericEventHandler<RangeMsg<TlfInfo>> NewPositions;
-		public event GenericEventHandler<RangeMsg<TlfState>> PositionsChanged;
-		public event GenericEventHandler<RangeMsg<TlfIaDestination>> IaPositionsChanged;
-		public event GenericEventHandler<bool> HangToneChanged;
-		public event GenericEventHandler<RangeMsg<string>> ConfListChanged;
-		public event GenericEventHandler<StateMsg<string>> CompletedIntrusion;
+        public event GenericEventHandler<RangeMsg<TlfInfo>> NewPositions;
+        public event GenericEventHandler<RangeMsg<TlfState>> PositionsChanged;
+        public event GenericEventHandler<RangeMsg<TlfIaDestination>> IaPositionsChanged;
+        public event GenericEventHandler<bool> HangToneChanged;
+        public event GenericEventHandler<bool> UnhangToneChanged;
+        public event GenericEventHandler<RangeMsg<string>> ConfListChanged;
+        public event GenericEventHandler<StateMsg<string>> CompletedIntrusion;
         public event GenericEventHandler<StateMsg<string>> IntrudeToStateEngine;
-		public event GenericEventHandler<StateMsg<string>> BegeningIntrudeTo;
-		public event GenericEventHandler<StateMsg<string>> IntrudedTo;
-		public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
-		public event GenericEventHandler<SnmpStringMsg<string, string>> SendSnmpTrapString;
+        public event GenericEventHandler<StateMsg<string>> BegeningIntrudeTo;
+        public event GenericEventHandler<StateMsg<string>> IntrudedTo;
+        public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
+        public event GenericEventHandler<SnmpStringMsg<string, string>> SendSnmpTrapString;
         public event GenericEventHandler<RangeMsg<LlamadaHistorica>> HistoricalOfLocalCallsEngine;
         public event GenericEventHandler<PositionIdMsg> RedirectedCall;
         //lalm 211007
@@ -55,25 +56,25 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
 		public List<TlfPosition> ActiveCalls
-		{
-			get { return _ActiveCalls; }
-		}
+        {
+            get { return _ActiveCalls; }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public TlfTransfer Transfer
-		{
-			get { return _Transfer; }
-		}
+        {
+            get { return _Transfer; }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public TlfListen Listen
-		{
-			get { return _Listen; }
-		}
+        {
+            get { return _Listen; }
+        }
 
         public TlfPickUp PickUp
         {
@@ -88,8 +89,8 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
 		public bool Activity()
-		{
-                return (_ActiveCalls.Count > 0);
+        {
+            return (_ActiveCalls.Count > 0);
         }
 
         //LALM 211029 
@@ -131,28 +132,29 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 int _Tone = tlf.Tone;
                 Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
+                Top.Mixer.SetVolumeRing();
             }
         }
 
         public bool ToneOn
         {
-           get { return (_HangUpTone != -1);}
+            get { return (_HangUpTone != -1)/*||(_UnhangUpTone!=-1)*/; }
         }
 
         /// <summary>
         /// 
         /// </summary>
 		public bool Holded
-		{
-			get { return _Holded; }
-			private set
-			{
-				if (_Holded != value)
-				{
-					_Holded = value;
-				}
-			}
-		}
+        {
+            get { return _Holded; }
+            private set
+            {
+                if (_Holded != value)
+                {
+                    _Holded = value;
+                }
+            }
+        }
 
         /// <summary>
         /// 
@@ -170,15 +172,15 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="id"></param>
         /// <returns></returns>
 		public TlfPosition this[int id]
-		{
-			get 
-			{       
+        {
+            get
+            {
                 TlfPosition ret;
                 Debug.Assert(id < Tlf.NumDestinations + Tlf.NumIaDestinations);
                 _TlfPositions.TryGetValue(id, out ret);
                 return ret;
-			}
-		}
+            }
+        }
 
         /// <summary>
         /// 
@@ -196,40 +198,40 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
 		public void Init()
-		{
-			Top.Cfg.ConfigChanged += OnConfigChanged;
-			Top.Sip.TlfCallStateChanged += OnCallStateChanged;
-			Top.Sip.IncomingTlfCall += OnIncomingCall;
-			Top.Sip.TlfTransferRequest += OnTransferRequest;
-			Top.Sip.TlfCallConfInfo += OnConfInfoReceived;
+        {
+            Top.Cfg.ConfigChanged += OnConfigChanged;
+            Top.Sip.TlfCallStateChanged += OnCallStateChanged;
+            Top.Sip.IncomingTlfCall += OnIncomingCall;
+            Top.Sip.TlfTransferRequest += OnTransferRequest;
+            Top.Sip.TlfCallConfInfo += OnConfInfoReceived;
             Top.Sip.TlfCallConfInfoAcc += OnConfInfoReceivedAcc;
             Top.Sip.InfoReceived += OnInfoReceived;
             Top.Sip.CallMoved += OnCallMoved;
-            
-			for (int i = Tlf.NumDestinations, to = Tlf.NumDestinations + Tlf.NumIaDestinations; i < to; i++)
-			{
-				_TlfPositions.Add (i, new TlfIaPosition(i));
-				_TlfPositions[i].TlfPosStateChanged += OnTlfIaStateChanged;
-			}
+
+            for (int i = Tlf.NumDestinations, to = Tlf.NumDestinations + Tlf.NumIaDestinations; i < to; i++)
+            {
+                _TlfPositions.Add(i, new TlfIaPosition(i));
+                _TlfPositions[i].TlfPosStateChanged += OnTlfIaStateChanged;
+            }
             _ToneTimer = new Timer(1000);
             _ToneTimer.AutoReset = false;
             _ToneTimer.Elapsed += OnToneEnd;
 
-		}
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public void Start()
-		{
-		}
+        {
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public void End()
-		{
-		}
+        {
+        }
 
         /// <summary>
         /// Gestiona las llamadas cuando proceden de un destino configurado 
@@ -238,34 +240,34 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="id"></param>
         /// <param name="prio"></param>
 		public void Call(int id, bool prio)
-		{
-			Debug.Assert(id < Tlf.NumDestinations+Tlf.NumIaDestinations);
-			TlfPosition tlf = _TlfPositions[id];
+        {
+            Debug.Assert(id < Tlf.NumDestinations + Tlf.NumIaDestinations);
+            TlfPosition tlf = _TlfPositions[id];
             if ((id == Tlf.NumDestinations) && (tlf.Cfg == null))
                 return;
 
-			switch (tlf.State)
-			{
-				case TlfState.Idle:
-				case TlfState.PaPBusy:
-					tlf.Call(prio);
-					//if (tlf.State != TlfState.Idle)	// Si no tiene permiso para hacer la llamada el estado es Idle y no tiene que cambiar el audio
-						ResetActiveCalls(tlf);
-					break;
+            switch (tlf.State)
+            {
+                case TlfState.Idle:
+                case TlfState.PaPBusy:
+                    tlf.Call(prio);
+                    //if (tlf.State != TlfState.Idle)	// Si no tiene permiso para hacer la llamada el estado es Idle y no tiene que cambiar el audio
+                    ResetActiveCalls(tlf);
+                    break;
 
-				case TlfState.In:
-				case TlfState.InPrio:
-				case TlfState.RemoteIn:
-					tlf.Accept(null);
-					ResetActiveCalls(tlf);
-					break;
-				case TlfState.NotAllowed:
-					tlf.HangUp(0);
-					ResetActiveCalls(tlf);
-					break;
+                case TlfState.In:
+                case TlfState.InPrio:
+                case TlfState.RemoteIn:
+                    tlf.Accept(null);
+                    ResetActiveCalls(tlf);
+                    break;
+                case TlfState.NotAllowed:
+                    tlf.HangUp(0);
+                    ResetActiveCalls(tlf);
+                    break;
 
-			}
-		}
+            }
+        }
 
         /// <summary>
         /// Funcion que gestiona la llamada cuando es externa
@@ -275,54 +277,54 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="number"></param>
         /// <param name="prio"></param>
 		public void Call(uint prefix, string dst, string number, bool prio, string literal)
-		{
-			ResetActiveCalls(null);
+        {
+            ResetActiveCalls(null);
 
-			foreach (TlfPosition tlf in _TlfPositions.Values)
-			{
-				if (tlf.CanHandleOutputCall(prefix, dst, number,literal))
-				{
-					switch (tlf.State)
-					{
-						case TlfState.Unavailable:
-						case TlfState.PaPBusy:
-						case TlfState.Idle:
-							tlf.Call(prio);
-							//if (tlf.State != TlfState.Idle)	// Si no tiene permiso para hacer la llamada el estado es Idle y no tiene que cambiar el audio
-							//	ResetActiveCalls(tlf);
-							break;
-						case TlfState.In:
-						case TlfState.InPrio:
-						case TlfState.RemoteIn:
-							tlf.Accept(null);
-							break;
-						case TlfState.Hold:
-							tlf.Unhold();
-							break;
-						case TlfState.NotAllowed:
-							tlf.HangUp(0);
-							//ResetActiveCalls(tlf);
-							break;
-						default:
-							Debug.Assert("Estado inesperado ejecutando llamada a numero" == null);
-							break;
-					}
+            foreach (TlfPosition tlf in _TlfPositions.Values)
+            {
+                if (tlf.CanHandleOutputCall(prefix, dst, number, literal))
+                {
+                    switch (tlf.State)
+                    {
+                        case TlfState.Unavailable:
+                        case TlfState.PaPBusy:
+                        case TlfState.Idle:
+                            tlf.Call(prio);
+                            //if (tlf.State != TlfState.Idle)	// Si no tiene permiso para hacer la llamada el estado es Idle y no tiene que cambiar el audio
+                            //	ResetActiveCalls(tlf);
+                            break;
+                        case TlfState.In:
+                        case TlfState.InPrio:
+                        case TlfState.RemoteIn:
+                            tlf.Accept(null);
+                            break;
+                        case TlfState.Hold:
+                            tlf.Unhold();
+                            break;
+                        case TlfState.NotAllowed:
+                            tlf.HangUp(0);
+                            //ResetActiveCalls(tlf);
+                            break;
+                        default:
+                            Debug.Assert("Estado inesperado ejecutando llamada a numero" == null);
+                            break;
+                    }
 
-					//if (tlf.State != TlfState.Idle)	// Si no tiene permiso para hacer la llamada el estado es Idle y no tiene que cambiar el audio
-					AddActiveCall(tlf);
-					return;
-				}
-			}
-		}
-        public TlfPosition SearchTlfPosition (uint prefix, string dst, string number, string literal, bool allowAID)
+                    //if (tlf.State != TlfState.Idle)	// Si no tiene permiso para hacer la llamada el estado es Idle y no tiene que cambiar el audio
+                    AddActiveCall(tlf);
+                    return;
+                }
+            }
+        }
+        public TlfPosition SearchTlfPosition(uint prefix, string dst, string number, string literal, bool allowAID)
         {
             foreach (TlfPosition tlf in _TlfPositions.Values)
             {
                 if ((tlf is TlfIaPosition == false) || allowAID)
-                if (tlf.CanHandleOutputCall(prefix, dst, number, literal))
-                {
-                    return tlf;
-                }
+                    if (tlf.CanHandleOutputCall(prefix, dst, number, literal))
+                    {
+                        return tlf;
+                    }
             }
             return null;
         }
@@ -331,7 +333,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="id"></param>
 		public void RetryCall(int id)
-		{
+        {
             Debug.Assert(id < Tlf.NumDestinations + Tlf.NumIaDestinations);
             TlfPosition tlf = null;
             if (_TlfPositions.TryGetValue(id, out tlf))
@@ -345,7 +347,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         break;
                 }
             }
-		}
+        }
 
         /// <summary>
         /// 
@@ -353,7 +355,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="id"></param>
         /// <param name="conference"></param>
 		public void Accept(int id, TlfConference conference)
-		{
+        {
             Debug.Assert(id < Tlf.NumDestinations + Tlf.NumIaDestinations);
             TlfPosition tlf = null;
             if (_TlfPositions.TryGetValue(id, out tlf))
@@ -376,7 +378,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         break;
                 }
             }
-		}
+        }
 
         /// <summary>
         /// 
@@ -386,12 +388,12 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             foreach (TlfPosition tlf in _TlfPositions.Values)
             {
-                if (on &&  (tlf.State == TlfState.Conf || tlf.State == TlfState.Set))
+                if (on && (tlf.State == TlfState.Conf || tlf.State == TlfState.Set))
                 {
                     tlf.Hold(false);
                 }
                 else if (_Conference != null &&
-                         tlf.State == TlfState.Hold && 
+                         tlf.State == TlfState.Hold &&
                          !on)
                 {
                     tlf.Unhold();
@@ -400,14 +402,14 @@ namespace HMI.CD40.Module.BusinessEntities
                 }
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="on"></param>
-		public void Hold(int id, bool on)
-		{
+        public void Hold(int id, bool on)
+        {
             Debug.Assert(id < Tlf.NumDestinations + Tlf.NumIaDestinations);
             TlfPosition tlf = null;
             if (_TlfPositions.TryGetValue(id, out tlf))
@@ -441,7 +443,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         break;
                 }
             }
-		}
+        }
 
         /// <summary>
         /// 
@@ -463,45 +465,77 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="id"></param>
 		public void RecognizeTlfState(int id)
-		{
-			Debug.Assert(_TlfPositions.ContainsKey(id));
+        {
+            Debug.Assert(_TlfPositions.ContainsKey(id));
 
-			// Esta funcion es para quitar Mem y RemoteMem, que no manejamos aquí (si lo hace la OPE)
-			if (_TlfPositions[id].State == TlfState.Idle)
-			{
-				if (id < Tlf.NumDestinations)
-				{
-					RangeMsg<TlfState> state = new RangeMsg<TlfState>(id, TlfState.Idle);
-					General.SafeLaunchEvent(PositionsChanged, this, state);
-				}
-				else
-				{
+            // Esta funcion es para quitar Mem y RemoteMem, que no manejamos aquí (si lo hace la OPE)
+            if (_TlfPositions[id].State == TlfState.Idle)
+            {
+                if (id < Tlf.NumDestinations)
+                {
+                    RangeMsg<TlfState> state = new RangeMsg<TlfState>(id, TlfState.Idle);
+                    General.SafeLaunchEvent(PositionsChanged, this, state);
+                }
+                else
+                {
                     TlfIaPosition tlfIa = (TlfIaPosition)_TlfPositions[id];
                     _Logger.Info("Inserto recurso: {0} {1}", tlfIa.Literal, tlfIa.Uri);
                     //LALM 211008 añado recurso.
                     //#2629 presentar via Atencion el paraemtro uri puede no corresponder con la llamada.
                     TlfIaDestination st = new TlfIaDestination(tlfIa.Literal, tlfIa.Number, tlfIa.State, tlfIa.IsTop, tlfIa.ChAllowsForward, tlfIa.Uri);
                     RangeMsg<TlfIaDestination> state = new RangeMsg<TlfIaDestination>(tlfIa.Pos, st);
-					General.SafeLaunchEvent(IaPositionsChanged, this, state);
-				}
-			}
-		}
+                    General.SafeLaunchEvent(IaPositionsChanged, this, state);
+                }
+            }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public void SetHangToneOff()
-		{
-			if (_HangUpTone >= 0)
-			{
-				Top.Mixer.Unlink(_HangUpTone);
-				SipAgent.DestroyWavPlayer(_HangUpTone);
-				_HangUpTone = -1;
+        {
+            if (_HangUpTone >= 0)
+            {
+                Top.Mixer.Unlink(_HangUpTone);
+                SipAgent.DestroyWavPlayer(_HangUpTone);
+                _HangUpTone = -1;
 
-				General.SafeLaunchEvent(HangToneChanged, this, false);
+                General.SafeLaunchEvent(HangToneChanged, this, false);
 
-			}
-		}
+            }
+        }
+
+        public void SetUnhangToneOff()
+        {
+            if (_UnhangUpTone >= 0)
+            {
+                Top.Mixer.Unlink(_UnhangUpTone);
+                SipAgent.DestroyWavPlayer(_UnhangUpTone);
+                _UnhangUpTone = -1;
+
+                General.SafeLaunchEvent(UnhangToneChanged, this, false);
+
+            }
+        }
+
+        public void SetUnhangToneOn(int tone=999)
+        {
+            if (_UnhangUpTone == -1)
+            {
+                //Aquii enlazar el fichero de audio y hacer la mezcla.
+                //Top.Mixer.Unlink(_UnhangUpTone);
+                //SipAgent.DestroyWavPlayer(_UnhangUpTone);
+                _UnhangUpTone = tone;
+
+                General.SafeLaunchEvent(UnhangToneChanged, this, true);
+
+            }
+            else
+            {
+                //_UnhangUpTone = -1;
+                General.SafeLaunchEvent(UnhangToneChanged, this, false);
+            }
+        }
 
         /// <summary>
         /// 
@@ -569,7 +603,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <summary>
         /// HangUpConf: 
         /// Se llama cuando se pulsa la tecla conferencia, entonces hay que colgar las llamadas en conferencia.
-      /// </summary>
+        /// </summary>
         public void HangUpConf()
         {
             List<TlfPosition> activeCalls = new List<TlfPosition>(_ActiveCalls);
@@ -580,7 +614,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     actTlf.Conference.HangUp();
                     break;
                 }
-             }
+            }
 
             // PosInConference = 0;
             if (_Conference != null)
@@ -653,18 +687,18 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="dst"></param>
         /// <param name="numberWithPrefix"></param>
 		public static void ExtractIaInfo(CfgRecursoEnlaceInterno rs, out string dst, out string numberWithPrefix)
-		{
+        {
             string numero = null;
-			switch (rs.Prefijo)
-			{
-				case Cd40Cfg.INT_DST:
+            switch (rs.Prefijo)
+            {
+                case Cd40Cfg.INT_DST:
                     dst = rs.NombreRecurso;
                     if (String.IsNullOrEmpty(rs.NumeroAbonado))
                         numero = Top.Cfg.GetNumeroAbonado(rs.NombreRecurso, Cd40Cfg.ATS_DST);
                     else
                         numero = rs.NumeroAbonado;
-					if (numero != null)
-					{
+                    if (numero != null)
+                    {
                         string[] lit;
 
                         lit = Top.Cfg.GetUserFromAddress(Cd40Cfg.ATS_DST, numero);    // Buscar el literal del sector/agrupación asociado al número ATS del sector
@@ -672,26 +706,26 @@ namespace HMI.CD40.Module.BusinessEntities
                             dst = lit[0];   // Nombre de la agrupación si el sector estuviera integrado con otro/s
 
                         numberWithPrefix = string.Format("{0:D2}{1}", Cd40Cfg.ATS_DST, numero);
-					}
-					else
-					{
-						numberWithPrefix = string.Format("{0:D2}{1}", rs.Prefijo, rs.NombreRecurso);
-					}
-					break;
-				case Cd40Cfg.PP_DST:
-					if (string.IsNullOrEmpty(rs.NumeroAbonado))
-					{
-						dst = rs.NombreRecurso;
-						numberWithPrefix = string.Format("{0:D2}{1}", rs.Prefijo, rs.NombreRecurso);
-					}
-					else
-					{
-						dst = rs.NumeroAbonado;
-						//number = string.Format("{0:D2}{1}@{2}", rs.Prefijo, rs.NombreRecurso, rs.NumeroAbonado);
+                    }
+                    else
+                    {
+                        numberWithPrefix = string.Format("{0:D2}{1}", rs.Prefijo, rs.NombreRecurso);
+                    }
+                    break;
+                case Cd40Cfg.PP_DST:
+                    if (string.IsNullOrEmpty(rs.NumeroAbonado))
+                    {
+                        dst = rs.NombreRecurso;
+                        numberWithPrefix = string.Format("{0:D2}{1}", rs.Prefijo, rs.NombreRecurso);
+                    }
+                    else
+                    {
+                        dst = rs.NumeroAbonado;
+                        //number = string.Format("{0:D2}{1}@{2}", rs.Prefijo, rs.NombreRecurso, rs.NumeroAbonado);
                         numberWithPrefix = string.Format("{0:D2}{1}", rs.Prefijo, rs.NumeroAbonado);
-					}
-					break;
-                case Cd40Cfg.IP_DST:                   
+                    }
+                    break;
+                case Cd40Cfg.IP_DST:
                 case Cd40Cfg.UNKNOWN_DST:
                     dst = rs.NombreRecurso;
                     numberWithPrefix = string.Format("{0:D2}{1}", rs.Prefijo, rs.NumeroAbonado);
@@ -707,11 +741,11 @@ namespace HMI.CD40.Module.BusinessEntities
                 //    }
                 //    goto default;
                 default:
-					dst = rs.NumeroAbonado;
-					numberWithPrefix = string.Format("{0:D2}{1}", rs.Prefijo, rs.NumeroAbonado);
-					break;
-			}
-		}
+                    dst = rs.NumeroAbonado;
+                    numberWithPrefix = string.Format("{0:D2}{1}", rs.Prefijo, rs.NumeroAbonado);
+                    break;
+            }
+        }
 
         /// <summary>
         /// 
@@ -721,16 +755,16 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="literal"></param>
         /// <param name="rs"></param>
 		public static void EncapsuleIaInfo(uint prefix, string dst, out string literal, out CfgRecursoEnlaceInterno rs)
-		{
-			rs = new CfgRecursoEnlaceInterno() ;
-			rs.Prefijo = prefix;
+        {
+            rs = new CfgRecursoEnlaceInterno();
+            rs.Prefijo = prefix;
 
-			switch (prefix)
-			{
-				case Cd40Cfg.INT_DST:
-					rs.NombreRecurso = dst;
-					literal = rs.NombreRecurso;
-					break;
+            switch (prefix)
+            {
+                case Cd40Cfg.INT_DST:
+                    rs.NombreRecurso = dst;
+                    literal = rs.NombreRecurso;
+                    break;
                 // Por acceso indirecto, el prefijo PP
                 // se comporta como un abonado con marcación
                 /*
@@ -757,99 +791,84 @@ namespace HMI.CD40.Module.BusinessEntities
                     rs.NumeroAbonado = dst;
                     literal = rs.NumeroAbonado;
                     break;
-				default:
-					rs.NumeroAbonado = dst;
-					literal = rs.NumeroAbonado;
-					break;
-			}
+                default:
+                    rs.NumeroAbonado = dst;
+                    literal = rs.NumeroAbonado;
+                    break;
+            }
 
-		}
+        }
+
+        bool EstoyDescolgado()
+        {
+            TlfIaPosition tlf = null;
+            if (_ActiveCalls.Count > 0)
+            {
+                for (int i = 0; i < _ActiveCalls.Count; i++)
+                {
+                    if ((ActiveCalls[i] is TlfIaPosition == true))
+                    {
+                        tlf = (TlfIaPosition)ActiveCalls[i];
+                        if (tlf.State == TlfState.offhook)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
 
         //#2855
         //lalm 211201
         // Esta funcion descuelga o cuelga dependiendo del estado de la tecla colgardescolgar
         public void Descuelga()
         {
-            ResetActiveCalls(null);
-            TlfIaPosition tlf =null;
-            int pos = Tlf.NumDestinations;
-            bool colgar = false;
-            // Cuelgo si esta descolgado
-            // Quito las llamadas que haya
+            if (!EstoyDescolgado())// Si No estoy descolgado cuelgo otras llamadas.
+                ResetActiveCalls(null);
+            int pos = Tlf.IaMappedPosition;
+            int id1 = pos;
+            TlfIaPosition tlfia3;
+            TlfPosition tlf2;
+            int icolgar = -1;
+            // Si hay dos llamdas en curso, conferencia por ejemplo
+            // no se deberia dejar pulsar la tecla descolgar.
             if (_ActiveCalls.Count > 0)
             {
                 for (int i = 0; i < _ActiveCalls.Count; i++)
                 {
-                    if ((ActiveCalls[i] is TlfIaPosition==true))
+                    if ((ActiveCalls[i] is TlfIaPosition == true))
                     {
-                        tlf = (TlfIaPosition)ActiveCalls[i];
-                        if (tlf.State == TlfState.offhook)
-                            colgar = true;
-                        if ((tlf.State == TlfState.Set)||
-                            (tlf.State == TlfState.Out)
-                            )
-                            colgar = true;
-                    }
-                    else
-                    {
-                        TlfPosition tlf1 = (TlfPosition)ActiveCalls[i];
-                        if (tlf1.State == TlfState.Set)
-                        {
-                            tlf1.HangUp(0);
-                            RemoveActiveCall(tlf1);
-                        }
+                        tlfia3 = (TlfIaPosition)ActiveCalls[i];
+                        if (tlfia3.State == TlfState.offhook)
+                            icolgar = i;
                     }
                 }
             }
-            if (colgar)
+            if (_TlfPositions.TryGetValue(id1, out tlf2) == true)
             {
-                int id = pos;
-                for (int i = 0; i < _ActiveCalls.Count; i++)
+                TlfIaPosition tlfia;
+                if (icolgar != -1)
+                    tlfia = (TlfIaPosition)ActiveCalls[icolgar];
+                else
+                    tlfia = (TlfIaPosition)tlf2;
+                if (tlfia.State == TlfState.offhook)
                 {
-                    tlf = (TlfIaPosition)ActiveCalls[i];
-                    if (tlf.State == TlfState.offhook)
-                    {
-                        TlfPosition tlf1 = null;
-                        if (_TlfPositions.TryGetValue(id, out tlf1))
-                            tlf.DescuelgaPos(false);
-                        break;
-                    }
-                    // si esta en conversacion cuelgo la conversacion y desculego la linea.
-                    if ((tlf.State == TlfState.Set) || (tlf.State == TlfState.Out))
-                    {
-                        TlfPosition tlf1 = null;
-                        if (_TlfPositions.TryGetValue(id, out tlf1))
-                        {
-                            tlf1.HangUp(0);
-
-                            //descuelgo AI.
-                            tlf = new TlfIaPosition(pos);
-                            tlf.State = TlfState.Idle;
-                            AddActiveCall(tlf);
-
-
-                            tlf1 = null;
-                            if (_TlfPositions.TryGetValue(id, out tlf1))
-                                tlf1.DescuelgaPos(true);
-                        }
-                        break;
-                    }
+                    ActiveCalls.Remove(tlfia);
+                    tlfia.DescuelgaPos(false);// Esto provoca cambio de audio,
+                                            // se pone despues de borrar las
+                                            // lineas activas
+                    SetUnhangToneOff();
+                    tlfia.State = TlfState.Idle;
+                    MakeAID(tlfia);
                 }
-            }
-
-            // Descuelgo la linea
-            if (!colgar)//descuelgo AI
-            {
-                Debug.Assert(pos < Tlf.NumDestinations + Tlf.NumIaDestinations);
-                //descuelgo AI.
-                tlf = new TlfIaPosition(pos);
-                tlf.State = TlfState.Idle;
-                AddActiveCall(tlf);
-
-                int id = pos;
-                TlfPosition tlf1 = null;
-                if (_TlfPositions.TryGetValue(id, out tlf1))
-                    tlf.DescuelgaPos(true);
+                else
+                {
+                    tlfia = new TlfIaPosition(pos);
+                    tlfia.DescuelgaPos(true);
+                    SetUnhangToneOn();
+                    tlfia.State = TlfState.offhook;
+                    MakeAID(tlfia);
+                    AddActiveCall(tlfia);
+                }
             }
         }
         //*2855
@@ -903,6 +922,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		private List<TlfIntrusion> _Intrusions = new List<TlfIntrusion>();
 		private TransferRequest _TransferRequest = null;
 		private int _HangUpTone = -1;
+		private int _UnhangUpTone = -1;
 		private int _IntrusionTone = -1;
 		private Dictionary<TlfPosition, CORESIP_ConfInfo> _ConfInfos = new Dictionary<TlfPosition, CORESIP_ConfInfo>();
         private TlfConference _Conference = null;
@@ -944,6 +964,32 @@ namespace HMI.CD40.Module.BusinessEntities
                     actTlf.Conference.HangUp();
                 }
             }
+        }
+        /// <summary>
+        /// Funcion para comprobar si el numero de aceso indirecto coincide con
+        /// el numero propio al unir dos roles
+        /// defecto #5385
+        /// </summary>
+        /// <param name="abonado"></param>
+        /// <returns></returns>
+        private bool CoincideConMiAbonado(string abonado)
+        {
+            if (abonado.StartsWith("03"))
+                abonado = abonado.Substring(2);
+            try
+            {
+                foreach (StrNumeroAbonado s in Top.Cfg.HostAddresses)
+                {
+                    if (s.NumeroAbonado == abonado)
+                        return true;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+                throw;
+            }
+            return false;
         }
 
         /// <summary>
@@ -1043,6 +1089,9 @@ namespace HMI.CD40.Module.BusinessEntities
                     if (_TlfPositions.TryGetValue(i, out tlf) == true)
                     {
                         TlfIaPosition tlfIa = (TlfIaPosition)tlf;
+                        // #5385 Borra la tecla si coincide con el numero de abonado.
+                        if (CoincideConMiAbonado(tlfIa.Number))
+                            tlfIa.Reset();
                         //Borra tecla 19+1 si cambia el usuario
                         if ((tlfIa.Cfg != null) && (Top.Cfg.ResetUsuario))
                             tlfIa.Reset();
@@ -1210,8 +1259,8 @@ namespace HMI.CD40.Module.BusinessEntities
             //int NumIa = 0;
 			foreach (TlfPosition tlf in _TlfPositions.Values)
 			{
-				//LALM 211004
-				//Peticiones #3638, anulada, solo puede existir una lina de AI.
+                //LALM 211004
+                //Peticiones #3638, anulada, solo puede existir una lina de AI.
                 //if (tlf is TlfIaPosition)
                 //    NumIa++;
                 //if ((NumIa > 1) && (info.Priority != CORESIP_Priority.CORESIP_PR_URGENT) && (info.Priority != CORESIP_Priority.CORESIP_PR_EMERGENCY))
@@ -1219,7 +1268,24 @@ namespace HMI.CD40.Module.BusinessEntities
                 //    answer.Value = SipAgent.SIP_BUSY;
                 //    return;
                 //}
-                answer.Value  = tlf.HandleIncomingCall(call, call2replace, info, inInfo);
+                //lalm 220603
+                string reason = "";
+                answer.Value  = tlf.HandleIncomingCall(call, call2replace, info, inInfo, out reason);
+                if (answer.Value==SipAgent.SIP_DECLINE && tlf.Pos== Tlf.IaMappedPosition)
+                {
+                    SortedList<int, TlfPosition> tlfPositionsCopy = new SortedList<int, TlfPosition>(_TlfPositions);
+                    //int pos = Tlf.IaMappedPosition + 1;
+                    int pos = 2;
+                    tlfPositionsCopy.Remove(pos);
+                    tlf.Reset();
+                    tlfPositionsCopy.Add(pos, tlf);
+                    TlfPosition p = new TlfPosition(pos);
+                    //p.Reset();
+                    //tlfPositionsCopy.TryGetValue(Tlf.IaMappedPosition, out p);
+                    if (tlfPositionsCopy.TryGetValue(pos, out p)==true)
+                        answer.Value = p.HandleIncomingCall(call, call2replace, info, inInfo, out reason);
+                    tlfPositionsCopy[pos].RefrescaPos();
+                }
 				if (answer.Value != SipAgent.SIP_DECLINE)
 				{
 					if (answer.Value == SipAgent.SIP_RINGING)
@@ -1274,6 +1340,11 @@ namespace HMI.CD40.Module.BusinessEntities
 					{
 						AddActiveCall(tlf);
 					}
+                    else
+                    {
+                        _Logger.Warn("LLamada entrante no tratada: " + inInfo.SrcId);
+                    }
+
 
 					return;
 				}
@@ -1718,12 +1789,14 @@ namespace HMI.CD40.Module.BusinessEntities
 				{
 					if (actTlf != tlf)
 					{
-						if ((actTlf.Conference == null) || (actTlf.Conference != tlfConference))
+                        if (actTlf.State == TlfState.offhook)
+                            _ActiveCalls.Add(actTlf);
+                        else if ((actTlf.Conference == null) || (actTlf.Conference != tlfConference))
 						{
 							actTlf.HangUp(0);
 						}
-						else
-						{
+                        else
+                        {
 							_ActiveCalls.Add(actTlf);
 						}
 					}
@@ -1738,6 +1811,20 @@ namespace HMI.CD40.Module.BusinessEntities
             PublishChangeActivity(oldActivityState, Activity());
 		}
 
+        //#2855 220713 crear AID para descolgado
+        private void MakeAID(TlfIaPosition tlf)
+        {
+            TlfState st = tlf.State;
+            TlfIaDestination iaSt;// = new TlfIaDestination(tlf.Literal, tlf.Number, st, tlf.IsTop, tlf.ChAllowsForward);
+            if (tlf.State==TlfState.Idle)
+                iaSt = new TlfIaDestination("", "", st, tlf.IsTop, tlf.ChAllowsForward);
+            else
+                iaSt = new TlfIaDestination("Marcacion", "9999", st, tlf.IsTop, tlf.ChAllowsForward);
+            RangeMsg<TlfIaDestination> state = new RangeMsg<TlfIaDestination>(tlf.Pos, iaSt);
+            General.SafeLaunchEvent(IaPositionsChanged, this, state);
+
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1747,6 +1834,8 @@ namespace HMI.CD40.Module.BusinessEntities
             bool oldActivityState = Activity();
 			_ActiveCalls.Add(tlf);
 			SetHangToneOff();
+            if (tlf.State == TlfState.offhook)
+                SetUnhangToneOn();
             PublishChangeActivity(oldActivityState, Activity());
 		}
 
@@ -2149,10 +2238,10 @@ namespace HMI.CD40.Module.BusinessEntities
                                 if (_TlfPositions.TryGetValue(i + 1, out tlf2) == true)
                                 {
                                     TlfIaPosition tlftmp = (TlfIaPosition)tlf2;
-                                    tlfIa1.setpos(170);
+                                    tlfIa1.setpos(Tlf.IaMappedPosition);
                                     _TlfPositions[i] = tlfIa1;
 
-                                    tlfIa.setpos(171);
+                                    tlfIa.setpos(Tlf.IaMappedPosition+1);
                                     _TlfPositions[i + 1] = tlfIa;
 
                                     _TlfPositions[i+1].RefrescaPos();
@@ -2177,11 +2266,11 @@ namespace HMI.CD40.Module.BusinessEntities
                                 if (_TlfPositions.TryGetValue(i, out tlf2) == true)
                                 {
                                     TlfIaPosition tlftmp = (TlfIaPosition)tlf2;
-                                    tlfIa1.setpos(170);
+                                    tlfIa1.setpos(Tlf.IaMappedPosition);
                                     _TlfPositions[i] = tlfIa1;
                                     _TlfPositions[i].RefrescaPos();
                                     
-                                    tlftmp.setpos(172);
+                                    tlftmp.setpos(Tlf.IaMappedPosition + 2);
                                     _TlfPositions[i + 1] = tlftmp;
                                 }
                             }
@@ -2192,6 +2281,6 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 #endif
-#endregion
+        #endregion
     }
 }

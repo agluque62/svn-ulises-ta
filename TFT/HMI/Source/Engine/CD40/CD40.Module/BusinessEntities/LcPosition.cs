@@ -214,14 +214,14 @@ namespace HMI.CD40.Module.BusinessEntities
 
                                 _Channels.Add(ch);
                             }
-                            }
-                            else
-                            {
+                        }
+                        else
+                        {
                                 ch.AddRemoteDestination(dst.NumeroAbonado, null);
-                            }
-						}
+                        }
+					}
 
-						break;
+					break;
 				}
 			}
 
@@ -306,15 +306,23 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="sipCallId"></param>
         /// <param name="info"></param>
         /// <param name="inInfo"></param>
+        /// <param name="reason"></param>
         /// <returns></returns>
-		public int HandleIncomingCall(int sipCallId, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
+		public int HandleIncomingCall(int sipCallId, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo,out string reason)
 		{
-			SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, sipCallId, info, inInfo, false);
+			//lalm 220603
+			//reason = "";
+			SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, sipCallId, info, inInfo, false,out reason);
 			if (inCall != null)
 			{
 				if ((Top.ScreenSaverEnabled) || Top.Hw.LCSpeaker == false)
                 {
-                    return SipAgent.SIP_DECLINE;
+					if (Top.ScreenSaverEnabled)
+						reason = "active screensaver";
+					else if (Top.Hw.LCSpeaker == false)
+						reason = "speaker not available";
+					return SipAgent.SIP_ERROR;
+					//return SipAgent.SIP_DECLINE;
                 }
                 // Si la telefonía va por altavoz y hay llamada de LC se quita 
                 // el estado "en espera de cuelgue"
@@ -353,7 +361,11 @@ namespace HMI.CD40.Module.BusinessEntities
 					else
                     {//LALM 210621 Quito la memorizada si el destino correspode al sector principal.
 						_lastaccid = "";
-						_RxNotifTimer.Enabled = false;
+						//220606 no se puede deshabilitar el timer.
+						//_RxNotifTimer.Enabled = false;
+						//220606 Borro tambien lastsrcid y lastsrcip
+						_lastsrcid= "";
+						_lastsrcip = "";
 						_RxNotifTimer.Interval = 1000;
 						_tiempo_memorizada = 0;
 					}
@@ -361,12 +373,14 @@ namespace HMI.CD40.Module.BusinessEntities
 					// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
 					// Cuando la llamada viene por linea lineas analógicas.
 					// Tomo esta opción para líneas analógicas
-					if (inInfo.SrcId[0] != 0)
+					if (inInfo.SrcId[0] != 0 )
                     {
 						_lastsrcid = inInfo.SrcId;
 						_RxNotifTimer.Enabled = true;
 						_RxNotifTimer.Interval = 1000;
 						_tiempo_memorizada = 7;
+						//220606 guardo tambien lasthosscrip
+						_lastsrcip = inInfo.SrcIp;
 					}
 					_Channels.Sort(delegate(SipChannel a, SipChannel b)
 						{
@@ -413,6 +427,9 @@ namespace HMI.CD40.Module.BusinessEntities
 						Top.Tlf.QuitaTonoRing();
 						Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
 					}
+					//#5884 Señalización de Actividad en LED ALTV Intercom cuando seleccionada TF en ALTV
+					// si hay actividad encender led.
+					Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
 				}
 				else if (stateInfo.State == CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED)
 				{
@@ -523,6 +540,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
 		private string _lastaccid = "";
 		private string _lastsrcid = "";
+		private string _lastsrcip = "";
 		/// <summary>
 		/// 
 		/// </summary>
@@ -595,7 +613,11 @@ namespace HMI.CD40.Module.BusinessEntities
 			// Tomo esta opción para líneas analógicas
 			if (_lastsrcid!="")
             {
-				dstUri = string.Format("<sip:{0}@{1}{2}>", _lastsrcid, path.Line.Ip, dstParams);
+				//220606 Añando lastsrcip.
+				if (_lastsrcip != "")
+					dstUri = string.Format("<sip:{0}@{1}{2}>", _lastsrcid, _lastsrcip, dstParams);
+				else
+					dstUri = string.Format("<sip:{0}@{1}{2}>", _lastsrcid, path.Line.Ip, dstParams);
 			}
 			try
 			{
@@ -616,7 +638,7 @@ namespace HMI.CD40.Module.BusinessEntities
 					_SipCallTx.Update(sipCallId, _lastaccid, remoteId, ch, path.Remote, path.Line);
 					//LALM 210609
 					// Incidencia #3684 Encaminamiento -> ENC.03.03. Cuando En un puesto de TWRN que integra dos sectores,
-					// No quito inmediatamente lastaccid, espero a que venza el teporizador
+					// No quito inmediatamente lastaccid, espero a que venza el temporizador
 					//if (_RxState!=LcRxState.Rx)
 					//	_lastaccid = "";
 				}
@@ -802,10 +824,12 @@ namespace HMI.CD40.Module.BusinessEntities
 					case LcTxState.Congestion:
 						_Tone = SipAgent.CreateWavPlayer("Resources/Tones/Congestion.wav", true);
 						Top.Mixer.Link(_Tone, MixerDev.SpkLc, MixerDir.Send, Mixer.LC_PRIORITY, FuentesGlp.RxLc);
+						Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER);//#5829
 						break;
 					case LcTxState.Busy:
 						_Tone = SipAgent.CreateWavPlayer("Resources/Tones/Busy.wav", true);
 						Top.Mixer.Link(_Tone, MixerDev.SpkLc, MixerDir.Send, Mixer.LC_PRIORITY, FuentesGlp.RxLc);
+						Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 						break;
 				}
 

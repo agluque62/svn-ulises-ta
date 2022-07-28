@@ -294,7 +294,8 @@ namespace HMI.Presentation.RadioLight.Views
             _PickUpBT.Enabled = _PickUpEnabled;
             _ForwardBT.Enabled = _ForwardEnabled;
             _MoreBT.Enabled = _MoreEnabled;
-        }
+			_CancelBT.Enabled = _CancelEnabled;//#2816 LALM 220615
+		}
 
 		[EventSubscription(EventTopicNames.ActiveViewChanging, ThreadOption.Publisher)]
 		public void OnActiveViewChanging(object sender, EventArgs<string> e)

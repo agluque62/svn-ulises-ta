@@ -155,9 +155,11 @@ namespace HMI.CD40.Module.BusinessEntities
                 return true;
          }
 
-		public override int HandleIncomingCall(int sipCallId, int call2replace, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
+		//lalm 220603
+		public override int HandleIncomingCall(int sipCallId, int call2replace, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo,out string reason)
 		{
             bool replacedCall = false;
+			reason = "";
 			if ((Top.ScreenSaverEnabled) || (Top.Mixer.RxTlfAudioVia == TlfRxAudioVia.Speaker && !Top.Hw.LCSpeaker) ||
 			// Errores #4928
 			// 211028 si no jacks ni altavoz de LC rechazo la llamada.
@@ -177,8 +179,8 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				if (_State == TlfState.Out)
 				{
-                    //En teclas de 19+1,  se admiten llamada con los datos que no coincidan con configuracion
-					SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, sipCallId, info, inInfo, true);
+					//En teclas de 19+1,  se admiten llamada con los datos que no coincidan con configuracion
+					SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, sipCallId, info, inInfo, true, out reason);
 
 					if (inCall != null)
 					{
@@ -209,7 +211,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 if (FillData(info, inInfo) == false)
                     return SipAgent.SIP_DECLINE;
 			}
-			int result = base.HandleIncomingCall(sipCallId, call2replace, info, inInfo);
+			//lalm 220603
+			reason = "";
+			int result = base.HandleIncomingCall(sipCallId, call2replace, info, inInfo, out reason);
             //Si no se acepta llamada entrante y se trataba de un replace que ya se ha colgado, se señaliza con error
             if (replacedCall && 
                 ((result == SipAgent.SIP_DECLINE) || (result == SipAgent.SIP_BUSY)))

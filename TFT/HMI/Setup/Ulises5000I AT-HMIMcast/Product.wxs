@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="*" Name="Ulises5000I Audio Terminal HMI Light" Language="1033" Version="2.6.0" Manufacturer="NucleoCC" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
+  <Product Id="*" Name="Ulises5000I Audio Terminal HMI Light" Language="1033" Version="2.6.2" Manufacturer="Grupo Amper" UpgradeCode="{6B02D6AF-FF68-4806-8D24-D5F42D78698F}">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
 
     <PropertyRef Id="NETFRAMEWORK45"/>
@@ -20,9 +20,9 @@
     <Property Id="INSTALLFOLDER_NAME" Value="Ulises5000I-TALight"></Property>
     <Property Id="CONFIG_FILE" Value="HMI.exe.config"></Property>
     <Property Id='RECDUAL' Value='0'></Property>
-    <Property Id="PVERSION" Value="2.6.0"></Property>
-    <Property Id="MCAST_INSTALLFOLDER_NAME" Value="Ulises5000I-MCastLight"></Property>
-    <!-- Propiedades para los directorios de Instalacion -->
+    <Property Id="PVERSION" Value="2.6.2"></Property>
+	  <Property Id="MCAST_INSTALLFOLDER_NAME" Value="Ulises5000I-MCastLight"></Property>
+	  <!-- Propiedades para los directorios de Instalacion -->
     <Property Id="MCAST_FOLDER">
       <RegistrySearch Id="UV5KI_MCAST_FOLDER" Root="HKLM" Key='SOFTWARE\Wix\UV5KI_MCAST' Name='FOLDER_Property' Type='raw'  />
     </Property>
@@ -222,7 +222,7 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="COMPANYFOLDER" Name="NucleoCC">
+        <Directory Id="COMPANYFOLDER" Name="UlisesV5000">
           <Directory Id="U5ki.MCast.INSTALLFOLDER" Name="Ulises5000I-MCastLight"/>
           <Directory Id="INSTALLFOLDER" Name="Ulises5000I-TALight">
             <Directory Id="EN" Name="en-GB" />
@@ -402,10 +402,11 @@
                         ElementPath="/configuration/applicationSettings/HMI.Presentation.Asecna.Properties.Settings/setting[\[]@name='DirectorioGLP'[\]]/value"
                         Value="[GLPDIR]"/>        
         <!-- Record ED137 -->
-        <util:XmlFile Id="RecordingEd137" Action="setValue"
+		  <!--Lo quito para que funcione Radiolight-->
+        <!--<util:XmlFile Id="RecordingEd137" Action="setValue"
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/U5ki.Infrastructure.Properties.Settings/setting[\[]@name='RecordingEd137'[\]]/value"
-                        Value="[ED137REC]"/>
+                        Value="[ED137REC]"/>-->
 		  <!-- Brillo -->
 		  <!-- Brillo -->
 		  <util:XmlFile Id="Brillo" Action="setValue"
@@ -451,8 +452,15 @@
         <util:XmlFile Id="MaxVolume" Action="setValue"
                 File = "[#HMI.config]"
                 ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='MaxVolume'[\]]/value"
-                Value="50"/>        
-        <!-- Nuevos OIDs a partir de la version 2.5.2 -->
+                Value="50"/>
+		  
+		  <!--VolumeTones 50%-->
+		  <util:XmlFile Id="VolumeTones" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='VolumeTones'[\]]/value"
+				  Value="50"/>
+		
+		 <!-- Nuevos OIDs a partir de la version 2.5.2 -->
         <util:XmlFile Id="TopOid" Action="setValue"
                 File = "[#HMI.config]"
                 ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='TopOid'[\]]/value"
@@ -847,13 +855,6 @@
                         ElementPath="/Task/Principals/Principal/UserId"
                         Value="[%USERDOMAIN]\[%USERNAME]"/>
       </Component>
-      <Component Id ="WAUDIOTASK" Guid="{8EDFECE7-E2A5-4F44-9CBD-D49A7CE21B8F}">
-        <File Id="WAUDIOTASK" Name="UV5K-WAUDIO-START.xml"></File>
-        <util:XmlFile Id="WAUDIOTASK_CMD" Action="setValue"
-                        File = "[#WAUDIOTASK]"
-                        ElementPath="/Task/Actions/Exec/Command"
-                        Value="&quot;[WINAUDIO]WinAudio.exe&quot;"/>
-      </Component>
       <Component Id ="TVTASK" Guid="{9D1BE7A6-40A4-47C8-BD06-C08F22650EC9}">
         <File Id="TVTASK" Name="TEAMVIEWER-START.xml"></File>
         <util:XmlFile Id="TVTASK_USER" Action="setValue"
@@ -944,21 +945,6 @@
   
   <Fragment>
     <ComponentGroup Id="HMI.WINAUDIO" Directory="WINAUDIO" Source="..\WinAudio\">
-      <Component Id="HMI.WINAUDIO.BIN" Guid="{2D3F51CF-DB14-42BA-9734-652FD0B43E96}">        
-        <File Id="Winaudio.exe" Name="Winaudio.exe"></File>
-      </Component>
-      <Component Id="HMI.WINAUDIO.NAUDIO" Guid="{72C85E3D-B25A-4ADA-A535-6D802676BBB5}">
-        <File Id="wa.naudio.dll" Name="naudio.dll"></File>
-      </Component>
-      <Component Id="HMI.WINAUDIO.INIP" Guid="{3B2AA028-1266-40FA-BE59-D29D5A7C4AB2}">
-        <File Id="wa.INIFileParser.dll" Name="INIFileParser.dll"></File>
-      </Component>
-      <Component Id="HMI.WINAUDIO.NLOG" Guid="{75714310-062F-435E-9F05-CD85756F5027}">
-        <File Id="wa.nlog.dll" Name="nlog.dll"></File>
-      </Component>
-      <Component Id="HMI.WINAUDIO.NLOG.CFG" Guid="{D4AD367A-F65E-4734-ADD6-1FCEB0D49E50}">
-        <File Id="wa.nlog.config" Name="NLog.config"></File>
-      </Component>
       <Component Id="HMI.WINAUDIO.INI" Guid="{22127FB8-2F56-45F7-A9B9-C0B952C0DCFE}">
         <File Id="wa.winaudio.ini" Name="winaudio.ini"></File>
       </Component>

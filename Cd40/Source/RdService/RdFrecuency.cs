@@ -31,7 +31,6 @@ namespace U5ki.RdService
             public int BssWindows { get; set; }
             public bool AudioSync { get; set; }
             public bool AudioInBssWindow { get; set; }
-            public bool NotUnassignable { get; set; }
             public int MetodosBssOfrecidos { get; set; }
             public uint PorcentajeRSSI { get; set; }
 
@@ -44,7 +43,6 @@ namespace U5ki.RdService
                 BssWindows = 200;
                 AudioSync = false;
                 AudioInBssWindow = true;
-                NotUnassignable = false;
                 Cld_supervision_time = 1000;
                 MetodosBssOfrecidos = (int)RdResource.BssMethods.Ninguno;
                 PorcentajeRSSI = 0;
@@ -238,6 +236,13 @@ namespace U5ki.RdService
             }
         }
 
+        private bool _PasivoRetransmision;               //Indica si es una frecuencia del tipo passivo en retransmision (follow-me)
+        public bool PasivoRetransmision
+        {
+            get { return _PasivoRetransmision; }
+            set { _PasivoRetransmision = value; }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -246,6 +251,7 @@ namespace U5ki.RdService
         {
             _IdDestino = idDestino;
             _Frecuency = fr;
+            PasivoRetransmision = false;
 
             _RtxSquelchTimer = new Timer(TIME_DELAY_TO_RTX)
             {
@@ -601,15 +607,24 @@ namespace U5ki.RdService
             _NumConfiguredRxResources = 0;
             _NumConfiguredTxResources = 0;
             _NumConfiguredTxRxResources = 0;
+            int nsquelches = 0;
             foreach (IRdResource res in _RdRs.Values)
             {
                 if (res.isRx && !res.isTx) _NumConfiguredRxResources++;
                 else if (!res.isRx && res.isTx) _NumConfiguredTxResources++;
                 else if (res.isRx && res.isTx) _NumConfiguredTxRxResources++;
+
+                if (res.isRx)
+                {
+                    if (res.Squelch && res.GetRxSelected() != null) nsquelches++;
+                }
             }
-            
+
             if (_FrRs != null)
+            {
+                if (nsquelches == 0) _FrRs.Squelch = RdSrvFrRs.SquelchType.NoSquelch;
                 RdRegistry.Publish(_IdDestino, _FrRs);
+            }
             ConfiguraModoTransmision(cfg);
         }
 
@@ -2964,6 +2979,8 @@ namespace U5ki.RdService
             //Establece una sección crítica para corregir el desorden de eventos de Ptt de rtx
             lock (_RtxGroups)
             {
+                if (PasivoRetransmision && pttOn) return;
+
                 List<RdFrecuency> rtxGroupFr = _RtxGroups[_FrRs.RtxGroupOwner.ToUpper() + _FrRs.RtxGroupId];
                 LogTrace<RdFrecuency>("IdDestino" + _IdDestino + "Frequency" + _Frecuency + " SendPttToRtxGroup on " + pttOn.ToString() + ",force " + force.ToString() +
                     " RtxGr " + _RtxGroups.Count().ToString() + "_sendingPtt:" + _SendingPttToRtxGroup.ToString());
@@ -3186,7 +3203,6 @@ namespace U5ki.RdService
             bool hayCambios = this.new_params.CLDCalculateMethod != (CORESIP_CLD_CALCULATE_METHOD)cfg.MetodoCalculoClimax ||
                                 this.new_params.BssWindows != cfg.VentanaSeleccionBss ||
                                 this.new_params.AudioSync != cfg.SincronizaGrupoClimax ||
-                                this.new_params.NotUnassignable != cfg.FrecuenciaNoDesasignable ||
                                 this.new_params.AudioInBssWindow != cfg.AudioPrimerSqBss ||
                                 this.new_params.Priority != (CORESIP_Priority)cfg.PrioridadSesionSip ||
                                 this.new_params.Cld_supervision_time != cfg.CldSupervisionTime ||
@@ -3217,7 +3233,6 @@ namespace U5ki.RdService
                     break;
             }
 
-            this.new_params.NotUnassignable = cfg.FrecuenciaNoDesasignable;
             this.new_params.AudioInBssWindow = cfg.AudioPrimerSqBss;
             this.new_params.Priority = (CORESIP_Priority)cfg.PrioridadSesionSip;
             this.new_params.Cld_supervision_time = cfg.CldSupervisionTime;

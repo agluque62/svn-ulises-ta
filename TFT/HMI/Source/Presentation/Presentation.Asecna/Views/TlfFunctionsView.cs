@@ -136,7 +136,9 @@ namespace HMI.Presentation.Asecna.Views
 		}
 		private bool _CancelEnabled
 		{
-			get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative; }
+			get { return _StateManager.Tft.Enabled && _StateManager.Engine.Operative 
+					&& _CmdManager.CancelTlfClick(true); //#2816 LALM 220615
+			}
 		}
         private string _Prioridad   // Miguel
         {

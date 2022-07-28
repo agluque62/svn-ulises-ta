@@ -5,15 +5,18 @@
 		1. Actualizar la referencia al servicio WEB...
 			Actualizará las clases de referencia SOAP.
 
-		1.1 Se obtiene el fichero WSDL de 
+		1.1 Se obtiene el fichero WSDL y el Reference.cs 
+			Dentro del Proyecto u5ki.CfgService/Web References está SoapCfg. En sus Propiedades se pone:			
 			http://192.168.1.4/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx
-			En el link "Service description" (en la parte de arriba)
+			
+			Después con botón derecho del ratón sobre SoapCfg se actualiza la referencia Web.
 
-			El contenido de ese fichero se pega en el fichero ulises-ta\Sources\Cd40\Source\CfgService\Web References\SoapCfg\InterfazSoapConfiguracion.wsdl
+			Con eso se actualiza el fichero  ulises-ta\Sources\Cd40\Source\CfgService\Web References\SoapCfg\InterfazSoapConfiguracion.wsdl
+			y el ulises-ta\Sources\Cd40\Source\CfgService\Web References\SoapCfg\Reference.cs
 
 			Se modifica a mano el fichero de esta solucion 'Cd40Cfg.proto'. y Se genera con ulises-ta\Tools\protobuf-net\protogen.exe el Cd40Cfg.proto.cs
 
-			Se modifica el ficher CfgTranslators.cs
+			Se modifica el fichero CfgTranslators.cs, la función Translate
 
 
 		2. Actualizar fichero 'protobuf'

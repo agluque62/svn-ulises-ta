@@ -55,9 +55,11 @@
     <Property Id="INSTALLFOLDER_NAME" Value="Ulises5000I-TA"></Property>
     <Property Id="CONFIG_FILE" Value="HMI.exe.config"></Property>
     <Property Id='RECDUAL' Value='0'></Property>
-    <Property Id="PVERSION" Value="2.6.0"></Property>
+    <Property Id="PVERSION" Value="2.6.2"></Property>
+    <Property Id="SPRINT" Value="#9"></Property>
+	<Property Id="BuildDate" Value="2022620" />
 
-    <!--Propiedades a mantener cuando se reinstala -->
+	  <!--Propiedades a mantener cuando se reinstala -->
     <!--<Property Id="ED137REC" Value="0">
       <RegistrySearch Id='UV5KI_HMI_ED137REC' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
@@ -242,7 +244,7 @@
             <Directory Id="ED137B4SERVICE" Name="Ed137b4Service">
               <Directory Id="Log1" Name="logs"/>
             </Directory>
-            <Directory Id="WINAUDIO" Name="WINAUDIO"></Directory>
+          <Directory Id="WINAUDIO" Name="WINAUDIO"></Directory>
           </Directory>
         </Directory>
       </Directory>
@@ -381,11 +383,17 @@
                         File = "[#HMI.config]"
                         ElementPath="/configuration/applicationSettings/HMI.Infrastructure.Shell.Settings/setting[\[]@name='Idioma'[\]]/value"
                         Value="[LANG]"/>
-        <!-- MaxVolume=50 a partir de 2.5.9#6 -->
+        <!-- MaxVolume=100 a partir de 2.6.2 -->
         <util:XmlFile Id="MaxVolume" Action="setValue"
                 File = "[#HMI.config]"
                 ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='MaxVolume'[\]]/value"
-                Value="50"/>
+                Value="100"/>
+
+		  <!--volumen tonos 50%-->
+		  <util:XmlFile Id="VolumeTones" Action="setValue"
+				  File = "[#HMI.config]"
+				  ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='VolumeTones'[\]]/value"
+				  Value="50"/>
 
 		  <!--RQF20 CONFIGURACION DISPOSITIVOS DE AUDIO-->
 		  <util:XmlFile Id="CasAlumnoId" Action="setValue"
@@ -668,7 +676,7 @@
                         Name="AssemblyFile"
                         Value="Presentation.AUrr.dll"/>
       </Component>
-      <Component Id='ConditionalUpdatesForKENIA' Guid='{7A3AAF79-ECF1-48B6-973B-B0CF39763259}' KeyPath='yes'>
+      <Component Id='ConditionalUpdatesForKENIA' Guid='{7A3AAF79-ECF1-48B6-973B-B0CF3976325A}' KeyPath='yes'>
         <Condition >CLIENTE="KENIA"</Condition>
         <util:XmlFile Id="LogoKENIA" Action="setValue"
                         File = "[#HMI.config]"
@@ -969,13 +977,6 @@
                         ElementPath="/Task/Principals/Principal/UserId"
                         Value="[%USERDOMAIN]\[%USERNAME]"/>
       </Component>
-      <Component Id ="WAUDIOTASK" Guid="{8EDFECE7-E2A5-4F44-9CBD-D49A7CE21B8F}">
-        <File Id="WAUDIOTASK" Name="UV5K-WAUDIO-START.xml"></File>
-        <util:XmlFile Id="WAUDIOTASK_CMD" Action="setValue"
-                        File = "[#WAUDIOTASK]"
-                        ElementPath="/Task/Actions/Exec/Command"
-                        Value="&quot;[WINAUDIO]WinAudio.exe&quot;"/>
-      </Component>
       <Component Id ="TVTASK" Guid="{9D1BE7A6-40A4-47C8-BD06-C08F22650EC9}">
         <File Id="TVTASK" Name="TEAMVIEWER-START.xml"></File>
         <util:XmlFile Id="TVTASK_USER" Action="setValue"
@@ -1066,21 +1067,6 @@
   
   <Fragment>
     <ComponentGroup Id="HMI.WINAUDIO" Directory="WINAUDIO" Source="..\WinAudio\">
-      <Component Id="HMI.WINAUDIO.BIN" Guid="{2D3F51CF-DB14-42BA-9734-652FD0B43E96}">        
-        <File Id="Winaudio.exe" Name="Winaudio.exe"></File>
-      </Component>
-      <Component Id="HMI.WINAUDIO.NAUDIO" Guid="{72C85E3D-B25A-4ADA-A535-6D802676BBB5}">
-        <File Id="wa.naudio.dll" Name="naudio.dll"></File>
-      </Component>
-      <Component Id="HMI.WINAUDIO.INIP" Guid="{3B2AA028-1266-40FA-BE59-D29D5A7C4AB2}">
-        <File Id="wa.INIFileParser.dll" Name="INIFileParser.dll"></File>
-      </Component>
-      <Component Id="HMI.WINAUDIO.NLOG" Guid="{75714310-062F-435E-9F05-CD85756F5027}">
-        <File Id="wa.nlog.dll" Name="nlog.dll"></File>
-      </Component>
-      <Component Id="HMI.WINAUDIO.NLOG.CFG" Guid="{D4AD367A-F65E-4734-ADD6-1FCEB0D49E50}">
-        <File Id="wa.nlog.config" Name="NLog.config"></File>
-      </Component>
       <Component Id="HMI.WINAUDIO.INI" Guid="{22127FB8-2F56-45F7-A9B9-C0B952C0DCFE}">
         <File Id="wa.winaudio.ini" Name="winaudio.ini"></File>
       </Component>
@@ -1416,8 +1402,9 @@
 			<Condition Action="enable"><![CDATA[ED137REC <> "0"]]> </Condition>
 		</Control>-->
 
-        <Control Id="RadioStatusRecovery_label" Type="Text"       X="10" Y="172" Width="105" Height="18" TabSkip="no" Text="Recuperación Estados Radio" />
-        <Control Id="RadioStatusRecovery_value" Type="ComboBox"   X="125" Y="170" Width="50" Height="18" Property="RDSTATUSREC" ComboList="yes" >
+		  <!--172 a 112-->
+        <Control Id="RadioStatusRecovery_label" Type="Text"       X="10" Y="112" Width="105" Height="18" TabSkip="no" Text="Recuperación Estados Radio" />
+        <Control Id="RadioStatusRecovery_value" Type="ComboBox"   X="125" Y="110" Width="50" Height="18" Property="RDSTATUSREC" ComboList="yes" >
           <ComboBox Property="RDSTATUSREC">
             <ListItem Value="0"  Text="No" />
             <ListItem Value="1"  Text="Sin Persistencia" />
@@ -1428,16 +1415,16 @@
           </ComboBox>
         </Control>
 
-        <Control Id="RadioRtxRecovery_label"  Type="Text"     X="190" Y="172" Width="100" Height="18" TabSkip="no" Text="Recupera Estado RTX(defecto yes)" />
-        <Control Id="RadioRtxRecovery_value"  Type="ComboBox" X="300" Y="170" Width="50"  Height="18" Property="RDRTXREC" ComboList="yes" >
+        <Control Id="RadioRtxRecovery_label"  Type="Text"     X="190" Y="112" Width="100" Height="18" TabSkip="no" Text="Recupera Estado RTX" />
+        <Control Id="RadioRtxRecovery_value"  Type="ComboBox" X="300" Y="110" Width="50"  Height="18" Property="RDRTXREC" ComboList="yes" >
           <ComboBox Property="RDRTXREC" >
             <ListItem Value="True"  Text="Si" />
             <ListItem Value="False" Text="No" />
           </ComboBox>
         </Control>
 <!---->
-        <Control Id="TxConfirmTime_label" Type="Text"       X="10" Y="192" Width="105" Height="18" TabSkip="no" Text="Confirmacion TX" />
-        <Control Id="TxConfirmTime_value" Type="ComboBox"   X="125" Y="190" Width="50" Height="18" Property="TIMESPTX" ComboList="yes" >
+        <Control Id="TxConfirmTime_label" Type="Text"       X="10" Y="132" Width="105" Height="18" TabSkip="no" Text="Confirmacion TX" />
+        <Control Id="TxConfirmTime_value" Type="ComboBox"   X="125" Y="130" Width="50" Height="18" Property="TIMESPTX" ComboList="yes" >
           <ComboBox Property="TIMESPTX">
             <ListItem Value="0"  Text="No" />
             <ListItem Value="500"  Text="G. 0.5 s" />
@@ -1447,8 +1434,8 @@
           </ComboBox>
         </Control>
 
-        <Control Id="SqConfirmTime_label"  Type="Text"     X="190" Y="192" Width="100" Height="18" TabSkip="no" Text="Confirmacion RX" />
-        <Control Id="SqConfirmTime_value"  Type="ComboBox" X="300" Y="190" Width="50"  Height="18" Property="TIMESPRX" ComboList="yes" >
+        <Control Id="SqConfirmTime_label"  Type="Text"     X="190" Y="132" Width="100" Height="18" TabSkip="no" Text="Confirmacion RX" />
+        <Control Id="SqConfirmTime_value"  Type="ComboBox" X="300" Y="130" Width="50"  Height="18" Property="TIMESPRX" ComboList="yes" >
           <ComboBox  Property="TIMESPRX">
             <ListItem Value="0"  Text="No" />
             <ListItem Value="500"  Text="G. 0.5 s" />
@@ -1458,8 +1445,8 @@
           </ComboBox>
         </Control>
 
-        <Control Id="FilterPtt_label" Type="Text"       X="10" Y="212"  Width="105" Height="18" TabSkip="no" Text="Filtro PTT" />
-        <Control Id="FilterPtt_value" Type="ComboBox"   X="125" Y="210" Width="50" Height="18" Property="PTTFILTER" ComboList="yes" >
+        <Control Id="FilterPtt_label" Type="Text"       X="10" Y="152"  Width="105" Height="18" TabSkip="no" Text="Filtro PTT" />
+        <Control Id="FilterPtt_value" Type="ComboBox"   X="125" Y="150" Width="50" Height="18" Property="PTTFILTER" ComboList="yes" >
           <ComboBox Property="PTTFILTER">
             <ListItem Value="0"  Text="No" />
             <ListItem Value="100" Text="100 ms" />
@@ -1485,7 +1472,7 @@
 
 
       <!-- Tercer Dialogo de Opciones -->
-      <Dialog Id="OptionsDlg3" Width="450" Height="270" Title="[ProductName] Options" NoMinimize="yes">
+      <Dialog Id="OptionsDlg3" Width="370" Height="270" Title="[ProductName] Options" NoMinimize="yes">
 
         <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
           <Text>{\WixUI_Font_Title}Configuracion del Puesto</Text>
@@ -1496,9 +1483,9 @@
           <Text>Introduzca la informacion del Puesto</Text>
         </Control>
 
-        <Control Id="StandardDevicesAsk_Label" Type="Text" X="10"  Y="52" Width="130" Height="18" TabSkip="no" Text="Dispositivos de salida standard" />
+        <Control Id="StandardDevicesAsk_Label" Type="Text" X="10"  Y="52" Width="200" Height="18" TabSkip="no" Text="Dispositivos de audio de salida standard" />
           
-        <Control Id="StandardDevicesAsk_Value"  Type="ComboBox" X="135" Y="52" Width="50"  Height="18" Property="STDAUDIODEV" ComboList="yes" >          
+        <Control Id="StandardDevicesAsk_Value"  Type="ComboBox" X="200" Y="52" Width="50"  Height="18" Property="STDAUDIODEV" ComboList="yes" >          
           <ComboBox Property="STDAUDIODEV" >
             <ListItem Value="True"  Text="Si" />
             <ListItem Value="False" Text="No" />
@@ -1506,7 +1493,7 @@
         </Control>
 
         <!--Dispositivos de salida de audio de Windows-->
-        <Control Id="WinDevicesAsk_Label" Type="Text" X="95"  Y="80" Width="150" Height="18" TabSkip="no" Text="Dispositivos salida audio Windows" >
+        <Control Id="WinDevicesAsk_Label" Type="Text" X="10"  Y="80" Width="150" Height="18" TabSkip="no" Text="Dispositivos salida audio Windows" >
           <Condition Action="show">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
@@ -1524,15 +1511,18 @@
             <![CDATA[STDAUDIODEV = "False"]]>
           </Condition>          
         </Control>
-        <Control Id="StdWinInstructorDevAsk_Value"  Type="ComboBox" X="95" Y="90" Width="150"  Height="18" Property="STD_WIN_INSTRUCTOR_DEV" ComboList="yes" >
-          <Condition Action="hide">
+        <Control Id="StdWinInstructorDevAsk_Value"  Type="ComboBox" X="10" Y="110" Width="150"  Height="18" Property="STD_WIN_INSTRUCTOR_DEV" ComboList="yes" >
+			<ComboBox Property="STD_WIN_INSTRUCTOR_DEV">
+				<ListItem Text="Dummy" Value="Dummy" />
+			</ComboBox>
+			<Condition Action="hide">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
           <Condition Action="hide">
             <![CDATA[STDAUDIODEV = "False"]]>
           </Condition>
         </Control>
-        <Control Id="SpkAlumno_Label"   Type="Text" X="10" Y="110" Width="100" Height="18" TabSkip="no" Text="Cascos Alumno" >
+        <Control Id="SpkAlumno_Label"   Type="Text" X="10" Y="100" Width="100" Height="18" TabSkip="no" Text="Cascos Ejecutivo" >
           <Condition Action="show">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
@@ -1540,7 +1530,18 @@
             <![CDATA[STDAUDIODEV = "False"]]>
           </Condition>
         </Control>
-        <Control Id="StdWinAlumnDevAsk_Value"  Type="ComboBox" X="95" Y="110" Width="150"  Height="18" Property="STD_WIN_ALUMN_DEV" ComboList="yes" >
+        <Control Id="StdWinAlumnDevAsk_Value"  Type="ComboBox" X="10" Y="110" Width="150"  Height="18" Property="STD_WIN_ALUMN_DEV" ComboList="yes" >
+			<ComboBox Property="STD_WIN_ALUMN_DEV">
+				<ListItem Text="Dummy" Value="Dummy" />
+			</ComboBox>
+			<Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="SpkRD_Label"   Type="Text" X="10" Y="140" Width="100" Height="18" TabSkip="no" Text="Altavoz Radio" >
           <Condition Action="show">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
@@ -1548,7 +1549,19 @@
             <![CDATA[STDAUDIODEV = "False"]]>
           </Condition>
         </Control>
-        <Control Id="SpkRD_Label"   Type="Text" X="10" Y="130" Width="100" Height="18" TabSkip="no" Text="Altavoz Radio" >
+        <Control Id="StdWinRDDevAsk_Value"  Type="ComboBox" X="10" Y="150" Width="150"  Height="18" Property="STD_WIN_RD_DEV" ComboList="yes" >
+			<!--PAra quitar warning-->
+			<ComboBox Property="STD_WIN_RD_DEV">
+				<ListItem Text="Dummy" Value="Dummy" />
+			</ComboBox>
+			<Condition Action="show">
+            <![CDATA[STDAUDIODEV = "True"]]>
+          </Condition>
+          <Condition Action="hide">
+            <![CDATA[STDAUDIODEV = "False"]]>
+          </Condition>
+        </Control>
+        <Control Id="SpkLC_Label"   Type="Text" X="10" Y="180" Width="100" Height="18" TabSkip="no" Text="Altavoz LC" >
           <Condition Action="show">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
@@ -1556,24 +1569,12 @@
             <![CDATA[STDAUDIODEV = "False"]]>
           </Condition>
         </Control>
-        <Control Id="StdWinRDDevAsk_Value"  Type="ComboBox" X="95" Y="130" Width="150"  Height="18" Property="STD_WIN_RD_DEV" ComboList="yes" >
-          <Condition Action="show">
-            <![CDATA[STDAUDIODEV = "True"]]>
-          </Condition>
-          <Condition Action="hide">
-            <![CDATA[STDAUDIODEV = "False"]]>
-          </Condition>
-        </Control>
-        <Control Id="SpkLC_Label"   Type="Text" X="10" Y="150" Width="100" Height="18" TabSkip="no" Text="Altavoz LC" >
-          <Condition Action="show">
-            <![CDATA[STDAUDIODEV = "True"]]>
-          </Condition>
-          <Condition Action="hide">
-            <![CDATA[STDAUDIODEV = "False"]]>
-          </Condition>
-        </Control>
-        <Control Id="StdWinLCDevAsk_Value"  Type="ComboBox" X="95" Y="150" Width="150"  Height="18" Property="STD_WIN_LC_DEV" ComboList="yes" >
-          <Condition Action="show">
+        <Control Id="StdWinLCDevAsk_Value"  Type="ComboBox" X="10" Y="190" Width="150"  Height="18" Property="STD_WIN_LC_DEV" ComboList="yes" >
+			<!--PAra quitar warning-->
+			<ComboBox Property="STD_WIN_LC_DEV">
+				<ListItem Text="Dummy" Value="Dummy" />
+			</ComboBox>
+			<Condition Action="show">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
           <Condition Action="hide">
@@ -1582,7 +1583,7 @@
         </Control>
 
         <!--Dispositivos de salida de audio de ASIO-->
-        <Control Id="ASIODevicesAsk_Label" Type="Text" X="270"  Y="80" Width="150" Height="18" TabSkip="no" Text="Dispositivos de ASIO" >
+        <Control Id="ASIODevicesAsk_Label" Type="Text" X="200"  Y="80" Width="150" Height="18" TabSkip="no" Text="Dispositivos de ASIO" >
           <Condition Action="show">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
@@ -1592,32 +1593,47 @@
         </Control>
 
 		  <!--Se quita (oculta) instructor-->
-		  <Control Id="StdASIOInstructorDevAsk_Value"  Type="ComboBox" X="270" Y="90" Width="150"  Height="18" Property="STD_ASIO_INSTRUCTOR_DEV" ComboList="yes" >
-          <Condition Action="hide">
+		  <Control Id="StdASIOInstructorDevAsk_Value"  Type="ComboBox" X="200" Y="110" Width="150"  Height="18" Property="STD_ASIO_INSTRUCTOR_DEV" ComboList="yes" >
+			  <!--PAra quitar warning-->
+			  <ComboBox Property="STD_ASIO_INSTRUCTOR_DEV">
+				  <ListItem Text="Dummy" Value="Dummy" />
+			  </ComboBox>
+			  <Condition Action="hide">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
           <Condition Action="hide">
             <![CDATA[STDAUDIODEV = "False"]]>
           </Condition>
         </Control>
-        <Control Id="StdASIOAlumnDevAsk_Value"  Type="ComboBox" X="270" Y="110" Width="150"  Height="18" Property="STD_ASIO_ALUMN_DEV" ComboList="yes" >
-          <Condition Action="show">
+        <Control Id="StdASIOAlumnDevAsk_Value"  Type="ComboBox" X="200" Y="110" Width="150"  Height="18" Property="STD_ASIO_ALUMN_DEV" ComboList="yes" >
+			<!--PAra quitar warning-->
+			<ComboBox Property="STD_ASIO_ALUMN_DEV">
+				<ListItem Text="Dummy" Value="Dummy" />
+			</ComboBox>
+			<Condition Action="show">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
           <Condition Action="hide">
             <![CDATA[STDAUDIODEV = "False"]]>
           </Condition>
         </Control>
-        <Control Id="StdAsioRDDevAsk_Value"  Type="ComboBox" X="270" Y="130" Width="150"  Height="18" Property="STD_ASIO_RD_DEV" ComboList="yes" >
-          <Condition Action="show">
+        <Control Id="StdAsioRDDevAsk_Value"  Type="ComboBox" X="200" Y="150" Width="150"  Height="18" Property="STD_ASIO_RD_DEV" ComboList="yes" >
+			<ComboBox Property="STD_ASIO_RD_DEV">
+				<ListItem Text="Dummy" Value="Dummy" />
+			</ComboBox>
+			<Condition Action="show">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
           <Condition Action="hide">
             <![CDATA[STDAUDIODEV = "False"]]>
           </Condition>
         </Control>
-        <Control Id="StdASIOLCDevAsk_Value"  Type="ComboBox" X="270" Y="150" Width="150"  Height="18" Property="STD_ASIO_LC_DEV" ComboList="yes" >
-          <Condition Action="show">
+        <Control Id="StdASIOLCDevAsk_Value"  Type="ComboBox" X="200" Y="190" Width="150"  Height="18" Property="STD_ASIO_LC_DEV" ComboList="yes" >
+			<!--PAra quitar warning-->
+			<ComboBox Property="STD_ASIO_LC_DEV">
+				<ListItem Text="Dummy" Value="Dummy" />
+			</ComboBox>
+			<Condition Action="show">
             <![CDATA[STDAUDIODEV = "True"]]>
           </Condition>
           <Condition Action="hide">

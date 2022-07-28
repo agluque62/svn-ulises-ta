@@ -190,12 +190,19 @@ namespace HMI.Presentation.Twr.UI
 
         void BorraFilesGrabados()
         {
-            DirectoryInfo di = new DirectoryInfo(Settings.Default.DirectorioGLPRxRadio);
-            FileInfo[] fi = di.GetFiles("RxRadio_*.*", SearchOption.AllDirectories);
-            foreach (System.IO.FileInfo f in fi)
+            try
             {
-                 //_Logger.Info("Purge file", f.Name);
-                 File.Delete(f.Directory + "/" + f.Name);
+                DirectoryInfo di = new DirectoryInfo(Settings.Default.DirectorioGLPRxRadio);
+                FileInfo[] fi = di.GetFiles("RxRadio_*.*", SearchOption.AllDirectories);
+                foreach (System.IO.FileInfo f in fi)
+                {
+                     //_Logger.Info("Purge file", f.Name);
+                     File.Delete(f.Directory + "/" + f.Name);
+                }
+            }
+            catch (Exception exc)
+            {
+                _Logger.Error("Error en BorraFilesGrabados: " + exc.Message);
             }
         }
 

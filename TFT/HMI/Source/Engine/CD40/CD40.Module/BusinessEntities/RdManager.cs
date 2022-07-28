@@ -275,7 +275,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			for (int i = oldPage * numPosByPage, to = Math.Min(_RdPositions.Length, (oldPage + 1) * numPosByPage); i < to; i++)
 			{
-				_RdPositions[i].SetRx(false);
+			    _RdPositions[i].SetRx(false);
                 _RdPositions[i].SetTx(false, false);
             }
 
@@ -285,7 +285,14 @@ namespace HMI.CD40.Module.BusinessEntities
                     _RdPositions[i].SetRx(true);
 			}
 
-			Top.WorkingThread.Enqueue("SetSnmp", delegate()
+            //RQF-14
+            for (int i = newPage * numPosByPage, to = Math.Min(_RdPositions.Length, (newPage + 1) * numPosByPage); i < to; i++)
+            {
+                if (_RdPositions[i].FrecuenciaNoDesasignable)
+                    _RdPositions[i].SetRx(true);
+            }
+
+            Top.WorkingThread.Enqueue("SetSnmp", delegate()
 			{
 				General.SafeLaunchEvent(SetSnmpInt, this, new SnmpIntMsg<string, int>(Settings.Default.RadioPageOid, _Page + 1));
 			});
@@ -642,8 +649,8 @@ namespace HMI.CD40.Module.BusinessEntities
 					{
 						RdPosition rd = _RdPositions[pos];
 						rd.Reset(link);
-
-                            RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, (FrequencyState)rd.Estado, rd.RxOnly);
+                            //RQF-14 parametro frecuencianodesasignable
+                            RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, rd.FrecuenciaNoDesasignable, (FrequencyState)rd.Estado, rd.RxOnly);
                             /** 20180321. AGL. ALIAS a mostrar en la tecla... */
                             posInfo.KeyAlias = rd.KeyAlias;
                             //LALM 220329 introduzco DescDestino.
@@ -663,7 +670,8 @@ namespace HMI.CD40.Module.BusinessEntities
 					RdPosition rd = _RdPositions[i];
 					rd.Reset();
 
-                        RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, (FrequencyState)rd.Estado, rd.RxOnly);
+                        //RQf-14 parametro frecuencianodesasignable
+                        RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, rd.FrecuenciaNoDesasignable, (FrequencyState)rd.Estado, rd.RxOnly);
                         /** 20180321. AGL. ALIAS a mostrar en la tecla... */
                         posInfo.KeyAlias = rd.KeyAlias;
                         //LALM 210223 Errores #4756 prioridad
@@ -954,14 +962,14 @@ namespace HMI.CD40.Module.BusinessEntities
                     if (_PttSource == U5ki.Infrastructure.PttSource.Hmi)
                     {
                         //_Logger.Trace("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.AlumnDev);
-                        SipAgent.RdPttEvent(true, rd.Literal, Top.Mixer.AlumnDev, prior);
+                        SipAgent.RdPttEvent(true, rd.DescDestino, Top.Mixer.AlumnDev, prior);
                         //_Logger.Trace("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.InstructorDev);
-                        SipAgent.RdPttEvent(true, rd.Literal, Top.Mixer.InstructorDev, prior);
+                        SipAgent.RdPttEvent(true, rd.DescDestino, Top.Mixer.InstructorDev, prior);
                     }
                     else
                     {
                         //_Logger.Trace("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, (_PttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev));
-                        SipAgent.RdPttEvent(true, rd.Literal, (_PttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev), prior);
+                        SipAgent.RdPttEvent(true, rd.DescDestino, (_PttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev), prior);
                     }
                 }
                 else if (rd.Tx && (rd.Ptt != PttState.PttOnlyPort && rd.Ptt != PttState.PttPortAndMod && !IsPttRtx))
@@ -973,14 +981,14 @@ namespace HMI.CD40.Module.BusinessEntities
                     if (_OldPttSource == U5ki.Infrastructure.PttSource.Hmi)
                     {
                         //_Logger.Trace("Ending recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.AlumnDev);
-                        SipAgent.RdPttEvent(false, rd.Literal, Top.Mixer.AlumnDev, prior);
+                        SipAgent.RdPttEvent(false, rd.DescDestino, Top.Mixer.AlumnDev, prior);
                         //_Logger.Trace("Ending recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.InstructorDev);
-                        SipAgent.RdPttEvent(false, rd.Literal, Top.Mixer.InstructorDev, prior);
+                        SipAgent.RdPttEvent(false, rd.DescDestino, Top.Mixer.InstructorDev, prior);
                     }
                     else
                     {
                         //_Logger.Trace("Ending recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, (_OldPttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev));
-                        SipAgent.RdPttEvent(false, rd.Literal, (_OldPttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev), prior);
+                        SipAgent.RdPttEvent(false, rd.DescDestino, (_OldPttSource == U5ki.Infrastructure.PttSource.Alumn ? Top.Mixer.AlumnDev : Top.Mixer.InstructorDev), prior);
                     }
                 }
 
@@ -994,11 +1002,11 @@ namespace HMI.CD40.Module.BusinessEntities
                     if (rd.TipoFrecuencia == TipoFrecuencia_t.FD)  
                     {
                         //Es una frecuencia desplazada
-                        SipAgent.RdSquEvent(true, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
+                        SipAgent.RdSquEvent(true, rd.DescDestino, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
                     }
                     else
                     {   //no es frecuencia desplazada.
-                        SipAgent.RdSquEvent(true, rd.Literal, rd.QidxResource, "", 0);
+                        SipAgent.RdSquEvent(true, rd.DescDestino, rd.QidxResource, "", 0);
                     }
                 }
                 else 
@@ -1033,11 +1041,11 @@ namespace HMI.CD40.Module.BusinessEntities
                         if (rd.TipoFrecuencia == TipoFrecuencia_t.FD)
                         {
                             //Es una frecuencia desplazada
-                            SipAgent.RdSquEvent(false, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
+                            SipAgent.RdSquEvent(false, rd.DescDestino, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
                         }
                         else
                         {   //no es frecuencia desplazada.
-                            SipAgent.RdSquEvent(false, rd.Literal, rd.QidxResource, "", 0);
+                            SipAgent.RdSquEvent(false, rd.DescDestino, rd.QidxResource, "", 0);
                         }
                     }
                 }
@@ -1069,14 +1077,14 @@ namespace HMI.CD40.Module.BusinessEntities
                 // JCAM. 20170323
                 // Adaptación para tratamiento BSS
                 //_Logger.Debug("Starting recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
-                SipAgent.RdSquEvent(true, rd.Literal,rd.QidxResource,rd.QidxMethod,rd.QidxValue);
+                SipAgent.RdSquEvent(true, rd.DescDestino, rd.QidxResource,rd.QidxMethod,rd.QidxValue);
             }
             else if (!rd.Rx)
             {
                 // JCAM. 20170323
                 // Adaptación para tratamiento BSS
                 //_Logger.Debug("Ending recording SQUELCH:{0} Frequency:{1} Resource:{2} BssMethod:{3} Qidx:{4}", rd.Squelch, rd.Literal, rd.QidxResource, rd.QidxMethod, rd.QidxValue);
-                SipAgent.RdSquEvent(false, rd.Literal,rd.QidxResource,rd.QidxMethod,rd.QidxValue);
+                SipAgent.RdSquEvent(false, rd.DescDestino, rd.QidxResource,rd.QidxMethod,rd.QidxValue);
             }
         }
 
@@ -1304,9 +1312,15 @@ namespace HMI.CD40.Module.BusinessEntities
                 _Logger.Debug(String.Format("BadOperation TONE Start Playing From {0}:{1}.", caller, lineNumber));
                 _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/RdBadOperation.wav", true);
                 if (Top.Hw.RdSpeaker)
-				  Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                {
+                    Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                    Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
+                }
                 else if (HFSpeakerAvailable())
+                {
                     Top.Mixer.Link(_BadOperationTone, MixerDev.SpkHf, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                    Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
+                }
             }
 			else if (!on && (_BadOperationTone >= 0))
 			{

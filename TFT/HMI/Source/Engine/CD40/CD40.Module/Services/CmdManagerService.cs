@@ -448,6 +448,7 @@ namespace HMI.CD40.Module.Services
                 {
                     int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                     Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                    Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
                     Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
                     {
@@ -778,6 +779,7 @@ namespace HMI.CD40.Module.Services
             {
                 int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                 Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
                 Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
                 {
                     NotifMsg msg = new NotifMsg(Resources.LCSpeakerBusy, Resources.BadOperation, Resources.LCSpeakerBusy, 3000, MessageType.Error, MessageButtons.Ok);
@@ -1418,9 +1420,9 @@ namespace HMI.CD40.Module.Services
 
 		public void Cancel()
 		{
-		}
+        }
 
-		public void Wait(int ms)
+        public void Wait(int ms)
 		{
 			Top.WorkingThread.Enqueue("Wait", delegate()
 			{
@@ -1654,6 +1656,7 @@ namespace HMI.CD40.Module.Services
         {
             int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
             Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+            Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
             Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
             {
                 NotifMsg msg = new NotifMsg("PickUpError", Resources.Info, textMsg, 20000, MessageType.Error, MessageButtons.Ok);
@@ -1967,8 +1970,9 @@ namespace HMI.CD40.Module.Services
 			{
 				int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
 				Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
-				Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
 				{
 					NotifMsg msg = new NotifMsg(Resources.NoJacksError, Resources.BadOperation, Resources.NoJacksError, 0, MessageType.Error, MessageButtons.Ok);
 					General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
@@ -1991,6 +1995,7 @@ namespace HMI.CD40.Module.Services
                     //En este caso, si el PTT esta activado no se permiten llamadas telefonicas
                     int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                     Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                    Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
                     Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
                     {
@@ -2017,6 +2022,7 @@ namespace HMI.CD40.Module.Services
             {
                 int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                 Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
                 Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
                 {
                     NotifMsg msg = new NotifMsg(Resources.LCSpeakerBusy, Resources.BadOperation, Resources.LCSpeakerBusy, 3000, MessageType.Error, MessageButtons.Ok);
@@ -2037,6 +2043,7 @@ namespace HMI.CD40.Module.Services
             {
                 int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                 Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
                 Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
                 {
                     NotifMsg msg = new NotifMsg(Resources.AudioViaNotAvailable, Resources.DeviceError, Resources.AudioViaNotAvailable + Resources.Speaker, 3000, MessageType.Error, MessageButtons.Ok);
@@ -2058,8 +2065,9 @@ namespace HMI.CD40.Module.Services
 			{
 				int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
 				Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
-				Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
 				{
 					NotifMsg msg = new NotifMsg(Resources.NoJacksError, Resources.BadOperation, Resources.NoJacksError, 3000, MessageType.Error, MessageButtons.Ok);
 					General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
@@ -2080,6 +2088,7 @@ namespace HMI.CD40.Module.Services
             {
                 int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                 Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
                 Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
                 {
                     NotifMsg msg = new NotifMsg(Resources.AudioViaNotAvailable, Resources.DeviceError, Resources.AudioViaNotAvailable + Resources.Speaker, 3000, MessageType.Error, MessageButtons.Ok);
@@ -2102,6 +2111,7 @@ namespace HMI.CD40.Module.Services
 
                 int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
                 Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
                 Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
                 {
@@ -2124,8 +2134,9 @@ namespace HMI.CD40.Module.Services
 			{
 				int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
 				Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
-				Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
 				{
 					NotifMsg msg = new NotifMsg(Resources.NoJacksError, Resources.BadOperation, Resources.NoJacksError, 0, MessageType.Error, MessageButtons.Ok);
 					General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
@@ -2144,8 +2155,9 @@ namespace HMI.CD40.Module.Services
 			{
 				int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
 				Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
-				Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
 				{
 					NotifMsg msg = new NotifMsg(Resources.PttPulsedError, Resources.BadOperation, Resources.PttPulsedError, 0, MessageType.Error, MessageButtons.Ok);
 					General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
@@ -2167,8 +2179,9 @@ namespace HMI.CD40.Module.Services
 			{
 				int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
 				Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
-				Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
 				{
 					NotifMsg msg = new NotifMsg(Resources.NoJacksError, Resources.BadOperation, Resources.NoJacksError, 0, MessageType.Error, MessageButtons.Ok);
 					General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
@@ -2185,8 +2198,9 @@ namespace HMI.CD40.Module.Services
 			{
 				int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
 				Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
-				Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
 				{
 					NotifMsg msg = new NotifMsg(Resources.PttPulsedError, Resources.BadOperation, Resources.PttPulsedError, 0, MessageType.Error, MessageButtons.Ok);
 					General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
@@ -2203,8 +2217,9 @@ namespace HMI.CD40.Module.Services
 			{
 				int _BadOperationTone = SipAgent.CreateWavPlayer("Resources/Tones/Falsa_Maniobra.wav", true);
 				Top.Mixer.Link(_BadOperationTone, MixerDev.SpkRd, MixerDir.Send, Mixer.RD_PRIORITY, FuentesGlp.RxRadio);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);//#5829
 
-				Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
+                Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
 				{
 					NotifMsg msg = new NotifMsg(Resources.PttPulsedError, Resources.BadOperation, Resources.FrecuencyRtxError, 0, MessageType.Error, MessageButtons.Ok);
 					General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
@@ -2476,6 +2491,12 @@ namespace HMI.CD40.Module.Services
             }
 
             return retorno;
+        }
+
+        //#5829 para unificar los tone de señalizacion
+        public void SetTonesLevel(int level)
+        {
+            //TODO
         }
 
         /**

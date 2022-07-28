@@ -59,10 +59,10 @@ namespace HMI.CD40.Module.BusinessEntities
         ///#3618 Señal de Llamada Entrante durante CONV en altavoz
         bool LineaCalienteEnUso()
         {
-            // 211029 cambio lc_activo por lc.Activitylc()
-            // hay un error lc_activo se queda a true cuando hay actividad en el altavoz de lc/tlf.
-            if (Top.Lc.lc_activo)
+            // 220617 solo puedo saber si el speker de linea caliente esta en uso
+            if (Top.Mixer.SpkLcInUse())
                 return true;
+
             return false;
         }
 
@@ -75,6 +75,7 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 _Tone = value;
                 Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
+                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER);//#5829
             }
         }
 
@@ -140,11 +141,18 @@ namespace HMI.CD40.Module.BusinessEntities
                                 //LALM 211014
                                 //#3618 Señal de Llamada Entrante durante CONV en altavoz
                                 // Si La linea caliente esta ocupada, genero otro tono.
-                                if (LineaCalienteEnUso()||LineaTlfEnUso())
+                                if (LineaCalienteEnUso() || LineaTlfEnUso())
+                                {
                                     _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingNoIntrusivo.wav", true);
+                                    Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
+                                    //Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER);//#5829
+                                }
                                 else
+                                {
                                     _Tone = SipAgent.CreateWavPlayer("Resources/Tones/Ring.wav", true);
-                                Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
+                                    Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
+                                    Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER);//#5829
+                                }
                                 break;
 							case TlfState.InPrio:
                                 //LALM 211014
@@ -155,7 +163,8 @@ namespace HMI.CD40.Module.BusinessEntities
                                 else
                                     _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingPrio.wav", true);
                                 Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
-								break;
+                                Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER);//#5829
+                                break;
                             //#2855
                             case TlfState.offhook:
                                 _Tone = SipAgent.CreateWavPlayer("Resources/Tones/Descolgado.wav", true);
@@ -209,6 +218,7 @@ namespace HMI.CD40.Module.BusinessEntities
                             break;
                         //#2855
                         case TlfState.offhook:
+                            _SipCall = null;
                             break;
                     }
 
@@ -501,11 +511,11 @@ namespace HMI.CD40.Module.BusinessEntities
 
         //LALM 211201
         //#2855
-        public void DescuelgaPos(bool descolgado)
+        public void DescuelgaPos(bool descolgar)
         {
-            if (State == TlfState.Idle)
+            if (State == TlfState.Idle && descolgar)
                 State = TlfState.offhook;
-            else if (State == TlfState.offhook)
+            else if (State == TlfState.offhook && !descolgar)
                 State = TlfState.Idle;
         }
         //*2855
@@ -797,6 +807,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
 				foreach (SipChannel ch in _Channels)
 				{
+                    //220602 mensaje motivorechazo.
 					SipPath path = ch.FindPath(transferInfo.DstId, transferInfo.DstIp, transferInfo.DstSubId, transferInfo.DstRs);
                     if (path != null)
                     {
@@ -885,8 +896,8 @@ namespace HMI.CD40.Module.BusinessEntities
             //State = (_State == TlfState.Set) || (_State == TlfState.Congestion) || (_State == TlfState.OutOfService) || (_State == TlfState.Busy) ? GetReachableState()/*TlfState.Idle*/ : (Top.Tlf.PriorityCall ? TlfState.PaPBusy : TlfState.Idle);
 
             Top.Tlf.PriorityCall = false;
-
-		}
+            
+        }
 
         /// <summary>
         /// 
@@ -1231,7 +1242,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
         public virtual bool IsForMe(CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
         {
-            SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, -1, info, inInfo, this is TlfIaPosition);
+            string reason = "";
+            SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, -1, info, inInfo, this is TlfIaPosition, out reason);
             return (inCall != null);
         }
         /// <summary>
@@ -1242,10 +1254,12 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="info"></param>
         /// <param name="inInfo"></param>
         /// <returns></returns>
-		public virtual int HandleIncomingCall(int sipCallId, int call2replace, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
+        //lalm 220603
+        public virtual int HandleIncomingCall(int sipCallId, int call2replace, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo, out string reason)
 		{
             //En teclas de AD, sólo se admiten llamada con los datos que coincidan con los configurados
-			SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, sipCallId, info, inInfo, this is TlfIaPosition);
+            //reason = null;
+            SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, sipCallId, info, inInfo, this is TlfIaPosition, out reason);
 
             if (inCall != null && 
                 (inCall.Ch.Type==TipoInterface.TI_EyM_MARC || 
@@ -1656,7 +1670,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         string uri = getdstParams(ch,path,(int)( _SipCall.Priority + 1),remoteid);
                         path.Reset(uri);
 
-						return TlfState.Out;
+                        return TlfState.Out;
 					}
 
 					path = ch.GetDetourPath(_SipCall.Priority);
@@ -1810,12 +1824,14 @@ namespace HMI.CD40.Module.BusinessEntities
 
 				State = st;
 			}
-			else
-			{
+            else //rs.IsValid
+            {
 				GwTlfRs.State rsState = rs.Content is GwTlfRs ? ((GwTlfRs)rs.Content).St : GwTlfRs.State.Idle;
                 //Actualiza los cambios de proxy en los destinos ATS externos
+                //RQF-49 Esta funcion, cambia todas las lineas de todos los recursos que se llaman igual al id pasado.
+                // si no se hace la llamada a todos los proxies.
                 if (rs.Content is GwTlfRs)
-				    ResetIpLinesOfChannels(rs.Id, ((GwTlfRs)rs.Content).GwIp);
+                    ResetIpLinesOfChannels(rs.Id, ((GwTlfRs)rs.Content).GwIp);
 
 				if (_SipCall != null) 
 				{
@@ -1858,14 +1874,14 @@ namespace HMI.CD40.Module.BusinessEntities
                     //    setIdle = false;
                     //State = GetReachableState(setIdle);
                     State = GetReachableState();
-				}
-			}
+                }
+            }
 		}
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="id"></param>
+        /// <param namFe="id"></param>
         /// <param name="gwIp"></param>
 		protected void ResetIpLinesOfChannels(string id, string gwIp)
 		{

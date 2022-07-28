@@ -95,14 +95,18 @@ namespace HMI.CD40.Module.BusinessEntities
             return base.TryCall(ch, path, prio);
         }
 
-        public override int HandleIncomingCall(int sipCallId, int call2replace, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
+        //lalm 220603
+        public override int HandleIncomingCall(int sipCallId, int call2replace, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo, out string reason)
         {
             int ret = SipAgent.SIP_DECLINE;
+            reason = "";
             if (inInfo.SrcId == _Literal)
             {
                 //it's for me
                 _ActiveState = true;
-                ret = base.HandleIncomingCall(sipCallId, call2replace, info, inInfo);
+                //lalm 220603
+                reason = "";
+                ret = base.HandleIncomingCall(sipCallId, call2replace, info, inInfo,out reason);
                 //Esta comprobación no se hace porque a veces la CORESIP pierde el NOTIFY del "deleted"
                 //TODO Pendiente de hacer cuando se resuelva la CORESIP
                 if (!_Subscribed)

@@ -212,6 +212,7 @@ namespace HMI.Model.Module.Messages
 		public readonly int RtxGroup;
         public readonly TipoFrecuencia_t TipoFrecuencia;
         public readonly bool Monitoring;
+		public readonly bool FrecuenciaNoDesasignable;//RQF-14
         public readonly FrequencyState Estado;
         public readonly bool RxOnly;
 		/** 20180321. AGL. ALIAS a mostrar en la tecla... */
@@ -219,9 +220,10 @@ namespace HMI.Model.Module.Messages
 		//LALM 210223 hay que pasar la prioridad.
 		public int Priority { get; set; }
 		public readonly string IdFrecuency;//RQF34
-
+		
+		//RQF-14 se pasa el parametro frecuencia no desasignable
 		public RdInfo(string dst, string alias, bool tx, bool rx, PttState ptt, SquelchState squelch,
-            RdRxAudioVia audioVia, int rtxGroup, TipoFrecuencia_t tipoFrecuencia, bool monitoring, FrequencyState estado, bool rxOnly)
+            RdRxAudioVia audioVia, int rtxGroup, TipoFrecuencia_t tipoFrecuencia, bool monitoring, bool frecuencianodesasignable, FrequencyState estado, bool rxOnly)
 		{
 			Dst = dst;
 			Alias = alias;
@@ -233,12 +235,14 @@ namespace HMI.Model.Module.Messages
 			RtxGroup = rtxGroup;
             TipoFrecuencia = tipoFrecuencia;
             Monitoring = monitoring;
+			FrecuenciaNoDesasignable = frecuencianodesasignable;//RQf-14
             Estado = estado;
             RxOnly = rxOnly;
         }
 		public override string ToString()
 		{
-            return string.Format("[Dst={0}] [Alias={1}] [Rx={2}] [Tx={3}] [Ptt={4}] [Squelch={5}] [AudioVia={6}] [RxtGroup={7}] [TipoFrecuencia={8}] [Monitoring={9}] [Estado={10}] [RxOnly={11}] [DescDestino={11}]", Dst, Alias, Rx, Tx, Ptt, Squelch, AudioVia, RtxGroup, TipoFrecuencia, Monitoring, Estado, RxOnly,DescDestino);
+			//RQf-14
+            return string.Format("[Dst={0}] [Alias={1}] [Rx={2}] [Tx={3}] [Ptt={4}] [Squelch={5}] [AudioVia={6}] [RxtGroup={7}] [TipoFrecuencia={8}] [Monitoring={9}] [FrecuenciaNoDesasignable={10}] [Estado={11}] [RxOnly={12}] [DescDestino={13}]", Dst, Alias, Rx, Tx, Ptt, Squelch, AudioVia, RtxGroup, TipoFrecuencia, Monitoring, FrecuenciaNoDesasignable, Estado, RxOnly,DescDestino);
 		}
 	}
 

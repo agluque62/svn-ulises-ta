@@ -491,6 +491,64 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 		}
 
+		//RQF-49
+		public class dependencia
+		{
+			private string id;
+			private string ip;
+			private GwTlfRs.State std;
+
+			public string Id { get => id; set => id = value; }
+			public string Ip { get => ip; set => ip = value; }
+			public GwTlfRs.State Std { get => std; set => std = value; }
+			public void setstd(GwTlfRs.State std)
+            {
+				Std = std;
+            }
+            public dependencia(string id, string ip)
+            {
+				Id = id;
+				Ip = ip;
+				Std = GwTlfRs.State.NotAvailable;
+			}
+		}
+		
+		public class Cdependencias
+        {
+			public List<dependencia> dependencias;
+
+			public dependencia find(string id, string ip)
+			{
+				foreach (dependencia dep in dependencias)
+				{
+					if (dep.Id == id && dep.Ip == ip)
+						return dep;
+				}
+				return null;
+			}
+
+			public bool presente(string ip)
+            {
+				foreach (dependencia dep in dependencias)
+				{
+					if (dep.Ip == ip)
+						if (dep.Std != GwTlfRs.State.NotAvailable)
+							return true;
+				}
+				return false;
+			}
+
+			public Cdependencias()
+			{
+				dependencias = new List<dependencia>();
+			}
+			public void inserta(dependencia dep)
+            {
+				dependencias.Add(dep);
+            }
+		}
+		public Cdependencias dependencias = new Cdependencias();
+
 		private void RsChanged<T>(RsChangeInfo change) where T : class
 		{
 			T rs = Deserialize<T>(change.Content);
@@ -504,18 +562,72 @@ namespace HMI.CD40.Module.BusinessEntities
 			if (rs is GwTlfRs) 
             {
                 object rsTlf = rs;
-                // No trato los eventos de proxies externos
-                if (((GwTlfRs)rsTlf).Type > (uint)RsChangeInfo.RsTypeInfo.InternalAltProxy)
-                    return;
- 
-                if (((GwTlfRs)rsTlf).Type >= (uint)RsChangeInfo.RsTypeInfo.ExternalSub)
+				//RQF-49
+				//Trato eventos recursos externos.
+				if (((GwTlfRs)rsTlf).Type > (uint)RsChangeInfo.RsTypeInfo.InternalAltProxy)
+                {
+					if ( ((((GwTlfRs)rsTlf).Type == (uint)RsChangeInfo.RsTypeInfo.ExternalProxy) || 
+						 (((GwTlfRs)rsTlf).Type == (uint)RsChangeInfo.RsTypeInfo.ExternalAltProxy) ))
+                    {
+						String[] userData = ((GwTlfRs)rsTlf).GwIp.ToString().Split(':');
+						
+						string ip = userData[0];
+						dependencia dep = dependencias.find(id,ip);
+						GwTlfRs.State std = ((GwTlfRs)rsTlf).St;
+						RsChangeInfo.RsTypeInfo tipo = (RsChangeInfo.RsTypeInfo)((GwTlfRs)rsTlf).Type;
+						if (dep == null)
+						{
+							dep = new dependencia(id,ip);
+							dependencias.inserta(dep);
+						}
+						if (dep.Std!=std)
+							dep.setstd(std);
+						_Logger.Trace($"RsChanged. Resource Changed <{id} {ip} {tipo} {std}>");
+						#if TEST1
+						// *********************
+						// Test1 cuando este 192.168.1.112 pongo que esta 192.168.2.206(1)
+						// Test2 cuando este 192.168.1.112 pongo que NO esta 192.168.2.206(2) y viceversa
+						//***********************
+						// si se pone una ip invalida no pasará por aqui.
+						if (ip=="192.168.1.112--")
+                        {
+							ip = "192.168.2.206";
+							dep = dependencias.find(id, ip);
+							std = ((GwTlfRs)rsTlf).St;
+							// (2) si se quiere estado contrario
+							/*if (std == GwTlfRs.State.Idle)
+								std = GwTlfRs.State.NotAvailable;
+							else
+								std = GwTlfRs.State.Idle;
+							*/
+							if (dep == null)
+							{
+								dep = new dependencia(id, ip);
+								dependencias.inserta(dep);
+							}
+							if (dep.Std != std)
+								dep.setstd(std);
+
+						}
+						#endif
+					}
+					return;
+				}
+
+				else if (((GwTlfRs)rsTlf).Type >= (uint)RsChangeInfo.RsTypeInfo.ExternalSub)
                 {
                     //TODO Le quito la informacion de puerto que no me sirve, de momento, hay que cambiar CORESIP y mas
                     String[] userData = ((GwTlfRs)rsTlf).GwIp.ToString().Split(':');
                     ((GwTlfRs)rsTlf).GwIp = userData[0];
-                    if (((GwTlfRs)rsTlf).St == GwTlfRs.State.NotAvailable)
-                        rs = null;
-               }
+					
+					_Logger.Trace($"Recibiendo Resource :{((GwTlfRs)rsTlf).Type},ip= {((GwTlfRs)rsTlf).GwIp.ToString()}, type { ((GwTlfRs)rsTlf).Type},estado{((GwTlfRs)rsTlf).St}");
+
+					if (((GwTlfRs)rsTlf).St == GwTlfRs.State.NotAvailable)
+					{
+						rs = null;
+					}
+
+				}
             }
 
             Top.WorkingThread.Enqueue("RsChanged", delegate()
@@ -551,6 +663,6 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 		}
 
-		#endregion
+#endregion
 	}
 }

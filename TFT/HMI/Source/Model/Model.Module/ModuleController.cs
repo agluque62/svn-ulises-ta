@@ -65,7 +65,7 @@ namespace HMI.Model.Module
                 WorkItem.RootWorkItem.Services.Get<IEngineCmdManagerService>().GetEngineInfo();
             };
 
-            ToolStripSeparator separator = new ToolStripSeparator();
+			ToolStripSeparator separator = new ToolStripSeparator();
             ToolStripMenuItem exit = new ToolStripMenuItem(Resources.Exit);
 			exit.Name = "Exit";
 			exit.Margin = new Padding(exit.Margin.Left, exit.Margin.Top + 5, exit.Margin.Right, exit.Margin.Bottom + 5);

@@ -1,6 +1,9 @@
-03-5-2022 Fin Sprint#6 v2.6.2
-27-1-2022 Fin Sprint#2.6.2
-16-12-2021 Fin Sprint#1
+14-6-2022 Spring 8
+01-6-2022 Version preliminar de 2.6.2.spring8
+23-5-2022 Fin Spring#7 c2.6.2
+03-5-2022 Fin Spring#6 v2.6.2
+27-1-2022 Fin Spring#2.6.2
+16-12-2021 Fin Spring#1
 
 Notas Envio 18-11-2014
 

@@ -89,6 +89,12 @@ namespace HMI.CD40.Module.BusinessEntities
             get { return _Monitoring; }
 		}
 
+        //RQF-14
+        public bool FrecuenciaNoDesasignable
+        {
+            get { return _FrecuenciaNodeDesasignable;  }
+        }
+
 		public PttState Ptt
 		{
 			get { return _Ptt; }
@@ -277,6 +283,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
             _TipoFrecuencia = (TipoFrecuencia_t)cfg.TipoFrecuencia;
             _Monitoring = cfg.EstadoAsignacion == "M";
+            //RQF-14
+            _FrecuenciaNodeDesasignable = cfg.FrecuenciaNoDesasignable;
             _RxOnly = false;
 
             switch (cfg.EstadoAsignacion)
@@ -375,7 +383,7 @@ namespace HMI.CD40.Module.BusinessEntities
 					_Rx = AssignState.Trying;
 					Top.Registry.SetRx(_Literal, true);
 				}
-				else if (!on && (_Rx != AssignState.Idle))
+				else if (!on && (_Rx != AssignState.Idle) && !FrecuenciaNoDesasignable)//RQF-14
 				{
 					if (_Rx == AssignState.Set)
 					{
@@ -532,7 +540,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         return RdRxAudioVia.HfSpeaker;
                     else if (Top.Mixer.ModoSoloAltavoces)
                     {
-                        if (!Tx)
+                        if (!Tx && !FrecuenciaNoDesasignable)//RQF-14-
                             return RdRxAudioVia.NoAudio;
                     }
                     else
@@ -546,7 +554,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 case RdRxAudioVia.HfSpeaker:
                     if (Top.Mixer.ModoSoloAltavoces)
                     {
-                        if (!Tx)
+                        if (!Tx && !FrecuenciaNoDesasignable)//RQF-14
                             return RdRxAudioVia.NoAudio;
                         else if (Top.Hw.RdSpeaker)
                             return RdRxAudioVia.Speaker;
@@ -561,7 +569,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     audioViaKO = RdRxAudioVia.HeadPhones;
                     break;
                 default: // RdRxAudioVia.HeadPhones
-                    if (!Tx)
+                    if (!Tx && !FrecuenciaNoDesasignable)//RQF-14
                         return RdRxAudioVia.NoAudio;
                     else if (Top.Hw.RdSpeaker)
                         return RdRxAudioVia.Speaker;
@@ -747,7 +755,9 @@ namespace HMI.CD40.Module.BusinessEntities
 		private static Logger _Logger = LogManager.GetCurrentClassLogger();
 
         private bool _Monitoring;
-		private int _Pos;
+        //RQF-14
+        private bool _FrecuenciaNodeDesasignable;
+        private int _Pos;
 		private string _Literal = "";
 		private string _Alias = "";
         private string _KeyAlias = "";

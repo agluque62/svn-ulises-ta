@@ -479,6 +479,9 @@ namespace HMI.Presentation.Twr.Views
                 case TlfState.InProcess:
                     backColor = VisualStyle.Colors.Yellow;
                     break;
+				case TlfState.offhook://#2855 220713
+					backColor = VisualStyle.Colors.Yellow;
+					break;
 
 			}
 

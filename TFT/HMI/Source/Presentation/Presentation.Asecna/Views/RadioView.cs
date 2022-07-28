@@ -770,7 +770,14 @@ namespace HMI.Presentation.Asecna.Views
 					}
 				}
 
-                bt.Reset(dst.Frecuency, dst.Alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, dst.TipoFrecuencia == TipoFrecuencia_t.HF ? VisualStyle.Colors.HfColor : VisualStyle.Colors.Black);
+				//bt.Reset(dst.Frecuency, dst.Alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, dst.TipoFrecuencia == TipoFrecuencia_t.HF ? VisualStyle.Colors.HfColor : VisualStyle.Colors.Black);
+				//RQF34
+				string alias = dst.KeyAlias;
+				int priority = dst.Priority;
+				bool bloqueado = (dst.Ptt == PttState.Blocked);
+				Color titleForeColor = VisualStyle.Colors.Black;
+				bt.Reset(dst.IdFrecuency, dst.NameFrecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+							dst.State, priority, bloqueado);
 				bt.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative && !dst.Unavailable;
                 UpdateTx(bt, dst);
 			}

@@ -416,7 +416,7 @@ namespace U5ki.RdService
                 _SipCallId = SipAgent.MakeRdCall(null, _LastUri, _Frecuency, _IdDestino, flags, Settings.Default.McastIp, _McastPort,
                     _FreqParams.Priority, new_params.zona, _FreqParams.FrequencyType,
                     _FreqParams.CLDCalculateMethod, _FreqParams.BssWindows, _FreqParams.AudioSync,
-                    _FreqParams.AudioInBssWindow, _FreqParams.NotUnassignable, _FreqParams.Cld_supervision_time, 
+                    _FreqParams.AudioInBssWindow, _FreqParams.Cld_supervision_time, 
                     ((BssMethods)_FreqParams.MetodosBssOfrecidos).ToString(),
                     PorcentajeRSSI);
 

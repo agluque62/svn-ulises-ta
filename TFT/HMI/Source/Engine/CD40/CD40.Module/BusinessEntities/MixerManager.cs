@@ -279,10 +279,9 @@ namespace HMI.CD40.Module.BusinessEntities
         //#3267 RQF22
         public void RecordMode0()
         {
-            /** Retornos de Grabacion */
             _InstructorRecorderDevInHw = (_InstructorRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input): _InstructorRecorderDevInHw;
             _AlumnRecorderDevInHw = (_AlumnRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input): _AlumnRecorderDevInHw;
-            _RadioRecorderDevInHw = (_RadioRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input) : _RadioRecorderDevInHw;
+            //_RadioRecorderDevInHw = (_RadioRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input) : _RadioRecorderDevInHw;
             _LcRecorderDevInHw = (_LcRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input): _LcRecorderDevInHw;
             //_RadioHfRecorderInHw = -1;
 
@@ -290,12 +289,16 @@ namespace HMI.CD40.Module.BusinessEntities
             _IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? - 1:-1;
             _AlumnRecorderDevOutHw = (_AlumnRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Output): _AlumnRecorderDevOutHw;
 
+            /** Retornos de Grabacion */
             _InstructorRecorderDevIn = _InstructorRecorderDevInHw;
             _AlumnRecorderDevIn = _AlumnRecorderDevInHw;
             _RadioRecorderDevIn = -1;
-            _LcRecorderDevIn = _LcRecorderDevInHw;
+            //_LcRecorderDevIn = -1;//version 6414
+            _LcRecorderDevIn = _LcRecorderDevInHw;// version 7373
             _RadioHfRecorderIn = -1;
-            _IntRecorderDevOut = _IntRecorderDevOutHw;
+
+            /** Salidas de Grabacion. */
+            _IntRecorderDevOut = -1;//220601 quito  _IntRecorderDevOutHw;
             _AlumnRecorderDevOut = _AlumnRecorderDevOutHw;
 
             if (Settings.Default.CMediaBkpVersion == "B41A")
@@ -319,13 +322,13 @@ namespace HMI.CD40.Module.BusinessEntities
         //#3267 RQF22
         public void RecordMode1()
         {
-            /** Retornos de Grabacion */
             _InstructorRecorderDevInHw = (_InstructorRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, CMediaDevMode.Input): _InstructorRecorderDevInHw;
             _AlumnRecorderDevInHw = (_AlumnRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Input): _AlumnRecorderDevInHw;
             _RadioRecorderDevInHw = (_RadioRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input): _RadioRecorderDevInHw;
             _LcRecorderDevInHw = (_LcRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input): _LcRecorderDevInHw;
             //_RadioHfRecorderInHw = -1;
 
+            /** Retornos de Grabacion */
             _InstructorRecorderDevIn = _InstructorRecorderDevInHw;
             _AlumnRecorderDevIn = _AlumnRecorderDevInHw;
             _RadioRecorderDevIn = _RadioRecorderDevInHw;
@@ -337,7 +340,7 @@ namespace HMI.CD40.Module.BusinessEntities
             _AlumnRecorderDevOutHw = (_AlumnRecorderDevOutHw == -1) ? _InstructorRecorderDevOut = _IntRecorderDevOut: _AlumnRecorderDevOutHw;
 
             _IntRecorderDevOut = _IntRecorderDevOutHw;
-            _AlumnRecorderDevOut = _AlumnRecorderDevOutHw;
+            _AlumnRecorderDevOut = _InstructorRecorderDevOut = _IntRecorderDevOut;//220601
         }
 
         /// RQF20 aqui se añadiran todos los tipos de dispositivos.
@@ -369,7 +372,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
             /** Salidas de Grabacion. */
             _IntRecorderDevOut = _IntRecorderDevOutHw;
-            _AlumnRecorderDevOut = _AlumnRecorderDevOutHw;
+            _AlumnRecorderDevOut = _InstructorRecorderDevOut = _IntRecorderDevOutHw;//220601
         }
 
         //#3267 RQF22
@@ -467,6 +470,7 @@ namespace HMI.CD40.Module.BusinessEntities
             Top.Hw.SpeakerChangedHw += OnHwChanged;
             Top.Tlf.Listen.ListenChanged += OnListenChanged;
             Top.Tlf.HangToneChanged += OnTlfToneChanged;
+            Top.Tlf.UnhangToneChanged += OnTlfToneChanged;
 #if _MEZCLADOR_ASECNA_
     _UnlinkGlpRadioTimer.AutoReset = true;
 #endif
@@ -987,6 +991,8 @@ namespace HMI.CD40.Module.BusinessEntities
 					((link._Dir == MixerDir.Send) || (link._Dir == MixerDir.SendRecv)))
 				{
 						SipAgent.SetVolume(link._CallId, _RdHeadPhonesVolume);
+                        //#5829 lo hago tambien sobre el dispositivo fisico.
+                        SipAgent.SetVolume(CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, _RdHeadPhonesVolume);
 				}
 			}
 
@@ -1305,11 +1311,16 @@ namespace HMI.CD40.Module.BusinessEntities
                             Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true, finalizar);
                             _UnlinkGlpRadioTimer.Enabled = true;
 #endif
+                            SipAgent.SetVolume(id, _RdSpeakerVolume);
                         }
                         else
+                        {
                             Top.Recorder.SetIdSession(id, FuentesGlp.RxRadio);
+                            
+                            // #5829 Aqui se pone el id del dispositivo fisico.
+                            SipAgent.SetVolume(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, _RdSpeakerVolume);
+                        }
 
-                        SipAgent.SetVolume(id, _RdSpeakerVolume);
                     }
                     else
                     {
@@ -1359,9 +1370,17 @@ namespace HMI.CD40.Module.BusinessEntities
 					if (_BuzzerEnabled)
 					{
 						LinkRing(id, priority);
-					}
-					SipAgent.SetVolume(id, _RingVolume);
-					break;
+                        bool VolumeInUse = false;
+                        foreach (LinkInfo link1 in _LinksList) if (link1._Dev == MixerDev.SpkLc) VolumeInUse = true;
+                        if (!VolumeInUse) SipAgent.SetVolume(id, _VolumeTones);//#5829
+                    }
+
+                    SipAgent.SetVolume(id, _RingVolume);
+                    //Pongo siempre el volumen al nivel de lina caliente si esta estuviese activa
+                    
+                    SetLcSpeakerLevel(CalculateLevel(_LcSpeakerVolume));
+
+                    break;
 			}
 
 		}
@@ -1691,7 +1710,8 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             else                                        
             {
-                _Logger.Error("MixerManager.LinkRecord Error. Dispositivo de Entrada o Salida no Disponible: {0}", dev);
+                if (on)// 220609 Solo doy error en caso de intentar grabar
+                    _Logger.Error("MixerManager.LinkRecord Error. Dispositivo de Entrada o Salida no Disponible: {0}", dev);
                 return;
             }
 		}
@@ -1865,6 +1885,7 @@ namespace HMI.CD40.Module.BusinessEntities
         private List<LinkInfo> _LinksList = new List<LinkInfo>();
         private List<int> _TlfListens = new List<int>();
 		private int _TlfRxLinks = 0;
+        private int _VolumeTones = 50;
 
         /** Dispositivos de Retorno de Grabacion */
 		private int _AlumnRecorderDevIn = -1;
@@ -1968,6 +1989,16 @@ namespace HMI.CD40.Module.BusinessEntities
 			double step = (Settings.Default.MaxVolume - Settings.Default.MinVolume) / 8.0;
 			return (Settings.Default.MinVolume + (int)((level + 1) * step));
 		}
+
+        private int CalculateLevel(int volume)
+        {
+            volume = Math.Max(Settings.Default.MinVolume, volume);
+            volume = Math.Min(Settings.Default.MaxVolume, volume);
+
+            double step = (Settings.Default.MaxVolume - Settings.Default.MinVolume) / 8.0;
+            return (volume - Settings.Default.MinVolume) / (int)step - 1;
+
+        }
 
         /// <summary>
         /// Método Link que tiene en cuenta la fuente y el destino
@@ -2381,6 +2412,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="mphToSpk">true si el cambio es de casco a altavoz, false en caso contrario </param>
         private void TogleRxAudioRadio(bool mphToSpk)
         {
+            _Logger.Info("TogleRxAudioRadio: " + mphToSpk);
             // AGL. Hace una copia de los enlaces establecidos en el 'Mezclador'.
             List<LinkInfo> copyLinks = new List<LinkInfo>(_LinksList);
             // AGL... ???
@@ -2400,6 +2432,7 @@ namespace HMI.CD40.Module.BusinessEntities
                                 if ((p._Dir == MixerDir.Send) || (p._Dir == MixerDir.SendRecv))
                                 {
                                     LinkInfo linkReal = _LinksList.Find(elem => elem == p);
+                                    _Logger.Info("ConectaAltavozDisponible: " + linkReal);
                                     ConectaAltavozDisponible(ref linkReal);
                                     //Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, true);
                                 }
@@ -2411,12 +2444,14 @@ namespace HMI.CD40.Module.BusinessEntities
                         {
                             //Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, false);
                             Unlink(p._CallId, p._CurrentDev, MixerDir.Send);
+                            _Logger.Info("Unlink: callid:{0} dev {1}" , p._CallId, p._CurrentDev);
                             p._CurrentDev = MixerDev.MhpRd;
 
                             if (_InstructorDev >= 0 && _InstructorJack)
                             {
                                 //Link teniendo en cuenta la dirección
                                 Link(p._CallId, _InstructorDev, p._Dir, p._Priority);
+                                _Logger.Info("Link: callid:{0} dev:{1}", p._CallId, _InstructorDev);
                                 //Top.Recorder.Rec(p.Key, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_RECORDER, p.Value.Dir, p.Value.Priority, true);
                             }
                             if (_AlumnDev >= 0 && _AlumnJack)
@@ -2424,6 +2459,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
                                 //Link teniendo en cuenta la dirección
                                 Link(p._CallId, _AlumnDev, p._Dir, p._Priority);
+                                _Logger.Info("Link: callid:{0} dev:{1}", p._CallId, _AlumnDev);
 
                                 //Top.Recorder.Rec(p.Key, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, p.Value.Dir, p.Value.Priority, true);
                             }
@@ -2438,7 +2474,10 @@ namespace HMI.CD40.Module.BusinessEntities
                                 dev = p._CallId;
                             }
                             if (dev != 0)
+                            {
                                 SipAgent.SetVolume(dev, _RdHeadPhonesVolume);
+                                _Logger.Info("SetVolume dev:{0} valor:{1}", dev, _RdHeadPhonesVolume);
+                            }
                         }
                     }
                 }
@@ -2458,10 +2497,12 @@ namespace HMI.CD40.Module.BusinessEntities
                 return;
 
             Unlink(link._CallId, link._CurrentDev, MixerDir.Send);
+            _Logger.Info("Unlink callid:{0} dev:{1} ", link._CallId, link._CurrentDev);
 
             if (Top.Hw.RdSpeaker)
             {
                 _Mixer.Link(link._CallId, Mixer.UNASSIGNED_PRIORITY, _RdSpeakerDev, link._Priority);
+                _Logger.Info("link callid:{0} dev:{1} ", link._CallId, _RdSpeakerDev);
                 SipAgent.SetVolume(link._CallId , _RdSpeakerVolume);
                 link._CurrentDev = MixerDev.SpkRd;
             }
@@ -2602,6 +2643,7 @@ namespace HMI.CD40.Module.BusinessEntities
             get { return (_RingDev == MixerDev.SpkLc); }
         }
 
+
         //#3267 RQF22
         public bool SetTipoGrabacionAnalogica(int tipoGrabacionAnalogica)
         {
@@ -2655,5 +2697,79 @@ namespace HMI.CD40.Module.BusinessEntities
                 }
             }
         }
+
+        // debe ser uno  de estos cuatro
+        //CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP
+        //CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP
+        //CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER
+        //CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER
+        //#5829 Nueva funcion para ajustar los volumenes de los dispositivos fisicos, sin idcall.
+        public bool SetVolumeTones(CORESIP_SndDevType dev)
+        {
+            if (Settings.Default.AudioCardSimul == true)
+            {
+                return true;
+            }
+            else if (Settings.Default.LcSpeakerSimul)
+            {
+                return true;
+            }
+            else if (dev == CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER)
+            {
+                // Compruebo si se esta usando el dispositivo
+                bool VolumeInUse = false;
+                foreach (LinkInfo link in _LinksList) if (link._Dev == MixerDev.SpkRd) VolumeInUse = true;
+                if (!VolumeInUse) SipAgent.SetVolume(dev, _VolumeTones);//#5829
+            }
+            else if (dev == CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP)// Habria que diferenciar en que modo estamos disgregado o agrupado
+            {
+                // Compruebo si se esta usando el dispositivo
+                bool VolumeInUse = false;
+                foreach (LinkInfo link in _LinksList) if (link._Dev == MixerDev.MhpRd) VolumeInUse = true;
+                if (!VolumeInUse) SipAgent.SetVolume(dev, _VolumeTones);//#5829
+            }
+            else if (dev == CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP)// Habria que diferenciar en que modo estamos disgregado o agrupado
+            {
+                // Compruebo si se esta usando el dispositivo
+                bool VolumeInUse = false;
+                foreach (LinkInfo link in _LinksList) if (link._Dev == MixerDev.MhpRd) VolumeInUse = true;
+                if (!VolumeInUse) SipAgent.SetVolume(dev, _VolumeTones);//#5829
+            }
+            else if (dev == CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER)
+            {
+                bool VolumeInUse = false;
+                foreach (LinkInfo link in _LinksList) if (link._Dev == MixerDev.SpkLc) VolumeInUse = true;
+                if (!VolumeInUse) SipAgent.SetVolume(dev, _VolumeTones);//#5829
+                if (_BuzzerEnabled)
+                {
+                    foreach (LinkInfo link in _LinksList)
+                    {
+                        if (link._Dev == MixerDev.Ring)
+                            SipAgent.SetVolume(dev, _RingVolume);//#5829
+
+                    }
+
+                    return true;
+                }
+            }
+            return false;
+        }
+		
+		// Para ajustar indendientemente
+		// volumen de ring y volumen LC
+        public void SetVolumeRing()
+        {
+            if (id_ringing>0)
+                SipAgent.SetVolume(id_ringing, _RingVolume);
+        }
+
+        public bool SpkLcInUse()
+        {
+            foreach (LinkInfo link in _LinksList) if (link._Dev == MixerDev.SpkLc) 
+                return true;
+            return false;
+        }
+
+        public int VolumeTones { get => _VolumeTones; set => _VolumeTones = value; }
     }
 }

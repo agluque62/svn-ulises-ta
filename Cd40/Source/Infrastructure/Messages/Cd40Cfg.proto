@@ -369,6 +369,7 @@ message CfgEnlaceExterno
     optional string EmplazamientoDefecto = 24;
 	optional int32 TiempoVueltaADefecto = 25;
 	optional uint32 PorcentajeRSSI = 26;
+	optional bool PasivoRetransmision = 27;
 }
 
 message CfgRecursoEnlaceInterno

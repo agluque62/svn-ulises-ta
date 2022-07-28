@@ -44,7 +44,7 @@ namespace UnitTestProject1
         public void MarvellChipsetTest()
         {
             string filePath = "c:\\Users\\luisangel.lopez\\Downloads\\EvSistema, Puesto chipsetMarvel.evtx";
-            string jconfig = "{ \"TeamingType\": \"Marvell\", \"WindowsLog\": \"System\", \"EventSource\": \"yukonw7\", \"UpEventId\": [121,123], \"DownEventId\": [83], \"PropertyIndex\": 0, \"LanInverted\" : 0 }";
+            string jconfig = "{ \"TeamingType\": \"Marvell\", \"WindowsLog\": \"System\", \"EventSource\": \"yukonw7\", \"UpEventId\": [121,123], \"DownEventId\": [83], \"PropertyIndex\": 0, \"LanInverted\" : 1 }";
             var mon = new NicEventMonitor(jconfig,
                     (lan, status) =>
                     {

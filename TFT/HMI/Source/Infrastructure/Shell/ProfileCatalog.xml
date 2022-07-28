@@ -18,6 +18,10 @@
 		</Dependencies>
 		<Modules>
 			<ModuleInfo AssemblyFile="Presentation.Twr.dll" />
+			<!--<ModuleInfo AssemblyFile="Presentation.Asecna.dll" />-->
+			<!--<ModuleInfo AssemblyFile="Presentation.RadioLight.dll" />-->
+			<!--<ModuleInfo AssemblyFile="Presentation.Urr.dll" />-->
+			<!--<ModuleInfo AssemblyFile="Presentation.Aurr.dll" />-->
 		</Modules>
 	</Section>
 </SolutionProfile>

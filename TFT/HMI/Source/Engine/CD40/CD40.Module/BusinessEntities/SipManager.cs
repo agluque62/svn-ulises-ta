@@ -21,10 +21,15 @@ namespace HMI.CD40.Module.BusinessEntities
 	{
 		public int Value;
         public string redirectTo = "";
+        public string reason_text;
+        public int reason_code;
 		public CORESIP_Answer(int value)
 		{
 			Value = value;
-		}
+            reason_code = 0;
+            reason_text = "";
+
+        }
 	}
 
 #if DEBUG
@@ -294,8 +299,12 @@ namespace HMI.CD40.Module.BusinessEntities
                         {
                             SipAgent.AnswerCall(call, answer.Value);
                         }
-                    }
-                    catch (Exception exc)
+                        // #5523 Siempre que haya una llamada entrante
+                        // Si no es para mi devuelvo decline, se podria devolver 500.
+                        else
+                            SipAgent.AnswerCall(call, answer.Value, answer.reason_code, answer.reason_text,false);
+                }
+                catch (Exception exc)
                     {
                         _Logger.Error("SipAgent.AnswerCall", exc.Message);
                     }

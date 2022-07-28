@@ -1137,7 +1137,7 @@ namespace HMI.Presentation.Twr.Views
             {
                 TimeSpan elapsed = DateTime.Now - last;
                 // Si ha pasado mas de 10 segundos pide confirmación
-                if (elapsed < TimeSpan.Zero || elapsed >= tick)
+                if ((elapsed < TimeSpan.Zero || elapsed >= tick) || !_StateManager.Radio.pagina_confirmada)
                     _CmdManager.SetCambioRadio(up);
                 else
                     _RdPageBT_UpClick_Confirmada(sender);
@@ -1157,7 +1157,7 @@ namespace HMI.Presentation.Twr.Views
             {
                 TimeSpan elapsed = DateTime.Now - last;
                 // Si ha pasado mas de 10 segundos pide confirmación
-                if (elapsed < TimeSpan.Zero || elapsed >= tick)
+                if (elapsed < TimeSpan.Zero || elapsed >= tick || !_StateManager.Radio.pagina_confirmada)
                     _CmdManager.SetCambioRadio(up);
                 else
                     _RdPageBT_DownClick_Confirmada(sender);

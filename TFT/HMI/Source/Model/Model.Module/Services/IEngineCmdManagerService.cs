@@ -88,5 +88,6 @@ namespace HMI.Model.Module.Services
 		void SetCambioRadio(bool up);
 		//LALM 211201
 		void Descuelga();
+		void SetTonesLevel(int level);
 	}
 }

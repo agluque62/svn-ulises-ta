@@ -190,10 +190,12 @@ namespace HMI.CD40.Module.BusinessEntities
 			return info;
 		}
 
-		public static SipCallInfo NewIncommingCall(IEnumerable<SipChannel> channels, int callId, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo, bool findNoConfigured)
+		// LALM anado reason
+		public static SipCallInfo NewIncommingCall(IEnumerable<SipChannel> channels, int callId, CORESIP_CallInfo info, CORESIP_CallInInfo inInfo, bool findNoConfigured,out string reason)
 		{
             SipPath path = null;
             SipChannel channel = null;
+			reason = "";
 			foreach (SipChannel ch in channels)
 			{
 				ch.First = false;
@@ -207,6 +209,13 @@ namespace HMI.CD40.Module.BusinessEntities
                     channel = ch;
                     break;
                 }
+                else
+                {
+					if (ch.ReasonDecline!="")
+                    {
+						reason= ch.ReasonDecline;
+                    }
+				}
             }
             //Si no se encuentra path en todos los canales,
             //se hace una busqueda sin comparar con el recurso.

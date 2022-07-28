@@ -7,132 +7,143 @@ using U5ki.Infrastructure;
 using Utilities;
 using NLog;
 using System.Collections;
+using static HMI.CD40.Module.BusinessEntities.TopRegistry;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
 #if DEBUG
     public class SipLine
 #else
-	class SipLine
+    class SipLine
 #endif	
-	{
-		public string Id
-		{
-			get { return (RsLine != null ? RsLine.Id : ""); }
-		}
+    {
+        public string Id
+        {
+            get { return (RsLine != null ? RsLine.Id : ""); }
+        }
 
-		public bool IsAvailable
-		{
+        public bool IsAvailable
+        {
             get { return (RsLine != null ? RsLine.IsValid : true); }
-		}
+        }
 
         public bool centralIP
         {
             get { return _centralIP; }
         }
+
+        // RQF-49
+        public bool IpPresente {
+            get => Top.Registry.dependencias.presente(Ip);
+            set => ipPresente = value; 
+        }
+
         public string Ip;
+        //RQF-49
+        private bool ipPresente;
         /// <summary>
         /// Recurso que representa el estado de la linea
         /// </summary>
-		public readonly Resource RsLine;
+        public readonly Resource RsLine;
         //Indica que es un encaminamiento tipo CentralIP externa (otro SCV)
         private bool _centralIP = false;
 
-		public SipLine(Resource rs, string ip, bool centralIP = false)
-		{
-			RsLine = rs;
-			Ip = ip;
+        public SipLine(Resource rs, string ip, bool centralIP = false)
+        {
+            RsLine = rs;
+            Ip = ip;
             _centralIP = centralIP;
-		}
+            IpPresente = false;
+        }
 
-		public bool Equals(string id, string ip)
-		{
-			return (SipUtilities.EqualSIPIPAddress(Ip, ip) && (string.Compare(Id, id, true) == 0));
-		}
+        public bool Equals(string id, string ip)
+        {
+            return (SipUtilities.EqualSIPIPAddress(Ip, ip) && (string.Compare(Id, id, true) == 0));
+        }
 
-		public bool Find(string id, string ip)
-		{
+        public bool Find(string id, string ip)
+        {
             //Comentado para permitir recibir transf directa de PP interna SCV
             return (SipUtilities.EqualSIPIPAddress(Ip, ip)/* && (string.IsNullOrEmpty(id) || (string.Compare(Id, id, true) == 0))*/);
-		}
-	}
+        }
+    }
 
 #if DEBUG
     public class SipRemote
 #else
-	class SipRemote
+    class SipRemote
 #endif	
-	{
-		public readonly List<string> Ids;
-		public readonly string SubId = null;
+    {
+        public readonly List<string> Ids;
+        public readonly string SubId = null;
 
-		public SipRemote(string id)
-		{
-			Ids = new List<string>(1);
-			Ids.Add(id);
-		}
+        public SipRemote(string id)
+        {
+            Ids = new List<string>(1);
+            Ids.Add(id);
+        }
 
-		public SipRemote(List<string> ids)
-		{
-			Ids = ids;
-		}
+        public SipRemote(List<string> ids)
+        {
+            Ids = ids;
+        }
 
-		public SipRemote(string id, string subId)
-		{
-			Ids = new List<string>(1);
-			Ids.Add(id);
+        public SipRemote(string id, string subId)
+        {
+            Ids = new List<string>(1);
+            Ids.Add(id);
 
-			SubId = subId;
-		}
+            SubId = subId;
+        }
 
-		public bool Equals(string remote, string subRemote)
-		{
-			if (string.Compare(SubId, subRemote, true) == 0)
-			{
-				foreach (string id in Ids)
-				{
-					if (string.Compare(id, remote, true) == 0)
-					{
-						return true;
-					}
-				}
-			}
+        public bool Equals(string remote, string subRemote)
+        {
+            if (string.Compare(SubId, subRemote, true) == 0)
+            {
+                foreach (string id in Ids)
+                {
+                    if (string.Compare(id, remote, true) == 0)
+                    {
+                        return true;
+                    }
+                }
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		public bool Find(string remote, string subRemote)
-		{
-			if (string.IsNullOrEmpty(SubId))
-			{
-				if (string.IsNullOrEmpty(subRemote))
-				{
-					foreach (string id in Ids)
-					{
-						if (string.Compare(id, remote, true) == 0)
-						{
-							return true;
-						}
-					}
-				}
-			}
-			else
-			{
-				return (string.Compare(SubId, subRemote, true) == 0);
-			}
+        public bool Find(string remote, string subRemote)
+        {
+            if (string.IsNullOrEmpty(SubId))
+            {
+                if (string.IsNullOrEmpty(subRemote))
+                {
+                    foreach (string id in Ids)
+                    {
+                        if (string.Compare(id, remote, true) == 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return (string.Compare(SubId, subRemote, true) == 0);
+            }
 
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 
 #if DEBUG
-	public class SipPath
+    public class SipPath
 #else
-	class SipPath
+    class SipPath
 #endif	
-	{
-		public readonly SipLine Line;
-		public readonly SipRemote Remote;
+    {
+        public readonly SipLine Line;
+        public readonly SipRemote Remote;
         public readonly bool PriorityChannel;
         /// <summary>
         ///  indica que la llamada debe hacerse en modo sin proxy, es el modo emergencia, para llamadas internas
@@ -205,108 +216,108 @@ namespace HMI.CD40.Module.BusinessEntities
     }
 
 #if DEBUG
-	public struct SipResult
+    public struct SipResult
 #else
     struct SipResult
 #endif
     {
-		public int Result;
-		public int PrioResult;
-	}
+        public int Result;
+        public int PrioResult;
+    }
 
 #if DEBUG
-	public abstract class SipChannel
+    public abstract class SipChannel
 #else
-	abstract class SipChannel
+    abstract class SipChannel
 #endif	
-	{
+    {
         public enum DestinationState {Idle, NotReachable, Busy};
-		public virtual event GenericEventHandler RsChanged
-		{
-			add
-			{
-				foreach (SipLine line in _Lines)
-				{
-					if (line.RsLine != null)
-						line.RsLine.Changed += value;
-				}
+        public virtual event GenericEventHandler RsChanged
+        {
+            add
+            {
+                foreach (SipLine line in _Lines)
+                {
+                    if (line.RsLine != null)
+                        line.RsLine.Changed += value;
+                }
                 if (RsProxyPropio != null)
                     RsProxyPropio.Changed += value;
             }
-			remove 
-			{
-				foreach (SipLine line in _Lines)
-				{
-					if (line.RsLine != null)
-						line.RsLine.Changed -= value;
+            remove 
+            {
+                foreach (SipLine line in _Lines)
+                {
+                    if (line.RsLine != null)
+                        line.RsLine.Changed -= value;
                 }
                 if (RsProxyPropio != null)
                     RsProxyPropio.Changed -= value;
             }
-		}
+        }
 
-		public string Id
-		{
-			get { return _Id; }
-		}
+        public string Id
+        {
+            get { return _Id; }
+        }
 
-		public uint Prefix
-		{
-			get { return _Prefix; }
-		}
+        public uint Prefix
+        {
+            get { return _Prefix; }
+        }
 
-		public string AccId
-		{
-			get { return _AccId; }
-		}
+        public string AccId
+        {
+            get { return _AccId; }
+        }
 
-		public virtual string Uri
-		{
-			get { return null; }
-		}
+        public virtual string Uri
+        {
+            get { return null; }
+        }
         public virtual string UriPropia
         {
             get { return null; }
         }
 
         public virtual string Domain
-		{
-			get { return null; }
-		}
+        {
+            get { return null; }
+        }
         public virtual ArrayList GetUris
-		{
-			get { return null; }
-		}
+        {
+            get { return null; }
+        }
 
-		public virtual TipoInterface Type
-		{
-			get
-			{
-				return _Type;
-			}
-		}
+        public virtual TipoInterface Type
+        {
+            get
+            {
+                return _Type;
+            }
+        }
 
-		public IEnumerable<SipLine> Lines
-		{
-			get { return _Lines; }
-		}
+        public IEnumerable<SipLine> Lines
+        {
+            get { return _Lines; }
+        }
 
         public List<SipLine> ListLines
         {
             get { return _Lines; }
         }
 
-		public List<SipRemote> RemoteDestinations
-		{
-			get { return _RemoteDestinations; }
-		}
+        public List<SipRemote> RemoteDestinations
+        {
+            get { return _RemoteDestinations; }
+        }
 
-		public bool First
-		{
-			get { return _First; }
+        public bool First
+        {
+            get { return _First; }
 
-			set { _First = value; }
-		}
+            set { _First = value; }
+        }
 
         public bool PriorityAllowed
         {
@@ -317,7 +328,9 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             get { return _IsPP; }
         }
-
+        
+        // anado ReasonDecline
+        public string ReasonDecline { get => _reasondecline; set => _reasondecline = value; }
 
         public SipChannel()
         {
@@ -329,48 +342,48 @@ namespace HMI.CD40.Module.BusinessEntities
                 RsProxyPropio = Top.Registry.GetRs<GwTlfRs>(idEquipo);
             }
          }
-		public void AddRemoteDestination(string dst, string subDst)
-		{
-			foreach (SipRemote remote in _RemoteDestinations)
-			{
-				if (remote.Equals(dst, subDst))
-				{
-					return;
-				}
-			}
+        public void AddRemoteDestination(string dst, string subDst)
+        {
+            foreach (SipRemote remote in _RemoteDestinations)
+            {
+                if (remote.Equals(dst, subDst))
+                {
+                    return;
+                }
+            }
 
-			_RemoteDestinations.Add(new SipRemote(dst, subDst));
-			_Results = new SipResult[_RemoteDestinations.Count, _Lines.Count];
-		}
+            _RemoteDestinations.Add(new SipRemote(dst, subDst));
+            _Results = new SipResult[_RemoteDestinations.Count, _Lines.Count];
+        }
 
-		public SipRemote ContainsRemote(string id, string subId)
-		{
-			foreach (SipRemote remote in _RemoteDestinations)
-			{
-				if (remote.Equals(id, subId))
-				{
-					return remote;
-				}
-			}
+        public SipRemote ContainsRemote(string id, string subId)
+        {
+            foreach (SipRemote remote in _RemoteDestinations)
+            {
+                if (remote.Equals(id, subId))
+                {
+                    return remote;
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		public SipLine ContainsLine(string id, string ip)
-		{
-			foreach (SipLine line in _Lines)
-			{
-				if (line.Equals(id, ip))
-				{
-					return line;
-				}
-			}
+        public SipLine ContainsLine(string id, string ip)
+        {
+            foreach (SipLine line in _Lines)
+            {
+                if (line.Equals(id, ip))
+                {
+                    return line;
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		public SipPath FindPath(string id, string ip, string subId, string rsId)
-		{
+        public SipPath FindPath(string id, string ip, string subId, string rsId)
+        {
             if (_UnknownUri != null)
                 return new SipPath(_RemoteDestinations[0], _Lines[0], RsProxyPropio);
             else
@@ -389,9 +402,12 @@ namespace HMI.CD40.Module.BusinessEntities
                         }
                     }
                 }
+                // Aqui podria marcar el mensaje de linea no encontrada.
+                if (ReasonDecline == "" || ReasonDecline==null)
+                    ReasonDecline = "Direct Access Key or Source Not Configured";
             }
-			return null;
-		}
+            return null;
+        }
         public SipPath FindPath(string uri)
         {
             SipPath sipPath = null;
@@ -438,115 +454,115 @@ namespace HMI.CD40.Module.BusinessEntities
             return null;
         }
 
-		public void ResetCallResults(bool allResults)
-		{
-			for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
-			{
-				for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
-				{
-					if (allResults)
-					{
-						_Results[i, j].Result = 0;
-					}
-					_Results[i, j].PrioResult = 0;
-				}
-			}
-		}
+        public void ResetCallResults(bool allResults)
+        {
+            for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
+            {
+                for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
+                {
+                    if (allResults)
+                    {
+                        _Results[i, j].Result = 0;
+                    }
+                    _Results[i, j].PrioResult = 0;
+                }
+            }
+        }
 
-		public bool ResetCallResults(Resource rs)
-		{
-			for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
-			{
-				if (_Lines[j].RsLine == rs)
-				{
-					if (!rs.IsValid)
-					{
-						switch (_Prefix)
-						{
-							case Cd40Cfg.INT_DST:
-								for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
-								{
-									_Results[i, j].Result = 0;
-									_Results[i, j].PrioResult = 0;
-								}
-								break;
+        public bool ResetCallResults(Resource rs)
+        {
+            for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
+            {
+                if (_Lines[j].RsLine == rs)
+                {
+                    if (!rs.IsValid)
+                    {
+                        switch (_Prefix)
+                        {
+                            case Cd40Cfg.INT_DST:
+                                for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
+                                {
+                                    _Results[i, j].Result = 0;
+                                    _Results[i, j].PrioResult = 0;
+                                }
+                                break;
 
-							default:
-								for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
-								{
-									switch (_Results[i, j].Result)
-									{
-										case SipAgent.SIP_BUSY:
-										case SipAgent.SIP_NOT_FOUND:
-										case SipAgent.SIP_CONGESTION:
-											break;
-										default:
-											_Results[i, j].Result = 0;
-											_Results[i, j].PrioResult = 0;
-											break;
-									}
-								}
-								break;
-						}
-					}
-					else if (rs.Content is GwTlfRs)
-					{
-						switch (((GwTlfRs)rs.Content).St)
-						{
-							case GwTlfRs.State.Idle:
-								for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
-								{
-									if (_Results[i, j].Result == SipAgent.SIP_TEMPORARILY_UNAVAILABLE)
-									{
-										_Results[i, j].Result = 0;
-										_Results[i, j].PrioResult = 0;
-									}
-								}
-								break;
-							case GwTlfRs.State.BusyInterruptionAllow:
-								for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
-								{
-									if (_Results[i, j].Result == SipAgent.SIP_TEMPORARILY_UNAVAILABLE)
-									{
-										_Results[i, j].PrioResult = 0;
-									}
-								}
-								break;
-						}
-					}
+                            default:
+                                for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
+                                {
+                                    switch (_Results[i, j].Result)
+                                    {
+                                        case SipAgent.SIP_BUSY:
+                                        case SipAgent.SIP_NOT_FOUND:
+                                        case SipAgent.SIP_CONGESTION:
+                                            break;
+                                        default:
+                                            _Results[i, j].Result = 0;
+                                            _Results[i, j].PrioResult = 0;
+                                            break;
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                    else if (rs.Content is GwTlfRs)
+                    {
+                        switch (((GwTlfRs)rs.Content).St)
+                        {
+                            case GwTlfRs.State.Idle:
+                                for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
+                                {
+                                    if (_Results[i, j].Result == SipAgent.SIP_TEMPORARILY_UNAVAILABLE)
+                                    {
+                                        _Results[i, j].Result = 0;
+                                        _Results[i, j].PrioResult = 0;
+                                    }
+                                }
+                                break;
+                            case GwTlfRs.State.BusyInterruptionAllow:
+                                for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
+                                {
+                                    if (_Results[i, j].Result == SipAgent.SIP_TEMPORARILY_UNAVAILABLE)
+                                    {
+                                        _Results[i, j].PrioResult = 0;
+                                    }
+                                }
+                                break;
+                        }
+                    }
 
-					return true;
-				}
-			}
+                    return true;
+                }
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		public void SetCallResult(SipRemote remote, SipLine line, CORESIP_Priority priority, int result)
-		{
-			for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
-			{
-				if (_RemoteDestinations[i] == remote)
-				{
-					for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
-					{
-						if (_Lines[j] == line)
-						{
-							_Results[i, j].Result = result;
+        public void SetCallResult(SipRemote remote, SipLine line, CORESIP_Priority priority, int result)
+        {
+            for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
+            {
+                if (_RemoteDestinations[i] == remote)
+                {
+                    for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
+                    {
+                        if (_Lines[j] == line)
+                        {
+                            _Results[i, j].Result = result;
 
-							if (priority == CORESIP_Priority.CORESIP_PR_EMERGENCY)
-							{
-								_Results[i, j].PrioResult = result;
-							}
+                            if (priority == CORESIP_Priority.CORESIP_PR_EMERGENCY)
+                            {
+                                _Results[i, j].PrioResult = result;
+                            }
 
-							break;
-						}
-					}
+                            break;
+                        }
+                    }
 
-					break;
-				}
-			}
-		}
+                    break;
+                }
+            }
+        }
 
         /// <summary>
         /// Devuelve true si el último error en los resultados era de una linea tipo centralIP
@@ -579,28 +595,29 @@ namespace HMI.CD40.Module.BusinessEntities
             if (!line.centralIP)
                 return line.IsAvailable;
             else
-                return (line.IsAvailable && RsProxyPropio != null && RsProxyPropio.IsValid);
+                //RQF-49 IpPresente.
+                return (line.IsAvailable && RsProxyPropio != null && RsProxyPropio.IsValid && line.IpPresente);
         }
 
-		public virtual SipPath GetPreferentPath(CORESIP_Priority priority)
-		{
-			return null;
-		}
+        public virtual SipPath GetPreferentPath(CORESIP_Priority priority)
+        {
+            return null;
+        }
 
-		public virtual SipPath GetInterrumpiblePath()
-		{
-			return null;
-		}
+        public virtual SipPath GetInterrumpiblePath()
+        {
+            return null;
+        }
 
-		public virtual SipPath GetDetourPath(CORESIP_Priority priority)
-		{
-			return null;
-		}
+        public virtual SipPath GetDetourPath(CORESIP_Priority priority)
+        {
+            return null;
+        }
 
-		public virtual void ResetLine(string id, string ip)
-		{
-			return;
-		}
+        public virtual void ResetLine(string id, string ip)
+        {
+            return;
+        }
 
         /// <summary>
         /// Devuelve el estado del destino
@@ -619,19 +636,19 @@ namespace HMI.CD40.Module.BusinessEntities
             return st;
         }
  
- 		#region Protected Members
+        #region Protected Members
         protected static Logger _Logger = LogManager.GetCurrentClassLogger();
 
-		protected string _Id;
-		protected uint _Prefix;
+        protected string _Id;
+        protected uint _Prefix;
         //Nombre de la cuenta SIP, coincide con el numero de abonado del sector
-		protected string _AccId;
-		protected List<SipLine> _Lines = new List<SipLine>();
-		protected List<SipRemote> _RemoteDestinations = new List<SipRemote>();
-		protected SipResult[,] _Results = null;
-		protected bool _First = false;
+        protected string _AccId;
+        protected List<SipLine> _Lines = new List<SipLine>();
+        protected List<SipRemote> _RemoteDestinations = new List<SipRemote>();
+        protected SipResult[,] _Results = null;
+        protected bool _First = false;
 
-		protected TipoInterface _Type = 0;
+        protected TipoInterface _Type = 0;
         //Recurso adicional que representa el estado del proxy propio
         //Se utiliza para activar el modo emergencia y afecta a la presencia de los encaminamientos por IP
         public Resource RsProxyPropio = null;
@@ -639,67 +656,67 @@ namespace HMI.CD40.Module.BusinessEntities
         protected bool _PriorityAllowed = true;
         protected bool _IsPP = false;
         protected string _UnknownUri = null;
+        private string _reasondecline = null;
 
-
-		#endregion
-	}
+        #endregion
+    }
 
     /// <summary>
     /// Not used
     /// </summary>
-	class IpChannel : SipChannel
-	{
-		public override string Uri
-		{
-			get { return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip); }
-		}
+    class IpChannel : SipChannel
+    {
+        public override string Uri
+        {
+            get { return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip); }
+        }
 
         public override string Domain
         {
             get { return _Lines[0].Ip; }
         }
 
-		public IpChannel(string localId, string remote, uint prefix)
-		{
+        public IpChannel(string localId, string remote, uint prefix)
+        {
             string rsIpExt;
             string idEquipo;
 
-			_Id = remote;
-			_Prefix = prefix;
-			_AccId = Top.Cfg.GetNumeroAbonado(localId, Cd40Cfg.ATS_DST) ?? localId;
+            _Id = remote;
+            _Prefix = prefix;
+            _AccId = Top.Cfg.GetNumeroAbonado(localId, Cd40Cfg.ATS_DST) ?? localId;
 
-			string[] idIp = remote.Split('@');
-			_RemoteDestinations.Add(new SipRemote(idIp[0]));
+            string[] idIp = remote.Split('@');
+            _RemoteDestinations.Add(new SipRemote(idIp[0]));
             // Usar esta en modo sin proxy 
             rsIpExt = idIp[1];
 
              rsIpExt = Top.Cfg.GetProxyIp(out idEquipo);
             _Lines.Add(new SipLine(null, rsIpExt));
-			_Results = new SipResult[1, 1];
-		}
+            _Results = new SipResult[1, 1];
+        }
 
-		public override SipPath GetPreferentPath(CORESIP_Priority priority)
-		{
-			SipLine line = _Lines[0];
-			SipRemote remote = _RemoteDestinations[0];
+        public override SipPath GetPreferentPath(CORESIP_Priority priority)
+        {
+            SipLine line = _Lines[0];
+            SipRemote remote = _RemoteDestinations[0];
 
-			if (_Results[0, 0].PrioResult == 0)
-			{
-				int result = _Results[0, 0].Result;
+            if (_Results[0, 0].PrioResult == 0)
+            {
+                int result = _Results[0, 0].Result;
 
-				if ((result == 0) ||
-					((result == SipAgent.SIP_BUSY) && (priority == CORESIP_Priority.CORESIP_PR_EMERGENCY)))
-				{
-					return new SipPath(remote, line, RsProxyPropio);
-				}
-			}
+                if ((result == 0) ||
+                    ((result == SipAgent.SIP_BUSY) && (priority == CORESIP_Priority.CORESIP_PR_EMERGENCY)))
+                {
+                    return new SipPath(remote, line, RsProxyPropio);
+                }
+            }
             _Logger.Debug("IpChannel not available, line {0}, results: {1}, {2}", line.RsLine.Id, _Results[0, 0].PrioResult, _Results[0, 0].Result);
-			return null;
-		}
-	}
+            return null;
+        }
+    }
 
-	class IntChannel : SipChannel
-	{
+    class IntChannel : SipChannel
+    {
         ///<summary>
         ///Devuelve la uri formada con la dirección del proxy si está disponible, 
         ///Si el proxy no está disponible se envía la dirección propia del sector
@@ -739,23 +756,23 @@ namespace HMI.CD40.Module.BusinessEntities
             get { return _Lines[0].IsAvailable ? _Lines[0].Ip : _Lines[1].Ip; }
         }
 
-		public IntChannel(string localId, string hostId, string userId, uint prefix)
-		{
+        public IntChannel(string localId, string hostId, string userId, uint prefix)
+        {
             string rsIp;
             string idEquipo;
 
-			_Id = hostId;
-			_Prefix = prefix;
-			//_Local = Top.Cfg.GetNumeroAbonado(localId, Cd40Cfg.ATS_DST) ?? localId;
+            _Id = hostId;
+            _Prefix = prefix;
+            //_Local = Top.Cfg.GetNumeroAbonado(localId, Cd40Cfg.ATS_DST) ?? localId;
             _AccId = localId;
 
-			foreach (StrNumeroAbonado num in Top.Cfg.GetHostAddresses(hostId))
-			{
-				if (string.Compare(num.NumeroAbonado, userId, true) != 0)
-				{
+            foreach (StrNumeroAbonado num in Top.Cfg.GetHostAddresses(hostId))
+            {
+                if (string.Compare(num.NumeroAbonado, userId, true) != 0)
+                {
                     _RemoteDestinations.Add(new SipRemote(num.NumeroAbonado));
-				}
-			}
+                }
+            }
 
             //Primera línea por el proxy
             //y última línea en caso de no disponibilidad de proxy, la directa entre puestos
@@ -770,7 +787,7 @@ namespace HMI.CD40.Module.BusinessEntities
             _Lines.Add(new SipLine(rsTop, rsIp));
 
             _Results = new SipResult[_RemoteDestinations.Count, _Lines.Count];
-		}
+        }
 
         /// <summary>
         /// Para puestos, se usa siempre la primera línea por el proxy
@@ -778,8 +795,8 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="priority"></param>
         /// <returns></returns>
-		public override SipPath GetPreferentPath(CORESIP_Priority priority)
-		{
+        public override SipPath GetPreferentPath(CORESIP_Priority priority)
+        {
              SipPath sipPath = null;
 
             for (int i = 0; i< _Lines.Count; i++)
@@ -798,7 +815,7 @@ namespace HMI.CD40.Module.BusinessEntities
             }
 
             return sipPath;
-		}
+        }
 
         /// <summary>
         /// Devuelve el estado del destino. 
@@ -818,77 +835,77 @@ namespace HMI.CD40.Module.BusinessEntities
             } 
             return DestinationState.NotReachable;
         }
-	}
+    }
 
-	class LcChannel : SipChannel
-	{
-		public override string Uri
-		{
-			get { return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip); }
-		}
+    class LcChannel : SipChannel
+    {
+        public override string Uri
+        {
+            get { return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip); }
+        }
         public override string Domain
         {
             get { return _Lines[0].Ip; }
         }
 
-		public LcChannel(string localId, string rsId, uint prefix)
-		{
-			Rs<GwLcRs> rs = Top.Registry.GetRs<GwLcRs>(rsId);
+        public LcChannel(string localId, string rsId, uint prefix)
+        {
+            Rs<GwLcRs> rs = Top.Registry.GetRs<GwLcRs>(rsId);
             string idEquipo;
 
-			_Id = rsId;
-			_Prefix = prefix;
-			_AccId = Top.Cfg.GetNumeroAbonado(localId, Cd40Cfg.ATS_DST) ?? localId;
+            _Id = rsId;
+            _Prefix = prefix;
+            _AccId = Top.Cfg.GetNumeroAbonado(localId, Cd40Cfg.ATS_DST) ?? localId;
             _RemoteDestinations.Add(new SipRemote(rsId));
-			_Lines.Add(new SipLine(rs, Top.Cfg.GetGwRsIp(rsId, out idEquipo)));
-			_Results = new SipResult[1, 1];
+            _Lines.Add(new SipLine(rs, Top.Cfg.GetGwRsIp(rsId, out idEquipo)));
+            _Results = new SipResult[1, 1];
         }
 
-		public override SipPath GetPreferentPath(CORESIP_Priority priority)
-		{
-			SipLine line = _Lines[0];
-			SipRemote remote = _RemoteDestinations[0];
+        public override SipPath GetPreferentPath(CORESIP_Priority priority)
+        {
+            SipLine line = _Lines[0];
+            SipRemote remote = _RemoteDestinations[0];
             SipPath sipPath = null;
 
             if (line.IsAvailable && (_Results[0, 0].PrioResult == 0) && (_Results[0, 0].Result == 0))
-			{
-				sipPath = new SipPath(remote, line, RsProxyPropio);
-			}
+            {
+                sipPath = new SipPath(remote, line, RsProxyPropio);
+            }
             _Logger.Debug("LcChannel not available, line {0}, results:{1}, {2}", line.RsLine.Id, _Results[0, 0].PrioResult, _Results[0, 0].Result);
 
             return sipPath;
-		}
-		public override void ResetLine(string id, string ip)
-		{
-			foreach (SipLine line in Lines)
-			{
-				if (line.Id == id)
-				{
-					line.Ip = ip;
-				}
-			}
-		}
-	}
+        }
+        public override void ResetLine(string id, string ip)
+        {
+            foreach (SipLine line in Lines)
+            {
+                if (line.Id == id)
+                {
+                    line.Ip = ip;
+                }
+            }
+        }
+    }
 
-	class TlfPPChannel : SipChannel
-	{
-		public override string Uri
-		{
-			get 
-			{
-				if (string.Compare(_RemoteDestinations[0].Ids[0], _Lines[0].Id) != 0)
-				{
+    class TlfPPChannel : SipChannel
+    {
+        public override string Uri
+        {
+            get 
+            {
+                if (string.Compare(_RemoteDestinations[0].Ids[0], _Lines[0].Id) != 0)
+                {
                     string dstParams="";
                     if (!_Lines[0].centralIP)
                     {
                         dstParams += string.Format(";cd40rs={0}", _Lines[0].Id);
                     }
                     return string.Format("<sip:{0}@{1}{2}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip, dstParams); 
-				}
+                }
 
-				return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip);
-			}
-		}
+                return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip);
+            }
+        }
 
         public override ArrayList GetUris
         {
@@ -907,22 +924,22 @@ namespace HMI.CD40.Module.BusinessEntities
             get { return _Lines[0].Ip; }
         }
 
-		public TlfPPChannel(string localId, string number, string rsId, uint prefix, TipoInterface type)
-		{
+        public TlfPPChannel(string localId, string number, string rsId, uint prefix, TipoInterface type)
+        {
             string rsIp;
             string idEquipo;
 
-			Rs<GwTlfRs> rs = Top.Registry.GetRs<GwTlfRs>(rsId);
+            Rs<GwTlfRs> rs = Top.Registry.GetRs<GwTlfRs>(rsId);
 
-			_Id = rsId;
-			_Prefix = prefix;
-			_AccId = Top.Cfg.GetNumeroAbonado(localId, Cd40Cfg.ATS_DST) ?? localId;
-			_Type = type;
-			_RemoteDestinations.Add(new SipRemote(string.IsNullOrEmpty(number) ? rsId : number));
+            _Id = rsId;
+            _Prefix = prefix;
+            _AccId = Top.Cfg.GetNumeroAbonado(localId, Cd40Cfg.ATS_DST) ?? localId;
+            _Type = type;
+            _RemoteDestinations.Add(new SipRemote(string.IsNullOrEmpty(number) ? rsId : number));
             rsIp = Top.Cfg.GetGwRsIp(rsId, out idEquipo);
             _Lines.Add(new SipLine(rs, rsIp));
 
-			_Results = new SipResult[1, 1];
+            _Results = new SipResult[1, 1];
 
             //En lineas PP recurso de pasarela no se admite la llamada con prioridad
             //Sin embargo en los teléfonos de seguridad IP que llegan configurados de la misma forma, si se permite
@@ -938,22 +955,22 @@ namespace HMI.CD40.Module.BusinessEntities
                 //_PriorityAllowed = false;
             }
             _PriorityAllowed = false;
-		}
+        }
 
-		public override SipPath GetPreferentPath(CORESIP_Priority priority)
-		{
-			SipLine line = _Lines[0];
-			SipRemote remote = _RemoteDestinations[0];
+        public override SipPath GetPreferentPath(CORESIP_Priority priority)
+        {
+            SipLine line = _Lines[0];
+            SipRemote remote = _RemoteDestinations[0];
             SipPath sipPath = null;
 
             if (line.IsAvailable &&
                 (_Results[0, 0].PrioResult == 0))
                 {
-				int result = _Results[0, 0].Result;
+                int result = _Results[0, 0].Result;
 
-				if ((result == 0) ||
-					((result == SipAgent.SIP_BUSY) && (priority == CORESIP_Priority.CORESIP_PR_EMERGENCY)))
-				{
+                if ((result == 0) ||
+                    ((result == SipAgent.SIP_BUSY) && (priority == CORESIP_Priority.CORESIP_PR_EMERGENCY)))
+                {
                     if (((GwTlfRs)line.RsLine.Content).St == GwTlfRs.State.Idle)
                     {
                         sipPath = new SipPath(remote, line, RsProxyPropio);
@@ -964,48 +981,48 @@ namespace HMI.CD40.Module.BusinessEntities
                     {
                         sipPath = new SipPath(remote, line, true, RsProxyPropio);
                     }
-				}
-			}
+                }
+            }
             if (sipPath == null)
                 _Logger.Debug("TlfPPChannel not available, line {0}, results:{1}, {2}", line.RsLine.Id, _Results[0, 0].PrioResult, _Results[0, 0].Result);
 
             return sipPath;
-		}
+        }
 
-		public override SipPath GetInterrumpiblePath()
-		{
-			SipLine line = _Lines[0];
-			SipRemote remote = _RemoteDestinations[0];
+        public override SipPath GetInterrumpiblePath()
+        {
+            SipLine line = _Lines[0];
+            SipRemote remote = _RemoteDestinations[0];
 
-			if (line.IsAvailable && 
-				((_Type == TipoInterface.TI_ATS_R2) || (_Type == TipoInterface.TI_ATS_N5) || (_Type == TipoInterface.TI_ATS_QSIG)) &&
-				((((GwTlfRs)line.RsLine.Content).St == GwTlfRs.State.Idle) || (((GwTlfRs)line.RsLine.Content).St == GwTlfRs.State.BusyInterruptionAllow)) &&
-				(_Results[0, 0].PrioResult == 0))
-			{
-				switch (_Results[0, 0].Result)
-				{
-					case 0:
-					case SipAgent.SIP_BUSY:
-					case SipAgent.SIP_CONGESTION:
-					case SipAgent.SIP_TEMPORARILY_UNAVAILABLE:
+            if (line.IsAvailable && 
+                ((_Type == TipoInterface.TI_ATS_R2) || (_Type == TipoInterface.TI_ATS_N5) || (_Type == TipoInterface.TI_ATS_QSIG)) &&
+                ((((GwTlfRs)line.RsLine.Content).St == GwTlfRs.State.Idle) || (((GwTlfRs)line.RsLine.Content).St == GwTlfRs.State.BusyInterruptionAllow)) &&
+                (_Results[0, 0].PrioResult == 0))
+            {
+                switch (_Results[0, 0].Result)
+                {
+                    case 0:
+                    case SipAgent.SIP_BUSY:
+                    case SipAgent.SIP_CONGESTION:
+                    case SipAgent.SIP_TEMPORARILY_UNAVAILABLE:
                         return new SipPath(remote, line, RsProxyPropio);
-				}
-			}
+                }
+            }
             _Logger.Debug("TlfPPChannel not available, line {0}, results:{1}, {2}", line.RsLine.Id, _Results[0, 0].PrioResult, _Results[0, 0].Result);
 
-			return null;
-		}
+            return null;
+        }
 
-		public override void ResetLine(string id, string ip)
-		{
-			foreach (SipLine line in Lines)
-			{
-				if (line.Id == id)
-				{
-					line.Ip = ip;
-				}
-			}
-		}
+        public override void ResetLine(string id, string ip)
+        {
+            foreach (SipLine line in Lines)
+            {
+                if (line.Id == id)
+                {
+                    line.Ip = ip;
+                }
+            }
+        }
         /// <summary>
         /// Devuelve el estado del destino. 
         /// En el caso general, el estado lo da la disponibilidad de cualquiera de sus lineas
@@ -1050,7 +1067,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="localId">own accountId</param>
         /// <param name="name">name of focus</param>
         public TlfFocusChannel(string localId, string name)
-		{
+        {
             _Id = "Focus";
             _UnknownUri = name;
             _AccId = localId;
@@ -1064,8 +1081,8 @@ namespace HMI.CD40.Module.BusinessEntities
                 Rs<GwTlfRs> rs = Top.Registry.GetRs<GwTlfRs>(idEquipo);
                 _Lines.Add(new SipLine(rs, rsIp, true));
             }
-			_RemoteDestinations.Add(new SipRemote(name));
-			_Results = new SipResult[_RemoteDestinations.Count, _Lines.Count];
+            _RemoteDestinations.Add(new SipRemote(name));
+            _Results = new SipResult[_RemoteDestinations.Count, _Lines.Count];
         }
         public TlfFocusChannel(string localId, string name, string host)
         {
@@ -1208,14 +1225,14 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
     }
-	class TlfNetChannel : SipChannel
-	{
-		public override string Uri
-		{
-			get 
-			{
+    class TlfNetChannel : SipChannel
+    {
+        public override string Uri
+        {
+            get 
+            {
                 string dstParams = "";
-                if (!_Lines[0].centralIP)
+                if (_Lines.Count>0 && !_Lines[0].centralIP)
                 {
                     dstParams += string.Format(";cd40rs={0}", _Lines[0].Id);
                 }
@@ -1234,9 +1251,9 @@ namespace HMI.CD40.Module.BusinessEntities
                     if (Prefix > Cd40Cfg.ATS_DST)
                         return string.Format("<sip:{0}@{1}{2}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip, dstParams);
                     return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip);
-			}
-		}
-		}
+            }
+        }
+        }
         public override string Domain
         {
             get { return _Lines[0].Ip; }
@@ -1253,10 +1270,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="prefix"></param>
         /// <param name="unknownResource"></param>
         public TlfNetChannel(TlfNet net, string localId, string number, string subNumber, uint prefix, bool unknownResource = false)
-		{            
+        {            
             
             _Id = net.Id;
-			_Prefix = prefix;
+            _Prefix = prefix;
             if (unknownResource)
                 _UnknownUri = number;
             if (prefix != Cd40Cfg.ATS_DST)
@@ -1266,48 +1283,48 @@ namespace HMI.CD40.Module.BusinessEntities
             if ((prefix > Cd40Cfg.ATS_DST) && (prefix < Cd40Cfg.UNKNOWN_DST))
                 _PriorityAllowed = false;
 
-			_RemoteDestinations.Add(new SipRemote(number, subNumber));
-			_Lines = net.Lines;
-			_Results = new SipResult[_RemoteDestinations.Count, _Lines.Count];
-			_RsTypes = net.RsTypes;
+            _RemoteDestinations.Add(new SipRemote(number, subNumber));
+            _Lines = net.Lines;
+            _Results = new SipResult[_RemoteDestinations.Count, _Lines.Count];
+            _RsTypes = net.RsTypes;
             //0 (preferente)
             //1, 2, 3,...1000 rutas alternativas (detour)
-			_Routes = net.Routes;
+            _Routes = net.Routes;
         }
 
-		public override SipPath GetPreferentPath(CORESIP_Priority priority)
-		{
+        public override SipPath GetPreferentPath(CORESIP_Priority priority)
+        {
             SipPath sipPath = null;
 
-			for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
-			{
-				SipRemote remote = _RemoteDestinations[i];
-				int preferentRoute = int.MaxValue;
-				int skipRoute = -1;
+            for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
+            {
+                SipRemote remote = _RemoteDestinations[i];
+                int preferentRoute = int.MaxValue;
+                int skipRoute = -1;
 
-				for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
-				{
-					SipLine line = _Lines[_RsTypes[j].indexToLine];
-					int route = _Routes[j];
-					int prioResult = _Results[i, j].PrioResult;
+                for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
+                {
+                    SipLine line = _Lines[_RsTypes[j].indexToLine];
+                    int route = _Routes[j];
+                    int prioResult = _Results[i, j].PrioResult;
 
-					if (IsAvailable(line) && (preferentRoute == int.MaxValue))
-					{
-						preferentRoute = route;
-					}
+                    if (IsAvailable(line) && (preferentRoute == int.MaxValue))
+                    {
+                        preferentRoute = route;
+                    }
 
-					if (route > preferentRoute)
-					{
-						break;
-					}
-					else if (route == skipRoute)
-					{
-						continue;
-					}
+                    if (route > preferentRoute)
+                    {
+                        break;
+                    }
+                    else if (route == skipRoute)
+                    {
+                        continue;
+                    }
 
-					if (prioResult == 0)
-					{
-						int result = _Results[i, j].Result;
+                    if (prioResult == 0)
+                    {
+                        int result = _Results[i, j].Result;
                         if ((result == 0) ||
                             ((priority == CORESIP_Priority.CORESIP_PR_EMERGENCY) &&
                              ((result == SipAgent.SIP_BUSY) ||
@@ -1323,166 +1340,166 @@ namespace HMI.CD40.Module.BusinessEntities
                         }
                         else if (SkipThisRoute(result, _RsTypes[j].TipoInteface))
                         // Debe saltarse esta ruta y buscar la siguiente
-						{
-							skipRoute = route;
-						}
+                        {
+                            skipRoute = route;
+                        }
                         else if (SkipAllRoutes(result, _RsTypes[j].TipoInteface))
                         {
                             return null;
                         }
-					}
-					else if ((prioResult == SipAgent.SIP_NOT_FOUND) || (prioResult == SipAgent.SIP_CONGESTION))
-					{
-						skipRoute = route;
-					}
+                    }
+                    else if ((prioResult == SipAgent.SIP_NOT_FOUND) || (prioResult == SipAgent.SIP_CONGESTION))
+                    {
+                        skipRoute = route;
+                    }
                     _Logger.Debug("TlfNetChannel not available, line {0}, results:{1}, {2}", line.RsLine.Id, _Results[i, j].PrioResult, _Results[i, j].Result);
                 }
-			}
+            }
 
             return sipPath;
-		}
+        }
 
-		public override SipPath GetInterrumpiblePath()
-		{
-			for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
-			{
-				List<Utilities.Tuple<SipLine, int, uint>> interrumpibleLines = new List<Utilities.Tuple<SipLine, int, uint>>();
-				SipRemote remote = _RemoteDestinations[i];
-				int preferentRoute = int.MaxValue;
-				int skipRoute = -1;
+        public override SipPath GetInterrumpiblePath()
+        {
+            for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
+            {
+                List<Utilities.Tuple<SipLine, int, uint>> interrumpibleLines = new List<Utilities.Tuple<SipLine, int, uint>>();
+                SipRemote remote = _RemoteDestinations[i];
+                int preferentRoute = int.MaxValue;
+                int skipRoute = -1;
 
-				for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
-				{
-					SipLine line = _Lines[j];
-					int route = _Routes[j];
-					int prioResult = _Results[i, j].PrioResult;
+                for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
+                {
+                    SipLine line = _Lines[j];
+                    int route = _Routes[j];
+                    int prioResult = _Results[i, j].PrioResult;
 
                     if (IsAvailable(line) && (preferentRoute == int.MaxValue))
-					{
-						preferentRoute = route;
-					}
+                    {
+                        preferentRoute = route;
+                    }
 
-					if (route > preferentRoute)
-					{
-						break;
-					}
-					else if (route == skipRoute)
-					{
-						continue;
-					}
+                    if (route > preferentRoute)
+                    {
+                        break;
+                    }
+                    else if (route == skipRoute)
+                    {
+                        continue;
+                    }
 
-					if (prioResult == 0)
-					{
-						switch (_Results[i, j].Result)
-						{
-							case 0:
-							case SipAgent.SIP_BUSY:
-							case SipAgent.SIP_CONGESTION:
-							case SipAgent.SIP_TEMPORARILY_UNAVAILABLE:
-								GwTlfRs rs = (GwTlfRs)line.RsLine.Content;
+                    if (prioResult == 0)
+                    {
+                        switch (_Results[i, j].Result)
+                        {
+                            case 0:
+                            case SipAgent.SIP_BUSY:
+                            case SipAgent.SIP_CONGESTION:
+                            case SipAgent.SIP_TEMPORARILY_UNAVAILABLE:
+                                GwTlfRs rs = (GwTlfRs)line.RsLine.Content;
 
                                 if (IsAvailable(line) &&
-									((rs.St == GwTlfRs.State.Idle) || (rs.St == GwTlfRs.State.BusyInterruptionAllow)))
-								{
-									TipoInterface type = _RsTypes[j].TipoInteface;
+                                    ((rs.St == GwTlfRs.State.Idle) || (rs.St == GwTlfRs.State.BusyInterruptionAllow)))
+                                {
+                                    TipoInterface type = _RsTypes[j].TipoInteface;
 
-									if ((type == TipoInterface.TI_ATS_R2) || (type == TipoInterface.TI_ATS_N5))
-									{
-										// Solo recursos en la ruta directa
-										if (route == 0)
-										{
-											uint[] r2Priorities = { 10, 9, 4, 10, 8, 3, 10, 7, 2 };
-											int sortKey = Array.IndexOf<uint>(r2Priorities, rs.Priority);
+                                    if ((type == TipoInterface.TI_ATS_R2) || (type == TipoInterface.TI_ATS_N5))
+                                    {
+                                        // Solo recursos en la ruta directa
+                                        if (route == 0)
+                                        {
+                                            uint[] r2Priorities = { 10, 9, 4, 10, 8, 3, 10, 7, 2 };
+                                            int sortKey = Array.IndexOf<uint>(r2Priorities, rs.Priority);
 
-											if (sortKey >= 0)
-											{
-												interrumpibleLines.Add(new Utilities.Tuple<SipLine, int, uint>(line, sortKey, rs.CallBegin));
-											}
-										}
-									}
-									else if (type == TipoInterface.TI_ATS_QSIG)
-									{
-										uint[] qsigPriorities = { 0, 10, 10, 1, 10, 10, 2, 10, 10 };
-										int sortKey = Array.IndexOf<uint>(qsigPriorities, rs.Priority);
+                                            if (sortKey >= 0)
+                                            {
+                                                interrumpibleLines.Add(new Utilities.Tuple<SipLine, int, uint>(line, sortKey, rs.CallBegin));
+                                            }
+                                        }
+                                    }
+                                    else if (type == TipoInterface.TI_ATS_QSIG)
+                                    {
+                                        uint[] qsigPriorities = { 0, 10, 10, 1, 10, 10, 2, 10, 10 };
+                                        int sortKey = Array.IndexOf<uint>(qsigPriorities, rs.Priority);
 
-										if (sortKey >= 0)
-										{
-											interrumpibleLines.Add(new Utilities.Tuple<SipLine, int, uint>(line, sortKey, rs.CallBegin));
-										}
-									}
-								}
-								break;
-							case SipAgent.SIP_NOT_FOUND:
-								skipRoute = route;
-								break;
-						}
-					}
-					else if ((prioResult == SipAgent.SIP_NOT_FOUND) || (prioResult == SipAgent.SIP_CONGESTION))
-					{
-						skipRoute = route;
-					}
-				}
+                                        if (sortKey >= 0)
+                                        {
+                                            interrumpibleLines.Add(new Utilities.Tuple<SipLine, int, uint>(line, sortKey, rs.CallBegin));
+                                        }
+                                    }
+                                }
+                                break;
+                            case SipAgent.SIP_NOT_FOUND:
+                                skipRoute = route;
+                                break;
+                        }
+                    }
+                    else if ((prioResult == SipAgent.SIP_NOT_FOUND) || (prioResult == SipAgent.SIP_CONGESTION))
+                    {
+                        skipRoute = route;
+                    }
+                }
 
-				if (interrumpibleLines.Count > 0)
-				{
-					interrumpibleLines.Sort(delegate(Utilities.Tuple<SipLine, int, uint> a, Utilities.Tuple<SipLine, int, uint> b)
-					{
+                if (interrumpibleLines.Count > 0)
+                {
+                    interrumpibleLines.Sort(delegate(Utilities.Tuple<SipLine, int, uint> a, Utilities.Tuple<SipLine, int, uint> b)
+                    {
                         //A igual prioridad se interrumpe la llamada mas antigua, con CallBegin menor
-						if (a.Second == b.Second)
-						{
-							return (int)(a.Third - b.Third);
-						}
+                        if (a.Second == b.Second)
+                        {
+                            return (int)(a.Third - b.Third);
+                        }
                         //Se interrumpe la llamada con menor prioridad, menor sortKey
-						return a.Second - b.Second;
-					});
+                        return a.Second - b.Second;
+                    });
 
                     return new SipPath(remote, interrumpibleLines[0].First, RsProxyPropio);
-				}
-			}
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		public override SipPath GetDetourPath(CORESIP_Priority priority)
-		{
-			for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
-			{
-				SipRemote remote = _RemoteDestinations[i];
-				int preferentRoute = int.MaxValue;
-				int skipRoute = -1;
+        public override SipPath GetDetourPath(CORESIP_Priority priority)
+        {
+            for (int i = 0, iTo = _RemoteDestinations.Count; i < iTo; i++)
+            {
+                SipRemote remote = _RemoteDestinations[i];
+                int preferentRoute = int.MaxValue;
+                int skipRoute = -1;
 
-				for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
-				{
-					SipLine line = _Lines[j];
-					int route = _Routes[j];
-					int prioResult = _Results[i, j].PrioResult;
+                for (int j = 0, jTo = _Lines.Count; j < jTo; j++)
+                {
+                    SipLine line = _Lines[j];
+                    int route = _Routes[j];
+                    int prioResult = _Results[i, j].PrioResult;
 
                     if (IsAvailable(line) && (preferentRoute == int.MaxValue))
-					{
-						preferentRoute = route;
-					}
+                    {
+                        preferentRoute = route;
+                    }
 
-					if (route == skipRoute)
-					{
-						continue;
-					}
+                    if (route == skipRoute)
+                    {
+                        continue;
+                    }
 
-					if (prioResult == 0)
-					{
-						int result = _Results[i, j].Result;
+                    if (prioResult == 0)
+                    {
+                        int result = _Results[i, j].Result;
                         if ((result == 0) ||
                             ((priority == CORESIP_Priority.CORESIP_PR_EMERGENCY) &&
                              ((result == SipAgent.SIP_BUSY) ||
                              (result == SipAgent.SIP_CONGESTION))))
                         {
                             if (IsAvailable(line) && (((GwTlfRs)line.RsLine.Content).St == GwTlfRs.State.Idle) &&
-								(((_RsTypes[j].TipoInteface != TipoInterface.TI_ATS_QSIG) && (route != 0)) ||
-								((_RsTypes[j].TipoInteface == TipoInterface.TI_ATS_QSIG) && (route > preferentRoute))))
-							{
+                                (((_RsTypes[j].TipoInteface != TipoInterface.TI_ATS_QSIG) && (route != 0)) ||
+                                ((_RsTypes[j].TipoInteface == TipoInterface.TI_ATS_QSIG) && (route > preferentRoute))))
+                            {
                                 _Type = _RsTypes[j].TipoInteface;
                                 return new SipPath(remote, line, RsProxyPropio);
-							}
-						}
+                            }
+                        }
                         else if (SkipThisRoute(result, _RsTypes[j].TipoInteface))
                         // Debe saltarse esta ruta y buscar la siguiente
                         {
@@ -1492,17 +1509,17 @@ namespace HMI.CD40.Module.BusinessEntities
                         {
                             return null;
                         }
-					}
-					else if ((prioResult == SipAgent.SIP_NOT_FOUND) || (prioResult == SipAgent.SIP_CONGESTION))
-					{
-						skipRoute = route;
-					}
+                    }
+                    else if ((prioResult == SipAgent.SIP_NOT_FOUND) || (prioResult == SipAgent.SIP_CONGESTION))
+                    {
+                        skipRoute = route;
+                    }
                     _Logger.Debug("TlfNetChannel detour not available, line {0}, results:{1}, {2}", line.RsLine.Id, _Results[i, j].PrioResult, _Results[i, j].Result);
                 }
-			}
+            }
 
-			return null;
-		}
+            return null;
+        }
 
         public override void ResetLine(string id, string ip)
         {
@@ -1510,7 +1527,15 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 if (line.Id == id)
                 {
-                    line.Ip = ip;
+                    // RQF-49, no cambio ip, solamente pongo disponible.
+                    if (line.Ip==ip)
+                    {
+                        //RQF-49 antes ponia todas las lineas a la ip pasada
+                        if (!line.IpPresente)
+                        {
+                            line.IpPresente = true;
+                        }
+                    }
                 }
             }
         }
@@ -1520,10 +1545,19 @@ namespace HMI.CD40.Module.BusinessEntities
             bool ret = false;
             switch (result)
             {
-                case SipAgent.SIP_CONGESTION:
-                    // Casos solo producidos en el caso de proxy
-                case SipAgent.SIP_ERROR:
-                case SipAgent.SIP_SERVER_TIMEOUT:
+                case SipAgent.SIP_CONGESTION:// RQF-49 cambio esta condición.
+                    if (tipo == TipoInterface.TI_IP_PROXY)
+                        return ret;
+                    ret = true;
+                    break;
+                // Casos solo producidos en el caso de proxy
+                case SipAgent.SIP_ERROR:// RQF-49 cambio esta condición.
+                    if (tipo == TipoInterface.TI_IP_PROXY)
+                        return ret;
+                    break;
+                case SipAgent.SIP_SERVER_TIMEOUT:// RQF - 49 cambio esta condición.
+                    if (tipo == TipoInterface.TI_IP_PROXY)
+                        return ret;
                     ret = true;
                     break;
                 default:
@@ -1539,7 +1573,9 @@ namespace HMI.CD40.Module.BusinessEntities
             bool ret = false;
             switch (result)
             {
-                case SipAgent.SIP_NOT_FOUND:
+                case SipAgent.SIP_NOT_FOUND:// RQF-49 cambio esta condición.
+                    if (tipo == TipoInterface.TI_IP_PROXY)
+                        return ret;
                     ret = true;
                     break;
                 default:
@@ -1547,11 +1583,12 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             return ret;
         }
-		#region Private Members
+        #region Private Members
 
-		private List<RsIdxType> _RsTypes;
-		private List<int> _Routes;
+        private List<RsIdxType> _RsTypes;
+        private List<int> _Routes;
+        private object dependecias;
 
-		#endregion
-	}
+        #endregion
+    }
 }

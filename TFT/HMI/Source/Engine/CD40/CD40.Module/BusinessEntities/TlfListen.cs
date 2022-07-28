@@ -176,8 +176,9 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			Debug.Assert(!_Froms.ContainsKey(call));
 			TlfIaPosition from = new TlfIaPosition(1000);
-
-			int code = from.HandleIncomingCall(call, -1, info, inInfo);
+			//lalm 220603
+			string reason = "";
+			int code = from.HandleIncomingCall(call, -1, info, inInfo,out reason);
 			Debug.Assert(code == SipAgent.SIP_RINGING);
 
 			if (!from.IsTop)

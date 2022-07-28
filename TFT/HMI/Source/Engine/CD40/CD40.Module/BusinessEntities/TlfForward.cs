@@ -956,6 +956,18 @@ namespace HMI.CD40.Module.BusinessEntities
             TlfForward forward;
             if (_ForwardAcc.TryGetValue(account, out forward))
                 ret = forward.GetDiversionTail();
+            if (ret=="")//220720 Si me laman a la cuenta alternativa tambien la recojo.
+            {
+                if (_MyAccounts.Contains(account))// si la cuenta esta presente en mis cuentas
+                foreach (string myAccount in _MyAccounts)
+                {
+                        if (_ForwardAcc.TryGetValue(myAccount, out forward))
+                        {
+                            ret = forward.GetDiversionTail();
+                            break;
+                        }
+                }
+            }
             return ret;
         }
         /// <summary>
@@ -980,7 +992,7 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             _Peer = target;
 
-            if (_Peer != null)
+            if (_Peer != null && _Peer.Uri.Contains("@"))// Cuando la llamada es por AI a otro SCV el desvio no lleva uri completa, genero error
             {
                 foreach (string myAccount in _MyAccounts)
                 {
@@ -989,6 +1001,8 @@ namespace HMI.CD40.Module.BusinessEntities
                     //foreach (string targetUri in target.Channels[0].GetUris)
                     string targetUri = _Peer.Uri;
                     newForward.RequestForward(targetUri);
+                    // 220719 solo hago una instancia, me salgo del bucle
+                    break;
                 }
                 Top.WorkingThread.Enqueue("SetSnmp", delegate ()
                 {
@@ -1120,8 +1134,8 @@ namespace HMI.CD40.Module.BusinessEntities
                 Cancel(true);
             }
             //220315 Anulo el intento de mantener el desvio en cambio de configuración
-            return;
-#if  MANTENER_DESVIO_CAMBIO_CONF
+//            return;
+//#if  MANTENER_DESVIO_CAMBIO_CONF
             Dictionary<string, TlfForward> oldForwardsAcc = new Dictionary<string, TlfForward>(_ForwardAcc);
 
             //LALM 220214
@@ -1173,7 +1187,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     forward.DiversionSetAutoRemoved -= OnAutoDiversionSetRemoved;
                 }
             }
-#endif
+//#endif
             //TODO si el otro cambia de host o de IP, habría que borrarlo
             //TODO Falta comprobar si han cambiado todos los participantes
             //foreach (TlfForward forward in _ForwardAcc.Values)

@@ -823,8 +823,13 @@ namespace HMI.Presentation.RadioLight.Views
                     // Aqui Paso tambien la prioridad.
                     //bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
                     //dst.State );
-                    bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
-                    dst.State, dst.Priority);
+                    //bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    //dst.State, dst.Priority);
+
+                    // Para compatibilizar  en radioMonitor con la version2.6.2#7
+                    bool bloqueado = (dst.Ptt == PttState.Blocked);
+                    bt.Reset(dst.IdFrecuency, dst.NameFrecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    dst.State, priority, bloqueado);
 
                 }
                 // Las frecuencias co solo RX (RxOnly), tienen deshabilitada la parte TX de la tecla

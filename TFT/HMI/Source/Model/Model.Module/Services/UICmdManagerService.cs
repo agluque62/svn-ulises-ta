@@ -149,9 +149,11 @@ namespace HMI.Model.Module.Services
 						General.SafeLaunchEvent(CambioPaginaRadioUp, this);
 					else
 						General.SafeLaunchEvent(CambioPaginaRadioDown, this);
+					_StateManager.Radio.pagina_confirmada = true;
 				}
 				else
 				{
+					_StateManager.Radio.pagina_confirmada = false;
 					// se queda igual
 				}
 			}
@@ -231,8 +233,12 @@ namespace HMI.Model.Module.Services
             // volumen del altavoz radio no puede bajar del 30% del máximo.
             if (_StateManager.Radio.RadioMonitoring && level < 3)
                 return;
+			//RQF-14
+			int numPositionsByPage = _StateManager.Radio.PageSize;
+			if (_StateManager.Radio.FrecuenciaNoDesasignable(numPositionsByPage) && level < 3)
+				return;
 
-            _EngineCmdManager.SetRdSpeakerLevel(level);
+			_EngineCmdManager.SetRdSpeakerLevel(level);
         }
 
         public void RdSetHfSpeakerLevel(int level)
@@ -242,6 +248,11 @@ namespace HMI.Model.Module.Services
 
         public void RdSetHeadPhonesLevel(int level)
 		{
+			//RQF-14
+			int numPositionsByPage = _StateManager.Radio.PageSize;
+			if (level < 3 && _StateManager.Radio.FrecuenciaNoDesasignable(numPositionsByPage) )
+				return;
+
 			_EngineCmdManager.SetRdHeadPhonesLevel(level);
 		}
 
@@ -553,10 +564,11 @@ namespace HMI.Model.Module.Services
                         }
 						else
 						{
-							//#2855 si la tecla AI esta desclogada, la cuelgo.
+							//#2855 si la tecla AI esta descolgada, la cuelgo.
 							if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
                             {
-								_StateManager.Tlf.Unhang.Cuelga();
+								_EngineCmdManager.Descuelga();
+								_EngineCmdManager.EndTlfCall(Tlf.IaMappedPosition);
 							}
 							if (_StateManager.Tlf.PickUp.State == FunctionState.Error)
                                 _EngineCmdManager.CancelPickUp();
@@ -716,43 +728,54 @@ namespace HMI.Model.Module.Services
                 _EngineCmdManager.EndTlfConf();
         }
 
-		public void CancelTlfClick()
+		public bool CancelTlfClick(bool test=false)
 		{
 			if (_StateManager.Tlf.Priority.State == FunctionState.Error)
 			{
+				if (test) return true;
 				_StateManager.Tlf.Priority.Reset();
 			}
 			else  if (_StateManager.Tlf.Listen.State == FunctionState.Error)
 			{
+				if (test) return true;
 				_EngineCmdManager.RecognizeListenState();
 			}
 			else if (_StateManager.Tlf.Transfer.State == FunctionState.Error)
 			{
+				if (test) return true;
 				_EngineCmdManager.RecognizeTransferState();
 			}
 			else if (_StateManager.Tlf.Priority.State == FunctionState.Ready)
 			{
+				if (test) return true;
 				_StateManager.Tlf.Priority.Reset();
 			}
 			else if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
 			{
+				if (test) return true;
 				_StateManager.Tlf.Listen.State = FunctionState.Idle;
 			}
 			else if (_StateManager.Tlf.Transfer.State == FunctionState.Ready)
 			{
+				if (test) return true;
 				_StateManager.Tlf.Transfer.State = FunctionState.Idle;
 			}
             else if (_StateManager.Tlf.Transfer.State == FunctionState.Executing)
             {
-                _EngineCmdManager.CancelTransfer();
+				if (test) return true;
+				_EngineCmdManager.CancelTransfer();
             }
 			//#2855
 			else if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
 			{
-				_StateManager.Tlf.Unhang.Cuelga();
+				if (test) return true;
+				//_StateManager.Tlf.Unhang.Cuelga();
+				//_StateManager.Tlf.Unhang.Reset();
+				TlfClick(Tlf.IaMappedPosition);
 			}
 			else if ((_StateManager.Tlf[TlfState.RemoteIn] > 0) && Settings.Default.SupportInTlfCancel)
 			{
+				if (test) return true;
 				int id = _StateManager.Tlf.GetFirstInState(TlfState.RemoteIn);
 
 				_EngineCmdManager.EndTlfCall(id);
@@ -763,6 +786,7 @@ namespace HMI.Model.Module.Services
 			}
 			else if ((_StateManager.Tlf[TlfState.In] > 0) && Settings.Default.SupportInTlfCancel)
 			{
+				if (test) return true;
 				int id = _StateManager.Tlf.GetFirstInState(TlfState.In);
 
 				_EngineCmdManager.EndTlfCall(id);
@@ -773,6 +797,7 @@ namespace HMI.Model.Module.Services
 			}
 			else if ((_StateManager.Tlf[TlfState.InPrio] > 0) && Settings.Default.SupportInTlfCancel)
 			{
+				if (test) return true;
 				int id = _StateManager.Tlf.GetFirstInState(TlfState.InPrio);
 
 				_EngineCmdManager.EndTlfCall(id);
@@ -783,10 +808,12 @@ namespace HMI.Model.Module.Services
 			}
 			else if (_StateManager.Tlf[TlfState.Conf] > 0)
 			{
+				if (test) return true;
 				_EngineCmdManager.EndTlfAll();
 			}
 			else if (_StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.NotAllowed] > 0)
 			{
+				if (test) return true;
 				int id = _StateManager.Tlf.GetFirstInState(TlfState.Out, TlfState.NotAllowed);
 
 				_EngineCmdManager.EndTlfCall(id);
@@ -798,11 +825,13 @@ namespace HMI.Model.Module.Services
 			else if (_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.RemoteHold] +
                 _StateManager.Tlf[TlfState.Busy] + _StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.OutOfService] > 0)
 			{
-                int id = _StateManager.Tlf.GetFirstInState(TlfState.Set, TlfState.RemoteHold, TlfState.Busy, TlfState.Congestion, TlfState.OutOfService);
+				if (test) return true;
+				int id = _StateManager.Tlf.GetFirstInState(TlfState.Set, TlfState.RemoteHold, TlfState.Busy, TlfState.Congestion, TlfState.OutOfService);
 				_EngineCmdManager.EndTlfCall(id);
 			}
 			else if (_StateManager.Tlf[TlfState.Mem] + _StateManager.Tlf[TlfState.RemoteMem] > 0)
 			{
+				if (test) return true;
 				int id = _StateManager.Tlf.GetFirstInState(TlfState.Mem, TlfState.RemoteMem, TlfState.NotAllowed);
 				//if (id == Tlf.IaMappedPosition)
 					_StateManager.Tlf.ResetMem(id);
@@ -811,16 +840,31 @@ namespace HMI.Model.Module.Services
 			}
 			else if (_StateManager.Tlf.HangTone.On)
 			{
+				if (test) return true;
 				_EngineCmdManager.SetHangToneOff();
+			}
+			//RQF-18#5009 Anular escucha con cancel
+			else if (_StateManager.Tlf.Listen.State > 0)
+			{
+				if (test) return true;
+				_EngineCmdManager.CancelListen();
+			}
+			else if (_StateManager.Tlf.Forward.State > 0)
+			{
+				if (test) return true;
+				_EngineCmdManager.CancelForward();
 			}
 			else if (_StateManager.Tlf[TlfState.Hold] > 0)
 			{
+				return false;
 				// No hacemos nada
 			}
 			else
 			{
 				_EngineCmdManager.Cancel();
+				return false;
 			}
+			return false;
 		}
 
 		public void NewDigit(int id, char key)
@@ -920,12 +964,11 @@ namespace HMI.Model.Module.Services
             string literal = null;
 			//LALM 211201
 			//#2855
-			if (number.Length == 0)
+			if (number.Length == 0 || number=="9999")
 			{
-				//_StateManager.Tlf.Reset(TlfState.offhook);
 				_EngineCmdManager.Descuelga();
-
-
+				if (_StateManager.Tlf[Tlf.IaMappedPosition].State==TlfState.offhook)
+					_EngineCmdManager.EndTlfCall(Tlf.IaMappedPosition);
 				// habria que colgar todo lo que esta en uso.
 				if (_StateManager.Tlf.Listen.State == FunctionState.Ready)
 				{
@@ -1004,7 +1047,7 @@ namespace HMI.Model.Module.Services
 				}
 			}
 			//*2855
-			if (number.Length > 0)
+			if (number.Length > 0 && number!="9999")
             {
                 number = Tlf.NumberToEngine(number);
 
@@ -1072,10 +1115,17 @@ namespace HMI.Model.Module.Services
                     }
                     if (_StateManager.Tlf.PickUp.State == FunctionState.Error)
                         _EngineCmdManager.CancelPickUp();
-                    if (id != Int32.MaxValue)
-                        _EngineCmdManager.BeginTlfCall(number, _StateManager.Tlf.Priority.NewCall(Tlf.IaMappedPosition), id, literal);
-                    else
-                        _EngineCmdManager.BeginTlfCall(number, _StateManager.Tlf.Priority.NewCall(Tlf.IaMappedPosition), givenLiteral);
+					if (id != Int32.MaxValue)
+						_EngineCmdManager.BeginTlfCall(number, _StateManager.Tlf.Priority.NewCall(Tlf.IaMappedPosition), id, literal);
+					else
+					{
+						//#2855 Si la llamada es de acceso directo se cuelga todo lo de AI.
+						_EngineCmdManager.Descuelga();
+						if (_StateManager.Tlf[Tlf.IaMappedPosition].State == TlfState.offhook)
+							_EngineCmdManager.EndTlfCall(Tlf.IaMappedPosition);
+
+						_EngineCmdManager.BeginTlfCall(number, _StateManager.Tlf.Priority.NewCall(Tlf.IaMappedPosition), givenLiteral);
+					}
                     _StateManager.Tlf.Unhang.NewCall(ia);
                 }
 			}
@@ -1190,6 +1240,13 @@ namespace HMI.Model.Module.Services
 
 			;//	Directory.Delete(Settings.Default.DirectorioGLP, true);
 
+		}
+
+		//#5829 Funcion para unificiar los tonos de señalización
+		public void SetTonesLevel(int level)
+		{
+			// si hay conversacion de algun tipo en ese dispositivo no aplica.
+			_EngineCmdManager.SetTonesLevel(level);
 		}
 	}
 }

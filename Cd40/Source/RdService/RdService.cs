@@ -483,7 +483,6 @@ namespace U5ki.RdService
                                                           BssWindows = f.GetParam.BssWindows,
                                                           AudioSync = f.GetParam.AudioSync,
                                                           AudioInBssWindow = f.GetParam.AudioInBssWindow,
-                                                          NotUnassignable = f.GetParam.NotUnassignable,
                                                           MetodosBssOfrecidos = f.GetParam.MetodosBssOfrecidos
                                                       },
                                                       PublicData = f.PublicData,
@@ -525,7 +524,6 @@ namespace U5ki.RdService
                                             BssWindows = fro.GetParam.BssWindows,
                                             AudioSync = fro.GetParam.AudioSync,
                                             AudioInBssWindow = fro.GetParam.AudioInBssWindow,
-                                            NotUnassignable = fro.GetParam.NotUnassignable,
                                             MetodosBssOfrecidos = fro.GetParam.MetodosBssOfrecidos
                                         },
                                         PublicData = fro.PublicData,
@@ -1685,7 +1683,7 @@ namespace U5ki.RdService
                             {
                                 rdFr = new RdFrecuency(rdLink.Literal, rdLink.DescDestino);
                                 rdFr.TimerElapsed += OnRdFrecuencyTimerElapsed;
-                                rdFr.SupervisionPortadora = rdLink.SupervisionPortadora;
+                                rdFr.SupervisionPortadora = rdLink.SupervisionPortadora;                                
                             }
 
                             // JCAM 24/02/2015
@@ -1694,11 +1692,8 @@ namespace U5ki.RdService
                             rdFr.TipoDeFrecuencia = Enum.Parse(typeof(Tipo_Frecuencia), rdLink.TipoFrecuencia.ToString()).ToString();
                             if (rdLink.TipoFrecuencia == Tipo_Frecuencia.HF)
                                 rdFr.FrecuenciaSintonizada = rdLink.FrecuenciaSintonizada;
+                            rdFr.PasivoRetransmision = rdLink.PasivoRetransmision;
                             /** Genera los  INVITE de los nuevos y BYE de los antiguos por este orden de la frecuencia ***/
-
-                            //rdLink.MetodosBssOfrecidos = (int)RdResource.BssMethods.CENTRAL;
-                            //rdLink.PorcentajeRSSI = 50;
-
 
                             rdFr.Reset(cfg.ConfiguracionGeneral, rdLink, selectedRs);
 #if DEBUG

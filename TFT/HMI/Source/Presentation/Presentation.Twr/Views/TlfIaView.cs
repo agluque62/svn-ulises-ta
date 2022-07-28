@@ -109,6 +109,7 @@ namespace HMI.Presentation.Twr.Views
 				if ((_StateManager.Tlf.Listen.State == FunctionState.Ready) ||
 					(_StateManager.Tlf.Transfer.State == FunctionState.Ready))
 				{
+					_Keypad.Enabled = true;//Defecto #4991 LALM220616 
 					return Tlf.ValidateNumber(_Keypad.Digits);
 				}
 				if (_StateManager.Tlf.Unhang.State != UnhangState.Idle)
@@ -116,7 +117,7 @@ namespace HMI.Presentation.Twr.Views
 					return true;
 				}
 				//#2855
-				// Ahora tambien en reposo esta habilitada la marcacion
+				// Ahora tambien en reposo esta habilitada la tecla Colgar/Descolgar
 				if (_StateManager.Tlf.Unhang.State == UnhangState.Idle)
 				{
 					return true;
@@ -693,6 +694,7 @@ namespace HMI.Presentation.Twr.Views
 				(dst1.Length == 6 && dst1.StartsWith("3")) ||
 				(dst1.Length == 8 && dst1.StartsWith("02")) ||
 				(dst1.Length == 8 && dst1.StartsWith("03")) ||
+ 				(dst1.Length > 2 && dst1.StartsWith("01")) ||
  				(dst1.Length > 2 && dst1.StartsWith("04")) ||
 				(dst1.Length > 2 && dst1.StartsWith("05")) ||
 				(dst1.Length > 2 && dst1.StartsWith("06")) ||
@@ -767,25 +769,25 @@ namespace HMI.Presentation.Twr.Views
 			_Keypad.Enabled = true;
 			string dst1 = _Keypad.Display;
 			_DescolgarTimer.Enabled = true;
-
-
-			//#2855
+			TlfState statepos19m1 = _StateManager.Tlf[Tlf.IaMappedPosition].State;
+		//#2855
 			if (dst1.Length==0)
             {
-				if (_StateManager.Tlf.Unhang.State == UnhangState.Idle)
+				if (_StateManager.Tlf.Unhang.State == UnhangState.Idle )
 				{
 					// Siempre va a se idle, cuando se cambia de pagina AD to AI se pone a idle.
-					int id = Tlf.NumDestinations;
+					int id = Tlf.IaMappedPosition;
 					//_StateManager.Tlf.Unhang.Cuelga();
 					//_StateManager.Tlf.Unhang.Descuelga(id);
 					//poner tono
 					_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
-					// LALM 211214 Cambio tlfclick(id) por rlfclick(dst1,id) 
+					// LALM 211214 Cambio tlfclick(id) por tlfclick(dst1,id) 
 					// para poder separar la tecla descuelgue de la tecla 19+1
 					//_CmdManager.TlfClick(id);
 					_CmdManager.TlfClick(dst1, id.ToString());
-
-					System.Threading.Thread.Sleep(1000);
+					if (statepos19m1!=TlfState.Idle && statepos19m1 != TlfState.Unavailable)
+						System.Threading.Thread.Sleep(1000);// Este sleep lo pongo en 100 para colgar lo pendiente
+					System.Threading.Thread.Sleep(50);// 
 					_Keypad.Enabled = true;
 					_StateManager.Tlf.Unhang.Descuelga(id);
 					_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
@@ -794,14 +796,17 @@ namespace HMI.Presentation.Twr.Views
 				else if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
 				{
 					//quitar tono
-					_StateManager.Tlf.Unhang.Cuelga();
-
+					//_StateManager.Tlf.Unhang.Cuelga();
+					
 					//_CallBT.ButtonColor = GetStateColor(_CallBT, UnhangState.Idle);
 					_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
 					_DescolgarTimer.Enabled = false;
-					int id = Tlf.NumDestinations;
-					_CmdManager.TlfClick(id);
+					
+					_CmdManager.TlfClick(Tlf.IaMappedPosition);
+					System.Threading.Thread.Sleep(50);// 
 					_Keypad.Enabled = false;
+					_StateManager.Tlf.Unhang.Cuelga();
+					_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
 					return;
 				}
 				else
@@ -861,9 +866,12 @@ namespace HMI.Presentation.Twr.Views
 			{
 				try
 				{
-					Debug.Assert(_StateManager.Tlf.Unhang.AssociatePosition == Tlf.IaMappedPosition);
-					_CmdManager.TlfClick(Tlf.IaMappedPosition);
-                    _CallBT.ButtonColor = GetStateColor(_CallBT, UnhangState.Idle);
+					if (_StateManager.Tlf.Unhang.AssociatePosition == Tlf.IaMappedPosition)
+					{
+						//Debug.Assert(_StateManager.Tlf.Unhang.AssociatePosition == Tlf.IaMappedPosition);
+						_CmdManager.TlfClick(Tlf.IaMappedPosition);
+						_CallBT.ButtonColor = GetStateColor(_CallBT, UnhangState.Idle);
+					}
 				}
 				catch (Exception ex)
 				{
@@ -894,7 +902,9 @@ namespace HMI.Presentation.Twr.Views
 
 			string num = _Historic[id].Digits;
 			Debug.Assert(!string.IsNullOrEmpty(num));
-
+			//#2855 cuando esta descolgado no permito llamar a morizados.
+			if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
+				return;
 			try
 			{
                 _CmdManager.TlfClick(num, ((HMIButton)sender).Text);

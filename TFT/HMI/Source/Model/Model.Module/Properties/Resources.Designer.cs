@@ -10,8 +10,8 @@
 
 namespace HMI.Model.Module.Properties {
     using System;
-    
-    
+
+
     /// <summary>
     ///   Clase de recurso fuertemente tipado, para buscar cadenas traducidas, etc.
     /// </summary>
@@ -113,7 +113,7 @@ namespace HMI.Model.Module.Properties {
                 return ResourceManager.GetString("EngineInfo", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Busca una cadena traducida similar a Salir.
         /// </summary>

@@ -45,7 +45,7 @@ namespace HMI.Presentation.AUrr.Properties
             {
                 if (object.ReferenceEquals(resourceMan, null))
                 {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Presentation.AUrr.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HMI.Presentation.AUrr.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

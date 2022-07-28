@@ -348,7 +348,7 @@ namespace HMI.Presentation.Twr.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool ConfCambioPagRad {
             get {
                 return ((bool)(this["ConfCambioPagRad"]));

@@ -775,6 +775,7 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 //Si el recurso no tiene contenido actualizado, la IP es de los datos de configuración (principal)                            
                 string id;
+               
                 ScvIp = scv.GetProxyIp(out id);
                 if (rs.IsUnreferenced)
                 {
@@ -787,10 +788,52 @@ namespace HMI.CD40.Module.BusinessEntities
             else
                 //Utilizo los datos del recurso (actualizado con el activo)
                 ScvIp = ((GwTlfRs)rs.Content).GwIp;
+
+            //RQF-49
+            //  Borro las lineas existentes
+            int index1 = 0;
+            if (true)
+            {
+                List < SipLine > listLines = net.Lines.FindAll(line1 => line1.centralIP == true);
+                foreach (SipLine line1 in listLines)
+                {
+                    int index = net.Lines.IndexOf(line1);
+                    net.Lines.RemoveAt(index);
+                    net.Routes.RemoveAt(index);
+                    net.RsTypes.RemoveAt(index);
+                }
+                string idDependencia;
+                do
+                {
+                    ScvIp = scv.GetProxyIp(out idDependencia, index1++);
+                } while (ScvIp == "" && index1 < 2);
+                //index1 -= 1;
+            }
+
+
             SipLine line = new SipLine(rs, ScvIp, true);
-            net.Lines.Add(line);
-            net.RsTypes.Add(new RsIdxType(net.Lines.Count - 1, 0, TipoInterface.TI_IP_PROXY));
-            net.Routes.Add(0);
+            //net.Lines.Add(line);
+            //net.RsTypes.Add(new RsIdxType(net.Lines.Count - 1, 0, TipoInterface.TI_IP_PROXY));
+            //net.Routes.Add(0);
+
+
+            //RQF-49 habria que crear 2 adicionales  proxies o 2 recursos.
+            // LALM Supongo que habria que crear una ruta por cada proxy que exista.
+            for (int i=0,j=0;i<3;i++)
+            {
+                string id;
+                ScvIp = scv.GetProxyIp(out id,i);
+                if (ScvIp != "")
+                {
+                    line = new SipLine(rs, ScvIp, true);
+                    net.Lines.Add(line);
+                    net.RsTypes.Add(new RsIdxType(net.Lines.Count - 1, 0, TipoInterface.TI_IP_PROXY));
+                    net.Routes.Add(0);
+                    j++;
+                }
+
+            }
+
             return net;
         }
 		public bool ExistNet(uint prefix, string number)
@@ -1153,25 +1196,29 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 foreach (Scv scv in _OtrosScv.Values)
                 {
-                    string ipAddScv = scv.GetProxyIp(out idEquipo);
-                    if ((scv.EsCentralIp) && (ipAddScv == ip))
-                    //Pertenece a otro SCV IP
+                    // RQF-49 busco entre todos los proxies.
+                    for (int i=0;i<3; i++)
                     {
-                        try
+                        string ipAddScv = scv.GetProxyIp(out idEquipo,i);
+                        if ((scv.EsCentralIp) && (ipAddScv == ip))
+                        //Pertenece a otro SCV IP
                         {
-                            resultNumber = Convert.ToUInt64(id);
-                            if (scv.IsInRangeScv(resultNumber))
+                            try
                             {
-                                recurso = new CfgRecursoEnlaceInterno();
-                                recurso.Prefijo = Cd40Cfg.ATS_DST;
-                                recurso.NumeroAbonado = id;
-                                recurso.NombreRecurso = string.Format("{0}@{1}", id, ipAddScv);
-                                break;
+                                resultNumber = Convert.ToUInt64(id);
+                                if (scv.IsInRangeScv(resultNumber))
+                                {
+                                    recurso = new CfgRecursoEnlaceInterno();
+                                    recurso.Prefijo = Cd40Cfg.ATS_DST;
+                                    recurso.NumeroAbonado = id;
+                                    recurso.NombreRecurso = string.Format("{0}@{1}", id, ipAddScv);
+                                    break;
+                                }
                             }
-                        }
-                        catch
-                        {
-                            return null;
+                            catch
+                            {
+                                return null;
+                            }
                         }
                     }
                 }

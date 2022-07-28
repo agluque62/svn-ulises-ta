@@ -336,7 +336,8 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <summary>
         /// 
         /// </summary>
-        public const string LastDeviceKeyPath = @"SOFTWARE\Nucleodf";
+        //public const string LastDeviceKeyPath = @"SOFTWARE\Nucleodf";
+        public const string LastDeviceKeyPath = @"SOFTWARE\Ulises";
         public const string LastDeviceKey = @"LastHidDevice";
         public static eAudioDeviceTypes LastAudioDevice
         {

@@ -512,8 +512,9 @@ namespace U5ki.CfgService
             cfg.PrioridadSesionSip = soapCfg.PrioridadSesionSIP;
             cfg.CldSupervisionTime = soapCfg.CldSupervisionTime;
             cfg.MetodosBssOfrecidos = soapCfg.MetodosBssOfrecidos;
-            //cfg.NombreZonaTxDefecto = soapCfg.NombreZonaTxDefecto;
-            /*
+			cfg.PasivoRetransmision = soapCfg.PasivoRetransmision;
+			//cfg.NombreZonaTxDefecto = soapCfg.NombreZonaTxDefecto;
+			/*
             if (soapCfg.MetodosBss != null)
             {
                 foreach (SoapCfg.MetodosBssDelRecurso m in soapCfg.MetodosBss)

@@ -86,6 +86,8 @@ namespace HMI.Model.Module.BusinessEntities
 		private int _TempRtxGroup = 0;
         private TipoFrecuencia_t _TipoFrecuencia = TipoFrecuencia_t.Basica;
         private bool _Monitoring = false;
+		//RQF-14
+		private bool _FrecuenciaNoDesasignable = false;
         private bool _Restored = true;
         private string _TempAlias = string.Empty;
         private FrequencyState _State = FrequencyState.NotAvailable;
@@ -208,9 +210,17 @@ namespace HMI.Model.Module.BusinessEntities
         {
             get { return _Monitoring; }
 
-        }
+		}
 
-        public bool Restored
+		//RQF-14
+		public bool FrecueciaNoDesasignable
+		{
+			get { return _FrecuenciaNoDesasignable; }
+
+		}
+
+
+		public bool Restored
         {
             get { return _Restored; }
         }
@@ -254,6 +264,7 @@ namespace HMI.Model.Module.BusinessEntities
 			_AudioVia = RdRxAudioVia.NoAudio;
 			_RtxGroup = _TempRtxGroup = 0;
             _Monitoring = false;
+			_FrecuenciaNoDesasignable = false;//RQF-14
             _Restored = true;
             _TipoFrecuencia = TipoFrecuencia_t.Basica;
             _qidxResource = _qidxMethod = string.Empty;
@@ -311,6 +322,8 @@ namespace HMI.Model.Module.BusinessEntities
 				_Rx = dst.Rx || _Tx;
                 _AudioVia = _Rx ? dst.AudioVia : RdRxAudioVia.NoAudio;
                 _Monitoring = dst.Monitoring;//  && !Unavailable;
+											 
+				_FrecuenciaNoDesasignable = dst.FrecuenciaNoDesasignable;//RQF-14
 				_RtxGroup = _TempRtxGroup = dst.RtxGroup;
                 _TipoFrecuencia = dst.TipoFrecuencia;
                 _State = dst.Estado;
@@ -494,6 +507,7 @@ namespace HMI.Model.Module.BusinessEntities
 		private bool _DoubleRadioSpeaker = Settings.Default.DoubleRadioSpeaker;
 
 		private static Logger _Logger = LogManager.GetCurrentClassLogger();
+		public bool pagina_confirmada = false;
 
 		[EventPublication(EventTopicNames.RadioChanged, PublicationScope.Global)]
 		public event EventHandler<RangeMsg> RadioChanged;
@@ -593,6 +607,29 @@ namespace HMI.Model.Module.BusinessEntities
 				return false;
 			}
 		}
+
+		//RQF-14 Duda, aqui se comprueba si hay alguna frecuencia
+		public bool FrecuenciaNoDesasignable(int numPositionsByPage)
+		{
+			int inicio = _Page * numPositionsByPage;
+			int fin = inicio + numPositionsByPage;
+			for (int i = inicio; i < fin; i++)
+			{
+				if (_Dst[i].FrecueciaNoDesasignable && _Dst[i].IsConfigurated && !_Dst[i].Unavailable)
+					return true;
+			}
+
+			return false;
+		}
+
+		//RQF-14 Aqui se comprueba una frecuencia en concreto.
+		public bool IdFrecuenciaNoDesasignable(int id)
+		{
+			if (_Dst[id].FrecueciaNoDesasignable)
+				return true;
+			return false;
+		}
+
 
 		public bool SiteManager
 		{

@@ -524,7 +524,6 @@ namespace U5ki.Infrastructure
       get { return _RtspPort2; }
       set { _RtspPort2 = value; }
     }
-
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1624,6 +1623,15 @@ namespace U5ki.Infrastructure
     {
       get { return _PorcentajeRSSI; }
       set { _PorcentajeRSSI = value; }
+    }
+
+    private bool _PasivoRetransmision = default(bool);
+    [global::ProtoBuf.ProtoMember(27, IsRequired = false, Name=@"PasivoRetransmision", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool PasivoRetransmision
+    {
+      get { return _PasivoRetransmision; }
+      set { _PasivoRetransmision = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

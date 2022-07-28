@@ -324,7 +324,7 @@ namespace HMI.CD40.Module.BusinessEntities
             SndDev snd;
 #endif
 
-            if (LstDispositivos == null)
+            if (LstDispositivos == null ||LstDispositivos.Count==0)
                 return;
 
             // Poner la Salida de Grabación.
@@ -940,7 +940,6 @@ namespace HMI.CD40.Module.BusinessEntities
                         Top.Mixer.Unlink(_ReplayTone);
                         SipAgent.DestroyWavPlayer(_ReplayTone);
                         _ReplayTone = -1;
-                        _Replaying = false;
                         _Replaying = false;
                         _StopPlaying.Enabled = false;
 
