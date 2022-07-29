@@ -20,7 +20,7 @@ namespace Translate
                                                 System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
         private static string languageDirectory = execDirectory.Replace("file:\\", "");//Esto es para quitar el formato URI que no lo acepta
         
-        private static CultureInfo ci = null;
+        private static CultureInfo ci { get; set; } = null;
         private static bool isOKInitialized = true;
         private static bool isInitialized = false;
         private static string errorMessage = "";
@@ -202,5 +202,15 @@ namespace Translate
          * 20171117. AGL. Obtiene el lenguaje activado...         * 
          */
         public static string Idioma { get { return cInfo; } }
+
+        public static void CurrentCultureSet()
+        {
+            lock (_lock)
+            {
+                if (!isInitialized) generateResources();
+                Thread.CurrentThread.CurrentCulture = ci;
+                Thread.CurrentThread.CurrentUICulture = ci;
+            }
+        }
     }
 }
