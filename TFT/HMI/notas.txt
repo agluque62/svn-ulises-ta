@@ -1,3 +1,10 @@
+01-09-2022 Sprint 12
+Falos vistos
+El proyecto se baja en version debug
+La primera vez que se compila en version release genera fallos, que se arreglan en la segunda compilación
+Sale con el atavoz hf puesto
+Salen con los jacks insertados (simlador de audio)
+
 14-6-2022 Spring 8
 01-6-2022 Version preliminar de 2.6.2.spring8
 23-5-2022 Fin Spring#7 c2.6.2

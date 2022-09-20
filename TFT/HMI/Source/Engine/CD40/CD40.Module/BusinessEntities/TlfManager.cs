@@ -481,7 +481,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     TlfIaPosition tlfIa = (TlfIaPosition)_TlfPositions[id];
                     _Logger.Info("Inserto recurso: {0} {1}", tlfIa.Literal, tlfIa.Uri);
                     //LALM 211008 añado recurso.
-                    //#2629 presentar via Atencion el paraemtro uri puede no corresponder con la llamada.
+                    //#2629 presentar via Atencion el parametro uri puede no corresponder con la llamada.
                     TlfIaDestination st = new TlfIaDestination(tlfIa.Literal, tlfIa.Number, tlfIa.State, tlfIa.IsTop, tlfIa.ChAllowsForward, tlfIa.Uri);
                     RangeMsg<TlfIaDestination> state = new RangeMsg<TlfIaDestination>(tlfIa.Pos, st);
                     General.SafeLaunchEvent(IaPositionsChanged, this, state);
@@ -821,7 +821,7 @@ namespace HMI.CD40.Module.BusinessEntities
         //lalm 211201
         // Esta funcion descuelga o cuelga dependiendo del estado de la tecla colgardescolgar
         public void Descuelga()
-        {
+            {
             if (!EstoyDescolgado())// Si No estoy descolgado cuelgo otras llamadas.
                 ResetActiveCalls(null);
             int pos = Tlf.IaMappedPosition;
@@ -872,6 +872,60 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
         //*2855
+
+        //220913
+        public class tsalvado
+        {
+            public int sipCallId;
+            public string _AccId;
+            public string _dstUri;
+            public string _ReferBy;
+            public CORESIP_Priority _Priority1;
+            public CORESIP_CallFlags _flags;
+            public int cont;
+            public tsalvado()
+            {
+                sipCallId = -1;
+                _AccId = ""; ;
+                _dstUri = "";
+                _ReferBy = "";
+                _Priority1 = 0;
+                _flags = 0;
+                cont = 0;
+            }
+        };
+        public List<tsalvado> lsalvado = new List<tsalvado>();
+        public void SaveParamLastCall(int sipCallId, string AccId, string dstUri, string ReferBy, CORESIP_Priority Priority, CORESIP_CallFlags flags)
+        {
+            tsalvado salvado = new tsalvado();
+            salvado.sipCallId = sipCallId;
+            salvado._AccId = AccId;
+            salvado._dstUri = dstUri;
+            salvado._ReferBy = ReferBy;
+            salvado._Priority1 = Priority;
+            salvado._flags = flags;
+            int c = lsalvado.Count;
+            if (c > 1)
+                salvado.cont = lsalvado[c - 1].cont + 1;
+            else
+                salvado.cont = 1;
+            if (c > 3)
+                lsalvado.RemoveAt(0);
+            lsalvado.Add(salvado);
+            
+        }
+        public tsalvado GetParamLastCall(int sipCallId)
+        {
+            tsalvado salvado = new tsalvado();
+            foreach (tsalvado s in lsalvado)
+            {
+                if (s.sipCallId == sipCallId)
+                    return s;
+            }
+            return salvado;
+        }
+
+
 
         /// <summary>
         /// Guarda el atributo de salida del audio para telefonía
@@ -1269,23 +1323,29 @@ namespace HMI.CD40.Module.BusinessEntities
                 //    return;
                 //}
                 //lalm 220603
+                //lalm 220902 No se pueden tratar 2 llamadas entrantes por AI
                 string reason = "";
-                answer.Value  = tlf.HandleIncomingCall(call, call2replace, info, inInfo, out reason);
-                if (answer.Value==SipAgent.SIP_DECLINE && tlf.Pos== Tlf.IaMappedPosition)
+                if (tlf is TlfIaPosition && this._UnhangUpTone>0)
                 {
-                    SortedList<int, TlfPosition> tlfPositionsCopy = new SortedList<int, TlfPosition>(_TlfPositions);
-                    //int pos = Tlf.IaMappedPosition + 1;
-                    int pos = 2;
-                    tlfPositionsCopy.Remove(pos);
-                    tlf.Reset();
-                    tlfPositionsCopy.Add(pos, tlf);
-                    TlfPosition p = new TlfPosition(pos);
-                    //p.Reset();
-                    //tlfPositionsCopy.TryGetValue(Tlf.IaMappedPosition, out p);
-                    if (tlfPositionsCopy.TryGetValue(pos, out p)==true)
-                        answer.Value = p.HandleIncomingCall(call, call2replace, info, inInfo, out reason);
-                    tlfPositionsCopy[pos].RefrescaPos();
+                    answer.Value = SipAgent.SIP_BUSY;
+                    return;
                 }
+                answer.Value  = tlf.HandleIncomingCall(call, call2replace, info, inInfo, out reason);
+                //if (answer.Value==SipAgent.SIP_DECLINE && tlf.Pos== Tlf.IaMappedPosition)
+                //{
+                //    SortedList<int, TlfPosition> tlfPositionsCopy = new SortedList<int, TlfPosition>(_TlfPositions);
+                //    //int pos = Tlf.IaMappedPosition + 1;
+                //    int pos = 2;
+                //    tlfPositionsCopy.Remove(pos);
+                //    tlf.Reset();
+                //    tlfPositionsCopy.Add(pos, tlf);
+                //    TlfPosition p = new TlfPosition(pos);
+                //    //p.Reset();
+                //    //tlfPositionsCopy.TryGetValue(Tlf.IaMappedPosition, out p);
+                //    if (tlfPositionsCopy.TryGetValue(pos, out p)==true)
+                //        answer.Value = p.HandleIncomingCall(call, call2replace, info, inInfo, out reason);
+                //    tlfPositionsCopy[pos].RefrescaPos();
+                //}
 				if (answer.Value != SipAgent.SIP_DECLINE)
 				{
 					if (answer.Value == SipAgent.SIP_RINGING)
@@ -1629,7 +1689,23 @@ namespace HMI.CD40.Module.BusinessEntities
 
                 //lalm 211008 añado recurso
                 //#2629 Presentar via utilizada en llamada saliente.
-                TlfInfo daSt = new TlfInfo(tlf.Literal, tlf.State, tlf.ChAllowsPriority(), TlfType.Unknown, tlf.IsTop, tlf.ChAllowsForward, tlf.Uri);
+                //220913
+                // Quito el parametro recused, ira en la proxima revision.
+                string recused = "";
+                /*
+                if (tlf.State==TlfState.Out || tlf.State == TlfState.Hold || tlf.State == TlfState.Set)
+                { 
+                    tsalvado ts = Top.Tlf.GetParamLastCall(tlf.CallId);
+                    if (ts.sipCallId!=-1)
+                        recused = ts._dstUri;
+                }
+                else
+                {
+                    recused = "";
+                }
+                */
+                //TlfInfo daSt = new TlfInfo(tlf.Literal, tlf.State, tlf.ChAllowsPriority(), TlfType.Unknown, tlf.IsTop, tlf.ChAllowsForward, tlf.Uri);
+                TlfInfo daSt = new TlfInfo(tlf.Literal, tlf.State, tlf.ChAllowsPriority(), TlfType.Unknown, tlf.IsTop, tlf.ChAllowsForward, recused);
                 RangeMsg<TlfInfo> stateAD = new RangeMsg<TlfInfo>(tlf.Pos, daSt);
                 General.SafeLaunchEvent(ResourceChanged, this, stateAD);
 
@@ -1722,7 +1798,7 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 
                 MensajesDeIntrusion(tlf);
-				TlfIaDestination iaSt = new TlfIaDestination(tlf.Literal, tlf.Number, st, tlf.IsTop, tlf.ChAllowsForward);
+				TlfIaDestination iaSt = new TlfIaDestination(tlf.Literal, tlf.Number, st, tlf.IsTop, tlf.ChAllowsForward,tlf.Uri);
 				RangeMsg<TlfIaDestination> state = new RangeMsg<TlfIaDestination>(tlf.Pos, iaSt);
 				General.SafeLaunchEvent(IaPositionsChanged, this, state);
 

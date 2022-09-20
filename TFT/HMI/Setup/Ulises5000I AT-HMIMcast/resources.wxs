@@ -292,6 +292,12 @@
             <Component Id="cmpD9699E6F06A899383FC0DD9E9570DCC2" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
                 <File Id="fil78820D819F6508F00CAF44B0D5124936" KeyPath="yes" Source="$(var.SourcePath)\Tones\ring.wav" />
             </Component>
+            <Component Id="cmp995FD4592B3AB9D6DA2ABBC1D69A7EE2" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="filC6674A248E2332E64EF8BCD4BCD474E2" KeyPath="yes" Source="$(var.SourcePath)\Tones\RingCascos.wav" />
+            </Component>
+            <Component Id="cmpF2E3A087B48817BC854A903480A1106E" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
+                <File Id="fil21C9C2815417D42B8829216454618582" KeyPath="yes" Source="$(var.SourcePath)\Tones\RingCascosPrio.wav" />
+            </Component>
             <Component Id="cmpB3E0C4908B4D67A7CCEB8DF5A4B300B5" Directory="dirE98B07650B376F75E85124D5E1E267D6" Guid="*">
                 <File Id="fil60FF028904D655DDB16B57ABBD27CE4C" KeyPath="yes" Source="$(var.SourcePath)\Tones\RingNoIntrusivo.wav" />
             </Component>

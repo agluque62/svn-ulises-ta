@@ -104,12 +104,16 @@ namespace HMI.Model.Module.Messages
             _AllowsForward = allowsForward;
 			//LALM 211007
 			//#2629 Presentar via utilizada en llamada saliente.
-			if (recused != "")
+			// Este parametro ira en la proxima revision.
+			if (recused != "" && recused!=null)
 
 				if (recused.IndexOf("rs=") > 0)
 				{
 					int begin = recused.IndexOf("rs=");
 					_recused = " [" + recused.Substring(begin + 3).Split('>')[0] + "] ";
+					int fpc = recused.Substring(begin + 3).IndexOf(';');
+					if (fpc > 0)
+						_recused = " [" + recused.Substring(begin + 3).Split(';')[0] + "] ";
 				}
 				else if (recused.IndexOf("sip:") > 0)
 				{

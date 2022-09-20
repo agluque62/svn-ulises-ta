@@ -1389,7 +1389,7 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 result = Native.Kernel32.GetPrivateProfileString(seccion, clave, "", retorno, 50, fullRecorderFileName);
             }
-            catch (Exception exc)
+            catch (Exception /*exc*/)
             {
                 //_Logger.Error("Error leyendo fichero UG5K_REC_CONF_FILE: {0} exception {1} !!!", Marshal.GetLastWin32Error(), exc.Message);
             }

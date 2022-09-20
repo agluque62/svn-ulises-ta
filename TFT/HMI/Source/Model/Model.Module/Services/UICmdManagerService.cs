@@ -579,6 +579,9 @@ namespace HMI.Model.Module.Services
 					{
 						//#2855
 						TlfClick(_StateManager.Tlf[id].Number, false, null, id);
+						//Para comunicar al boton que cambia de color.
+						if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
+							_StateManager.Tlf.Unhang.Cuelga();
 					}
 					break;
 				case TlfState.In:
@@ -769,9 +772,9 @@ namespace HMI.Model.Module.Services
 			else if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
 			{
 				if (test) return true;
-				//_StateManager.Tlf.Unhang.Cuelga();
 				//_StateManager.Tlf.Unhang.Reset();
 				TlfClick(Tlf.IaMappedPosition);
+				_StateManager.Tlf.Unhang.Cuelga();
 			}
 			else if ((_StateManager.Tlf[TlfState.RemoteIn] > 0) && Settings.Default.SupportInTlfCancel)
 			{

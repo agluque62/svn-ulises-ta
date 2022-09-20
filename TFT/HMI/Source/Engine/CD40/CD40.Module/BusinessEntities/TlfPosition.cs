@@ -827,7 +827,16 @@ namespace HMI.CD40.Module.BusinessEntities
                            dstUri = transferInfo.ReferTo;
 
                        int sipCallId = SipAgent.MakeTlfCall(ch.AccId, dstUri, _SipCall.ReferBy, _SipCall.Priority, flags);
-                    _SipCall.Update(sipCallId, ch.AccId, transferInfo.DstId, ch, path.Remote, path.Line);
+                       try
+                       {
+                           Top.Tlf.SaveParamLastCall(sipCallId, ch.AccId, dstUri, _SipCall.ReferBy, _SipCall.Priority, flags);
+                           _Logger.Debug("Guardo llamada " + sipCallId.ToString() + dstUri);
+                       }
+                       catch (Exception ex)
+                       {
+                           _Logger.Warn("Imposible salvar llamada" + ex);
+                       }
+                       _SipCall.Update(sipCallId, ch.AccId, transferInfo.DstId, ch, path.Remote, path.Line);
 
                     _Literal = TlfManager.GetDisplayName(dstUri);
                     if (String.IsNullOrEmpty(_Literal))
@@ -1527,9 +1536,18 @@ namespace HMI.CD40.Module.BusinessEntities
                         if (path.ModoSinProxy == false)
                             flags |= CORESIP_CallFlags.CORESIP_CALL_EXTERNAL_IP;
                         sipCallId = SipAgent.MakeTlfCall(ch.AccId, dstUri, _SipCall.ReferBy, _SipCall.Priority, flags);
-                    }
+                        try
+                        {
+                            Top.Tlf.SaveParamLastCall(sipCallId, ch.AccId, dstUri, _SipCall.ReferBy, _SipCall.Priority, flags);
+                            _Logger.Debug("Guardo llamada "+ sipCallId.ToString()+ dstUri);
+                        }
+                        catch (Exception ex)
+                        {
+                            _Logger.Warn("Imposible salvar llamada" + ex);
+                        }
+                }
 
-				_SipCall.Update(sipCallId, ch.AccId, remoteId, ch, path.Remote, path.Line);
+                _SipCall.Update(sipCallId, ch.AccId, remoteId, ch, path.Remote, path.Line);
 
                 _Logger.Info("Making call to: {0} {1:X}", dstUri, sipCallId);
 				return true;
@@ -1542,18 +1560,67 @@ namespace HMI.CD40.Module.BusinessEntities
 
 			return false;
 		}
+        public class tsalvado
+        {
+            public int sipCallId;
+            public string _AccId;
+            public string _dstUri;
+            public string _ReferBy;
+            public CORESIP_Priority _Priority1;
+            public CORESIP_CallFlags _flags;
+            public int cont;
+            public tsalvado()
+            {
+                sipCallId = -1;
+                _AccId = ""; ;
+                _dstUri="";
+                _ReferBy = "";
+                _Priority1 = 0;
+                _flags = 0;
+                cont = 0;
+            }
+        };
+        public List<tsalvado> lsalvado = new List<tsalvado>();
+        public void SaveParamLastCall(int sipCallId, string AccId, string dstUri, string ReferBy, CORESIP_Priority Priority, CORESIP_CallFlags flags)
+        {
+            tsalvado salvado = new tsalvado();
+            salvado.sipCallId = sipCallId;
+            salvado._AccId = AccId;
+            salvado._dstUri = dstUri;
+            salvado._ReferBy = ReferBy;
+            salvado._Priority1 = Priority;
+            salvado._flags = flags;
+            int c = lsalvado.Count;
+            if (c > 2)
+                lsalvado.RemoveAt(0);
+            if (c > 1)
+                salvado.cont = lsalvado[c - 1].cont + 1;
+            else
+                salvado.cont = 1;
+            lsalvado.Add(salvado);
+        }
+        public tsalvado GetParamLastCall(int sipCallId)
+        {
+            tsalvado salvado = new tsalvado();
+            foreach (tsalvado s in lsalvado)
+            {
+                if (s.sipCallId == sipCallId)
+                    return s;
+            }
+            return salvado;
+        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// LALM 211006
-        ///#2629 Presentar via utilizada en llamada saliente.
-        /// <param name="ch"></param>
-        /// <param name="path"></param>
-        /// <param name="prio"></param>
-        /// <param name="remoteId"></param>
-        /// <returns></returns>
-        private static string getdstParams(SipChannel ch, SipPath path, int prio, string remoteId)
+/// <summary>
+/// 
+/// </summary>
+/// LALM 211006
+///#2629 Presentar via utilizada en llamada saliente.
+/// <param name="ch"></param>
+/// <param name="path"></param>
+/// <param name="prio"></param>
+/// <param name="remoteId"></param>
+/// <returns></returns>
+private static string getdstParams(SipChannel ch, SipPath path, int prio, string remoteId)
         {
             string dstParams = "";
             if (!path.Line.centralIP)
@@ -1621,7 +1688,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
                     if (TryCall(ch, path, (int)_SipCall.Priority + 1))
                     {
-                        path.Reset();
+                        path.Reset(ch.Uri);//220802 paso la uri para que se almacene
                         return TlfState.Out;
                     }
 

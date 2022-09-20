@@ -157,7 +157,13 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='ECLC_Property' Type='raw' />
     </Property>
-    <!-- 20181107. Tipo de TEAM para Supervision -->
+	  <!-- Habilitación Ring to Headphones-->
+	  <Property Id="RTOH" Value="False">
+		  <RegistrySearch Id='UV5KI_HMI_RTOH' Root='HKLM'
+						 Key='SOFTWARE\Wix\UV5KI_HMI'
+						 Name='RTOH_Property' Type='raw' />
+	  </Property>
+	  <!-- 20181107. Tipo de TEAM para Supervision -->
     <Property Id="NICTEAM" Value="0">
       <RegistrySearch Id='UV5KI_HMI_NICTEAM' Root='HKLM'
                      Key='SOFTWARE\Wix\UV5KI_HMI'
@@ -603,8 +609,14 @@
                   File = "[#HMI.config]"
                   ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='ECHandsFreeLC'[\]]/value"
                   Value="[ECLC]"/>
-        
-        <!-- Tipo de TEAM de LAN -->
+
+		  <!-- Ring to HeadPhones -->
+		  <util:XmlFile Id="RingToHeadSet" Action="setValue"
+					File = "[#HMI.config]"
+					ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='RingToHeadSet'[\]]/value"
+					Value="[RTOH]"/>
+
+		  <!-- Tipo de TEAM de LAN -->
         <util:XmlFile Id="LanTypeSet" Action="setValue"
                   File = "[#HMI.config]"
                   ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='LanTeamType'[\]]/value"
@@ -894,7 +906,8 @@
           <RegistryValue Name='TIMESPRX_Property' Value='[TIMESPRX]' Type='string' />
           <RegistryValue Name='PTTFILTER_Property' Value='[PTTFILTER]' Type='string' />
           <!--<RegistryValue Name='ECTLF_Property' Value='[ECTLF]' Type='string' />-->
-          <RegistryValue Name='ECLC_Property' Value='[ECLC]' Type='string' />
+			<RegistryValue Name='ECLC_Property' Value='[ECLC]' Type='string' />
+			<RegistryValue Name='RTOH_Property' Value='[RTOH]' Type='string' />
           <RegistryValue Name='NICTEAM_Property' Value='[NICTEAM]' Type='string' />
           <RegistryValue Name='BRILLO_Property' Value='[BRILLO]' Type='string' />
         </RegistryKey>
@@ -1282,7 +1295,18 @@
           </ComboBox>
         </Control>
 
-        <Control Id="DoubleRadioSpeakerLabel"  Type="Text" X="10" Y="150" Width="60" Height="18" TabSkip="no" Text="Doble altavoz" />
+		  <Control Id="RTOHLabel"  Type="Text"     X="10" Y="212" Width="100" Height="18" TabSkip="no" Text="Ring a Cascos"/>
+		  <Control Id="RTOH_value"  Type="ComboBox" X="85" Y="210" Width="50"  Height="18" Property="RTOH" ComboList="yes">
+			  <ComboBox Property="RTOH" >
+				  <ListItem Value="False" Text="No" />
+				  <ListItem Value="True"  Text="Si" />
+			  </ComboBox>
+		  </Control>
+
+
+
+
+		  <Control Id="DoubleRadioSpeakerLabel"  Type="Text" X="10" Y="150" Width="60" Height="18" TabSkip="no" Text="Doble altavoz" />
         <Control Id="DoubleRadioSpeakerLabel2"  Type="Text" X="10" Y="159" Width="60" Height="18" TabSkip="no" Text="radio general" />
         <Control Id="DoubleRadioSpeakerEdit"   Type="ComboBox" X="85" Y="150" Width="90" Height="18" Property="DOUBLERDSPEAKER" ComboList="yes">
           <ComboBox Property="DOUBLERDSPEAKER" >

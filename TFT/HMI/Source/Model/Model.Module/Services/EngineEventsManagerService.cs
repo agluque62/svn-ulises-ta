@@ -541,8 +541,8 @@ namespace HMI.Model.Module.Services
 		public void OnTlfResStateEngine(object sender, RangeMsg<TlfInfo> msg)
 		{
 			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.TlfResStateEngine, msg);
-
-			_StateManager.Tlf.Reset(msg);
+			//220914 parece que en cualquier cambio de estado esta fucion es llamada.
+			//_StateManager.Tlf.Reset(msg);
 		}
 
 		[EventSubscription(EventTopicNames.LcSpeakerLevelEngine, ThreadOption.UserInterface)]

@@ -383,5 +383,17 @@ namespace HMI.Model.Module.Properties {
                 return ResourceManager.GetString("TalkTlfStateDescription", resourceCulture);
             }
         }
+
+        /// <summary>//lalm220914
+        ///   Busca una cadena traducida similar a Congestion.
+        /// </summary>
+        public static string CongestionDescription
+        {
+            get
+            {
+                return "Congestion";
+                //return ResourceManager.GetString("CongestionDescription", resourceCulture);
+            }
+        }
     }
 }

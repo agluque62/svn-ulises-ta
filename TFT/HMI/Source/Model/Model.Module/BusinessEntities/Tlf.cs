@@ -391,14 +391,18 @@ namespace HMI.Model.Module.BusinessEntities
 					    StateDescription = Resources.TalkTlfStateDescription + " " + _Dst+recused;
 					break;
 				case TlfState.Hold:
-					StateDescription = Resources.HoldToTlfStateDescription + " " + _Dst;
+					StateDescription = Resources.HoldToTlfStateDescription + " " + _Dst + recused; 
 					break;
 				case TlfState.RemoteHold:
-					StateDescription = Resources.HoldByTlfStateDescription + " " + _Dst;
+					StateDescription = Resources.HoldByTlfStateDescription + " " + _Dst + recused; 
 					break;
 				//case TlfState.InPrio:
 				//    _StateDescription = Resources.IntrudedByDescription + " " + _Dst;
 				//    break;
+				//LALM 220914
+				case TlfState.Congestion:
+					StateDescription = Resources.CongestionDescription + " " + _Dst + recused;
+					break;
 				default:
 					StateDescription = "";
 					break;
@@ -1028,7 +1032,9 @@ namespace HMI.Model.Module.BusinessEntities
 						if (_State != UnhangState.Idle)
 						{
 							// Puede ocurrir que antes realizar la llamada por acceso indirecto
-							// tengamos que colgar una ya existente. De ahí la comprobación
+							// tengamos que colgar una ya existente. De ahí la comprobaciónç
+							if (State == UnhangState.Descolgado)
+								break;
 							_AssociatePosition = -1;
 							State = UnhangState.Idle;
 						}

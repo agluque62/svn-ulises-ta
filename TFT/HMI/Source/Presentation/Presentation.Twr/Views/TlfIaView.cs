@@ -95,6 +95,16 @@ namespace HMI.Presentation.Twr.Views
 				return true;
 			}
 		}
+
+		private bool _ColaLLamadasCompleta()
+        {
+			return 
+				(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.In) &&
+				(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.InPrio) &&
+				(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.RemoteIn) &&
+				(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.Hold);
+		}
+
 		private bool _CallEnabled
 		{
 			get 
@@ -114,13 +124,17 @@ namespace HMI.Presentation.Twr.Views
 				}
 				if (_StateManager.Tlf.Unhang.State != UnhangState.Idle)
 				{
-					return true;
+					//LALM 220905
+					// Cola de llamadas llena cuando hay la tecla descolgar esta en uso.
+					return _ColaLLamadasCompleta();
+					//return true;
 				}
 				//#2855
 				// Ahora tambien en reposo esta habilitada la tecla Colgar/Descolgar
 				if (_StateManager.Tlf.Unhang.State == UnhangState.Idle)
 				{
-					return true;
+					return _ColaLLamadasCompleta();
+					//return true;
 				}
 				if (//(_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] == 1) ||
 					(_StateManager.Tlf[Tlf.IaMappedPosition].State == TlfState.In) || 
@@ -313,12 +327,14 @@ namespace HMI.Presentation.Twr.Views
 			{
 				_IsCurrentView = false;
 				_CallTimestamp = null;
+				int puntoparada = 0;
 				//#2855
 				// Al cambiar de vista, aunque no se haya empezado a marcar, no se modifica el estado de AI.
 				// Puede que esté la telca AI descolgada sin posicion asociada.
 				if (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado)
                 {
-
+					//pongo punto de parada
+					puntoparada++;
                 }
 				else if (_StateManager.Tlf.Unhang.AssociatePosition != -1)
 				{
@@ -329,7 +345,10 @@ namespace HMI.Presentation.Twr.Views
 						_SlowBlinkTimer.Enabled = false;
 						_SlowBlinkOn = true;
 					}
+
 				}
+				//220905
+				_CallBT.ButtonColor = GetStateColor(_CallBT, _StateManager.Tlf.Unhang.State);
 			}
 		}
 
@@ -349,7 +368,7 @@ namespace HMI.Presentation.Twr.Views
 
 				//#2855
 				_Keypad.Enabled = (_StateManager.Tlf.Unhang.State == UnhangState.Descolgado);
-				_CallBT.Enabled = true;
+				//_CallBT.Enabled = true;// 220905 habilito dependiendo de callenabled por cola de llamadas.
 
 				if (_SlowBlinkList.Remove(_CallBT) && (_SlowBlinkList.Count == 0))
 				{
@@ -497,8 +516,9 @@ namespace HMI.Presentation.Twr.Views
 					}
 
                     _Keypad.Enabled = _KeypadEnabled;
-					//_CallBT.Enabled = _CallEnabled;//*2855
-					_CallBT.Enabled = true;//#2855 habilito marcador por defecto
+					_CallBT.Enabled = _CallEnabled;//*2855
+					//220905 quito la habilitacion por defecto para cola de llamdas llena
+					//_CallBT.Enabled = true;//#2855 habilito marcador por defecto
 				}
 			}
 
@@ -785,8 +805,10 @@ namespace HMI.Presentation.Twr.Views
 					// para poder separar la tecla descuelgue de la tecla 19+1
 					//_CmdManager.TlfClick(id);
 					_CmdManager.TlfClick(dst1, id.ToString());
-					if (statepos19m1!=TlfState.Idle && statepos19m1 != TlfState.Unavailable)
+					if (statepos19m1 != TlfState.Idle && statepos19m1 != TlfState.Unavailable)
+					{
 						System.Threading.Thread.Sleep(1000);// Este sleep lo pongo en 100 para colgar lo pendiente
+					}
 					System.Threading.Thread.Sleep(50);// 
 					_Keypad.Enabled = true;
 					_StateManager.Tlf.Unhang.Descuelga(id);

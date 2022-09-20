@@ -257,6 +257,7 @@ namespace HMI.CD40.Module.BusinessEntities
             _LcRecorderDevInHw = (_LcRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input) : _LcRecorderDevInHw;
             _RadioHfRecorderInHw = (_RadioHfRecorderInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, CMediaDevMode.Input) : _RadioHfRecorderInHw;
             //_RadioHfRecorderInHw = -1;
+            _RadioHfRecorderInHw = (_RadioHfRecorderInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, CMediaDevMode.Input) : _RadioHfRecorderInHw;
 
             /** Salidas de Grabacion. */
             _IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, CMediaDevMode.Output) : _IntRecorderDevOutHw;
@@ -284,9 +285,10 @@ namespace HMI.CD40.Module.BusinessEntities
             //_RadioRecorderDevInHw = (_RadioRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input) : _RadioRecorderDevInHw;
             _LcRecorderDevInHw = (_LcRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input): _LcRecorderDevInHw;
             //_RadioHfRecorderInHw = -1;
+            _RadioHfRecorderInHw = (_RadioHfRecorderInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, CMediaDevMode.Input) : _RadioHfRecorderInHw;
 
             /** Salidas de Grabacion. */
-            _IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? - 1:-1;
+            //_IntRecorderDevOutHw = (_IntRecorderDevOutHw == -1) ? - 1:-1;
             _AlumnRecorderDevOutHw = (_AlumnRecorderDevOutHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, CMediaDevMode.Output): _AlumnRecorderDevOutHw;
 
             /** Retornos de Grabacion */
@@ -327,6 +329,7 @@ namespace HMI.CD40.Module.BusinessEntities
             _RadioRecorderDevInHw = (_RadioRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Input): _RadioRecorderDevInHw;
             _LcRecorderDevInHw = (_LcRecorderDevInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Input): _LcRecorderDevInHw;
             //_RadioHfRecorderInHw = -1;
+            _RadioHfRecorderInHw = (_RadioHfRecorderInHw == -1) ? HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, CMediaDevMode.Input) : _RadioHfRecorderInHw;
 
             /** Retornos de Grabacion */
             _InstructorRecorderDevIn = _InstructorRecorderDevInHw;
@@ -342,7 +345,24 @@ namespace HMI.CD40.Module.BusinessEntities
             _IntRecorderDevOut = _IntRecorderDevOutHw;
             _AlumnRecorderDevOut = _InstructorRecorderDevOut = _IntRecorderDevOut;//220601
         }
+        
+        //220920 Se añade este nuevo modo.
+        public void NoRecordMode()
+        {
+            _InstructorRecorderDevIn = -1;
+            _AlumnRecorderDevIn = -1;
+            _RadioRecorderDevIn = -1;
+            _LcRecorderDevIn = -1;
+            _RadioHfRecorderIn = -1;
 
+            /** Salidas de Grabacion. */
+            _IntRecorderDevOutHw = -1;
+            _AlumnRecorderDevOutHw = -1;
+
+            _IntRecorderDevOut = -1;
+            _AlumnRecorderDevOut = _InstructorRecorderDevOut = _IntRecorderDevOut = 1;
+
+        }
         /// RQF20 aqui se añadiran todos los tipos de dispositivos.
         static private void SetTipoOutWindows(CORESIP_SndDevType UlisesDev, string namewindows)
         {
@@ -397,7 +417,7 @@ namespace HMI.CD40.Module.BusinessEntities
         public void AsignacionAudioVolumen()
 #endif
         {
-            string alumno = Settings.Default.CasAlumnoId;
+        string alumno = Settings.Default.CasAlumnoId;
             string altavozlc = Settings.Default.LcSpkWindowsId;
             string instructor = Settings.Default.CasInstructorId;
             string altavozrd = Settings.Default.RdSpkWindowsId;
@@ -569,6 +589,8 @@ namespace HMI.CD40.Module.BusinessEntities
 
                 //#3267 RQF22
                 LoadDevices();
+                //220920 se cambia la asignacionhw al inicio, solo se debe llamar una vez.
+                RecordModeHw();
                 //#3267 RQF22 desparecerá, esta funcion no se la llamará
                 if (TipoGrabacionAnalogica == 1 && EnableGrabacionAnalogica)
                 //if (Settings.Default.RecordMode == 1)              // Pointe Noire.
@@ -587,7 +609,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 }
                 else
                 {
-                    RecordModeHw();
+                    NoRecordMode();
                 }
             }
             else if (tipoAudio == eAudioDeviceTypes.MICRONAS)    // IAU-MICRONAS. 
@@ -2412,7 +2434,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="mphToSpk">true si el cambio es de casco a altavoz, false en caso contrario </param>
         private void TogleRxAudioRadio(bool mphToSpk)
         {
-            _Logger.Info("TogleRxAudioRadio: " + mphToSpk);
+            _Logger.Debug("TogleRxAudioRadio: " + mphToSpk);
             // AGL. Hace una copia de los enlaces establecidos en el 'Mezclador'.
             List<LinkInfo> copyLinks = new List<LinkInfo>(_LinksList);
             // AGL... ???
@@ -2692,7 +2714,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 else
                 {
                     End();
-                    RecordModeHw();
+                    //220920 Se cambia recormode_hw por norecordmode
+                    //RecordModeHw();
+                    NoRecordMode();
                     //RecordModeDisable(); No es necesario.
                 }
             }
