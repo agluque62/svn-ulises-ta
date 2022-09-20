@@ -428,8 +428,26 @@ namespace U5ki.RdService.NM
             return NodeDeallocate(gear);
         }
 
+        public void Set_SipSessionFail(String SipUri, bool sipsessionfail)
+        {
+            BaseGear gear = NodeGet_by_SipUri(SipUri);
+            if (null != gear)
+            {
+                if (sipsessionfail)
+                {
+                    //Si el establecimiento de sesion falla, se incrementa el valor hasta un valor maximo MAX_SipSessionFail
+                    if (gear.SipSessionFail < BaseNode.MAX_SipSessionFail) gear.SipSessionFail++;
+                }
+                else
+                {
+                    //Si la sesion se consigue establecer, entonces esta variable se reinicia a 0
+                    gear.SipSessionFail = 0;
+                }                
+            }
+        }
+
         #endregion
-        
+
         #region Logic - NodeManager
 
         /// <summary>
@@ -737,6 +755,22 @@ namespace U5ki.RdService.NM
                 return null;
             }
         }
+
+        protected BaseGear NodeGet_by_SipUri(String SipUri)
+        {
+            lock (NodePool)
+            {
+                foreach (KeyValuePair<String, BaseGear> pair in NodePool)
+                {
+                    if (NodePool[pair.Key].SipUri == SipUri)
+                    {
+                        return NodePool[pair.Key];
+                    }
+                }
+                return null;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -923,9 +957,10 @@ namespace U5ki.RdService.NM
                         OnGearCheckedTimeout(gear);
                         break;
 
-                    case GearOperationStatus.FailSessionsSip:
-                    case GearOperationStatus.FailMasterConfig:
-                        OnGearCheckedFail(gear, GearStatus.Forbidden);
+                    case GearOperationStatus.FailSessionsListSip:
+                    case GearOperationStatus.FailSessionSip:
+                    case GearOperationStatus.FailMasterConfig:                        
+                        OnGearCheckedFail(gear, GearStatus.Forbidden);  //Se deshabilita
                         gear.Deallocate(GearStatus.Forbidden);
                         break;
 
@@ -1124,7 +1159,9 @@ namespace U5ki.RdService.NM
             BaseGear replacement = null;
             if (null != gearToReplace)
                 replacement = NodeReplacementFind(gearToReplace);
-            
+
+            gearKO.ReplacementWhenKO = replacement;
+
             // Ahora trabajamos con el reemplazo.
             if (null == replacement)
             {
@@ -1159,7 +1196,7 @@ namespace U5ki.RdService.NM
                     String replacementFrecuency = replacement.Frecuency;
                     LogWarn<MNManager>("Se desasigna por Prioridad: " + replacement.ToString(),
                         replacement.IsReceptor ? U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_FRECUENCY_RX_NONPRIORITY_ONERROR : U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_FRECUENCY_TX_NONPRIORITY_ONERROR,
-                        replacement.Frecuency, "IdDestino: " + replacement.idDestino, "Equipo: " + replacement.Id);
+                        replacement.Frecuency, "Equipo: " + replacement.Id);
 
                     replacement.Deallocate(GearStatus.AssignationInProgress);
 
@@ -1219,12 +1256,14 @@ namespace U5ki.RdService.NM
             gear.KOsCount = 0;
             gear.OmiteKOsCount = 0; 
 
-            // Historico de Equipo TIMEOUT, Caido o Deshabilitado...
-            LogInfo<MNManager>("[OPERATION " + GearOperationStatus.Timeout + "] " + gear.ToString(),
-                 U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GEAR_FAIL, gear.Id, " TIMEOUT");
-
             if (gear.IsTimeout)
+            {
+                // Historico de Equipo TIMEOUT, Caido o Deshabilitado...
+                LogInfo<MNManager>("[OPERATION " + GearOperationStatus.Timeout + "] " + gear.ToString(),
+                     U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GEAR_FAIL, gear.Id, " TIMEOUT");
+
                 OnGearCheckedKO(gear, deallocateStatus);
+            }
             else
             {
                 LogTrace<MNManager>("OnGearCheckedTimeout adelanta check " + gear.Id);

@@ -399,6 +399,16 @@ namespace u5ki.RemoteControlService
                 GearOperationStatus output = SNMPDeviceStatusGet(
                     ((BaseNode)input).IP,
                     RCSessionTypes.Monitoring);
+
+                if (output == GearOperationStatus.OK)
+                {
+                    if (((BaseNode)input).SipSessionFail == BaseNode.MAX_SipSessionFail)
+                    {
+                        //Solamente se activa el estado de fallo de sesion sip si no hay fallo por SNMP
+                        output = GearOperationStatus.FailSessionSip;
+                    }
+                }
+
                 // JOI: 20171031 ERROR #3231
                 if ((output == GearOperationStatus.OK) && ((BaseNode)input).IsMaster == true && ((BaseNode)input).Power == 0 && ((BaseNode)input).IsEmitter == true)
                 {
@@ -1297,7 +1307,7 @@ namespace u5ki.RemoteControlService
                             LogWarn<RCRohde4200>("[SNMP][" + "Device Status GET" + "] [" + ToString(targetIp) + "] SESSION SIP: " + this.ToString(targetIp),
                              U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GEAR_ITF_ERROR,
                             Id, CTranslate.translateResource("Número de sesiones SIP superadas"));
-                            return GearOperationStatus.FailSessionsSip;
+                            return GearOperationStatus.FailSessionsListSip;
                         }
                     }
                     return GearOperationStatus.OK;

@@ -105,7 +105,11 @@ namespace U5ki.Infrastructure
         /// <summary>
         /// Tipo de equipo fisico que tiene este element.
         /// </summary>
-        public RCTypes RemoteControlType { get; set; }      
+        public RCTypes RemoteControlType { get; set; }
+
+        public static int MAX_SipSessionFail = 3;       
+        public int SipSessionFail { get; set; }         //Si su valor es MAX_SipSessionFail indica que el equipo no ha podido conectarse por SIP.
+                                                        
 
         public BaseNode() { }
         /// <summary>
@@ -113,6 +117,8 @@ namespace U5ki.Infrastructure
         /// </summary>
         public BaseNode(Node input)
         {
+            SipSessionFail = 0;
+
             if (null == input)
                 LogFatal<BaseNode>(String.Format(Errors.ElementCannotBeNull, "Node input", "BaseNode.BaseNode"));
 
@@ -125,7 +131,7 @@ namespace U5ki.Infrastructure
             IsEmitter = input.EsTransmisor;
             //JOI: CONTROL FRECUENCIA;
             IsMaster = (input.FormaDeTrabajo == Tipo_Formato_Trabajo.Principal) ? true : false;
-        }
+        }       
 
     }
 

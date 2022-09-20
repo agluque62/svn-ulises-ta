@@ -2371,11 +2371,33 @@ namespace U5ki.RdService
                                     /** 20200624. AGL. Adaptacion a grupos 1+1 */
                                     if (simpleRdRes != null)
                                     {
-                                        if (_sessions_sip_control.Event(simpleRdRes.ID, CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED) == true)
-                                        {                                            
+                                        MNManager.Set_SipSessionFail(simpleRdRes.Uri1, true);
+
+                                        if (_sessions_sip_control.Event(resourceID, CORESIP_CallState.CORESIP_CALL_STATE_DISCONNECTED) == true)
+                                        {
+                                            string reason = "";
+                                            if (stateInfo.LastReason != null)
+                                            {
+                                                if (stateInfo.LastReason.Length > 0)
+                                                {
+                                                    reason = "Reason: " + stateInfo.LastReason.Replace('\"', ' ');
+                                                }
+                                            }
+
+                                            string causa;
+                                            if (stateInfo.LastCode == 200)
+                                            {
+                                                //Se ha desconectado porque Nodebox ha enviado un BYE y se ha recibido el 200OK
+                                                causa = "Causa: BYE";
+                                            }
+                                            else
+                                            {
+                                                causa = $"Causa: {stateInfo.LastCode}";
+                                            }
+
                                             var msg = rdRes is RdResourcePair ?
-                                            $"Desconexion Sip. Grupo 1+1: {rdRes.ID} Recurso {resourceID}. Causa: {stateInfo.LastCode}." :
-                                            $"Desconexion Sip. Recurso: {resourceID}. Causa: {stateInfo.LastCode}";
+                                            $"Desconexion Sip. Grupo 1+1: {rdRes.ID} Recurso {resourceID}. {causa}. {reason}" :
+                                            $"Desconexion Sip. Recurso: {resourceID}. {causa}. {reason}";
                                             LogWarn<RdService>(
                                                 rdFr.Value.Frecuency + " " + msg,
                                                 U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR,
@@ -2383,6 +2405,7 @@ namespace U5ki.RdService
                                                 CTranslate.translateResource(msg));
                                         }
                                     }
+                                    
                                     /**********************************/
                                 }
                                 else
@@ -2391,11 +2414,12 @@ namespace U5ki.RdService
                                     /** 20200624. AGL. Adaptacion a grupos 1+1 */
                                     if (simpleRdRes != null)
                                     {
-                                        if (_sessions_sip_control.Event(simpleRdRes.ID, CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED) == true)
+                                        MNManager.Set_SipSessionFail(simpleRdRes.Uri1, false);
+                                        if (_sessions_sip_control.Event(resourceID, CORESIP_CallState.CORESIP_CALL_STATE_CONFIRMED) == true)
                                         {
                                             var msg = rdRes is RdResourcePair ?
-                                            $"Conexion Sip. Grupo 1+1: {rdRes.ID} Recurso {resourceID}" :
-                                            $"Conexion Sip. Recurso: {resourceID}";
+                                            $"Conexion Sip. Grupo 1+1: {rdRes.ID} Recurso {resourceID} " :
+                                            $"Conexion Sip. Recurso: {resourceID} ";
                                             LogInfo<RdService>(
                                                 rdFr.Value.Frecuency + " " + msg,
                                                 U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
@@ -2630,9 +2654,11 @@ namespace U5ki.RdService
 
 #if _MN_ENQUEUE_NODES_
                 if (gear.Status != GearStatus.Forbidden)
+                {
                     //EnqueueFrecAllocate(gear.Frecuency, gearId, gear.ResourceType, gear.SipUri, (gear.Status != GearStatus.Fail), gear.IsMaster);
                     //JOI FREC_DES
                     EnqueueFrecAllocate(gear.idDestino, gear.Frecuency, gearId, gear.ResourceType, gear.SipUri, (gear.Status != GearStatus.Fail), gear.IsMaster, gear.IdEmplazamiento, uriGearToReplace);
+                }
                 //JOI FREC_DES FIN
 #else
 
@@ -2686,7 +2712,8 @@ namespace U5ki.RdService
                 // JOI FREC_DES
                 //EnqueueFrecDeallocate(gear.LastFrecuency, gear.ResourceType, gear.SipUri, gear.Status);
                 //EnqueueFrecDeallocate(gear.LastFrecuency, gear.ResourceType, gear.SipUri, gear.Status, gear.IdEmplazamiento);
-                EnqueueFrecDeallocate(gear.idDestino, gear.LastFrecuency, gear.ResourceType, gear.SipUri, gear.Status, gear.IdEmplazamiento, gear.IsSlave);
+                bool WithoutReplacement = gear.ReplacementWhenKO == null;
+                EnqueueFrecDeallocate(gear.idDestino, gear.LastFrecuency, gear.ResourceType, gear.SipUri, gear.Status, gear.IdEmplazamiento, gear.IsSlave, WithoutReplacement);
                 // JOI FREC_DES FIN
 #else
                 // Optener la frecuancia.
@@ -2725,13 +2752,15 @@ namespace U5ki.RdService
         /// <param name="uri"></param>
         //internal void EnqueueFrecAllocate(string frec, string gearId, RdRsType tipo, string uri, bool generaLogAsignacion, bool isMaster)
         //JOI FREC_DES
-        internal void EnqueueFrecAllocate(string idDestino, string frec, string gearId, RdRsType tipo, string uri, bool generaLogAsignacion, bool isMaster, string idEmplazamiento, string uriGearToReplace)
+        internal void EnqueueFrecAllocate(string idDestino, string frec, string gearId, RdRsType tipo, string uri, bool gearStatusNotFail, bool isMaster, string idEmplazamiento, string uriGearToReplace)
         //JOI FREC_DES FIN 
         {
             _EventQueue.Enqueue("FrecAllocate " + frec + " idDestino " + idDestino, delegate()
             {
                 try
                 {
+                    bool generaLogAsignacion = gearStatusNotFail;
+
                     /** Obtener la Frecuencia */
                     RdFrecuency frecuency = Frecuencies.Values.Where(e => e.IdDestino == idDestino).FirstOrDefault();
 
@@ -2758,6 +2787,20 @@ namespace U5ki.RdService
                     // Esto habría que revisarlo para los 1+1 en M+N...
                     if (new FrecuencyHelper(Frecuencies).RsIsInFrec(frecuency, tipo, uri))
                     {
+                        return;
+                    }
+
+                    if (new FrecuencyHelper(Frecuencies).RsIsInFrecAndForbidden(frecuency, tipo, uri))
+                    {
+                        if (!gearStatusNotFail)
+                        {
+                            return;
+                        }
+                    }
+
+                    if (!gearStatusNotFail && uriGearToReplace == "--")
+                    {
+                        //Si el equipo esta en fallo y no esta reemplazando a ninguno entonces no abrimos la sesion
                         return;
                     }
 
@@ -2850,7 +2893,7 @@ namespace U5ki.RdService
         //  internal void EnqueueFrecDeallocate(string frec, RdRsType tipo, string uri, GearStatus Status)
         //JOI FREC_DES
         //internal void EnqueueFrecDeallocate(string frec, RdRsType tipo, string uri, GearStatus Status, string idEmplazamiento)
-        internal void EnqueueFrecDeallocate(string idDestino, string frec, RdRsType tipo, string uri, GearStatus Status, string idEmplazamiento, bool IsSlave)
+        internal void EnqueueFrecDeallocate(string idDestino, string frec, RdRsType tipo, string uri, GearStatus Status, string idEmplazamiento, bool IsSlave, bool WithoutReplacement)
         //JOI FREC_DES FIN
         {
             _EventQueue.Enqueue("FrecDeallocate " + frec + " idDestino " + idDestino, delegate()
@@ -2872,7 +2915,7 @@ namespace U5ki.RdService
                     }
 
                     // Desasignacion de recurso.
-                    if (!new FrecuencyHelper(Frecuencies).ResourceFree(frecuency, uri, tipo))
+                    if (!new FrecuencyHelper(Frecuencies).ResourceFree(frecuency, uri, tipo, WithoutReplacement))
                     {
                         if (!IsSlave && Status != GearStatus.Initial)
                         {

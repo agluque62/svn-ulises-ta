@@ -19,11 +19,31 @@ using VideoPlayerController;
 namespace U5ki.Infrastructure
 {
 
+
     /// <summary>
     /// 
     /// </summary>
     public static partial class SipAgent
 	{
+        public class viauri { 
+            public string via; 
+            public string uri;
+            
+            public viauri(string v, string u)
+            {
+                via = v;
+                uri = u;
+            }
+            /*public viauri get(string v,string u)
+            {
+                via = v;
+                uri = u;
+                return this;
+            }*/
+        };
+        static int MaxIdVia = 10;
+        static public Dictionary<int, viauri> IdVia = new Dictionary<int, viauri>();
+
         private static string UG5K_REC_CONF_FILE = "ug5krec-config.ini";
         
 		/// <summary>
@@ -1238,6 +1258,9 @@ namespace U5ki.Infrastructure
 #if _TRACEAGENT_
             _Logger.Debug("Saliendo de SipAgent.MakeTlfCall");
 #endif
+
+            if (IdVia.Count > MaxIdVia) IdVia.Clear();
+            IdVia[callId] =  new viauri("", outInfo.DstUri);
             return callId;
 		}
         /// <summary>

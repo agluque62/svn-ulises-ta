@@ -53,6 +53,7 @@ namespace U5ki.RdService
         {
             get { return this.new_params; }
         }
+        private bool NoFirstCheck;      //No es el primer check de una frecuencia
         private RdSrvFrRs.FrequencyStatusType StatusCheck;
         private RdSrvFrRs.FrequencyStatusType _OldStatus;
         private RdSrvFrRs.FrequencyStatusType _Status;
@@ -249,6 +250,7 @@ namespace U5ki.RdService
         /// <param name="fr"></param>
         public RdFrecuency(string idDestino, string fr)
         {
+            NoFirstCheck = false;
             _IdDestino = idDestino;
             _Frecuency = fr;
             PasivoRetransmision = false;
@@ -915,10 +917,19 @@ namespace U5ki.RdService
                 {
                     StatusCheck = _FrRs.FrequencyStatus;
                     _FrRs.FrequencyStatus = this.Status;
-                    if (_FrRs.FrequencyStatus != StatusCheck)
+                    if (_FrRs.FrequencyStatus != StatusCheck || !NoFirstCheck)
                     {
-                        RdRegistry.Publish(_IdDestino, _FrRs);
+                        if (_FrRs.FrequencyStatus == RdSrvFrRs.FrequencyStatusType.NotAvailable)
+                        {
+                            RdRegistry.Publish(_IdDestino, null);
+                        }
+                        else
+                        {
+                            RdRegistry.Publish(_IdDestino, _FrRs);
+                        }
                     }
+
+                    NoFirstCheck = true;
                 }
                 catch (Exception x)
                 {
@@ -1999,7 +2010,20 @@ namespace U5ki.RdService
             List<RdResource> newList = newRdRs.GetListResources();
             foreach(RdResource rs in newList)
             {
-                RdResource foundRs = existingList.First(x => x.ID.Equals(rs.ID));
+                if (rs == null) continue;
+                RdResource foundRs = null;
+                foreach (RdResource ers in existingList)
+                {
+                    if (ers != null)
+                    {
+                        if (ers.ID.Equals(rs.ID))
+                        {
+                            foundRs = ers;
+                            break;
+                        }
+                    }
+                }
+
                 equal = foundRs == null ? false : EqualResources(rs, foundRs);
                 if (!equal)
                     break;
@@ -3100,6 +3124,7 @@ namespace U5ki.RdService
                 _RxIds.Clear();
                 _TxIds.Clear();
                 _FrRs = null;
+                NoFirstCheck = false;
 
                 RdRegistry.Publish(_IdDestino, null);
                 _CurrentPttSemaphore.Release();

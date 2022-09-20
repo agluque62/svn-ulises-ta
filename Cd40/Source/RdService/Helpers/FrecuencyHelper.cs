@@ -82,6 +82,7 @@ namespace U5ki.RdService.Helpers
 
             // Añadir el nuevo recurso.
             frecuency.ResourceAdd(keyNew, resource, isMaster);
+
             return true;
         }
 
@@ -105,7 +106,7 @@ namespace U5ki.RdService.Helpers
 
         }
 
-        public Boolean ResourceFree(RdFrecuency frecuency, String sipUri, RdRsType resourceType, Boolean removeResource = false)
+        public Boolean ResourceFree(RdFrecuency frecuency, String sipUri, RdRsType resourceType, Boolean WithoutReplacement)
         {
             String key = ResourceIdGet(sipUri, resourceType);
             
@@ -117,7 +118,10 @@ namespace U5ki.RdService.Helpers
             frecuency.RemoveSipCall(resource);
             resource.Dispose();
             resource.IsForbidden = true;
-            frecuency.RdRs.Remove(key);
+            if (!WithoutReplacement)
+            {
+                frecuency.RdRs.Remove(key);
+            }
             return true;
         }
 
@@ -160,7 +164,21 @@ namespace U5ki.RdService.Helpers
             }            
             return false;
         }
-#endregion
+
+        public Boolean RsIsInFrecAndForbidden(RdFrecuency frecuency, RdRsType resourceType, String sipUri)
+        {
+            String key = ResourceIdGet(sipUri, resourceType);
+
+            // Si la frecuencia ya tiene el recurso, retorna y no hay que seguir con el proceso de asignacion
+            if (frecuency.RdRs.ContainsKey(key))
+            {
+                if (frecuency.RdRs[key].IsForbidden == true)
+                    return true;
+            }
+            return false;
+        }
+
+        #endregion
 
         #region sharing
 

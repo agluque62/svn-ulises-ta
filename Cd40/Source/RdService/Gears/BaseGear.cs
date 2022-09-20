@@ -18,7 +18,6 @@ namespace U5ki.RdService.Gears
     /// </summary>
     public class BaseGear : BaseNode
     {
-
         #region Declarations
 
         private Func<BaseGear, bool> ReserveFrecuency { get; set; }
@@ -205,6 +204,8 @@ namespace U5ki.RdService.Gears
                         this._status != Enums.GearStatus.AssignationInProgress);
             }
         }
+
+        public BaseGear ReplacementWhenKO;           //Reemplazo en el caso de que este KO. Si vale null entonces no hay reemplazo
 
         private BaseGear _replaceBy;
         /// <summary>
@@ -864,6 +865,7 @@ namespace U5ki.RdService.Gears
 
                 InitializeDefaultValues();
             }
+            this.SipSessionFail = 0;        //Se reinicia para cuando se reintente la conexion SIP en el allocate
 
             // Desasignacion.
             ClearReplacements();

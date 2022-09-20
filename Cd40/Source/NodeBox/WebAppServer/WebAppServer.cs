@@ -94,7 +94,7 @@ namespace U5ki.NodeBox.WebServer
                         // Supervisar la disponibilidad del Listener.
                         lock (Locker)
                         {
-                            if (Listener == null)
+                            if (Listener == null && ExecutiveThreadCancel.IsCancellationRequested == false)
                             {
                                 try
                                 {
@@ -106,7 +106,7 @@ namespace U5ki.NodeBox.WebServer
                                     Listener.AuthenticationSchemes = AuthenticationSchemes.Basic | AuthenticationSchemes.Anonymous;
                                     Listener.AuthenticationSchemeSelectorDelegate = request =>
                                     {
-                                        /** Todas las operaciones No GET de Usuarios no ulises se consideran inseguras... Habra que autentificarse */
+                                    /** Todas las operaciones No GET de Usuarios no ulises se consideran inseguras... Habra que autentificarse */
                                         return request.HttpMethod == "GET" || request.Headers["UlisesClient"] == "MTTO" ? AuthenticationSchemes.Anonymous : AuthenticationSchemes.Basic;
                                     };
 
@@ -137,7 +137,7 @@ namespace U5ki.NodeBox.WebServer
             lock (Locker)
             {
                 LogDebug<WebAppServer>($"{Id} Ending WebAppServer");
-
+                                
                 ExecutiveThreadCancel?.Cancel();
                 ExecutiveThread?.Wait(TimeSpan.FromSeconds(5));
                 Listener?.Close();
@@ -145,6 +145,7 @@ namespace U5ki.NodeBox.WebServer
 
                 LogDebug<WebAppServer>($"{Id} WebAppServer Ended");
             }
+            closing_web = false;
         }
 
         #endregion
@@ -161,81 +162,81 @@ namespace U5ki.NodeBox.WebServer
                 return;
             lock (Locker)
             {
-                if (Listener == null || Listener.IsListening == false)
-                    return;
+                //U5kGenericos.SetCurrentCulture();
 
-                // Ejecutar el thread en la 'cultura especificada'.
-                Translate.CTranslate.CurrentCultureSet();
-
-                HttpListenerContext context = Listener.EndGetContext(result);
-
-                try
+                if (!closing_web && Listener != null && Listener.IsListening != false)
                 {
-                    Logrequest(context);
 
-                    if (Authenticated(context))
+                    HttpListenerContext context = Listener.EndGetContext(result);
+
+                    try
                     {
-                        string url = context.Request.Url.LocalPath;
-                        if (Enable)
+                        Logrequest(context);
+
+                        if (Authenticated(context))
                         {
-                            if (url == "/") context.Response.Redirect(DefaultUrl);
-                            else
+                            string url = context.Request.Url.LocalPath;
+                            if (Enable)
                             {
-                                wasRestCallBack cb = FindRest(url);
-                                if (cb != null)
-                                {
-                                    StringBuilder sb = new System.Text.StringBuilder();
-                                    cb(context, sb);
-                                    context.Response.ContentType = FileContentType(".json");
-                                    Render(Encode(sb.ToString()), context.Response);
-                                }
+                                if (url == "/") context.Response.Redirect(DefaultUrl);
                                 else
                                 {
-                                    url = DefaultDir + url;
-                                    if (url.Length > 1 && File.Exists(url.Substring(1)))
+                                    wasRestCallBack cb = FindRest(url);
+                                    if (cb != null)
                                     {
-                                        /** Es un fichero lo envio... */
-                                        string file = url.Substring(1);
-                                        string ext = Path.GetExtension(file).ToLowerInvariant();
-
-                                        context.Response.ContentType = FileContentType(ext);
-                                        ProcessFile(context.Response, file);
+                                        StringBuilder sb = new System.Text.StringBuilder();
+                                        cb(context, sb);
+                                        context.Response.ContentType = FileContentType(".json");
+                                        Render(Encode(sb.ToString()), context.Response);
                                     }
                                     else
                                     {
-                                        context.Response.StatusCode = 404;
+                                        url = DefaultDir + url;
+                                        if (url.Length > 1 && File.Exists(url.Substring(1)))
+                                        {
+                                            /** Es un fichero lo envio... */
+                                            string file = url.Substring(1);
+                                            string ext = Path.GetExtension(file).ToLowerInvariant();
+
+                                            context.Response.ContentType = FileContentType(ext);
+                                            ProcessFile(context.Response, file);
+                                        }
+                                        else
+                                        {
+                                            context.Response.StatusCode = 404;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            // Render(Encode(DisableCause), context.Response);
-                            // context.Response.StatusCode = 503;
-                            // context.Response.Redirect("/noserver.html");
-                            context.Response.ContentType = FileContentType(".html");
-                            ProcessFile(context.Response, (DefaultDir + "/disabled.html").Substring(1), "{{cause}}", DisableCause);
+                            else
+                            {
+                                // Render(Encode(DisableCause), context.Response);
+                                // context.Response.StatusCode = 503;
+                                // context.Response.Redirect("/noserver.html");
+                                context.Response.ContentType = FileContentType(".html");
+                                ProcessFile(context.Response, (DefaultDir + "/disabled.html").Substring(1), "{{cause}}", DisableCause);
+                            }
                         }
                     }
-                }
-                catch(HttpListenerException x)
-                {
-                    // Si se produce una excepcion de este tipo, hay que reiniciar el LISTENER.
-                    LogException<WebAppServer>("", x, false);
-                    ResetListener();
-                }
-                catch (Exception x)
-                {
-                    LogException<WebAppServer>("", x, false);
-                    context.Response.StatusCode = 500;
-                    // Todo. Render(Encode(x.Message), context.Response);
-                }
-                finally
-                {
-                    if (Listener != null && Listener.IsListening)
+                    catch (HttpListenerException x)
                     {
-                        context.Response.Close();
-                        Listener.BeginGetContext(new AsyncCallback(GetContextCallback), null);
+                        // Si se produce una excepcion de este tipo, hay que reiniciar el LISTENER.
+                        LogException<WebAppServer>("", x, false);
+                        ResetListener();
+                    }
+                    catch (Exception x)
+                    {
+                        LogException<WebAppServer>("", x, false);
+                        context.Response.StatusCode = 500;
+                        // Todo. Render(Encode(x.Message), context.Response);
+                    }
+                    finally
+                    {
+                        if (Listener != null && Listener.IsListening)
+                        {
+                            context.Response.Close();
+                            Listener.BeginGetContext(new AsyncCallback(GetContextCallback), null);
+                        }
                     }
                 }
             }

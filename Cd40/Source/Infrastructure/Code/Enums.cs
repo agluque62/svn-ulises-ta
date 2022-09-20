@@ -25,9 +25,10 @@ namespace U5ki.Enums
         Timeout = 3,
         Local = 4,
         Rejected = 5,
-        FailSessionsSip = 6,
+        FailSessionsListSip = 6,    //Falla la obtencion de la lista de sesiones SIP
         FailMasterConfig = 7, //JOI CONTROL FRECUENCIA MASTER
         FailProtocolSNMP = 8, //20180319 INHABILITACIÓN POR ERROR SNMP
+        FailSessionSip = 9,         //No se puede establecer sesion SIP
         None
     }
 
