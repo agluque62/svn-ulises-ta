@@ -79,6 +79,9 @@
             <Component Id="cmpF22E795AFEE6D93440425EC1AD7AE5CA" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
                 <File Id="fil05582266F12C3CB3BB336F02743C0A09" KeyPath="yes" Source="$(var.SourcePath)\images\corporativo-ncc.png" />
             </Component>
+            <Component Id="cmp3E6E7867C2A2E505A0BFD1323902120A" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
+                <File Id="fil20B6C7D6E3DD756C8161901FAF65FA8B" KeyPath="yes" Source="$(var.SourcePath)\images\corporativo.png" />
+            </Component>
             <Component Id="cmp8065EE4DAFA407FEA968CA3DB445FDDC" Directory="dir0389686E27C10280705B22F49A2817D1" Guid="*">
                 <File Id="filFAB7D3A5F4AAA6FB8630A2537994842F" KeyPath="yes" Source="$(var.SourcePath)\images\nucleo-df-new.jpg" />
             </Component>
