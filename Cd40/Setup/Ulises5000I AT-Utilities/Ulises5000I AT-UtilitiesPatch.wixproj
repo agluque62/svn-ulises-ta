@@ -15,6 +15,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
+    <RunWixToolsOutOfProc Condition=" '$(PROCESSOR_ARCHITECTURE)'!='x86' ">true</RunWixToolsOutOfProc>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -61,7 +62,13 @@
 	</Target>
 	-->
   <Target Name="BeforeBuild">
-    <HeatDirectory DirectoryRefId="U5ki.NodeBox.INSTALLFOLDER" OutputFile="appweb.wxs" Directory="..\..\bin\Release\appweb" ComponentGroupName="U5ki.NodeBox.WebAppComponents" ToolPath="$(WixToolPath)" PreprocessorVariable="var.SourcePath" AutogenerateGuids="true">
-    </HeatDirectory>
+    <HeatDirectory DirectoryRefId="U5ki.NodeBox.INSTALLFOLDER" 
+                   OutputFile="appweb.wxs" 
+                   Directory="..\..\bin\Release\appweb" 
+                   ComponentGroupName="U5ki.NodeBox.WebAppComponents" 
+                   ToolPath="$(WixToolPath)" 
+                   PreprocessorVariable="var.SourcePath" 
+                   AutogenerateGuids="true"
+	                RunAsSeparateProcess="$(RunWixToolsOutOfProc)" />
   </Target>
 </Project>

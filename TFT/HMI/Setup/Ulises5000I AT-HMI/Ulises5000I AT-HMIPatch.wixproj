@@ -10,6 +10,7 @@
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <RunWixToolsOutOfProc Condition=" '$(PROCESSOR_ARCHITECTURE)'!='x86' ">true</RunWixToolsOutOfProc>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -66,7 +67,13 @@
 	</Target>
 	-->
   <Target Name="BeforeBuild">
-    <HeatDirectory DirectoryRefId="INSTALLFOLDER" OutputFile="resources.wxs" Directory="..\..\bin\Release\Resources" ComponentGroupName="U5ki.HMI.ResourcesComponents" ToolPath="$(WixToolPath)" PreprocessorVariable="var.SourcePath" AutogenerateGuids="true">
-    </HeatDirectory>
+    <HeatDirectory DirectoryRefId="INSTALLFOLDER" 
+                   OutputFile="resources.wxs" 
+                   Directory="..\..\bin\Release\Resources" 
+                   ComponentGroupName="U5ki.HMI.ResourcesComponents" 
+                   ToolPath="$(WixToolPath)" 
+                   PreprocessorVariable="var.SourcePath" 
+                   AutogenerateGuids="true"
+                   RunAsSeparateProcess="$(RunWixToolsOutOfProc)"/>
   </Target>
 </Project>

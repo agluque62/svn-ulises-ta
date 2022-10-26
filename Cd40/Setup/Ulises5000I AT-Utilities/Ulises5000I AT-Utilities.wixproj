@@ -21,6 +21,7 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>SourcePath=$(SolutionDir)bin\$(Configuration)\appweb</DefineConstants>
     <Cultures>es-ES</Cultures>
+    <RunWixToolsOutOfProc Condition=" '$(PROCESSOR_ARCHITECTURE)'!='x86' ">true</RunWixToolsOutOfProc>
   </PropertyGroup>
   <ItemGroup>
     <WixExtension Include="WixUIExtension">
@@ -61,7 +62,13 @@
 	</Target>
 	-->
   <Target Name="BeforeBuild">
-    <HeatDirectory DirectoryRefId="U5ki.NodeBox.INSTALLFOLDER" OutputFile="appweb.wxs" Directory="..\..\bin\Release\appweb" ComponentGroupName="U5ki.NodeBox.WebAppComponents" ToolPath="$(WixToolPath)" PreprocessorVariable="var.SourcePath" AutogenerateGuids="true">
-    </HeatDirectory>
+    <HeatDirectory DirectoryRefId="U5ki.NodeBox.INSTALLFOLDER" 
+                   OutputFile="appweb.wxs" 
+                   Directory="..\..\bin\Release\appweb" 
+                   ComponentGroupName="U5ki.NodeBox.WebAppComponents" 
+                   ToolPath="$(WixToolPath)" 
+                   PreprocessorVariable="var.SourcePath" 
+                   AutogenerateGuids="true"
+                   RunAsSeparateProcess="$(RunWixToolsOutOfProc)"/>
   </Target>
 </Project>

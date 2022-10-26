@@ -25,6 +25,7 @@
     <VerboseOutput>True</VerboseOutput>
     <SuppressAllWarnings>False</SuppressAllWarnings>
     <Pedantic>False</Pedantic>
+    <RunWixToolsOutOfProc Condition=" '$(PROCESSOR_ARCHITECTURE)'!='x86' ">true</RunWixToolsOutOfProc>
   </PropertyGroup>
   <ItemGroup>
     <WixExtension Include="WixUtilExtension">
@@ -73,7 +74,13 @@
 	</Target>
 	-->
   <Target Name="BeforeBuild">
-    <HeatDirectory DirectoryRefId="INSTALLFOLDER" OutputFile="resources.wxs" Directory="..\..\bin\Release\Resources" ComponentGroupName="U5ki.HMI.ResourcesComponents" ToolPath="$(WixToolPath)" PreprocessorVariable="var.SourcePath" AutogenerateGuids="true">
-    </HeatDirectory>
+    <HeatDirectory DirectoryRefId="INSTALLFOLDER" 
+                   OutputFile="resources.wxs" 
+                   Directory="..\..\bin\Release\Resources" 
+                   ComponentGroupName="U5ki.HMI.ResourcesComponents" 
+                   ToolPath="$(WixToolPath)" 
+                   PreprocessorVariable="var.SourcePath" 
+                   AutogenerateGuids="true"
+                   RunAsSeparateProcess="$(RunWixToolsOutOfProc)"/>
   </Target>
 </Project>
