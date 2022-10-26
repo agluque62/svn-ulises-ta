@@ -995,6 +995,10 @@ namespace U5ki.RdService.Gears
         {
             //20180207 #3136
             //Campos de configuración comunes M - N
+
+            if (this.idDestino != input.idDestino)
+                return false;
+
             if (this.RemoteControlType != input.RemoteControlType)
                 return false;
 

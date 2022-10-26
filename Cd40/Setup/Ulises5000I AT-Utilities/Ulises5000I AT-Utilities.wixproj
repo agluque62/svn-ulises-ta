@@ -23,24 +23,6 @@
     <Cultures>es-ES</Cultures>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\MCast\u5ki.Mcast.csproj">
-      <Name>u5ki.Mcast</Name>
-      <Project>{47e41cf6-13a4-4e38-b318-a86586fef0fd}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Source\NodeBox\u5ki.NodeBox.csproj">
-      <Name>u5ki.NodeBox</Name>
-      <Project>{7bc5a180-21c5-4a4a-a131-6bdf65d4287a}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <WixExtension Include="WixUIExtension">
       <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
       <Name>WixUIExtension</Name>

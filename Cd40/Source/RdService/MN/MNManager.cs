@@ -606,9 +606,16 @@ namespace U5ki.RdService.NM
                     OldState = NodePool[inputNode.Id].Status; 
                     //20180703 Fuerza petición de potencia
                     if (NodePool[inputNode.Id].IsMaster && NodePool[inputNode.Id].IsEmitter)
-                        NodePool[inputNode.Id].Power = 0;
-
-                    if (!NodePool[inputNode.Id].Compare(inputNode))
+                        NodePool[inputNode.Id].Power = 0;  
+                    
+                    if (NodePool[inputNode.Id].idDestino != inputNode.idDestino)
+                    {
+                        //Si el idDestino cambia, entonces se trata como uno nuevo
+                        NodePool[inputNode.Id].Deallocate(GearStatus.Forbidden);
+                        NodePool[inputNode.Id] = inputNode;
+                        NodePool[inputNode.Id].Allocate();
+                    }
+                    else if (!NodePool[inputNode.Id].Compare(inputNode))
                     {
                         NodePool[inputNode.Id].Deallocate(GearStatus.Forbidden);
                         NodePool[inputNode.Id] = inputNode;

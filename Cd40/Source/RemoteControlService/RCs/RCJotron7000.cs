@@ -587,13 +587,19 @@ namespace u5ki.RemoteControlService
             // Socket Exception, que es el POSIBLE error, entre otros, por que este en modo applicacion interactiva.
             if (ex is SocketException)
             {
-                if (_lastExceptions.ContainsKey(targetIp) && _lastExceptions[targetIp] != ex.GetType()) // Validate don't shot the same exception again.
+                if ((ex as SocketException).SocketErrorCode == System.Net.Sockets.SocketError.ConnectionReset)
+                {
+                    LogTrace<RCJotron7000>("[SNMP][" + logMethod + "] [" + targetIp + "] ConnectionReset: " + this.ToString(targetIp));
+                    _lastExceptions[targetIp] = ex.GetType();
+                }
+                else if (_lastExceptions.ContainsKey(targetIp) && _lastExceptions[targetIp] != ex.GetType()) // Validate don't shot the same exception again.
                 {
                     //LogWarn<RCJotron7000>("[SNMP][" + logMethod + "] [" + targetIp + "] SOCKET EXCEPTION (Posible modo Interactivo): " + this.ToString(targetIp),
                     //    U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GEAR_SOCKET_ERROR);
-                    LogWarn<RCJotron7000>("[SNMP][" + logMethod + "] [" + targetIp + "] SOCKET EXCEPTION (Posible modo Interactivo): " + this.ToString(targetIp),
+                    LogInfo<RCJotron7000>("[SNMP][" + logMethod + "] [" + targetIp + "] SOCKET EXCEPTION " + (ex as SocketException).SocketErrorCode.ToString() +
+                        " " + Id + " " + this.ToString(targetIp),
                         U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GEAR_ITF_ERROR,
-                        Id, "SOCKET EXCEPTION (Posible modo Interactivo)");
+                        Id, "SOCKET EXCEPTION " + (ex as SocketException).SocketErrorCode.ToString());
                     _lastExceptions[targetIp] = ex.GetType();
                 }
                 return GearOperationStatus.Fail;

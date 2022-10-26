@@ -152,13 +152,20 @@ namespace U5ki.Infrastructure
 
             group_name id;
 			sp_time tm = new sp_time(1, 0);
-
-            int res = SP_connect_timeout(host, name, 0, 1, out _SpreadHandle, out id, tm);
+            int res = -1;
+            id.Name = "Noname";
+            for (int intento = 1; intento < 4; intento++)
+            {
+                _Logger.Debug("SP_connect_timeout intento:{0}", intento);
+                res = SP_connect_timeout(host, name, 0, 1, out _SpreadHandle, out id, tm);
+                if (ACCEPT_SESSION == res)
+                    break;
+            }
             if (ACCEPT_SESSION != res)
             {
                 throw new Exception(string.Format("ERROR {0} conectando al servidor spread. {1}##{2}", res, host, name));
             }
-            
+
             Trace(name, "{0}::{2}. Conectado en: host={1}.", name, host, id.Name);
 
             _Name = name;

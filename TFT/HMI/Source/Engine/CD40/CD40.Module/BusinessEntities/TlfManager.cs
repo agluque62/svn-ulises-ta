@@ -305,6 +305,11 @@ namespace HMI.CD40.Module.BusinessEntities
                             tlf.HangUp(0);
                             //ResetActiveCalls(tlf);
                             break;
+                        //220923
+                        case TlfState.offhook:
+                            tlf.State = TlfState.Idle;
+                            tlf.Call(prio);
+                            break;
                         default:
                             Debug.Assert("Estado inesperado ejecutando llamada a numero" == null);
                             break;
@@ -490,7 +495,7 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         /// <summary>
-        /// 
+        /// Quita tono de colgado si lo hubiera.
         /// </summary>
 		public void SetHangToneOff()
         {
@@ -520,9 +525,12 @@ namespace HMI.CD40.Module.BusinessEntities
 
         public void SetUnhangToneOn(int tone=999)
         {
+#if _TRACEAGENT_
+            _Logger.Debug("SetUnHangToneOn {0}", tone);
+#endif
             if (_UnhangUpTone == -1)
             {
-                //Aquii enlazar el fichero de audio y hacer la mezcla.
+                //Aqui enlazar el fichero de audio y hacer la mezcla.
                 //Top.Mixer.Unlink(_UnhangUpTone);
                 //SipAgent.DestroyWavPlayer(_UnhangUpTone);
                 _UnhangUpTone = tone;
@@ -862,7 +870,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 }
                 else
                 {
-                    tlfia = new TlfIaPosition(pos);
+                    //220923
+                    if (tlfia==null)
+                        tlfia = new TlfIaPosition(pos);
                     tlfia.DescuelgaPos(true);
                     SetUnhangToneOn();
                     tlfia.State = TlfState.offhook;
@@ -1690,9 +1700,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 //lalm 211008 añado recurso
                 //#2629 Presentar via utilizada en llamada saliente.
                 //220913
-                // Quito el parametro recused, ira en la proxima revision.
+                // Quito el parametro recused, irá en la proxima revision.
                 string recused = "";
-                /*
+                
                 if (tlf.State==TlfState.Out || tlf.State == TlfState.Hold || tlf.State == TlfState.Set)
                 { 
                     tsalvado ts = Top.Tlf.GetParamLastCall(tlf.CallId);
@@ -1703,7 +1713,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     recused = "";
                 }
-                */
+                
                 //TlfInfo daSt = new TlfInfo(tlf.Literal, tlf.State, tlf.ChAllowsPriority(), TlfType.Unknown, tlf.IsTop, tlf.ChAllowsForward, tlf.Uri);
                 TlfInfo daSt = new TlfInfo(tlf.Literal, tlf.State, tlf.ChAllowsPriority(), TlfType.Unknown, tlf.IsTop, tlf.ChAllowsForward, recused);
                 RangeMsg<TlfInfo> stateAD = new RangeMsg<TlfInfo>(tlf.Pos, daSt);
@@ -1904,12 +1914,13 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <summary>
         /// 
         /// </summary>
+        /// 
         /// <param name="tlf"></param>
 		private void AddActiveCall(TlfPosition tlf)
 		{
             bool oldActivityState = Activity();
 			_ActiveCalls.Add(tlf);
-			SetHangToneOff();
+			SetHangToneOff();// Quita tono de colgado
             if (tlf.State == TlfState.offhook)
                 SetUnhangToneOn();
             PublishChangeActivity(oldActivityState, Activity());
@@ -1982,6 +1993,9 @@ namespace HMI.CD40.Module.BusinessEntities
                     }
                     else if (tlf.State == TlfState.Idle)
                     {
+                        // LALM 220921
+                        // Esta función provoca que en el caso de una tranferencia directa
+                        // genere un eror de _AssociateCall==null en OnAssociateCallStateChanged
                         tlf.RefrescaPos();
                     }
                     //#*2855

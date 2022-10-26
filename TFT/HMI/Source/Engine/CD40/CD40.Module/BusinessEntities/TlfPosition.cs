@@ -108,7 +108,7 @@ namespace HMI.CD40.Module.BusinessEntities
 						_Tone = -1;
 					}
 
-					if (((_SipCall != null) && !_SipCall.Monitoring)
+                    if (((_SipCall != null) && !_SipCall.Monitoring)
                         || (_SipCall== null))
 					{
 						switch (value)
@@ -1536,6 +1536,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         if (path.ModoSinProxy == false)
                             flags |= CORESIP_CallFlags.CORESIP_CALL_EXTERNAL_IP;
                         sipCallId = SipAgent.MakeTlfCall(ch.AccId, dstUri, _SipCall.ReferBy, _SipCall.Priority, flags);
+                        //#2629 Presentar via utilizada en llamada saliente.
                         try
                         {
                             Top.Tlf.SaveParamLastCall(sipCallId, ch.AccId, dstUri, _SipCall.ReferBy, _SipCall.Priority, flags);
@@ -1620,31 +1621,32 @@ namespace HMI.CD40.Module.BusinessEntities
 /// <param name="prio"></param>
 /// <param name="remoteId"></param>
 /// <returns></returns>
-private static string getdstParams(SipChannel ch, SipPath path, int prio, string remoteId)
-        {
-            string dstParams = "";
-            if (!path.Line.centralIP)
-            {
-                //Estos parametros son internos, sirven para dar información a la pasarela
-                //En encaminamiento IP no se deben usar
-                if (!string.IsNullOrEmpty(path.Remote.SubId))
-                {
-                    dstParams += string.Format(";isub={0}", path.Remote.SubId);
-                }
-                if ((ch.Prefix != Cd40Cfg.INT_DST) && (ch.Prefix != Cd40Cfg.IP_DST) && (ch.Prefix != Cd40Cfg.UNKNOWN_DST) &&
-                        ((ch.Prefix != Cd40Cfg.PP_DST) || (string.Compare(remoteId, path.Line.Id, true /*ignoreCase*/) != 0)))
-                {
-                    dstParams += string.Format(";cd40rs={0}", path.Line.Id);
+/// 220929 Se hace en trycall
+//private static string getdstParams(SipChannel ch, SipPath path, int prio, string remoteId)
+//        {
+//            string dstParams = "";
+//            if (!path.Line.centralIP)
+//            {
+//                //Estos parametros son internos, sirven para dar información a la pasarela
+//                //En encaminamiento IP no se deben usar
+//                if (!string.IsNullOrEmpty(path.Remote.SubId))
+//                {
+//                    dstParams += string.Format(";isub={0}", path.Remote.SubId);
+//                }
+//                if ((ch.Prefix != Cd40Cfg.INT_DST) && (ch.Prefix != Cd40Cfg.IP_DST) && (ch.Prefix != Cd40Cfg.UNKNOWN_DST) &&
+//                        ((ch.Prefix != Cd40Cfg.PP_DST) || (string.Compare(remoteId, path.Line.Id, true /*ignoreCase*/) != 0)))
+//                {
+//                    dstParams += string.Format(";cd40rs={0}", path.Line.Id);
                   
-                }
-                if (ch.Prefix == Cd40Cfg.ATS_DST)
-                {
-                    dstParams += string.Format(";cd40prio={0}", prio);
-                }
-            }
+//                }
+//                if (ch.Prefix == Cd40Cfg.ATS_DST)
+//                {
+//                    dstParams += string.Format(";cd40prio={0}", prio);
+//                }
+//            }
 
-            return dstParams;
-        }
+//            return dstParams;
+//        }
 
         public ArrayList GetUris()
         {
@@ -1688,7 +1690,9 @@ private static string getdstParams(SipChannel ch, SipPath path, int prio, string
 
                     if (TryCall(ch, path, (int)_SipCall.Priority + 1))
                     {
-                        path.Reset(ch.Uri);//220802 paso la uri para que se almacene
+                        //path.Reset(ch.Uri);//220802 paso la uri para que se almacene
+                        //220929 la uri la guardo en trycall.
+                        path.Reset();
                         return TlfState.Out;
                     }
 
@@ -1733,9 +1737,10 @@ private static string getdstParams(SipChannel ch, SipPath path, int prio, string
 					{
                         //LALM 211007
                         //#2629 Presentar via utilizada en llamada saliente.
-                        string remoteid = "";
-                        string uri = getdstParams(ch,path,(int)( _SipCall.Priority + 1),remoteid);
-                        path.Reset(uri);
+                        //2209329 se realiza en trycall
+                        //string remoteid = "";
+                        //string uri = getdstParams(ch,path,(int)( _SipCall.Priority + 1),remoteid);
+                        //path.Reset(uri);
 
                         return TlfState.Out;
 					}

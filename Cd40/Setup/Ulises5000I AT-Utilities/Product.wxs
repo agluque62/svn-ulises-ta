@@ -412,6 +412,11 @@
         <File Id='translate' Name='translate.dll'></File>
         <File Id='translate_data' Name='data.xml'></File>        
       </Component>
+      <Component Id="removeTmpFiles" Guid="1AF11812-2222-3C33-44A4-555725355455">
+        <RemoveFile Id="PurgeMSTxPersistence" Name="MSTxPersistence.json" On="both" />
+        <RemoveFile Id="Purgeu5kiLastCfgbin" Name="u5ki.LastCfg.bin" On="both" />
+        <RemoveFile Id="Purgeu5kiLastCfgjson" Name="u5ki.LastCfg.json" On="both" />
+      </Component>
     </ComponentGroup>
 
     <ComponentGroup Id='uvki_tools_mcast' Directory="U5ki.MCast.INSTALLFOLDER" Source=".">

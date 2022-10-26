@@ -356,11 +356,11 @@ namespace HMI.CD40.Module.BusinessEntities
             _RadioHfRecorderIn = -1;
 
             /** Salidas de Grabacion. */
-            _IntRecorderDevOutHw = -1;
-            _AlumnRecorderDevOutHw = -1;
+            //_IntRecorderDevOutHw = -1;
+            //_AlumnRecorderDevOutHw = -1;
 
             _IntRecorderDevOut = -1;
-            _AlumnRecorderDevOut = _InstructorRecorderDevOut = _IntRecorderDevOut = 1;
+            _AlumnRecorderDevOut = _InstructorRecorderDevOut = _IntRecorderDevOut = -1;
 
         }
         /// RQF20 aqui se añadiran todos los tipos de dispositivos.
@@ -591,21 +591,25 @@ namespace HMI.CD40.Module.BusinessEntities
                 LoadDevices();
                 //220920 se cambia la asignacionhw al inicio, solo se debe llamar una vez.
                 RecordModeHw();
+                //Top.Mixer.Start();//221003
                 //#3267 RQF22 desparecerá, esta funcion no se la llamará
                 if (TipoGrabacionAnalogica == 1 && EnableGrabacionAnalogica)
                 //if (Settings.Default.RecordMode == 1)              // Pointe Noire.
                 {
                     RecordMode1();
+                    Top.Mixer.Start();//221003
                 }
                 //#3267 RQF22 desparecerá, esta funcion no se la llamará
                 else if (TipoGrabacionAnalogica == 2 && EnableGrabacionAnalogica)
                 //else if (Settings.Default.RecordMode == 2)         // Nouakchott.
                 {
                     RecordMode2();
+                    Top.Mixer.Start();//221003
                 }
                 else if (EnableGrabacionAnalogica)/* if (Settings.Default.RecordMode == 0) */   // Por defecto será ENAIRE...
                 {
                     RecordMode0();
+                    Top.Mixer.Start();//221003
                 }
                 else
                 {
@@ -773,6 +777,17 @@ namespace HMI.CD40.Module.BusinessEntities
                 _Logger.Debug("REC-ON <= Alumn-HPH");
                 Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_ALUMN_RECORDER, true);
             }
+            //221003
+            if (_RadioRecorderDevIn >= 0)
+            {
+                _Logger.Debug("REC-ON <= Altavoz RAD-VHF");
+                Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, true);
+            }
+            if (_RadioHfRecorderIn >= 0)
+            {
+                _Logger.Debug("REC-ON <= Altavoz RAD-HF");
+                Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_HF_RECORDER, true);
+            }
 
             //#3267 RQF22
             if (TipoGrabacionAnalogica == 1 || TipoGrabacionAnalogica == 2)
@@ -814,11 +829,20 @@ namespace HMI.CD40.Module.BusinessEntities
             //if (Settings.Default.RecordMode == 1 || Settings.Default.RecordMode==2)
             {
                 if (_LcRecorderDevIn >= 0)
+                {
                     Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, false);
+                    _Logger.Debug("Rec {0} {1}", CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, false);
+                }
                 if (_RadioRecorderDevIn >= 0)
+                {
                     Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, false);
+                    _Logger.Debug("Rec {0} {1}", CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, false);
+                }
                 if (_RadioHfRecorderIn >= 0)
+                {
                     Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_HF_RECORDER, false);
+                    _Logger.Debug("Rec {0} {1} ", CORESIP_SndDevType.CORESIP_SND_HF_RECORDER, false);
+                }
             }
         }
 
@@ -2700,13 +2724,19 @@ namespace HMI.CD40.Module.BusinessEntities
                     switch (TipoGrabacionAnalogica)
                     {
                         case 1:
+                            Top.Mixer.End();//221003
                             RecordMode1();
+                            Top.Mixer.Start();//221003
                             break;
                         case 2:
+                            Top.Mixer.End();//221003
                             RecordMode2();
+                            Top.Mixer.Start();//221003
                             break;
                         default:
+                            Top.Mixer.End();//221003
                             RecordMode0();
+                            Top.Mixer.Start();//221003
                             break;
                     }
                     Start();

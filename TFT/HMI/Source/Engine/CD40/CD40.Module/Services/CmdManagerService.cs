@@ -2237,7 +2237,7 @@ namespace HMI.CD40.Module.Services
 
 		private bool AllowRtx(Dictionary<int, RtxState> rtxGroup)
 		{
-			if (Top.Rd.HowManySquelchsInRtxGroup(rtxGroup) > 1)
+            if (Top.Rd.HowManySquelchsInRtxGroup(rtxGroup) > 1 && !Top.Cfg.PermisoRTXSQ())
 			{
 				Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate()
 				{

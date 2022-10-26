@@ -1846,6 +1846,7 @@ namespace U5ki.RdService
             List<RdFrecuency> rdFrToRemove = new List<RdFrecuency>();
             List<RdFrecuency> actualRtxGroupRdFr;
             List<RdFrecuency> prevFrequenciesSquAvion = new List<RdFrecuency>();
+            List<RdFrecuency> prevFrequenciesSquAvionToRemove = new List<RdFrecuency>();
             List<RdFrecuency> currentFrequenciesSquAvion = new List<RdFrecuency>();
 
             if (_RtxGroups.TryGetValue(rtxGroupOwner.ToUpper() + rtxGroupId, out actualRtxGroupRdFr))
@@ -1898,13 +1899,33 @@ namespace U5ki.RdService
                 }
             }
 
+            //Quitamos de la lista de frecuencias que previamente tienen squelch las que no pertenecen al nuevo grupo
+            prevFrequenciesSquAvionToRemove.AddRange(prevFrequenciesSquAvion);
+            foreach (RdFrecuency rdFr in prevFrequenciesSquAvionToRemove)
+            {
+                if (rtxGroupRdFr.FirstOrDefault(f => f.IdDestino.Equals(rdFr.IdDestino)) == null)
+                {
+                    prevFrequenciesSquAvion.Remove(rdFr);
+                }
+            }
+            
             if (rtxGroupRdFr.Count > 0)
             {
                 if (rtxGroupRdFr.Count == 1)
                 {
                     rdFrToRemove.AddRange(rtxGroupRdFr);
                 }
-                else
+
+                if (rdFrToRemove.Count > 0)
+                {
+                    rdFrToRemove = RemoveFromRtxGroupWithSquelch(rdFrToRemove);
+                    foreach (RdFrecuency rdFr in rdFrToRemove)
+                    {
+                        rdFr.RemoveFromRtxGroup(true);
+                    }
+                }
+
+                if (rtxGroupRdFr.Count > 1)
                 {
                     RdFrecuency frInSquelch = null;
                     foreach (RdFrecuency rdFr in rtxGroupRdFr)
@@ -1970,14 +1991,16 @@ namespace U5ki.RdService
                         frInSquelch.AddToRtxGroup(rtxGroupId, rtxGroupOwner);
                     }
                 }
-            }
-
-            if (rdFrToRemove.Count > 0)
+            }  
+            else
             {
-                rdFrToRemove = RemoveFromRtxGroupWithSquelch(rdFrToRemove);
-                foreach (RdFrecuency rdFr in rdFrToRemove)
+                if (rdFrToRemove.Count > 0)
                 {
-                    rdFr.RemoveFromRtxGroup(true);
+                    rdFrToRemove = RemoveFromRtxGroupWithSquelch(rdFrToRemove);
+                    foreach (RdFrecuency rdFr in rdFrToRemove)
+                    {
+                        rdFr.RemoveFromRtxGroup(true);
+                    }
                 }
             }
         }

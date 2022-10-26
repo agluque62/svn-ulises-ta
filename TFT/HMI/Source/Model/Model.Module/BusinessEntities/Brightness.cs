@@ -162,6 +162,7 @@ namespace HMI.Model.Module.BusinessEntities
 
 						General.SafeLaunchEvent(BrightnessLevelChanged, this);
 
+                        _Logger.Info(String.Format("************* INICIO DE HMI *******************"));
                         _Logger.Info(String.Format("Last brightness Saved. Max {0}, Min{1}, Val {2}, Percent {3}",
                             Properties.Settings.Default.BrightnessMin,
                             Properties.Settings.Default.BrightnessMax, value, LevelToPercent(value)));

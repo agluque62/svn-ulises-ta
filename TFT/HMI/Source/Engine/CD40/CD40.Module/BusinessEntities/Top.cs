@@ -470,24 +470,24 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
         public static void Start()
-		{
+        {
 #if _NEWSTART_
             /** AGL.START Controlado */
-            var StartList = new List<VoidDelegate> 
-            { 
-                SnmpAgent.Start, 
-                delegate() { if (_WorkingThread != null) _WorkingThread.Start("working",Settings.Default.OverloadQueueWarning);}, 
+            var StartList = new List<VoidDelegate>
+            {
+                SnmpAgent.Start,
+                delegate() { if (_WorkingThread != null) _WorkingThread.Start("working",Settings.Default.OverloadQueueWarning);},
                 delegate() { if (_PublisherThread != null) _PublisherThread.Start("publisher", Settings.Default.OverloadQueueWarning);},
-                delegate() { if (_RdManager != null) _RdManager.Start();}, 
-                delegate() { if (_LcManager != null) _LcManager.Start();}, 
-                delegate() { if (_TlfManager != null) _TlfManager.Start();}, 
-                delegate() { if (_SipManager != null) _SipManager.Start();}, 
-                delegate() { if (_RecorderManager != null) _RecorderManager.Start();}, 
-                delegate() { if (_MixerManager != null) _MixerManager.Start();}, 
-                delegate() { if (_CfgManager != null) _CfgManager.Start();},            
-                delegate() { if (_Registry != null) _Registry.Start();}, 
+                delegate() { if (_RdManager != null) _RdManager.Start();},
+                delegate() { if (_LcManager != null) _LcManager.Start();},
+                delegate() { if (_TlfManager != null) _TlfManager.Start();},
+                delegate() { if (_SipManager != null) _SipManager.Start();},
+                delegate() { if (_RecorderManager != null) _RecorderManager.Start();},
+                delegate() { if (_HwManager != null) {_HwManager.Start(); SetCurrentSwVersion();}; },
+                delegate() { if (_MixerManager != null) _MixerManager.Start();},
+                delegate() { if (_CfgManager != null) _CfgManager.Start();},
+                delegate() { if (_Registry != null) _Registry.Start();}
                 /** 20190107. Incluir en las versiones el componente CMEDIA */
-                delegate() { if (_HwManager != null) {_HwManager.Start(); SetCurrentSwVersion();} }
             };
 
             int n = 0;

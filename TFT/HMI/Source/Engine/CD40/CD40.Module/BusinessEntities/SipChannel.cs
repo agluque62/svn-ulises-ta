@@ -208,18 +208,18 @@ namespace HMI.CD40.Module.BusinessEntities
 
         //LALM 211012
         //#2629 Presentar via utilizada en llamada saliente.
-        public void Reset(string uri)
-        {
-            if (Remote.Ids[0].Contains("0*"))
-                Remote.Ids[0] = Remote.Ids[0].Substring(2);
-            int begin = uri.IndexOf("rs=");
-            if (begin > 0)
-            {
-                string recused = " (" + uri.Substring(begin + 3).Split('>')[0] + ")";
-                SipAgent.IdVia[0] = new SipAgent.viauri("", recused);
-                //_recused = recused;
-            }
-        }
+        //public void Reset(string uri)
+        //{
+        //    if (Remote.Ids[0].Contains("0*"))
+        //        Remote.Ids[0] = Remote.Ids[0].Substring(2);
+        //    int begin = uri.IndexOf("rs=");
+        //    if (begin > 0)
+        //    {
+        //        string recused = " (" + uri.Substring(begin + 3).Split('>')[0] + ")";
+        //        SipAgent.IdVia[0] = new SipAgent.viauri("", recused);
+        //        //_recused = recused;
+        //    }
+        //}
     }
 
 #if DEBUG

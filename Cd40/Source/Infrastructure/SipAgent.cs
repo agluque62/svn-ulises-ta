@@ -25,24 +25,24 @@ namespace U5ki.Infrastructure
     /// </summary>
     public static partial class SipAgent
 	{
-        public class viauri { 
-            public string via; 
-            public string uri;
+        //public class viauri { 
+        //    public string via; 
+        //    public string uri;
             
-            public viauri(string v, string u)
-            {
-                via = v;
-                uri = u;
-            }
-            /*public viauri get(string v,string u)
-            {
-                via = v;
-                uri = u;
-                return this;
-            }*/
-        };
-        static int MaxIdVia = 10;
-        static public Dictionary<int, viauri> IdVia = new Dictionary<int, viauri>();
+        //    public viauri(string v, string u)
+        //    {
+        //        via = v;
+        //        uri = u;
+        //    }
+        //    /*public viauri get(string v,string u)
+        //    {
+        //        via = v;
+        //        uri = u;
+        //        return this;
+        //    }*/
+        //};
+        //static int MaxIdVia = 10;
+        //static public Dictionary<int, viauri> IdVia = new Dictionary<int, viauri>();
 
         private static string UG5K_REC_CONF_FILE = "ug5krec-config.ini";
         
@@ -1259,8 +1259,8 @@ namespace U5ki.Infrastructure
             _Logger.Debug("Saliendo de SipAgent.MakeTlfCall");
 #endif
 
-            if (IdVia.Count > MaxIdVia) IdVia.Clear();
-            IdVia[callId] =  new viauri("", outInfo.DstUri);
+            //if (IdVia.Count > MaxIdVia) IdVia.Clear();
+            //IdVia[callId] =  new viauri("", outInfo.DstUri);
             return callId;
 		}
         /// <summary>
@@ -1763,7 +1763,7 @@ namespace U5ki.Infrastructure
         public static int GetRdQidx(int callId)
         {
 #if _TRACEAGENT_
-            _Logger.Debug("Entrando en SipAgent.GetRdResourceInfo {0}", callId);
+            _Logger.Debug("Entrando en SipAgent.GetRdQidx {0}", callId);
 #endif
             CORESIP_Error err;
             int Qidx = 0;
@@ -1775,7 +1775,7 @@ namespace U5ki.Infrastructure
             }
             return Qidx;
 #if _TRACEAGENT_
-            _Logger.Debug("Saliendo de SipAgent.GetRdResourceInfo");
+            _Logger.Debug("Saliendo de SipAgent.GetRdQidx");
 #endif
         }
 

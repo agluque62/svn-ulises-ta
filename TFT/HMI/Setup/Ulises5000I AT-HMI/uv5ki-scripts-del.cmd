@@ -7,4 +7,6 @@ REM Borrando las tareas
 schtasks.exe /delete /TN "UV5K-HMI-START" /F
 schtasks.exe /delete /TN "UV5K-WAUDIO-START" /F
 schtasks.exe /delete /TN "TEAMVIEWER-START" /F 
+REM Borro ficheros logs
+rem del logs\*.csv /Q
 @echo on

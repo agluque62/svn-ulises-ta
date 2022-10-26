@@ -188,8 +188,10 @@ namespace HMI.CD40.Module.BusinessEntities
 		private void OnAssociateCallStateChanged(object sender)
 		{
 			Debug.Assert(_State == FunctionState.Executing);
-			Debug.Assert(sender == _AssociateCall);
-
+			// La funcion RefrescaPos provoca que llegue un evento de reposo sin _AssociateCall
+			//Debug.Assert(sender == _AssociateCall);
+			if (_AssociateCall == null)
+				return;
 			switch (_AssociateCall.State)
 			{
 				case TlfState.Unavailable:
