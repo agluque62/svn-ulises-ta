@@ -25,7 +25,7 @@ namespace HMI.CD40.Module.BusinessEntities
 {
 #if _AUDIOGENERIC_
 
-    public enum eAudioDeviceTypes { NONE, MICRONAS, CMEDIA, GENERIC_PTT, GENERIC, SIMUL }
+    public enum eAudioDeviceTypes { NONE, MICRONAS, CMEDIA, GENERIC_PTT, GENERIC, SIMUL, BINAURAL }
 
     /// <summary>
     /// Definicion de la Clase que Gestiona un dispositivo de audio en referencia a PTT, JACK y Volumen.
@@ -291,6 +291,15 @@ namespace HMI.CD40.Module.BusinessEntities
                         return AudioDevice(eAudioDeviceTypes.GENERIC);
 
                     return AudioDevice(eAudioDeviceTypes.NONE);
+                }
+                if (Properties.Settings.Default.AudioCardBinaural == true)
+                {
+                    // Testeo Generic
+                    if ((new HidGenericHwManager(true)).Count > 0)
+                        return AudioDevice(eAudioDeviceTypes.BINAURAL);
+
+                    return AudioDevice(eAudioDeviceTypes.NONE);
+
                 }
 
                 // Testeo cmedia

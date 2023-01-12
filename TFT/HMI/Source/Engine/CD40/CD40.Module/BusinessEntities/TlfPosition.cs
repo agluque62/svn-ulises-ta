@@ -141,7 +141,8 @@ namespace HMI.CD40.Module.BusinessEntities
                                 //LALM 211014
                                 //#3618 Señal de Llamada Entrante durante CONV en altavoz
                                 // Si La linea caliente esta ocupada, genero otro tono.
-                                if (LineaCalienteEnUso() || LineaTlfEnUso())
+                                
+                                if ((LineaCalienteEnUso() && (!Top.Replay.Replaying)) || LineaTlfEnUso())
                                 {
                                     _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingNoIntrusivo.wav", true);
                                     Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);

@@ -404,7 +404,42 @@ namespace HMI.CD40.Module.Properties {
                 return ((string)(this["DirectorioGLP"]));
             }
         }
-        
+
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
+        public int TiempoGrabacionRecorderRadio
+        {
+            get
+            {
+                return ((int)(this["TiempoGrabacionRecorderRadio"]));
+            }
+        }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1800")]
+        public int TiempoAlmacenamRecorderRadio
+        {
+            get
+            {
+                return ((int)(this["TiempoAlmacenamRecorderRadio"]));
+            }
+        }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int TempMinRecorderRadio
+        {
+            get
+            {
+                return ((int)(this["TempMinRecorderRadio"]));
+            }
+        }
+
+
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("DirectorioGLPRxRadio/")]
@@ -800,7 +835,18 @@ namespace HMI.CD40.Module.Properties {
                 return ((bool)(this["AudioCardStandard"]));
             }
         }
-        
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AudioCardBinaural
+        {
+            get
+            {
+                return ((bool)(this["AudioCardBinaural"]));
+            }
+        }
+
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("90")]
@@ -885,27 +931,40 @@ namespace HMI.CD40.Module.Properties {
                 return ((string)(this["CasAsioId"]));
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public int TempMinRecorderRadio {
-            get {
-                return ((int)(this["TempMinRecorderRadio"]));
-            }
-            set {
-                this["TempMinRecorderRadio"] = value;
+        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset1 a")]
+        public string CasAsioId1
+        {
+            get
+            {
+                return ((string)(this["CasAsioId1"]));
             }
         }
-        
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset1 b")]
+        public string CasAsioId2
+        {
+            get
+            {
+                return ((string)(this["CasAsioId2"]));
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool GLPOnlyRadio {
-            get {
+        public bool GLPOnlyRadio
+        {
+            get
+            {
                 return ((bool)(this["GLPOnlyRadio"]));
             }
-            set {
+            set
+            {
                 this["GLPOnlyRadio"] = value;
             }
         }

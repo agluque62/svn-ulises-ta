@@ -24,191 +24,9 @@ using System.Linq;
 namespace HMI.CD40.Module.BusinessEntities
 {
     /// <summary>
-    /// 
-    /// </summary>
-    class DevDescr
-    {
-        public string IdVendor { get; set; }
-        public string IdProduct { get; set; }
-        public string IdGlobal { get; set; }
-        public string IdInputMic { get; set; }
-        public string IdOutputCas { get; set; }
-        public string IdOutputAlt1 { get; set; }
-        public string IdOutputAlt2 { get; set; }
-        public int PttByte { get; set; }
-        public int PttBit { get; set; }
-    }
-
-    class DevList
-    {
-        /// <summary>
-        /// Casco Plantronic.
-        /// </summary>
-        public static DevDescr Plantronic = new DevDescr()
-        {
-            IdGlobal = "Plantronic",
-            IdVendor = "VID_047F",
-            IdProduct = "PID_FAA1",
-            IdInputMic = "PTT Headset Adapter 1",
-            IdOutputCas = "PTT Headset Adapter 1",
-            IdOutputAlt1 = "NoUtilizado",
-            IdOutputAlt2 = "NoUtilizado",
-            PttByte = 1,
-            PttBit = 1
-        };
-        /// <summary>
-        /// Casco Senheiser
-        /// </summary>
-        public static DevDescr Senheiser = new DevDescr()
-        {
-            IdGlobal = "Senheiser",
-            IdVendor = "VID_0D8C",
-            IdProduct = "PID_0175",
-            IdInputMic = "USA PTT Headset Adapter 1",
-            IdOutputCas = "USA PTT Headset Adapter 1",
-            IdOutputAlt1 = "NoUtilizado",
-            IdOutputAlt2 = "NoUtilizado",
-            PttByte = 5,
-            PttBit = 32
-        };
-        /// <summary>
-        /// Cascos Genericos sin PTT
-        /// </summary>
-        public static DevDescr Microcascos = new DevDescr()
-        {
-            IdGlobal = "Microcascos",
-            IdVendor = "",
-            IdProduct = "",
-            IdInputMic =Settings.Default.MicAsioId,
-            IdOutputCas = Settings.Default.CasAsioId,
-            IdOutputAlt1 = "NoUtilizado",
-            IdOutputAlt2 = "NoUtilizado",
-            PttByte = 0,
-            PttBit = 0
-        };
-        /// <summary>
-        /// Altavoces.
-        /// </summary>
-        public static DevDescr Altavoces = new DevDescr()
-        {
-            IdGlobal = "Altavoces",
-            IdVendor = "",
-            IdProduct = "",
-            IdInputMic = "NoUtilizado",
-            IdOutputCas = "NoUtilizado",
-            IdOutputAlt1 = Settings.Default.RdSpkAsioId,   // "HD Audio output 1",
-            IdOutputAlt2 = Settings.Default.LcSpkAsioId,   // "HD Audio output 2",
-            PttByte = 0,
-            PttBit = 0
-        };
-        /// <summary>
-        /// Binaurales.
-        /// </summary>
-        public static DevDescr Binaurales= new DevDescr()
-        {
-            IdGlobal = "Binaurales",
-            IdVendor = "",
-            IdProduct = "",
-            IdInputMic = "USA PTT Headset Adapter 1",
-            IdOutputCas = Settings.Default.CasAsioId,
-            IdOutputAlt1 = Settings.Default.RdSpkAsioId,   // "HD Audio output 1",
-            IdOutputAlt2 = Settings.Default.LcSpkAsioId,   // "HD Audio output 2",
-            PttByte = 0,
-            PttBit = 0
-        };
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        static List<DevDescr> _devs = new List<DevDescr>() { Plantronic, Senheiser, Altavoces, Microcascos, Binaurales };
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="Byte"></param>
-        /// <param name="Bit"></param>
-        /// <returns></returns>
-        public static bool ByteBit(string id, ref int Byte, ref int Bit)
-        {
-            foreach (DevDescr dev in _devs)
-            {
-                if (dev.IdGlobal == id)
-                {
-                    Byte = dev.PttByte;
-                    Bit = dev.PttBit;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static bool IsChannelInput(string name)
-        {
-            foreach (DevDescr dev in _devs)
-            {
-                if (name.Contains(dev.IdInputMic))
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static bool IsChannelOutputCas(string name)
-        {
-            foreach (DevDescr dev in _devs)
-            {
-                if (name.Contains(dev.IdOutputCas))
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static bool IsChannelOutputAlt1(string name)
-        {
-            foreach (DevDescr dev in _devs)
-            {
-                if (name.Contains(dev.IdOutputAlt1))
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static bool IsChannelOutputAlt2(string name)
-        {
-            foreach (DevDescr dev in _devs)
-            {
-                if (name.Contains(dev.IdOutputAlt2))
-                    return true;
-            }
-            return false;
-        }
-    }
-
-
-    /// <summary>
     /// Implementacion de la Clase para dispositivos Genericos
     /// </summary>
-    class HidGenericSndDev : ISndDevIO
+    class HidBinauralSndDev : ISndDevIO
     {
         #region INTERFACE ISndDevIO
         /// <summary>
@@ -343,7 +161,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
         /// <param name="dev"></param>
-        public HidGenericSndDev(GenericHid.HidDeviceManagement.DeviceDescription dev)
+        public HidBinauralSndDev(GenericHid.HidDeviceManagement.DeviceDescription dev)
         {
             try
             {
@@ -361,7 +179,7 @@ namespace HMI.CD40.Module.BusinessEntities
             catch (Exception x)
             {
                 /** TODO Gestion de la Excepcion */
-                _Logger.Fatal("HidGenericSndDev", x);
+                _Logger.Fatal("HidBinauralSndDev", x);
                 Error = true;
             }
         }
@@ -449,6 +267,11 @@ namespace HMI.CD40.Module.BusinessEntities
             catch (System.OperationCanceledException)
             {
             }
+            catch (System.IO.IOException)
+            {
+                // Se ha desconectado usb.
+                Error = true;
+            }
             catch (Exception x)
             {
                 _Logger.Fatal("ReadCompleted", x);
@@ -465,7 +288,7 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             int bptt = _data & (byte )_PttBit;
 
-            _Logger.Debug("HidGenericSndDev.HidPtt ({0})-->({1}))", _data, bptt);
+            _Logger.Debug("HidBinauralSndDev.HidPtt ({0})-->({1}))", _data, bptt);
             return bptt != 0 ? true : false;
         }
 
@@ -578,7 +401,7 @@ namespace HMI.CD40.Module.BusinessEntities
     /// <summary>
     /// Implementacion de la Clase para Genericos
     /// </summary>
-    class HidGenericHwManager : HwManager
+    class HidBinauralHwManager : HwManager
     {
         class DeviceSupervision
         {
@@ -618,7 +441,7 @@ namespace HMI.CD40.Module.BusinessEntities
             new GenericHid.HidDeviceManagement.DeviceIdentification(){ id=DevList.Plantronic.IdGlobal, vid=DevList.Plantronic.IdVendor, pid=DevList.Plantronic.IdProduct},
         };
         protected List<GenericHid.HidDeviceManagement.DeviceDescription> _dev_desc = null;
-        protected List<HidGenericSndDev> _devs = new List<HidGenericSndDev>();
+        protected List<HidBinauralSndDev> _devs = new List<HidBinauralSndDev>();
         public struct DevData
         {
             public CORESIP_SndDevType TipoDev;
@@ -634,26 +457,15 @@ namespace HMI.CD40.Module.BusinessEntities
                 if (PTTDevice == true)
                     return GenericHid.HidDeviceManagement.DeviceList(_did).Count;
 
-                // No se puede llamar a esta función debido a que no esta inicializada coresip
-                try
-                {
-                    LoadChannels();
-                    return _input_channels.Count + _output_channels.Count;
-
-                }
-                catch (Exception x)
-                {
-                    /** TODO Gestion de la Excepcion */
-                    _Logger.Fatal("GenericHwManager Count", x);
-                    return 0;
-                }
+                LoadChannels();
+                return _input_channels.Count + _output_channels.Count;
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public HidGenericHwManager(bool bHIDDevice) : base()
+        public HidBinauralHwManager(bool bHIDDevice) : base()
         {
             PTTDevice = bHIDDevice;
         }
@@ -671,7 +483,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
                 foreach (GenericHid.HidDeviceManagement.DeviceDescription _dd in _dev_desc)
                 {
-                    HidGenericSndDev _dev = new HidGenericSndDev(_dd);
+                    HidBinauralSndDev _dev = new HidBinauralSndDev(_dd);
                     if (_dev.IsValid)
                     {
                         _SOSndDvcs.Add(_dev.Type);
@@ -688,10 +500,9 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             if (PTTDevice == true)
             {
-                if (_dev_desc!=null)
-                    _Logger.Debug("HidGenericHwManager.Start. Numero de dispositivos = {0}", _dev_desc.Count);
+                _Logger.Debug("HidBinauralHwManager.Start. Numero de dispositivos = {0}", _dev_desc.Count);
 
-                foreach (HidGenericSndDev _dev in _devs)
+                foreach (HidBinauralSndDev _dev in _devs)
                 {
                     StartDevice(_dev);
                 }
@@ -768,7 +579,8 @@ namespace HMI.CD40.Module.BusinessEntities
             _input_channels.Clear();
             _output_channels.Clear();
 
-            AsioChannels.Init();
+            AsioChannels.Init();//Aqui obtenemos todos los dispositivos asio, si tenemos 2 dispositivos binaurales y 2 dispositivos en una IAO
+            //seran 8 dispositivos
             foreach (String name in AsioChannels.InChannels)
             {
                 CORESIP_SndDevType tipo = GetTipoIn(name);
@@ -830,7 +642,9 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             if (DevList.IsChannelInput(channel))
             {
-                return CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP;
+                bool first = (AsioChannels.InChannels.Count == 0);
+                if (first) return CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP;
+                return CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP;
             }
 
             return CORESIP_SndDevType.CORESIP_SND_UNKNOWN;

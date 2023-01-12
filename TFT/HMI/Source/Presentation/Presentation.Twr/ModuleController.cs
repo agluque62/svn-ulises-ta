@@ -31,6 +31,7 @@ using HMI.Presentation.Twr.Views;
 using HMI.Presentation.Twr.Properties;
 using HMI.Presentation.Twr.UI;
 using Utilities;
+using static HMI.Model.Module.Services.UICmdManagerService;
 
 namespace HMI.Presentation.Twr
 {
@@ -40,6 +41,9 @@ namespace HMI.Presentation.Twr
 		private StateManagerService _StateManager = null;
 		private string _ActualTlfView = ViewNames.TlfDa;
 		private string _PreviusTlfView = null;
+		//221027
+		private string _ActualRdView = ViewNames.Radio;
+		private string _PreviusRdView = null;
 		private List<MessageBoxView> _Messages = new List<MessageBoxView>();
 
 		public string ActualTlfView
@@ -141,8 +145,16 @@ namespace HMI.Presentation.Twr
 			}
 			else if (_ActualTlfView == ViewNames.Depencences)
 			{
-				NavigateToPrevius();
+				NavigateToPrevius(true);
 			}
+		}
+
+
+		[EventSubscription(EventTopicNames.SwitchRadViewUI, ThreadOption.Publisher)]
+		public void OnSwitchRadViewUI(object sender, EventArgs e)
+		{
+			string pantalla = ((EventArgs<changefr>)e).Data.pantalla;
+			NavigateTo(pantalla,false);
 		}
 
 		[EventSubscription(EventTopicNames.ScreenSaverChanged, ThreadOption.Publisher)]
@@ -189,7 +201,7 @@ namespace HMI.Presentation.Twr
 
 					if ((dst.State == TlfState.In) || (dst.State == TlfState.InPrio) || (dst.State == TlfState.RemoteIn))
 					{
-						NavigateToPrevius();
+						NavigateToPrevius(true);
 						break;
 					}
 				}
@@ -247,9 +259,9 @@ namespace HMI.Presentation.Twr
 			}
 		}
 
-		public void NavigateTo(string viewId)
+		public void NavigateTo(string viewId, bool tipotlf= true)
 		{
-			if (viewId != _ActualTlfView)
+			if ((viewId != _ActualTlfView) && tipotlf)
 			{
 				_PreviusTlfView = _ActualTlfView;
 				_ActualTlfView = viewId;
@@ -271,15 +283,30 @@ namespace HMI.Presentation.Twr
 						break;
 				}
 			}
+			//221102 LLamada a la vista en panel de radio Cambiodefrecuencia
+			if ((viewId !=_ActualRdView) && !tipotlf)
+            {
+				_PreviusRdView = _ActualRdView;
+				_ActualRdView = viewId;
+				switch (_ActualRdView)
+				{
+					case ViewNames.CambioFrecuencia:
+						ShowViewInWorkspace<CambioFrecuenciaView>(ViewNames.CambioFrecuencia, WorkspaceNames.RdWorkspace);
+						break;
+					case ViewNames.Radio:
+						ShowViewInWorkspace<RadioView>(ViewNames.Radio, WorkspaceNames.RdWorkspace);
+						break;
+				}
+			}
 		}
 
-		public void NavigateToPrevius()
+		public void NavigateToPrevius(bool tipotlf=true)
 		{
-			if (_PreviusTlfView != null)
+			if ((_PreviusTlfView != null)  && tipotlf)
 			{
 				_ActualTlfView = _PreviusTlfView;
 				_PreviusTlfView = null;
-
+				
 				switch (_ActualTlfView)
 				{
 					case ViewNames.TlfDa:
@@ -294,6 +321,21 @@ namespace HMI.Presentation.Twr
 						break;
 					case ViewNames.Depencences:
 						ShowViewInWorkspace<DependencesView>(ViewNames.Depencences, WorkspaceNames.TlfWorkspace);
+						break;
+				}
+			}
+			//221102 LLamada a la vista en panel de radio Cambiodefrecuencia
+			if ((_ActualRdView!=_PreviusRdView) && !tipotlf)
+            {
+				_ActualRdView = _PreviusRdView;
+				_PreviusRdView = null;
+				switch (_ActualRdView)
+				{
+					case ViewNames.CambioFrecuencia:
+						ShowViewInWorkspace<CambioFrecuenciaView>(ViewNames.CambioFrecuencia, WorkspaceNames.RdWorkspace);
+						break;
+					case ViewNames.Radio:
+						ShowViewInWorkspace<CambioFrecuenciaView>(ViewNames.Radio, WorkspaceNames.RdWorkspace);
 						break;
 				}
 			}

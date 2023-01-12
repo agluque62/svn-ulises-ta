@@ -374,6 +374,8 @@ namespace U5ki.Infrastructure
         CORESIP_SND_LC_RECORDER, //La aplicacion crea solo 1. Que es el Out al grabador analogico
         CORESIP_SND_HF_SPEAKER, //La aplicacion crea 2. In Es la linea de retorno del altavoz HF. Out es la salida
         CORESIP_SND_HF_RECORDER, //Es la linea Out hacia el grabador analogico
+        CORESIP_SND_INSTRUCTOR_BINAURAL,
+        CORESIP_SND_ALUMNO_BINAURAL,
         CORESIP_SND_UNKNOWN
     }
 

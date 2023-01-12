@@ -212,6 +212,21 @@ namespace HMI.CD40.Module.BusinessEntities
             Send(Identifiers.RdMasterTopic, Identifiers.SITE_CHANGING_MSG, msg);
         }
 
+		//LALM 221102 cambiofrecuencia
+		public void SetNewFrecuency(string fr, string literal, uint pttType, bool checkAlreadyAssigned)
+		{
+			_Logger.Trace($"SetNewFrecuency <{fr}>: {fr}, Literal {literal}, AlreadyAssigned {checkAlreadyAssigned}");
+			// Aqui habría que crear otra estructura, con protobuf.
+			FrTxChangeAsk change = new FrTxChangeAsk();
+			change.HostId = Top.HostId;
+			change.Frecuency = fr;
+			//change.Tx = tx;
+			//change.PttType = pttType;
+			//change.CheckAlreadyAssigned = checkAlreadyAssigned;
+
+			Send(Identifiers.RdMasterTopic, Identifiers.FR_RXTX_CHANGE_ASK_MSG, change);
+		}
+
 		#region Private Members
 
 		private static Logger _Logger = LogManager.GetLogger("TopRegistry");

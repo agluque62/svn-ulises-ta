@@ -748,9 +748,36 @@ namespace HMI.CD40.Module.BusinessEntities
             return Alias;
         }
 
-		#region Private Members
+		//LALM 221102 cambiofrecuencia
+        public void SetNewFrecuency(string frecuency, bool checkAlreadyAssigned)
+        {
+            //cambiar todo por setnewfrecuency
+            if (Available && Top.Rd.PttSource == PttSource.NoPtt && !Top.Rd.ScreenSaverStatus)
+            {
+                if ( (_Tx != AssignState.Set))
+                {
+                    _Tx = AssignState.Trying;
+                    if (_Rx == AssignState.Idle)
+                        _Rx = AssignState.Trying;
 
-		private enum AssignState { Idle, Trying, Set }
+                    //221028
+                    //_Literal ==> frecuency;//no lo se.
+
+                    //Top.Registry.SetTx(_Literal, true, _Priority, checkAlreadyAssigned);
+                    Top.Registry.SetNewFrecuency(frecuency, Literal, _Priority, false);
+                }
+                else if ( (_Tx != AssignState.Idle))
+                {
+                    _RtxGroup = Math.Min(_RtxGroup, 0);
+ 
+                    Top.Registry.SetNewFrecuency(frecuency, Literal, _Priority, false);
+                }
+            }
+        }
+
+        #region Private Members
+
+        private enum AssignState { Idle, Trying, Set }
 
 		private static Logger _Logger = LogManager.GetCurrentClassLogger();
 

@@ -219,14 +219,7 @@ namespace HMI.Model.Module.Services
             var configData = msg.Info.ToList().Select(i => new { i.Dst, i.Alias });
             var newConfig = Newtonsoft.Json.JsonConvert.SerializeObject(configData);
             var newConfigHashCode = newConfig.GetHashCode();
-            bool RdRtxStatusRetrieveEnabledanterior = RdRtxStatusRetrieveEnabled;
             Log.Trace("Processing Event {0} Config Hash Code {1}", EventTopicNames.RdInfoEngine, newConfigHashCode);
-            //RQF36
-            RdRtxStatusRetrieveEnabled = ((StateManager.Permissions & Permissions.PermisoRTXSect) == Permissions.PermisoRTXSect);
-            if (RdRtxStatusRetrieveEnabledanterior!=RdRtxStatusRetrieveEnabled)
-            {
-                RdRtxStatusRetrieveEnabledanterior = RdRtxStatusRetrieveEnabled;
-            }
             //if (newConfigHashCode != CurrentConfigHasCode)
             //{
             //    CurrentConfigHasCode = newConfigHashCode;
@@ -640,6 +633,9 @@ namespace HMI.Model.Module.Services
         /// <param name="pos"></param>
         void RtxRestoreFor(int pos)
         {
+            //RQF36
+            RdRtxStatusRetrieveEnabled = ((StateManager.Permissions & Permissions.PermisoRTXSect) == Permissions.PermisoRTXSect);
+
             if (RdStatusRecoveryEnabled == false || RdRtxStatusRetrieveEnabled == false || StateManager == null)
                 return;
 

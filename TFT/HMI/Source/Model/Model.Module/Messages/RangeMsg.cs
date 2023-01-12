@@ -346,7 +346,7 @@ namespace HMI.Model.Module.Messages
 	{
         private long tiempo;
         private bool _HaveFiles;
-
+		public bool Refresco = false;
 		public ParametrosReplay(long tiempo)
 		{
 			Tiempo= tiempo;

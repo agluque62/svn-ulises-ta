@@ -520,7 +520,19 @@ namespace HMI.CD40.Module.BusinessEntities
         public void UpdateRadioSpeakerLed()
         {
             Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.Speaker) ? HwManager.ON : HwManager.OFF);
-            Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.HfSpeaker) ? HwManager.ON : HwManager.OFF);
+            Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.HfSpeaker)|| ring_rad ? HwManager.ON : HwManager.OFF);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="on"></param>
+		//LALM 221102 cambiofrecuencia
+		public void SetNewFrecuency(int id, string frecuency)
+        {
+            Debug.Assert(id < _RdPositions.Length);
+            _RdPositions[id].SetNewFrecuency(frecuency, true);//SetNewFrecuency
         }
 
 
@@ -580,7 +592,7 @@ namespace HMI.CD40.Module.BusinessEntities
         private Timer _TimerNetworkStatus = new Timer(1000);
         private bool _StatusNetworkOn = false;
         private bool _DoubleRadioSpeaker = false;
-
+        public bool ring_rad = false;
         // Guarda el ultimo estado global de HF recibido para enviarlo sólo una vez hacia la presentation
         int _LastStatusHF = -1;
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
@@ -763,12 +775,16 @@ namespace HMI.CD40.Module.BusinessEntities
 			{
                 rd.CheckAudioVia();
 			}
-		}
+                //#7214 221121 si no hay jacks paro reproduccion
+                if (!jacks)
+                Top.Replay.DoFunction(FunctionReplay.Stop, ViaReplay.SpeakerRadio, "", 0);
+            }
             catch (Exception e)
             {
                 _Logger.Debug("Excepcion. Mensaje: {0}", e.Message);
             }
-		}
+
+        }
 
         /// <summary>
         /// 

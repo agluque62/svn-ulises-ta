@@ -109,6 +109,7 @@
       <Link>VersionInfo.cs</Link>
     </Compile>
     <Compile Include="BusinessEntities\AsioChannels.cs" />
+    <Compile Include="BusinessEntities\CBinauralHwManager.cs" />
     <Compile Include="BusinessEntities\CfgManager.cs" />
     <Compile Include="BusinessEntities\TlfForward.cs" />
     <Compile Include="BusinessEntities\TlfPickUp.cs" />

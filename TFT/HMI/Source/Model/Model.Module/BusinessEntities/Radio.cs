@@ -495,6 +495,7 @@ namespace HMI.Model.Module.BusinessEntities
 
 		private RdDst[] _Dst = new RdDst[NumDestinations];
 		private int _Page = 0;
+		private int _Idsel = 0;
 		private bool _PttOn = false;
 		private int _Rtx = 0;
 		private int _NumRtx = 0;
@@ -658,7 +659,9 @@ namespace HMI.Model.Module.BusinessEntities
 			}
 		}
 
-		public Radio()
+        public int Idsel { get => _Idsel; set => _Idsel = value; }
+
+        public Radio()
 		{
 			for (int i = 0; i < NumDestinations; i++)
 			{
@@ -998,5 +1001,37 @@ namespace HMI.Model.Module.BusinessEntities
 			_ParametrosReplay.Tiempo = segundos;
 			General.SafeLaunchEvent(TempReplayChanged, this, _ParametrosReplay);
 		}
+
+		public void RefreshPlay()
+        {
+			_ParametrosReplay.Refresco = true;
+			General.SafeLaunchEvent(TempReplayChanged, this, _ParametrosReplay);
+		}
+
+		//LALM 221102 cambiofrecuencia
+		public List<string> GetListaFrecuencias()
+		{
+			List<string> listafr = new List<string>(); 
+			for (int i = 0, to = NumDestinations; i < to; i++)
+			{
+				RdDst dst = _Dst[i];
+				listafr.Add(dst.Frecuency);
+			}
+			return listafr;
+		}
+
+		//LALM 221102 cambiofrecuencia
+		public int GetFrecuenciaSeleccionada(string equipo)
+		{
+
+			List<string> listafr = GetListaFrecuencias();
+			for (int i = 0, to = NumDestinations; i < to; i++)
+			{
+				if (_Dst[i].Alias == equipo)
+					return i;
+			}
+			return -1;
+		}
+
 	}
 }

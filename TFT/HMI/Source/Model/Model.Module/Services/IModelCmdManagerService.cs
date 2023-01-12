@@ -43,6 +43,7 @@ namespace HMI.Model.Module.Services
 		void HoldClick();
 		void TransferClick();
 		void SwitchTlfView(string view);
+		void SwitchRadView(string pantalla,int id, string fr);
 		bool CancelTlfClick(bool test=false);//#2816 LALM 220615
 		void SpeakerTlfClick();
         void NewDigit(int id, char key);
@@ -62,5 +63,7 @@ namespace HMI.Model.Module.Services
 		void SetCambioRadio(bool up);
 		void PlayRadioClick();
 		void StopAudioReproduccion();
+		void SetNewFrecuency(int id, string fr);//LALM 221102 cambiofrecuencia
+
 	}
 }

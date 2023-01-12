@@ -16,6 +16,13 @@ using System.IO;
 
 namespace HMI.Model.Module.Services
 {
+	public class changefr : EventArgs
+	{
+		public string pantalla { get; set; }
+		public int id { get; set; }
+		public string frecuencias { get; set; }
+	}
+
 	public class UICmdManagerService : IModelCmdManagerService
 	{
 		private StateManagerService _StateManager = null;
@@ -28,10 +35,13 @@ namespace HMI.Model.Module.Services
         [EventPublication(EventTopicNames.ShowInfoUI, PublicationScope.Global)]
         public event EventHandler ShowInfoUI;
 
-        [EventPublication(EventTopicNames.SwitchTlfViewUI, PublicationScope.Global)]
-        public event EventHandler<EventArgs<string>> SwitchTlfViewUI;
+		[EventPublication(EventTopicNames.SwitchTlfViewUI, PublicationScope.Global)]
+		public event EventHandler<EventArgs<string>> SwitchTlfViewUI;
+		
+		[EventPublication(EventTopicNames.SwitchRadViewUI, PublicationScope.Global)]
+		public event EventHandler<EventArgs<changefr>> SwitchRadViewUI;
 
-        [EventPublication(EventTopicNames.BriefingSessionUI, PublicationScope.Global)]
+		[EventPublication(EventTopicNames.BriefingSessionUI, PublicationScope.Global)]
         public event EventHandler BriefingSessionUI;
 
         [EventPublication(EventTopicNames.LoadTlfDaPageUI, PublicationScope.Global)]
@@ -221,13 +231,22 @@ namespace HMI.Model.Module.Services
 
 		public void SwitchTlfView(string view)
 		{
-            //if (!_StateManager.Tft.Briefing)
-                General.SafeLaunchEvent(SwitchTlfViewUI, this, new EventArgs<string>(view));
-            //else
-            //    General.SafeLaunchEvent(BriefingSessionUI, this);
+			//if (!_StateManager.Tft.Briefing)
+			General.SafeLaunchEvent(SwitchTlfViewUI, this, new EventArgs<string>(view));
+			//else
+			//    General.SafeLaunchEvent(BriefingSessionUI, this);
 		}
 
-        public void RdSetSpeakerLevel(int level)
+		public void SwitchRadView(string pantalla, int id, string fr)
+		{
+			changefr view = new changefr();
+			view.id = id;
+			view.frecuencias = fr;
+			view.pantalla = pantalla;
+			General.SafeLaunchEvent(SwitchRadViewUI, this, new EventArgs<changefr>(view));
+		}
+
+		public void RdSetSpeakerLevel(int level)
         {
             // Si existen posiciones no desasignables en el puesto, el nivel de 
             // volumen del altavoz radio no puede bajar del 30% del máximo.
@@ -1179,7 +1198,7 @@ namespace HMI.Model.Module.Services
 								subItem.Lenght = f.Length;
 								subItem.Text = f.DirectoryName + "/" + f.Name;
 								subItem.Datetime = File.GetCreationTime(subItem.Text);
-								if (subItem.Lenght>16000)
+								if (subItem.Lenght>1600)// reproduzco ficheros mayores de 100ms
 									ListViewItem.Add(subItem);
 								break;
 						}
@@ -1230,7 +1249,7 @@ namespace HMI.Model.Module.Services
 					string fileName = item.Text;
 					long fileLength = item.Lenght;
 					FunctionReplay(function, via, fileName, fileLength);
-					_StateManager.Radio.SetTiempoReplay((int)(fileLength / 16000));
+					_StateManager.Radio.SetTiempoReplay((fileLength / 16000)>0?(int)(fileLength / 16000):1);
 				}
 				else
                 {
@@ -1251,5 +1270,15 @@ namespace HMI.Model.Module.Services
 			// si hay conversacion de algun tipo en ese dispositivo no aplica.
 			_EngineCmdManager.SetTonesLevel(level);
 		}
+
+		//LALM 221028 CambioFrecuencia
+		public void SetNewFrecuency(int id,string frecuency)
+		{
+			RdDst dst = _StateManager.Radio[id];
+			Debug.Assert((_StateManager.Radio.Rtx == 0) || !dst.Tx || ((dst.RtxGroup != 0) && (dst.RtxGroup != _StateManager.Radio.Rtx)));
+
+			_EngineCmdManager.SetNewFrecuency(id, frecuency);
+		}
+
 	}
 }

@@ -398,10 +398,22 @@ namespace HMI.CD40.Module.BusinessEntities
         //#3267 RQF22
         public void LoadDevices()
         {
+            if (!BinAural)
+            {
+                HidCMediaHwManager.LoadChannels();
+                _InstructorDev = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, CMediaDevMode.Bidirectional);
+                _AlumnDev = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, CMediaDevMode.Bidirectional);
+            }
+            else
+            {
+                HidCMediaHwManager.LoadChannels();
+#if TRUE //CORESIP_SND_ALUMNO_BINAURAL
+                _InstructorBinauralDev = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_BINAURAL, CMediaDevMode.Output);
+                _AlumnoBinauralDev = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMNO_BINAURAL, CMediaDevMode.Bidirectional);
+#endif
+            }
             HidCMediaHwManager.LoadChannels();
             /** Dispositivos */
-            _InstructorDev = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_MHP, CMediaDevMode.Bidirectional);
-            _AlumnDev = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP, CMediaDevMode.Bidirectional);
             _LcSpeakerDev = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, CMediaDevMode.Output);
             _RdSpeakerDev = HidCMediaHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, CMediaDevMode.Output);
             if (Settings.Default.HfSpeaker)
@@ -518,9 +530,22 @@ namespace HMI.CD40.Module.BusinessEntities
                 _InstructorRecorderDevIn = _AlumnRecorderDevIn = _LcRecorderDevIn = _RadioRecorderDevIn = _RadioHfRecorderIn = -1;
                 _InstructorRecorderDevOut = _AlumnRecorderDevOut = _IntRecorderDevOut = -1;
             }
-            else if (tipoAudio==eAudioDeviceTypes.CMEDIA)    // IAU-CMEDIA
+            else if (tipoAudio == eAudioDeviceTypes.BINAURAL)    // BINAURAL
             {
-                bool hayiao = false;
+                HidBinauralHwManager.LoadChannels();
+
+                _AlumnDev = HidBinauralHwManager.AddDevice(Settings.Default.AlumnMHP, CORESIP_SndDevType.CORESIP_SND_ALUMN_MHP);
+                _AlumnDev2 = HidBinauralHwManager.AddDevice(Settings.Default.AlumnMHP, CORESIP_SndDevType.CORESIP_SND_ALUMNO_BINAURAL);
+                _LcSpeakerDev = HidBinauralHwManager.AddDevice(Settings.Default.LcSpeaker, CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER);
+                _RdSpeakerDev = HidBinauralHwManager.AddDevice(Settings.Default.RdSpeaker, CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER);
+
+                _InstructorDev = _HfSpeakerDev = -1;
+                _InstructorRecorderDevIn = _AlumnRecorderDevIn = _LcRecorderDevIn = _RadioRecorderDevIn = _RadioHfRecorderIn = -1;
+                _InstructorRecorderDevOut = _AlumnRecorderDevOut = _IntRecorderDevOut = -1;
+            }
+            else if (tipoAudio == eAudioDeviceTypes.CMEDIA)    // IAU-CMEDIA
+                    {
+                        bool hayiao = false;
                 //RQF-20
                 // Lo saco de .config
                 //RQF-20
@@ -589,6 +614,14 @@ namespace HMI.CD40.Module.BusinessEntities
 
                 //#3267 RQF22
                 LoadDevices();
+#if FALSE //CORESIP_SND_ALUMNO_BINAURAL 
+                if (tipoAudio == eAudioDeviceTypes.BINAURAL)
+                {
+                    HidCBinauralHwManager.LoadChannels();
+                    _InstructorBinauralDev = HidCBinauralHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_INSTRUCTOR_BINAURAL, CBinauralDevMode.Output);
+                    _AlumnoBinauralDev = HidCBinauralHwManager.AddDevice(true, CORESIP_SndDevType.CORESIP_SND_ALUMNO_BINAURAL, CBinauralDevMode.Bidirectional);//bidireccional
+                }
+#endif
                 //220920 se cambia la asignacionhw al inicio, solo se debe llamar una vez.
                 RecordModeHw();
                 //Top.Mixer.Start();//221003
@@ -992,13 +1025,18 @@ namespace HMI.CD40.Module.BusinessEntities
 			foreach (LinkInfo link in _LinksList)
 			{
                 // Se cambia el volumen para las conversaciones activas de ese tipo
-				if (link._Dev == MixerDev.SpkLc && link._TipoFuente == FuentesGlp.RxLc)
-				{
-					SipAgent.SetVolume(link._CallId, _LcSpeakerVolume);
-				}
-			}
+                if (link._Dev == MixerDev.SpkLc && link._TipoFuente == FuentesGlp.RxLc)
+                {
+                    SipAgent.SetVolume(link._CallId, _LcSpeakerVolume);
+                }
+                //#7214 221121 Se cambia el volumen de la reproducion radio de la ultima llamada.
+                else if (link._Dev == MixerDev.SpkLc && link._TipoFuente == FuentesGlp.Briefing)
+                {
+                    SipAgent.SetVolume(link._CallId, _LcSpeakerVolume);
+                }
+            }
 
-			return true;
+            return true;
 		}
 
         /// <summary>
@@ -1288,9 +1326,117 @@ namespace HMI.CD40.Module.BusinessEntities
 						}
 					}
                     Top.Rd.UpdateRadioSpeakerLed();
-					break;
 
-				case MixerDev.SpkLc:
+                    if (BinAural)
+                    {
+                        alreadySessionOpen = false;
+                        if ((_SplitMode != SplitMode.Off) || AutChangeToRdSpeaker() == false)
+                        {
+                            // Graba la recepción en cascos bien del instructor o del alumno
+                            if ((_InstructorBinauralDev >= 0) && ((_SplitMode == SplitMode.Off) || (_SplitMode == SplitMode.LcTf)))
+                            {
+                                Link(id, _InstructorBinauralDev, dir, priority);
+                                if (dir == MixerDir.Send)
+                                {
+                                    alreadySessionOpen = true;
+                                    if (Top.Rd.AnySquelch)
+                                    {
+#if _MEZCLADOR_ASECNA_
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true);
+                                    _UnlinkGlpRadioTimer.Enabled = false;
+#endif
+#if _MEZCLADOR_TWR_
+                                        //LALM:Pongo finalizar a false para que no corte la grabacion
+                                        bool finalizar = false;
+                                        Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false, finalizar);
+                                        Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true, finalizar);
+                                        _UnlinkGlpRadioTimer.Enabled = true;
+#endif
+                                    }
+                                    else
+                                        Top.Recorder.SetIdSession(id, FuentesGlp.RxRadio);
+                                }
+                            }
+                            if ((_AlumnoBinauralDev >= 0) && ((_SplitMode == SplitMode.Off) || (_SplitMode == SplitMode.RdLc)))
+                            {
+                                if (!BinAural)
+                                    Link(id, _AlumnDev, dir, priority);
+                                else
+                                    Link(id, _AlumnoBinauralDev, dir, priority);
+                                if ((dir == MixerDir.Send) && (alreadySessionOpen == false))
+                                {
+                                    if (Top.Rd.AnySquelch)
+                                    {
+#if _MEZCLADOR_ASECNA_
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true);
+                                    _UnlinkGlpRadioTimer.Enabled = true;
+#endif
+#if _MEZCLADOR_TWR_
+                                        //Pongo finalizar a false para que no corte la grabacion.
+                                        bool finalizar = false;
+                                        Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false, finalizar);
+                                        Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true, finalizar);
+                                        _UnlinkGlpRadioTimer.Enabled = true;
+#endif
+                                    }
+                                    else
+                                        Top.Recorder.SetIdSession(id, FuentesGlp.RxRadio);
+                                }
+                            }
+
+                            if ((dir == MixerDir.Send) || (dir == MixerDir.SendRecv))
+                            {
+                                SipAgent.SetVolume(id, _RdHeadPhonesVolume);
+                            }
+                        }
+                        // Por telefonía por cascos, se pasa automáticamente a altavoz temporalmente
+                        else if (Top.Hw.RdSpeaker || Top.Rd.HFSpeakerAvailable())
+                        {
+                            if ((dir == MixerDir.Send) || (dir == MixerDir.SendRecv))
+                            {
+                                ConectaAltavozDisponible(ref link);
+                                if (dir == MixerDir.Send)
+                                {
+                                    if (Top.Rd.AnySquelch)
+                                    {
+                                        //lalm 220225
+#if _MEZCLADOR_ASECNA_
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false);
+                                    Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true);
+                                    _UnlinkGlpRadioTimer.Enabled = false;
+#endif
+#if _MEZCLADOR_TWR_
+                                        //Pongo finalizar a false para que no corte la grabacion.
+                                        bool finalizar = false;
+                                        Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, false, finalizar);
+                                        Top.Recorder.SessionGlp(id, FuentesGlp.RxRadio, true, finalizar);
+                                        _UnlinkGlpRadioTimer.Enabled = true;
+#endif
+                                    }
+                                    else
+                                        Top.Recorder.SetIdSession(id, FuentesGlp.RxRadio);
+                                }
+                            }
+                            if ((dir == MixerDir.Recv) || (dir == MixerDir.SendRecv))
+                            {
+                                if (_InstructorDev >= 0)
+                                {
+                                    _Mixer.Link(_InstructorDev, priority, id, Mixer.UNASSIGNED_PRIORITY);
+                                }
+                                if (_AlumnDev >= 0)
+                                {
+                                    _Mixer.Link(_AlumnDev, priority, id, Mixer.UNASSIGNED_PRIORITY);
+                                }
+                            }
+                        }
+                        Top.Rd.UpdateRadioSpeakerLed();
+                    }
+                    break;
+
+
+                case MixerDev.SpkLc:
                     ManageECHandsFreeByLC();
 					Debug.Assert(dir == MixerDir.Send);
 					if (_LcSpeakerDev >= 0)
@@ -1336,6 +1482,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     if (_RdSpeakerDev >= 0)
                     {
                         _Mixer.Link(id, Mixer.UNASSIGNED_PRIORITY, _RdSpeakerDev, priority);
+                        //_Mixer.Link(id, Mixer.UNASSIGNED_PRIORITY, _InstructorBinauralDev, priority);//compruebo si sale algo.
                         Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, HwManager.ON);
                         /*- AGL.REC La Grabación del Altavoz Radio es Continua...
 						Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_RADIO_RECORDER, true);
@@ -1817,8 +1964,11 @@ namespace HMI.CD40.Module.BusinessEntities
                 case ViaReplay.SpeakerLc:
                     if (_LcSpeakerDev > 0)
                     {
-                        link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
+                        //#7214 221121
+                        //link = new LinkInfo(MixerDev.MhpTlf, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
+                        link = new LinkInfo(MixerDev.SpkLc, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Briefing, file);
                         Link(file, _LcSpeakerDev, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY);
+                        SipAgent.SetVolume(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, _LcSpeakerVolume);//ajusto el volumen incial
                     }
                     break;
             }
@@ -1914,8 +2064,13 @@ namespace HMI.CD40.Module.BusinessEntities
 		private int _LcSpeakerDev = -1;
         private int _HfSpeakerDev = -1;
 		private int _InstructorDev = -1;
-		private int _AlumnDev = -1;
-		private MixerDev _RingDev = MixerDev.Invalid;
+		private int _InstructorDev2 = -1;
+        private int _AlumnDev = -1;
+        private int _AlumnDev2 = -1;
+        private bool BinAural = false;
+        private int _InstructorBinauralDev = -1;
+        private int _AlumnoBinauralDev = -1;
+        private MixerDev _RingDev = MixerDev.Invalid;
 		private int _TlfHeadPhonesVolume = 50;
         private int _TlfSpeakerVolume = 50;
         private int _RdHeadPhonesVolume = 50;
@@ -2122,7 +2277,9 @@ namespace HMI.CD40.Module.BusinessEntities
 					break;
 
 				case MixerDev.SpkRd:
-					_Mixer.Link(id, Mixer.UNASSIGNED_PRIORITY, _RdSpeakerDev, priority);
+                    Top.Rd.ring_rad = true;
+                    Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, HwManager.ON);
+                    _Mixer.Link(id, Mixer.UNASSIGNED_PRIORITY, _RdSpeakerDev, priority);
 					break;
 
                 case MixerDev.Invalid:

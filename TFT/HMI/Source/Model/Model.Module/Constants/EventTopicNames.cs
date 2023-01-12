@@ -78,6 +78,7 @@ namespace HMI.Model.Module.Constants
 		public const string SplitShowModeSelectionUI = "SplitShowModeSelectionUI";
 		public const string ShowInfoUI = "ShowInfoUI";
 		public const string SwitchTlfViewUI = "SwitchTlfViewUI";
+		public const string SwitchRadViewUI = "SwitchRadViewUI";
 		public const string LoadTlfDaPageUI = "LoadTlfDaPageUI";
 		public const string ShowNotifMsgUI = "ShowNotifMsgUI";
 		public const string HideNotifMsgUI = "HideNotifMsgUI";

@@ -426,6 +426,42 @@ namespace HMI.CD40.Module.Services
 
         public void GetEngineInfo()
         {
+            Top.PublisherThread.Enqueue(EventTopicNames.ShowNotifMsgEngine, delegate ()
+            {
+                DirectoryInfo di = new DirectoryInfo(".");
+                FileInfo[] fi = di.GetFiles("*.exe", SearchOption.TopDirectoryOnly);
+                FileInfo[] f2 = di.GetFiles("*.dll", SearchOption.TopDirectoryOnly);
+                int lenfi = fi.Length;
+                Array.Resize<FileInfo>(ref fi, lenfi + f2.Length);
+                Array.Copy(f2, 0, fi, lenfi, f2.Length); 
+                if (fi.Length == 0)
+                    return;
+
+                FileInfo lastInfo = fi[fi.Length - 1];
+                FileInfo ftmp;
+                for (int j =0;j<fi.Length-1;j++)
+                for (int i =j;i< fi.Length-1;i++)
+                {
+                    if (fi[i].LastWriteTime < fi[i + 1].LastWriteTime)
+                    {
+                        ftmp = fi[i];
+                        fi[i] = fi[i + 1];
+                        fi[i + 1] = ftmp;
+                    }
+                }
+                System.IO.FileInfo[] patron = { fi[0], fi[1], fi[2] };// = { f2020, f2020, f2020};
+                string text = "";
+                foreach (System.IO.FileInfo f in patron)
+                {
+                    string Name = f.Name;
+                    int maxlen = 32;
+                    if (f.Name.Length > maxlen-4)
+                        Name = f.Name.Substring(0, maxlen-4) + "*" + f.Name.Substring(f.Name.Length-4);
+                    text += Name + ":" + f.LastWriteTime.ToString() + "\r\n";
+                }
+                NotifMsg msg = new NotifMsg("Informacion", "Versiones", text, 0, MessageType.Information, MessageButtons.Ok);
+                General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+            });
         }
 
         public bool HayConferencia()
@@ -1097,6 +1133,18 @@ namespace HMI.CD40.Module.Services
                         NotifMsg msg = new NotifMsg(Resources.ActivityError, Resources.BadOperation, Resources.ActivityError, 0, MessageType.Error, MessageButtons.Ok);
                         General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
                     }
+                }
+            });
+        }
+
+		//LALM 221102 cambiofrecuencia
+        public void SetNewFrecuency(int id, string frecuency)
+        {
+            Top.WorkingThread.Enqueue("SetNewFrecuency", delegate ()
+            {
+                if (AllowRd(id) && (Twr() || AllowBriefing()))
+                {
+                    Top.Rd.SetNewFrecuency(id, frecuency);//SetNewFrecuency
                 }
             });
         }
@@ -1934,6 +1982,12 @@ namespace HMI.CD40.Module.Services
         private void OnFileRecorderChanged(object sender, StateMsg<bool> fileState)
         {
             // No se puede llamar a esta funcion desde aqui.
+            //221121 para que al finalizar la grabacion aparezca antes el boton habilitado.
+            Top.PublisherThread.Enqueue(EventTopicNames.PlayingStateEngine, delegate ()
+            {
+                StateMsg<bool> valor = new StateMsg<bool>(true);
+                General.SafeLaunchEvent(PlayingStateEngine, this, valor);
+            });
         }
 
         private void OnPlayingChanged(object sender, StateMsg<bool> playing)

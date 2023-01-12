@@ -673,6 +673,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 case CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER:
                     if ((_dev3_alr != null) && (ledState[Type] != (LastStateGpio)OnOff))
                     {
+                        Top.Rd.ring_rad = (OnOff!=0);
                         _dev3_alr.SetGpio(4, OnOff);
                         ledState[Type] = (LastStateGpio)OnOff;
                     }

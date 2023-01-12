@@ -65,6 +65,8 @@ namespace HMI.CD40.Module.BusinessEntities
         private bool _LocalRecordingEnabled = true;//RQF35
         private bool _LocalRecordingOnlyRadio = true;//RQF35
         private int _TempMinRecorderRadio = 1000;//RQF35
+        private int _TiempoGrabacionRecorderRadio = 180;//#7214 segundos, 3 minutos
+        private int _TiempoAlmacenamRecorderRadio = 6000;//#7214 segundos, 10 minutos
         private object _Sync = new object();
 
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
@@ -82,6 +84,8 @@ namespace HMI.CD40.Module.BusinessEntities
             this._LocalRecordingEnabled = enable;
             this._LocalRecordingOnlyRadio = onlyradio;
             this._TempMinRecorderRadio = Settings.Default.TempMinRecorderRadio;
+            this._TiempoGrabacionRecorderRadio = Settings.Default.TiempoGrabacionRecorderRadio;//#7214
+            this._TiempoAlmacenamRecorderRadio = Settings.Default.TiempoAlmacenamRecorderRadio;//#7214
             _Logger.Info("Grabacion habilitada: " + enable.ToString()+" Radio" + onlyradio.ToString());
             if (onlyradio)
                 PurgeFilesRadio(true);
@@ -151,6 +155,7 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 _Logger.Warn("Directorio de grabación no está vacío o no existe.");
             }
+
         }
 
         /// <summary>
@@ -385,10 +390,35 @@ namespace HMI.CD40.Module.BusinessEntities
                 Array.Sort(fi, new FileComparer());
                 FileInfo lastInfo = fi[fi.Length - 1];
                 long ms = lastInfo.Length * 1000L / 16000L;
-                if (ms < (long)_TempMinRecorderRadio)
+                long secmax = (long)(DateTime.Now - lastInfo.LastWriteTime).TotalSeconds;
+
+                if (ms/1000 < (long)_TempMinRecorderRadio)
                 {
                     _Logger.Info("Purge file", lastInfo.Name);
-                    File.Delete(lastInfo.Directory + "/" + lastInfo.Name);
+                    try
+                    {
+                        File.Delete(lastInfo.Directory + "/" + lastInfo.Name);
+                    }
+                    catch (System.IO.IOException /*e*/)
+                    {
+                        _Logger.Warn("Error al intentar borrar el fichero " + lastInfo.Name);
+                    }
+
+                    fi[fi.Length - 1].Delete();
+                    General.SafeLaunchEvent(FileRecordedChanged, this, new StateMsg<bool>(false));
+                }
+                else if (secmax > _TiempoAlmacenamRecorderRadio)//#7214 221121
+                {
+                    _Logger.Info("Purge file", lastInfo.Name);
+                    try
+                    {
+                        File.Delete(lastInfo.Directory + "/" + lastInfo.Name);
+                    }
+                    catch (System.IO.IOException /*e*/)
+                    {
+                        _Logger.Warn("Error al intentar borrar el fichero " + lastInfo.Name);
+                    }
+                    fi[fi.Length - 1].Delete();
                     General.SafeLaunchEvent(FileRecordedChanged, this, new StateMsg<bool>(false));
                 }
                 else
@@ -403,10 +433,19 @@ namespace HMI.CD40.Module.BusinessEntities
                         {
                             {
                                 _Logger.Info("Purge file", f.Name);
-                                File.Delete(f.Directory + "/" + f.Name);
+                                try
+                                {
+                                    File.Delete(f.Directory + "/" + f.Name);
+                                }
+                                catch (System.IO.IOException /*e*/)
+                                {
+                                    _Logger.Warn("Error al intentar borrar el fichero " + f.Name);
+                                }
                             }
                         }
                     }
+
+                    General.SafeLaunchEvent(FileRecordedChanged, this, new StateMsg<bool>(true));// 221127 lo envio dos veces.
                 }
             }
             catch (System.IO.IOException /*e*/)
@@ -790,8 +829,10 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     FileInfo fi = new FileInfo(_SessionsFileName[(int)FuentesGlp.RxRadio]);
                     _Logger.Info("Supervisor GLP: GLP session started. Recording file: " + fi.FullName);
-                    int interval =  1 ;
-                    if (fi != null && fi.Exists && fi.Length > interval * 60 * 16000 /*interval minutos, aprox. */)
+                    int interval =  60 ;//en segundos
+                    if ((_TiempoGrabacionRecorderRadio > _TempMinRecorderRadio/1000) && _TiempoGrabacionRecorderRadio < _TiempoAlmacenamRecorderRadio)
+                        interval = _TiempoGrabacionRecorderRadio;
+                    if (fi != null && fi.Exists && fi.Length > interval * 16000 /*interval en segundos, aprox. */)
                         ResetRecording(FuentesGlp.RxRadio);
                     if (!Top.Rd.AnySquelch)
                         ResetRecording(FuentesGlp.RxRadio);
@@ -805,8 +846,8 @@ namespace HMI.CD40.Module.BusinessEntities
                     {
                         FileInfo fi = new FileInfo(_SessionsFileName[(int)i]);
                         _Logger.Info("Supervisor GLP: GLP session started. Recording file: " + fi.FullName);
-                        int interval = (i == FuentesGlp.RxRadio || i == FuentesGlp.TxRadio) ? 1 : 30;
-                        if (fi != null && fi.Exists && fi.Length > interval * 60 * 16000 /*interval minutos, aprox. */)
+                        int interval = (i == FuentesGlp.RxRadio || i == FuentesGlp.TxRadio) ? _TiempoGrabacionRecorderRadio : 1800;
+                        if (fi != null && fi.Exists && fi.Length > interval * 16000 /*interval segundos, aprox. */)
                             ResetRecording(i);
                     }
                 }

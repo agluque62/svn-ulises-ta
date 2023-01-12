@@ -562,49 +562,59 @@ namespace U5ki.Infrastructure
             CORESIP_Error err;
             CORESIP_SndWindowsDevices Devices;
             List<string> DevWinName = new List<string>();
-            if (CORESIP_GetWindowsSoundDeviceNames(0, out Devices, out err) != 0)
+            try
             {
-                return null;
-            }
-            else
-            {
-                _Logger.Info("CORESIP_GetWindowsSoundDeviceNames  ndevices_found " + Devices.ndevices_found + " " + Devices.DeviceNames);
-                string[] separatingStrings = { "<###>" };
-                string[] DevWinName1 = Devices.DeviceNames.Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
-                DevWinName.AddRange(DevWinName1);
-                if (mascara != null && mascara.Length>0)
+                if (CORESIP_GetWindowsSoundDeviceNames(0, out Devices, out err) != 0)
                 {
-                    foreach (string dev in DevWinName1)
+                    return null;
+                }
+                else
+                {
+                    _Logger.Info("CORESIP_GetWindowsSoundDeviceNames  ndevices_found " + Devices.ndevices_found + " " + Devices.DeviceNames);
+                    string[] separatingStrings = { "<###>" };
+                    string[] DevWinName1 = Devices.DeviceNames.Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
+                    DevWinName.AddRange(DevWinName1);
+                    if (mascara != null && mascara.Length > 0)
                     {
-                        //_Logger.Info("GetNameDevice  " + mascara+ " "+ dev);
-                        try
+                        foreach (string dev in DevWinName1)
                         {
-                            if ((dev!=null) && (dev.Length > 0) && (dev.Contains(mascara)))
+                            //_Logger.Info("GetNameDevice  " + mascara+ " "+ dev);
+                            try
                             {
-                                _Logger.Info("GetNameDevice  " + mascara);
-                                return dev;
+                                if ((dev != null) && (dev.Length > 0) && (dev.Contains(mascara)))
+                                {
+                                    _Logger.Info("GetNameDevice  " + mascara);
+                                    return dev;
+                                }
+                                else if ((dev == null) || (dev.Length == 0))
+                                {
+                                    if (mascara != "-none-")
+                                        _Logger.Info("GetNameDevice  " + mascara + " No Encontrada");
+                                    return null;
+                                }
                             }
-                            else  if ((dev == null) || (dev.Length == 0))
+                            catch (Exception excep)
                             {
-                                if (mascara!= "-none-")
-                                    _Logger.Info("GetNameDevice  " + mascara + " No Encontrada");
                                 return null;
                             }
                         }
-                        catch (Exception excep)
-                        {
-                            return null;
-                        }
                     }
+                    if (mascara == null && DevWinName1.Length > indice)
+                    {
+                        _Logger.Info("Buscando dispositivo + Devices.ndevices_found " + indice.ToString() + " " + DevWinName1[indice]);
+                        return DevWinName[indice];
+                    }
+                    else
+                        return null;
                 }
-                if (mascara==null && DevWinName1.Length > indice)
-                {
-                    _Logger.Info("Buscando dispositivo + Devices.ndevices_found "+ indice.ToString() + " " + DevWinName1[indice]);
-                    return DevWinName[indice];
-                }
-                else
-                    return null;
             }
+            catch (Exception x)
+            {
+                /** TODO Gestion de la Excepcion */
+                _Logger.Fatal("GetNameDevice", x);
+                return null;
+            }
+
         }
 
         /// <summary>

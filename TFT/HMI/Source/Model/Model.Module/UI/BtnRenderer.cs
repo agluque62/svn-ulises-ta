@@ -132,7 +132,7 @@ namespace HMI.Model.Module.UI
 			}
 		}
 
-		public int CornerRadius
+		public int CornerRadius	
 		{
 			get { return (_Style != BtnStyle.Fixed3D ? _CornerRadius : 0); }
 			set { _CornerRadius = value; }

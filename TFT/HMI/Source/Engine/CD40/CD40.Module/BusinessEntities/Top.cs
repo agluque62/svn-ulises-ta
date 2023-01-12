@@ -297,6 +297,11 @@ namespace HMI.CD40.Module.BusinessEntities
                         case eAudioDeviceTypes.GENERIC:         // Cascos sin PTT y Altavoces USB...
                             _HwManager = new HidGenericHwManager(false);
                             break;
+#if TRUE //CORESIP_SND_ALUMNO_BINAURAL 
+                        case eAudioDeviceTypes.BINAURAL:         // Cascos sin PTT y Altavoces USB...
+                            _HwManager = new HidBinauralHwManager(true);
+                            break;
+#endif
                         case eAudioDeviceTypes.SIMUL:           // Simulacion de Tarjetas HID
                             _HwManager = new SimCMediaHwManager();
                             break;

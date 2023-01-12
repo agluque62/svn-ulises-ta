@@ -159,6 +159,7 @@ namespace HMI.Presentation.Twr.Views
 					bt.TxClick += RdButton_TxClick;
 					bt.RxLongClick += RdButton_RxLongClick;
 					bt.RxShortClick += RdButton_RxShortClick;
+                    bt.TitleLongClick += RdButton_TitleLongClick;
                     if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
                     {
                         this._RdButtonsTLP.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -240,8 +241,17 @@ namespace HMI.Presentation.Twr.Views
             // 26/01/2017
 			// RecuperaEstadoAsignacionFrecuencias();
 		}
+        //#7214 221121 nueva funcion para cuando entren en modo limpieza.
+        private bool _ReplayEnabled
+        {
+            get
+            {
+                return ((_StateManager.Permissions & Permissions.ReplayOnlyRadio) == Permissions.ReplayOnlyRadio) &&
+                     _StateManager.Jacks.SomeJack;
+            }
+        }
 
-		[EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
 		[EventSubscription(EventTopicNames.EngineStateChanged, ThreadOption.Publisher)]
 		public void OnTftEngineChanged(object sender, EventArgs e)
 		{
@@ -251,7 +261,8 @@ namespace HMI.Presentation.Twr.Views
 			_PttBT.Enabled = _PttEnabled;
 			_RtxBT.Enabled = _RtxEnabled;
 			_RdPageBT.Enabled = _RdPageEnabled;
-
+            //#7214 221121
+            _PlayBT.Enabled = _ReplayEnabled;
 			foreach (RdButton bt in _RdButtons)
 			{
 				bt.Enabled = _StateManager.Tft.Enabled && _StateManager.Engine.Operative && !_StateManager.Radio[bt.Id].Unavailable;
@@ -263,7 +274,16 @@ namespace HMI.Presentation.Twr.Views
                 _PlayBT.Show();
             else 
                 _PlayBT.Hide();
-            
+            if (!_StateManager.Tft.Enabled)
+            {
+                //_PlayBT.StopReproducion();
+                _PlayBT.Enabled = false;
+            }
+            else
+            {
+                _PlayBT.Enabled = _ReplayEnabled;
+
+            }
         }
 
         private bool _ReplayOnlyRadioVisible
@@ -478,7 +498,11 @@ namespace HMI.Presentation.Twr.Views
         {
             //LALM:Cuando hay cambio de configuracion llega hasta aqui
             if (_ReplayOnlyRadioVisible)
+            {
                 _PlayBT.Show();
+                //#7214 221121
+                _PlayBT.Enabled = true;
+            }
             else
                 _PlayBT.Hide();
         }
@@ -489,15 +513,18 @@ namespace HMI.Presentation.Twr.Views
         public void OnTempReplayChanged(object sender, EventArgs e/*,TiempoReplay segundos*/)
         {
             ParametrosReplay pr = (ParametrosReplay)e;
-             _PlayBT.TiempoMax = pr.GetTiempo();
+            _PlayBT.TiempoMax = pr.GetTiempo();
             if (pr.HaveFiles)
             {
                 _PlayBT.Reproduciendo();
             }
             else
             {
-                //_PlayBT.CambiaFileGrabado(false);
-                //_PlayBT.Habilitado(false);
+                _PlayBT.StopReproducion();
+            }
+            if (pr.Refresco)
+            {
+                _PlayBT.Timer2();//221128 para forzar el refresco.
             }
         }
 
@@ -1267,6 +1294,26 @@ namespace HMI.Presentation.Twr.Views
 			}
 		}
 
+        private void RdButton_TitleLongClick(object sender, EventArgs e)
+        {
+            
+            int id = ((RdButton)sender).Id;
+
+            try
+            {
+                //LALM 221028
+                _StateManager.Radio.Idsel = id;
+                //no habria que pasar el id.
+                _CmdManager.SwitchRadView("CambioFrecuencia",id,"");
+            }
+            catch (Exception ex)
+            {
+                int pos = _RdButtons.IndexOf((RdButton)sender);
+                string msg = string.Format("ERROR modificando frecuencia RD mediante pulsacion larga [Pos={0}] [Id={1}]", pos, id);
+                _Logger.Error(msg, ex);
+            }
+        }
+
         private void Forced_RxShortClick(object sender)
         {
             int id = ((RdButton)sender).Id;
@@ -1370,6 +1417,7 @@ namespace HMI.Presentation.Twr.Views
 			Invalidate(true);
 		}
 
+        [EventSubscription(EventTopicNames.TlfChanged, ThreadOption.Publisher)]
         [EventSubscription(EventTopicNames.LcChanged, ThreadOption.Publisher)]
         public void OnLcChanged(object sender, RangeMsg e)
         {
@@ -1381,7 +1429,6 @@ namespace HMI.Presentation.Twr.Views
                 _CmdManager.StopAudioReproduccion();
             }
         }
-
 
 
         /** 20190205. Pintar los errores de confirmacion de transmision */
@@ -1497,14 +1544,7 @@ namespace HMI.Presentation.Twr.Views
             }
         }
 
-        [EventSubscription(EventTopicNames.TempReplayChanged, ThreadOption.Publisher)]
-        public void OnReplayChanged(object sender, EventArgs e)
-        {
-            ParametrosReplay pr = (ParametrosReplay)e;
-            _PlayBT.TiempoMax = pr.GetTiempo();
-            if (pr.GetTiempo()== 0)
-                _PlayBT.StopReproducion();
-        }
+
     }
 }
 

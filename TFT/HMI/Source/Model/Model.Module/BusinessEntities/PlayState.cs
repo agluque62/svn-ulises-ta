@@ -19,7 +19,7 @@ namespace HMI.Model.Module.BusinessEntities
         {
             Deshabilitado,
             Reposo,
-            Repoduciendo,
+            Reproduciendo,
             Error,
             Oculto,
             Visto,

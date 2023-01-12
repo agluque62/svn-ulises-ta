@@ -12,8 +12,9 @@ namespace HMI.Model.Module.Constants
 		public const string TlfDa = "TlfDaView";
 		public const string TlfIa = "TlfIaView";
 		public const string TlfFunctions = "TlfFunctionsView";
+		public const string CambioFrecuencia = "CambioFrecuencia";
 		public const string Depencences = "DepencencesView";
-        public const string ScreenSaver = "ScreenSaverView";
+		public const string ScreenSaver = "ScreenSaverView";
         public const string Replay = "ReplayView";
         public const string HistoryOfCalls = "HistoryReportOfCallsView";
         public const string InfoEngine = "InfoEngine";

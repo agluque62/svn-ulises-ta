@@ -67,13 +67,13 @@ namespace HMI.Presentation.Twr.UI
             // 
             // ProgressBar
             // 
+            this.ProgressBar.Enabled = false;
             this.ProgressBar.Location = new System.Drawing.Point(0, 32);
             this.ProgressBar.Maximum = 30;
             this.ProgressBar.Name = "ProgressBar";
             this.ProgressBar.RightToLeftLayout = true;
             this.ProgressBar.Size = new System.Drawing.Size(33, 16);
             this.ProgressBar.TabIndex = 2;
-            this.ProgressBar.Visible = true;
             this.ProgressBar.Click += new System.EventHandler(this.ProgressBar_Click);
             // 
             // hmiButtonStop
@@ -99,7 +99,7 @@ namespace HMI.Presentation.Twr.UI
             this.uiTimer1.SynchronizingObject = this;
             this.uiTimer1.Elapsed += new System.Timers.ElapsedEventHandler(this.uiTimer1_Elapsed);
             // 
-            // uiTimer1
+            // uiTimer2
             // 
             this.uiTimer2.Enabled = true;
             this.uiTimer2.Interval = 10000D;

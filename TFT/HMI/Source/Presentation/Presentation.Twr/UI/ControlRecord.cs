@@ -30,7 +30,7 @@ namespace HMI.Presentation.Twr.UI
         {
             Deshabilitado,
             Reposo,
-            Repoduciendo,
+            Reproduciendo,
             Error
         };
         private bool _jacks = false;
@@ -58,7 +58,7 @@ namespace HMI.Presentation.Twr.UI
                             hmiButtonPlay.Enabled = true;
                         }
                     }
-                    else if (value == estados.Repoduciendo)
+                    else if (value == estados.Reproduciendo)
                     {
                         StartRep();
                         hmiButtonPlay.Enabled = false;
@@ -91,9 +91,12 @@ namespace HMI.Presentation.Twr.UI
             {
                 _TiempoMax = value;
                 ProgressBar.Maximum = _TiempoMax;
-                
-                if (_TiempoMax == 0 && estado==estados.Reposo)
+                this.hmiButtonStop.Text = TiempoMax.ToString();
+                if (_TiempoMax == 0 && estado == estados.Reposo)
+                {
                     estado = estados.Deshabilitado;
+                    Timer2();// Puede que no haga falta, se llama refresh, por seguridad lo dejamos.
+                }
                 if (_TiempoMax > 0 && estado==estados.Deshabilitado)
                     estado = estados.Reposo;
             }
@@ -144,7 +147,7 @@ namespace HMI.Presentation.Twr.UI
 
         private void uiTimer1_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (estado == estados.Repoduciendo)
+            if (estado == estados.Reproduciendo)
             {
                 this.hmiButtonStop.Text = (ProgressBar.Maximum - ProgressBar.Value).ToString();
                 if (ProgressBar.Value < ProgressBar.Maximum)
@@ -159,7 +162,8 @@ namespace HMI.Presentation.Twr.UI
                 ProgressBar.Value = 0;
         }
 
-        private void uiTimer2_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        //private void uiTimer2_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        public void Timer2()
         { 
             //Comprobar si hay ficheros grabados.
             if (estado == estados.Reposo || estado==estados.Deshabilitado)
@@ -170,7 +174,7 @@ namespace HMI.Presentation.Twr.UI
                     if (Directory.Exists(Settings.Default.DirectorioGLPRxRadio))
                     {
                         DirectoryInfo di = new DirectoryInfo(dirName);
-                        FileInfo[] fi = di.GetFiles("RxRadio_*.*", SearchOption.AllDirectories);
+                        FileInfo[] fi = di.GetFiles("RxRadio_*.wav", SearchOption.TopDirectoryOnly);
                         if (fi.Length == 0)
                             CambiaFileGrabado(false);
                         if (fi.Length > 0)
@@ -188,6 +192,11 @@ namespace HMI.Presentation.Twr.UI
             }
         }
 
+        private void uiTimer2_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            Timer2();
+        }
+
         void BorraFilesGrabados()
         {
             try
@@ -196,8 +205,15 @@ namespace HMI.Presentation.Twr.UI
                 FileInfo[] fi = di.GetFiles("RxRadio_*.*", SearchOption.AllDirectories);
                 foreach (System.IO.FileInfo f in fi)
                 {
-                     //_Logger.Info("Purge file", f.Name);
-                     File.Delete(f.Directory + "/" + f.Name);
+                    //_Logger.Info("Purge file", f.Name);
+                    try
+                    {
+                        File.Delete(f.Directory + "/" + f.Name);
+                    }
+                    catch (System.IO.IOException /*e*/)
+                    {
+                        _Logger.Warn("Error al intentar borrar el fichero "+f.Name);
+                    }
                 }
             }
             catch (Exception exc)
@@ -218,12 +234,12 @@ namespace HMI.Presentation.Twr.UI
         public void Reproduciendo()
         {
             if (TiempoMax>0)
-                estado = estados.Repoduciendo;
+                estado = estados.Reproduciendo;
         }
 
         public void StopReproducion()
         {
-            if (this.estado == estados.Repoduciendo)
+            if (this.estado == estados.Reproduciendo)
             {
                 estado = estados.Reposo;
             }
@@ -231,7 +247,7 @@ namespace HMI.Presentation.Twr.UI
 
         private void StopRep()
         {
-            if (estado == estados.Repoduciendo)
+            if (estado == estados.Reproduciendo)
             {
                 hmiButtonPlay.Show();
                 hmiButtonStop.Hide();
@@ -246,6 +262,7 @@ namespace HMI.Presentation.Twr.UI
             General.SafeLaunchEvent(LevelUp, this);// Envia comando parar reproduccion
         }
 
+        
         private void hmiButtonPlay_MouseUp(object sender, MouseEventArgs e)
         {
             // este comando llega tambien al desabilitar el boton.
@@ -253,7 +270,7 @@ namespace HMI.Presentation.Twr.UI
             //General.SafeLaunchEvent(LevelDown, this);
             if (estado==estados.Reposo)
             {
-                estado = estados.Repoduciendo;
+                estado = estados.Reproduciendo;
                 General.SafeLaunchEvent(LevelUpReproduce, this);
             }
         }
@@ -282,11 +299,22 @@ namespace HMI.Presentation.Twr.UI
             {
                 if (estado!=estados.Reposo)
                 {
-                    if (estado == estados.Repoduciendo)
+                    if (estado == estados.Reproduciendo)
                         hmiButtonStop_Click(this, null);
-                    estado = estados.Reposo;
-                    estado = estados.Deshabilitado;
                 }
+                estado = estados.Reposo;
+                estado = estados.Deshabilitado;
+            }
+            //221125
+            else if (!on)
+            {
+                if (estado != estados.Reposo)
+                {
+                    if (estado == estados.Reproduciendo)
+                        hmiButtonStop_Click(this, null);
+                }
+                estado = estados.Reposo;
+                estado = estados.Deshabilitado;
             }
             Jacks = on;
             BorraFilesGrabados();
@@ -323,7 +351,7 @@ namespace HMI.Presentation.Twr.UI
             }
             else
             {
-                if (estado == estados.Repoduciendo)
+                if (estado == estados.Reproduciendo)
                     estado = estados.Reposo;
                 if (estado == estados.Reposo)
                     estado = estado = estados.Deshabilitado;

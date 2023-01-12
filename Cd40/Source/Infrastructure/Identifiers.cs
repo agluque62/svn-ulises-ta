@@ -62,6 +62,10 @@ namespace U5ki.Infrastructure
         /// 
         /// </summary>
 		public const short RTX_GROUP_CHANGE_ASK_MSG = 4;
+
+
+
+		public const short FR_RXTX_CHANGE_ASK_MSG = 5;//LALM 221102 cambiofrecuencia
         /// <summary>
         /// 
         /// </summary>
@@ -78,6 +82,7 @@ namespace U5ki.Infrastructure
         /// 
         /// </summary>
         public const short FR_HF_TX_CHANGE_RESPONSE_MSG = 54;
+		public const short FR_RXTX_CHANGE_RESPONSE_MSG = 55;//LALM 221102 cambiofrecuencia
         /// <summary>
         /// 
         /// </summary>

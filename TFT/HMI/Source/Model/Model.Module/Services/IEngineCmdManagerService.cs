@@ -21,6 +21,7 @@ namespace HMI.Model.Module.Services
 		void SetRdPage(int oldPage, int newPage, int numPosByPage);
 		void SetRdRx(int id, bool on, bool forced = false);
 		void SetRdTx(int id, bool on);
+		void SetNewFrecuency(int id, string fr);//LALM 221102 cambiofrecuencia
         void ForceTxOff(int id);
 		void ConfirmRdTx(int id);
 		void SetRdAudio(int id, RdRxAudioVia audio, bool forced = false);

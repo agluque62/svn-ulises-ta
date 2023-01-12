@@ -806,10 +806,11 @@ namespace HMI.Model.Module.Services
 			{
 				_StateManager.Radio.SetTiempoReplay((int)(0));
 			}
+			_StateManager.Radio.RefreshPlay();// Para que refresque inmediatamente.
 		}
 
 
-        private void OnEngineStateChanged()
+		private void OnEngineStateChanged()
 		{
 			if (_StateManager.Engine.Connected)
 			{
