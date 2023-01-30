@@ -128,7 +128,7 @@
     <Setting Name="ConfCambioPagRad" Type="System.String" Scope="Application">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="DirectorioGLPRxRadio" Type="System.String" Scope="User">
+    <Setting Name="DirectorioGLPRxRadio" Type="System.String" Scope="Application">
       <Value Profile="(Default)">DirectorioGLPRxRadio</Value>
     </Setting>
   </Settings>

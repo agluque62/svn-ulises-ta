@@ -156,10 +156,10 @@
       <Value Profile="(Default)">Linea lc</Value>
     </Setting>
     <Setting Name="CasAlumnoId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Cascos Alumno windows</Value>
+      <Value Profile="(Default)">USB Headset 2</Value>
     </Setting>
     <Setting Name="CasInstructorId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Cascos Instructor windows</Value>
+      <Value Profile="(Default)">USB Headset1</Value>
     </Setting>
     <Setting Name="LcSpkAsioId" Type="System.String" Scope="Application">
       <Value Profile="(Default)">HD Audio output 2</Value>
@@ -234,10 +234,10 @@
       <Value Profile="(Default)">.1.3.6.1.4.1.7916.8.2.1.5.0</Value>
     </Setting>
     <Setting Name="MaintenanceTrapsIp" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">10.12.60.35</Value>
+      <Value Profile="(Default)">192.168.2.3</Value>
     </Setting>
     <Setting Name="AudioCardSimul" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LcSpeakerSimul" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
@@ -252,10 +252,10 @@
       <Value Profile="(Default)">.1.3.6.1.4.1.7916.8.2.2.12.0</Value>
     </Setting>
     <Setting Name="IdHost" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">PICT04</Value>
+      <Value Profile="(Default)">PICT02</Value>
     </Setting>
     <Setting Name="SipIp" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">10.68.60.132</Value>
+      <Value Profile="(Default)">192.168.2.202</Value>
     </Setting>
     <Setting Name="AudioCardStandard" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
@@ -291,10 +291,22 @@
     <Setting Name="CasAsioId" Type="System.String" Scope="Application">
       <Value Profile="(Default)">USB Headset1</Value>
     </Setting>
-    <Setting Name="TempMinRecorderRadio" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+    <Setting Name="TempMinRecorderRadio" Type="System.Int64" Scope="Application">
+      <Value Profile="(Default)">500</Value>
     </Setting>
-    <Setting Name="GLPOnlyRadio" Type="System.Boolean" Scope="User">
+    <Setting Name="GLPOnlyRadio" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="TiempoGrabacionRecorderRadio" Type="System.Int64" Scope="Application">
+      <Value Profile="(Default)">30</Value>
+    </Setting>
+    <Setting Name="TiempoAlmacenamRecorderRadio" Type="System.Int64" Scope="Application">
+      <Value Profile="(Default)">1800</Value>
+    </Setting>
+    <Setting Name="AudioCardBinaural" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="RingToHeadSet" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

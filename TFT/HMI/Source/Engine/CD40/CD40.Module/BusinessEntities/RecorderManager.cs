@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Timers;
+using System.Threading.Tasks;
 
 using HMI.Model.Module.BusinessEntities;
 using HMI.Model.Module.Messages;
@@ -64,9 +65,9 @@ namespace HMI.CD40.Module.BusinessEntities
         private List<int>[] _GlpCallId = new List<int>[6];
         private bool _LocalRecordingEnabled = true;//RQF35
         private bool _LocalRecordingOnlyRadio = true;//RQF35
-        private int _TempMinRecorderRadio = 1000;//RQF35
-        private int _TiempoGrabacionRecorderRadio = 180;//#7214 segundos, 3 minutos
-        private int _TiempoAlmacenamRecorderRadio = 6000;//#7214 segundos, 10 minutos
+        private long _TempMinRecorderRadio = 1000;//RQF35
+        private long _TiempoGrabacionRecorderRadio = 30;//#7214 segundos, 30 segundos
+        private long _TiempoAlmacenamRecorderRadio = 1800;//#7214 segundos, 30 minutos
         private object _Sync = new object();
 
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
@@ -127,6 +128,17 @@ namespace HMI.CD40.Module.BusinessEntities
             _SupervisorLengthRecording.AutoReset = true;
             _SupervisorLengthRecording.Elapsed += OnSupervisorLengthRecordingTimerElapsed;
             _SupervisorLengthRecording.Enabled = true && this._LocalRecordingEnabled;
+
+			// Tarea que supervisa los ficheros de audio grabados.
+            Task.Run(() =>
+            {
+                while(true)
+                {
+                    Task.Delay(1000).Wait();
+                    PurgeFilesRadio();
+
+                }
+            });
 
             _BriefingSessionTimer.AutoReset = false;
             _BriefingSessionTimer.Elapsed += new ElapsedEventHandler(_SupervisorTimer_Elapsed);
@@ -390,11 +402,13 @@ namespace HMI.CD40.Module.BusinessEntities
                 Array.Sort(fi, new FileComparer());
                 FileInfo lastInfo = fi[fi.Length - 1];
                 long ms = lastInfo.Length * 1000L / 16000L;
-                long secmax = (long)(DateTime.Now - lastInfo.LastWriteTime).TotalSeconds;
+                long secmax = (long)(DateTime.Now - lastInfo.CreationTime).TotalSeconds;
 
-                if (ms/1000 < (long)_TempMinRecorderRadio)
+                //_Logger.Info($"Compruebo secmax:{secmax} _TiempoAlmacenamRecorderRadio: {_TiempoAlmacenamRecorderRadio}");
+
+                if (ms < (long)_TempMinRecorderRadio)
                 {
-                    _Logger.Info("Purge file", lastInfo.Name);
+                    _Logger.Info("Purge file:"+ lastInfo.Name);
                     try
                     {
                         File.Delete(lastInfo.Directory + "/" + lastInfo.Name);
@@ -409,7 +423,21 @@ namespace HMI.CD40.Module.BusinessEntities
                 }
                 else if (secmax > _TiempoAlmacenamRecorderRadio)//#7214 221121
                 {
-                    _Logger.Info("Purge file", lastInfo.Name);
+                    _Logger.Info("Purge file: " + lastInfo.Name);
+                    try
+                    {
+                        //File.Move(lastInfo.Directory + "/" + lastInfo.Name, lastInfo.Directory + "/" + lastInfo.Name.Replace("@", ""));
+                        File.Delete(lastInfo.Directory + "/" + lastInfo.Name);
+                    }
+                    catch (System.IO.IOException /*e*/)
+                    {
+                        _Logger.Warn("Error al intentar borrar el fichero " + lastInfo.Name);
+                    }
+                    fi[fi.Length - 1].Delete();
+                    General.SafeLaunchEvent(FileRecordedChanged, this, new StateMsg<bool>(false));
+                }
+                else if (secmax > _TiempoGrabacionRecorderRadio*20)
+                {
                     try
                     {
                         File.Delete(lastInfo.Directory + "/" + lastInfo.Name);
@@ -423,7 +451,8 @@ namespace HMI.CD40.Module.BusinessEntities
                 }
                 else
                 {
-                    General.SafeLaunchEvent(FileRecordedChanged, this, new StateMsg<bool>(true));
+                    //221201
+                    //General.SafeLaunchEvent(FileRecordedChanged, this, new StateMsg<bool>(true));
 
 
                     foreach (System.IO.FileInfo f in fi)
@@ -432,7 +461,7 @@ namespace HMI.CD40.Module.BusinessEntities
                             (allrecords || f.Name != lastInfo.Name))
                         {
                             {
-                                _Logger.Info("Purge file", f.Name);
+                                _Logger.Info("Purge file: "+ f.Name);
                                 try
                                 {
                                     File.Delete(f.Directory + "/" + f.Name);
@@ -539,6 +568,7 @@ namespace HMI.CD40.Module.BusinessEntities
                             try
                             {
                                 File.Move(_SessionsFileName[(int)fuente], _SessionsFileName[(int)fuente].Replace("@", ""));
+                                AjustaTiempoFichero(_SessionsFileName[(int)fuente].Replace("@", ""), (int)_TiempoGrabacionRecorderRadio);
                             }
                             catch (System.IO.IOException /*e*/)
                             {
@@ -558,6 +588,20 @@ namespace HMI.CD40.Module.BusinessEntities
                     _Logger.Error("GLP.SesionGlp Excepcion "+ exc.Message);
                 }
             }
+        }
+        /// <summary>
+        /// AjustaTiempoFichero
+        /// Cambia el tamaño de un fichero de audio al tiempo maximo permitido, dejanod los ultimos segundos
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <param name="tiempo"></param>
+        void AjustaTiempoFichero(string Name,int tiempo)
+        {
+            WaveIO waveio = new WaveIO();
+            string temp = Name+".tmp";
+            File.Move(Name, temp);
+            waveio.Recorta(temp,Name, 0, _TiempoGrabacionRecorderRadio*1000, true);
+            File.Delete(temp);
         }
 
         /// <summary>
@@ -666,6 +710,7 @@ namespace HMI.CD40.Module.BusinessEntities
                                 try
                                 {
                                     File.Move(_SessionsFileName[(int)fuente], _SessionsFileName[(int)fuente].Replace("@", ""));
+                                    AjustaTiempoFichero(_SessionsFileName[(int)fuente].Replace("@", ""), (int)_TiempoGrabacionRecorderRadio);
                                 }
                                 catch (System.IO.IOException /*e*/)
                                 {
@@ -744,6 +789,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 try
                 {
                     File.Move(_SessionsFileName[(int)fuente], _SessionsFileName[(int)fuente].Replace("@", ""));
+                    AjustaTiempoFichero(_SessionsFileName[(int)fuente].Replace("@", ""), (int)_TiempoGrabacionRecorderRadio);
                 }
                 catch (System.IO.IOException /*e*/)
                 {
@@ -831,7 +877,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     _Logger.Info("Supervisor GLP: GLP session started. Recording file: " + fi.FullName);
                     int interval =  60 ;//en segundos
                     if ((_TiempoGrabacionRecorderRadio > _TempMinRecorderRadio/1000) && _TiempoGrabacionRecorderRadio < _TiempoAlmacenamRecorderRadio)
-                        interval = _TiempoGrabacionRecorderRadio;
+                        interval = (int)_TiempoGrabacionRecorderRadio;
                     if (fi != null && fi.Exists && fi.Length > interval * 16000 /*interval en segundos, aprox. */)
                         ResetRecording(FuentesGlp.RxRadio);
                     if (!Top.Rd.AnySquelch)
@@ -846,7 +892,7 @@ namespace HMI.CD40.Module.BusinessEntities
                     {
                         FileInfo fi = new FileInfo(_SessionsFileName[(int)i]);
                         _Logger.Info("Supervisor GLP: GLP session started. Recording file: " + fi.FullName);
-                        int interval = (i == FuentesGlp.RxRadio || i == FuentesGlp.TxRadio) ? _TiempoGrabacionRecorderRadio : 1800;
+                        int interval = (i == FuentesGlp.RxRadio || i == FuentesGlp.TxRadio) ? (int)_TiempoGrabacionRecorderRadio : 1800;
                         if (fi != null && fi.Exists && fi.Length > interval * 16000 /*interval segundos, aprox. */)
                             ResetRecording(i);
                     }
@@ -931,7 +977,8 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     // Da problemas al borrar y crear
                     //Directory.Delete(Settings.Default.DirectorioGLPRxRadio, true);
-                    Directory.Delete(Settings.Default.DirectorioGLPRxRadio, true);
+                    //220116 no borro el directorio al cambiar de configuracion
+                    //Directory.Delete(Settings.Default.DirectorioGLPRxRadio, true);
                 }
             }
             catch (System.IO.IOException /*e*/)
@@ -1011,6 +1058,9 @@ namespace HMI.CD40.Module.BusinessEntities
                         _StopPlaying.AutoReset = false;
                         _StopPlaying.Enabled = true;
                         
+                        // 230118 Enciendo led de altavozLC
+                        Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+
                         General.SafeLaunchEvent(PlayingChanged, this, new StateMsg<bool>(true));
                         if (Settings.Default.SNMPEnabled == 1)
                         {

@@ -514,17 +514,21 @@ namespace HMI.Presentation.Twr.Views
         {
             ParametrosReplay pr = (ParametrosReplay)e;
             _PlayBT.TiempoMax = pr.GetTiempo();
-            if (pr.HaveFiles)
-            {
-                _PlayBT.Reproduciendo();
-            }
-            else
-            {
-                _PlayBT.StopReproducion();
-            }
             if (pr.Refresco)
             {
                 _PlayBT.Timer2();//221128 para forzar el refresco.
+            }
+            else
+            {
+                if (pr.HaveFiles)
+                {
+                    _PlayBT.Reproduciendo();
+                }
+                else
+                {
+                    _PlayBT.StopReproducion();
+                }
+
             }
         }
 

@@ -1653,7 +1653,8 @@ namespace HMI.CD40.Module.BusinessEntities
                             Top.Recorder.Rec(CORESIP_SndDevType.CORESIP_SND_LC_RECORDER, false);
 
                         Top.Recorder.SessionGlp(info._TipoFuente, false);
-                        Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
+						// 230118 Comento esto, se comprueba todo al final de la funcion
+                        //Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
 						break;
 
 					case MixerDev.MhpRd://cascos
@@ -1716,7 +1717,15 @@ namespace HMI.CD40.Module.BusinessEntities
 
             /** */
             RingLedToOff(id);
-		}
+
+            //230118 el led lo hago si esta en uso el mezclador
+            List<LinkInfo> listring = _LinksList.FindAll(link => link._CallId == id_ringing);
+            List<LinkInfo> listspklc = _LinksList.FindAll(link => link._Dev == MixerDev.SpkLc);
+            if (listspklc.Count>0 || listring.Count>0)
+                Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.ON);
+            else
+                Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER, HwManager.OFF);
+        }
 
         /// <summary>
         /// 

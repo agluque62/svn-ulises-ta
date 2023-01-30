@@ -995,10 +995,12 @@ namespace HMI.Model.Module.BusinessEntities
 			General.SafeLaunchEvent(RadioChanged, this, new RangeMsg(id, 1));
 		}
 
-
+		
 		public void SetTiempoReplay(int segundos)
 		{
 			_ParametrosReplay.Tiempo = segundos;
+			// Este parametro le pongo a false para evitar una reproduccion automatica
+			_ParametrosReplay.Refresco = false;//221130
 			General.SafeLaunchEvent(TempReplayChanged, this, _ParametrosReplay);
 		}
 

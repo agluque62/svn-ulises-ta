@@ -280,7 +280,7 @@ namespace HMI.Presentation.AUrr.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool EnableListen {
             get {
                 return ((bool)(this["EnableListen"]));
@@ -289,7 +289,7 @@ namespace HMI.Presentation.AUrr.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool EnableHold {
             get {
                 return ((bool)(this["EnableHold"]));
@@ -298,7 +298,7 @@ namespace HMI.Presentation.AUrr.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool EnableTransfer {
             get {
                 return ((bool)(this["EnableTransfer"]));
@@ -307,7 +307,7 @@ namespace HMI.Presentation.AUrr.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int RdColumns {
             get {
                 return ((int)(this["RdColumns"]));

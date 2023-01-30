@@ -1337,8 +1337,16 @@ namespace HMI.CD40.Module.BusinessEntities
                 string reason = "";
                 if (tlf is TlfIaPosition && this._UnhangUpTone>0)
                 {
-                    answer.Value = SipAgent.SIP_BUSY;
-                    return;
+                    //LALM 221207 Si esta el tono de invitacion a marcar lo quito para permitir llamadas entrantes por 19+1
+                    if (EstoyDescolgado())
+                    {
+                        Descuelga();
+                    }    
+                    else
+                    {
+                        answer.Value = SipAgent.SIP_BUSY;
+                        return;
+                    }
                 }
                 answer.Value  = tlf.HandleIncomingCall(call, call2replace, info, inInfo, out reason);
                 //if (answer.Value==SipAgent.SIP_DECLINE && tlf.Pos== Tlf.IaMappedPosition)

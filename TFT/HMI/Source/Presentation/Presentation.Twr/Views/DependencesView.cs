@@ -85,7 +85,7 @@ namespace HMI.Presentation.Twr.Views
 					(_StateManager.Tlf.Listen.State != FunctionState.Executing) &&
 					(_StateManager.Tlf.Listen.State != FunctionState.Error) &&
 					(_StateManager.Tlf.Transfer.State != FunctionState.Error) &&
-					(_StateManager.Tlf.Transfer.State != FunctionState.Executing) &&
+					/*(_StateManager.Tlf.Transfer.State != FunctionState.Executing) &&*/  //221207 Permite abrir marcacion estando en transferencia
 					(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.In) &&
 					(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.InPrio) &&
 					(_StateManager.Tlf[Tlf.IaMappedPosition].State != TlfState.RemoteIn);

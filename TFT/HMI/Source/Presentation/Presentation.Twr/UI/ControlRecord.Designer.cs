@@ -102,7 +102,7 @@ namespace HMI.Presentation.Twr.UI
             // uiTimer2
             // 
             this.uiTimer2.Enabled = true;
-            this.uiTimer2.Interval = 10000D;
+            this.uiTimer2.Interval = 1000D;
             this.uiTimer2.SynchronizingObject = this;
             this.uiTimer2.Elapsed += new System.Timers.ElapsedEventHandler(this.uiTimer2_Elapsed);
             // 

@@ -91,10 +91,13 @@ namespace HMI.Presentation.Twr.UI
             {
                 _TiempoMax = value;
                 ProgressBar.Maximum = _TiempoMax;
-                this.hmiButtonStop.Text = TiempoMax.ToString();
+                //this.hmiButtonStop.Text = TiempoMax.ToString();
+                // para quitar doble cuenta 220116
+                this.hmiButtonStop.Text=(ProgressBar.Maximum - ProgressBar.Value).ToString();
                 if (_TiempoMax == 0 && estado == estados.Reposo)
                 {
-                    estado = estados.Deshabilitado;
+                    //220116 
+                    //estado = estados.Deshabilitado;
                     Timer2();// Puede que no haga falta, se llama refresh, por seguridad lo dejamos.
                 }
                 if (_TiempoMax > 0 && estado==estados.Deshabilitado)
@@ -164,7 +167,7 @@ namespace HMI.Presentation.Twr.UI
 
         //private void uiTimer2_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         public void Timer2()
-        { 
+        {
             //Comprobar si hay ficheros grabados.
             if (estado == estados.Reposo || estado==estados.Deshabilitado)
             {
@@ -265,13 +268,14 @@ namespace HMI.Presentation.Twr.UI
         
         private void hmiButtonPlay_MouseUp(object sender, MouseEventArgs e)
         {
-            // este comando llega tambien al desabilitar el boton.
+            // este comando llega tambien al deshabilitar el boton.
             //StartRep();
             //General.SafeLaunchEvent(LevelDown, this);
             if (estado==estados.Reposo)
             {
                 estado = estados.Reproduciendo;
-                General.SafeLaunchEvent(LevelUpReproduce, this);
+                if (Enabled)
+                    General.SafeLaunchEvent(LevelUpReproduce, this);
             }
         }
 
@@ -317,7 +321,8 @@ namespace HMI.Presentation.Twr.UI
                 estado = estados.Deshabilitado;
             }
             Jacks = on;
-            BorraFilesGrabados();
+            if (!Jacks)//220116 Solo se borran los ficheros si no hay jacks
+                BorraFilesGrabados();
         }
 
         public void CambiaFileGrabado(bool on)

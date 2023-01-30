@@ -152,6 +152,7 @@ namespace HMI.Model.Module.Services
         StateManagerService StateManager = null;
         bool RdStatusRecoveryEnabled = (Properties.Settings.Default.RdStatusRetriveEnableAndStoreDelay > 0);
         bool RdRtxStatusRetrieveEnabled = Properties.Settings.Default.RdRtxStatusRetrieveEnable;
+        int ChangesRdRtxStatusRetrieveEnabled = 0;
         bool RdStatusRecoveryWithoutPersistence = (Properties.Settings.Default.RdStatusRetriveEnableAndStoreDelay == 1);
         Task SaveStatusTask = null;
         Task RestoringRtxStatusTask = null;
@@ -634,8 +635,11 @@ namespace HMI.Model.Module.Services
         void RtxRestoreFor(int pos)
         {
             //RQF36
-            RdRtxStatusRetrieveEnabled = ((StateManager.Permissions & Permissions.PermisoRTXSect) == Permissions.PermisoRTXSect);
-
+            if (RdRtxStatusRetrieveEnabled != ((StateManager.Permissions & Permissions.PermisoRTXSect) == Permissions.PermisoRTXSect))
+            {
+                if (ChangesRdRtxStatusRetrieveEnabled++>0)
+                    RdRtxStatusRetrieveEnabled = ((StateManager.Permissions & Permissions.PermisoRTXSect) == Permissions.PermisoRTXSect);
+            }
             if (RdStatusRecoveryEnabled == false || RdRtxStatusRetrieveEnabled == false || StateManager == null)
                 return;
 

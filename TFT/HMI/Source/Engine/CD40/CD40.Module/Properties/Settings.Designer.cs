@@ -404,42 +404,7 @@ namespace HMI.CD40.Module.Properties {
                 return ((string)(this["DirectorioGLP"]));
             }
         }
-
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("180")]
-        public int TiempoGrabacionRecorderRadio
-        {
-            get
-            {
-                return ((int)(this["TiempoGrabacionRecorderRadio"]));
-            }
-        }
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1800")]
-        public int TiempoAlmacenamRecorderRadio
-        {
-            get
-            {
-                return ((int)(this["TiempoAlmacenamRecorderRadio"]));
-            }
-        }
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public int TempMinRecorderRadio
-        {
-            get
-            {
-                return ((int)(this["TempMinRecorderRadio"]));
-            }
-        }
-
-
+        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("DirectorioGLPRxRadio/")]
@@ -523,7 +488,7 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Cascos Alumno windows")]
+        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset 2")]
         public string CasAlumnoId {
             get {
                 return ((string)(this["CasAlumnoId"]));
@@ -532,7 +497,7 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Cascos Instructor windows")]
+        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset1")]
         public string CasInstructorId {
             get {
                 return ((string)(this["CasInstructorId"]));
@@ -757,7 +722,7 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10.12.60.35")]
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.2.3")]
         public string MaintenanceTrapsIp {
             get {
                 return ((string)(this["MaintenanceTrapsIp"]));
@@ -766,7 +731,7 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool AudioCardSimul {
             get {
                 return ((bool)(this["AudioCardSimul"]));
@@ -811,7 +776,7 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("PICT04")]
+        [global::System.Configuration.DefaultSettingValueAttribute("PICT02")]
         public string IdHost {
             get {
                 return ((string)(this["IdHost"]));
@@ -820,7 +785,7 @@ namespace HMI.CD40.Module.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10.68.60.132")]
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.2.202")]
         public string SipIp {
             get {
                 return ((string)(this["SipIp"]));
@@ -835,18 +800,7 @@ namespace HMI.CD40.Module.Properties {
                 return ((bool)(this["AudioCardStandard"]));
             }
         }
-
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AudioCardBinaural
-        {
-            get
-            {
-                return ((bool)(this["AudioCardBinaural"]));
-            }
-        }
-
+        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("90")]
@@ -931,41 +885,58 @@ namespace HMI.CD40.Module.Properties {
                 return ((string)(this["CasAsioId"]));
             }
         }
-
+        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset1 a")]
-        public string CasAsioId1
-        {
-            get
-            {
-                return ((string)(this["CasAsioId1"]));
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public long TempMinRecorderRadio {
+            get {
+                return ((long)(this["TempMinRecorderRadio"]));
             }
         }
-
+        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("USB Headset1 b")]
-        public string CasAsioId2
-        {
-            get
-            {
-                return ((string)(this["CasAsioId2"]));
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool GLPOnlyRadio
-        {
-            get
-            {
+        public bool GLPOnlyRadio {
+            get {
                 return ((bool)(this["GLPOnlyRadio"]));
             }
-            set
-            {
-                this["GLPOnlyRadio"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public long TiempoGrabacionRecorderRadio {
+            get {
+                return ((long)(this["TiempoGrabacionRecorderRadio"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1800")]
+        public long TiempoAlmacenamRecorderRadio {
+            get {
+                return ((long)(this["TiempoAlmacenamRecorderRadio"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AudioCardBinaural {
+            get {
+                return ((bool)(this["AudioCardBinaural"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RingToHeadSet {
+            get {
+                return ((bool)(this["RingToHeadSet"]));
             }
         }
     }
