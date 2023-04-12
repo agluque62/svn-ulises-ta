@@ -560,11 +560,6 @@ namespace HMI.Model.Module.Services
                 if (s.Position < Radio.NumDestinations && s.AudioVia != RdRxAudioVia.NoAudio)
                 {
                     RdDst onlinepos = StateManager.Radio[s.Position];
-                    //Primero recuperar tx
-                    if (s.TxStatus == true)
-                    {
-                        s.RestoreTx(EngineCmdManager);
-                    }
                     if (s.RxStatus == true)
                     {
                         s.RestoreRx(EngineCmdManager);
@@ -573,8 +568,12 @@ namespace HMI.Model.Module.Services
                             s.RestoreAudioVia(EngineCmdManager);
                         }
                     }
+                    if (s.TxStatus == true)
+                    {
+                        s.RestoreTx(EngineCmdManager);
+                    }
                     /** Log de Operacion */
-                    Log.Trace("RadioStatusRecovery. Recuperado Estado de Posicion Radio {0}({1}) => Tx={2}, Rx={3}, Audio={4}.",
+                    LogManager.GetLogger("RSFService").Trace("RadioStatusRecovery. Recuperado Estado de Posicion Radio {0}({1}) => Tx={2}, Rx={3}, Audio={4}.",
                         onlinepos.Id, onlinepos.Frecuency, s.TxStatus, s.RxStatus, s.AudioVia);
 
                     RtxRestoreFor(s.Position);

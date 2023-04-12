@@ -174,7 +174,7 @@
   <data name="RdFrAsignedToOtherNotification" xml:space="preserve">
     <value>La posición {0} ha seleccionado la frecuencia {1}</value>
   </data>
-	<data name="RdFrAsignedRtxToOtherConfirmation" xml:space="preserve">
+  <data name="RdFrAsignedRtxToOtherConfirmation" xml:space="preserve">
     <value>Un Equipo de la frecuencia {0} rechaza RTX</value>
   </data>
   <data name="RtxMaxFrError" xml:space="preserve">
@@ -224,5 +224,8 @@
   </data>
   <data name="From" xml:space="preserve">
     <value>desde </value>
+  </data>
+  <data name="CongestionDescription" xml:space="preserve">
+    <value>Congestion</value>
   </data>
 </root>

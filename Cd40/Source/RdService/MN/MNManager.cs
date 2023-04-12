@@ -1061,13 +1061,15 @@ namespace U5ki.RdService.NM
         /// </summary>
         private void OnGearCheckedOK(BaseGear gear)
         {
-            if (gear.Status != GearStatus.Forbidden)       
+            if (gear.Status != GearStatus.Forbidden && 
+                !(gear.Status == GearStatus.Initial && gear.OldStatus == GearStatus.Ready))
             {
                 // Historico de Equipo OK...
+                
                 LogInfo<MNManager>("[OPERATION " + GearOperationStatus.OK + "] " + gear.ToString(),
                     U5kiIncidencias.U5kiIncidencia.U5KI_NBX_NM_GEAR_DISP, gear.Id);
             }
-            else
+            else if (gear.Status == GearStatus.Forbidden && gear.OldStatus != GearStatus.Forbidden)
             {
                 // Historico de Equipo OK...
                 LogInfo<MNManager>("[OPERATION " + "HABILITAR" + "] " + gear.ToString(),

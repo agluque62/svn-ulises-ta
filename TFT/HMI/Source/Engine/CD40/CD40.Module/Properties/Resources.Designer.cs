@@ -19,7 +19,7 @@ namespace HMI.CD40.Module.Properties {
     // a través de una herramienta como ResGen o Visual Studio.
     // Para agregar o quitar un miembro, edite el archivo .ResX y, a continuación, vuelva a ejecutar ResGen
     // con la opción /str o recompile su proyecto de VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -79,6 +79,15 @@ namespace HMI.CD40.Module.Properties {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Número No Accesible.
+        /// </summary>
+        internal static string BadNumberATS {
+            get {
+                return ResourceManager.GetString("BadNumberATS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Número erróneo.
         /// </summary>
         internal static string BadNumberError {
@@ -86,29 +95,16 @@ namespace HMI.CD40.Module.Properties {
                 return ResourceManager.GetString("BadNumberError", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Busca una cadena traducida similar a Falsa maniobra.
         /// </summary>
-        internal static string BadOperation
-        {
-            get
-            {
+        internal static string BadOperation {
+            get {
                 return ResourceManager.GetString("BadOperation", resourceCulture);
             }
         }
-
-        /// <summary>
-        /// 20201120 LALM Errores #4534 sustituir el mensaje de error “Número Erróneo” por “Número No Accesible”
-        /// </summary>
-        internal static string BadNumberATS
-        {
-            get
-            {
-                return ResourceManager.GetString("BadNumberATS", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Busca una cadena traducida similar a Error en captura porque se ha sobrepasado la capacidad de llamadas o no hay permiso de red.
         /// </summary>

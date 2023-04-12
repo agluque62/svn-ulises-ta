@@ -10,8 +10,8 @@
 
 namespace HMI.Model.Module.Properties {
     using System;
-
-
+    
+    
     /// <summary>
     ///   Clase de recurso fuertemente tipado, para buscar cadenas traducidas, etc.
     /// </summary>
@@ -19,7 +19,7 @@ namespace HMI.Model.Module.Properties {
     // a través de una herramienta como ResGen o Visual Studio.
     // Para agregar o quitar un miembro, edite el archivo .ResX y, a continuación, vuelva a ejecutar ResGen
     // con la opción /str o recompile su proyecto de VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -88,6 +88,15 @@ namespace HMI.Model.Module.Properties {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Congestion.
+        /// </summary>
+        public static string CongestionDescription {
+            get {
+                return ResourceManager.GetString("CongestionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a ¿Desea eliminar la sesión de grabación local en puesto?.
         /// </summary>
         public static string DeleteSessionGLP {
@@ -113,7 +122,7 @@ namespace HMI.Model.Module.Properties {
                 return ResourceManager.GetString("EngineInfo", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Busca una cadena traducida similar a Salir.
         /// </summary>
@@ -381,18 +390,6 @@ namespace HMI.Model.Module.Properties {
         public static string TalkTlfStateDescription {
             get {
                 return ResourceManager.GetString("TalkTlfStateDescription", resourceCulture);
-            }
-        }
-
-        /// <summary>//lalm220914
-        ///   Busca una cadena traducida similar a Congestion.
-        /// </summary>
-        public static string CongestionDescription
-        {
-            get
-            {
-                return "Congestion";
-                //return ResourceManager.GetString("CongestionDescription", resourceCulture);
             }
         }
     }

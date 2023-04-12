@@ -166,9 +166,9 @@ namespace U5ki.RdService.Gears
             get
             {
                     return _status;
-                }
+            }
             set
-            {
+            {               
                 OldStatus = _status;
                 _status = value;
                 if (OldStatus != _status && null != OnGearStatusUpdated)
@@ -404,6 +404,7 @@ namespace U5ki.RdService.Gears
             BaseGearOperation onGearChecked)
             : base(input)
         {
+
 #if DEBUG
             _semaphore.SetName(Id);
 #endif
