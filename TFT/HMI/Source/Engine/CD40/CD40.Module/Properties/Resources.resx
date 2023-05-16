@@ -123,6 +123,9 @@
   <data name="AudioViaNotAvailable" xml:space="preserve">
     <value>Dispositivo de audio no disponible: </value>
   </data>
+  <data name="BadNumberATS" xml:space="preserve">
+    <value>Número No Accesible</value>
+  </data>
   <data name="BadNumberError" xml:space="preserve">
     <value>Número erróneo</value>
   </data>

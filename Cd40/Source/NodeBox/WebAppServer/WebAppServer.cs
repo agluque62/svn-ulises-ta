@@ -163,6 +163,8 @@ namespace U5ki.NodeBox.WebServer
             lock (Locker)
             {
                 //U5kGenericos.SetCurrentCulture();
+                // Ejecutar el thread en la 'cultura especificada'.
+                Translate.CTranslate.CurrentCultureSet();
 
                 if (!closing_web && Listener != null && Listener.IsListening != false)
                 {

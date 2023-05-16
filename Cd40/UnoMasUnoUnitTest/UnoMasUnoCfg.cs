@@ -374,8 +374,8 @@ namespace UnoMasUnoUnitTest
             i.IpGrabador2 = "";
             i.RtspPort = 0;
             i.TipoGrabacionAnalogica = 0;
-            i.EnableGrabacionEd137 = false;
-            i.EnableGrabacionAnalogica = false;
+            i.EnableGrabacionEd137 = 0;
+            i.EnableGrabacionAnalogica = 0;
             //RQF-36 Mejoras funcionalidad retransmisión radio (RETRANS)
             i.QuitarRTXSQ = false;
             i.MantRTXSect = false;

@@ -641,11 +641,6 @@ namespace u5ki.PhoneService
             });
 
         }
-
-        public object AllDataGet()
-        {
-            throw new NotImplementedException();
-        }
         #endregion
 
         #region Private Attributes

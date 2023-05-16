@@ -23,7 +23,7 @@ namespace PhoneServiceUnitTests
     [TestClass]
     public class PhoneServiceResourcesUnitTest 
     {
-        //Esta clase susituye a nivel estructural a NbxService
+        //Esta clase sustituye a nivel estructural a NbxService
         private TestContext testContextInstance;
         private static PhoneService phs = new PhoneService();
        // private static NodeBoxSrv nbx = new NodeBoxSrv();

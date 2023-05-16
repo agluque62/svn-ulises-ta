@@ -444,6 +444,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\logo_enaire.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\SpeakerTlf.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
