@@ -33,6 +33,7 @@ using HMI.Presentation.Twr.Constants;
 using HMI.Presentation.Twr.Properties;
 using Utilities;
 using NLog;
+using System.Linq;
 
 namespace HMI.Presentation.Twr.Views
 {
@@ -44,14 +45,17 @@ namespace HMI.Presentation.Twr.Views
 		private IModelCmdManagerService _CmdManager;
 		private StateManagerService _StateManager;
 		private List<HMIButton> _TlfButtons = new List<HMIButton>();
+		private List<HMIButton> _TlfButtonsConf = new List<HMIButton>();//230410
 		private Dictionary<HMIButton, Color> _FastBlinkList;
 		private Dictionary<HMIButton, Color> _SlowBlinkList;
 		private bool _FastBlinkOn = true;
 		private bool _SlowBlinkOn = true;
 		private int _Page = 0;
 		private int _NumPositionsByPage;
-
-        public TlfDaView([ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
+		private int FirstButtoConf=45;
+		private int FirstPageConf=3;
+		private int pageant = 0;
+		public TlfDaView([ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
 		{
 			InitializeComponent();
             if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
@@ -60,7 +64,7 @@ namespace HMI.Presentation.Twr.Views
             }
             _CmdManager = cmdManager;
 			_StateManager = stateManager;
-
+			listaDEParticipantes1.setup(cmdManager, stateManager);
 			_TlfButtonsTLP.RowCount = Settings.Default.TlfRows;
 			_TlfButtonsTLP.RowStyles.Clear();
 
@@ -72,6 +76,12 @@ namespace HMI.Presentation.Twr.Views
 
 			_TlfButtonsTLP.ColumnCount = Settings.Default.TlfColumns;
 			_TlfButtonsTLP.ColumnStyles.Clear();
+
+			_NumPositionsByPage = (_TlfButtonsTLP.RowCount * _TlfButtonsTLP.ColumnCount) - 1;
+			FirstPageConf = 3;//Este define no esta en TWR Settings.Default. NumTelPages;
+							  //230531 habria que sumarles las posible posiciones de AI
+			int numposAI = 0;// 3;
+			FirstButtoConf = FirstPageConf * _NumPositionsByPage + numposAI;
 
 			for (int i = 0; i < _TlfButtonsTLP.ColumnCount; i++)
 			{
@@ -97,8 +107,10 @@ namespace HMI.Presentation.Twr.Views
 					bt.Id = pos == _NumPositionsByPage ? Tlf.IaMappedPosition : pos;
 
 					bt.Click += TlfButton_Click;
+					bt.LongClick += Bt_LongClick;
 				}
 			}
+
 
 			_LcSpeakerUDB.Level = _StateManager.LcSpeaker.LevelLC;
 			_TlfHeadPhonesUDB.Level = _StateManager.TlfHeadPhones.Level;
@@ -119,6 +131,22 @@ namespace HMI.Presentation.Twr.Views
             }
 		}
 
+        private void Bt_LongClick(object sender, EventArgs e)
+        {
+			//
+			//_CmdManager.RefrescaListaParticipantesEstado("1000");
+			int id = ((HMIButton)sender).Id;
+			if (esbotonconferencia(id))
+			{
+				string idconferencia = _StateManager.Tlf[id].Dst;
+				//listaDEParticipantes1.SetIdConferencia(idconferencia);
+				string sala = _CmdManager.GetSala(id - FirstButtoConf);
+				listaDEParticipantes1.SetSala(sala);
+				OcultaVisibiliza(id, sala, true);
+			}
+
+		}
+
 		[EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
 		[EventSubscription(EventTopicNames.EngineStateChanged, ThreadOption.Publisher)]
 		public void OnTftEngineChanged(object sender, EventArgs e)
@@ -133,9 +161,14 @@ namespace HMI.Presentation.Twr.Views
 			{
 				bt.Enabled = TlfDstEnabled(_StateManager.Tlf[bt.Id]);
 			}
-		}
+			//borrar prueba para saber cuntos se quedan habilitados en la inicializacion.
+			var enabledElements = _TlfButtons.Where(item => item.Enabled).ToList();
+            HMIButton hmib = _TlfButtons[0];
+			if (hmib.Height < 2)
+				hmib.Height = 20;
+        }
 
-		[EventSubscription(EventTopicNames.ActiveViewChanging, ThreadOption.Publisher)]
+        [EventSubscription(EventTopicNames.ActiveViewChanging, ThreadOption.Publisher)]
 		public void OnActiveViewChanging(object sender, EventArgs<string> e)
 		{
 			if (e.Data == ViewNames.TlfDa)
@@ -186,9 +219,11 @@ namespace HMI.Presentation.Twr.Views
 		[EventSubscription(EventTopicNames.LoadTlfDaPageUI, ThreadOption.Publisher)]
 		public void OnLoadTlfDaPage(object sender, PageMsg e)
 		{
+			if (ListaVisible())
+				OcultaPaticipantes();
 			if (_Page != e.Page)
 			{
-				Debug.Assert(e.Page < 3);
+				Debug.Assert(e.Page < 4);
 
 				_Page = e.Page;
 				int absPageBegin = _Page * _NumPositionsByPage;
@@ -197,16 +232,26 @@ namespace HMI.Presentation.Twr.Views
 				{
 					_TlfPageFirstBT.Text = "2";
 					_TlfPageSecondBT.Text = "3";
+					_TlfPageConfBT.Text = "C";
 				}
 				else if (_Page == 1)
 				{
 					_TlfPageFirstBT.Text = "1";
 					_TlfPageSecondBT.Text = "3";
+					_TlfPageConfBT.Text = "C";
 				}
 				else if (_Page == 2)
 				{
 					_TlfPageFirstBT.Text = "1";
 					_TlfPageSecondBT.Text = "2";
+					_TlfPageConfBT.Text = "C";
+				}
+				else if (_Page== 3)
+                {
+					_TlfPageFirstBT.Text = "1";
+					_TlfPageSecondBT.Text = "2";
+					_TlfPageConfBT.Text = "3";
+
 				}
 
 				for (int i = 0; i < _NumPositionsByPage; i++)
@@ -217,16 +262,108 @@ namespace HMI.Presentation.Twr.Views
 					Reset(bt, dst);
 				}
 
- 				ResetBtPage(_TlfPageFirstBT);
+				//230410
+				// la pagina de conferencias es la ultima pagina.
+				if (_Page == 3)
+				{
+					bool pageconf = Tlf.PagConferencia;
+                    //LALM 230427
+					int absConfBtPageBegin = _Page * _NumPositionsByPage;
+                    for (int i = 0; i < _NumPositionsByPage; i++)
+					{
+						HMIButton bt = _TlfButtons[i];
+						TlfDst dst = _StateManager.Tlf[i + absConfBtPageBegin];
+						Reset(bt, dst);
+					}
+				}
+				ResetBtPage(_TlfPageFirstBT);
 				ResetBtPage(_TlfPageSecondBT);
+				ResetBtPage(_TlfPageConfBT);
+				if (_Page == 3)
+					_StateManager.Tlf.pageconf = true;
+				else
+					_StateManager.Tlf.pageconf = false;
+				bool ConfirmaPaginaConf = false;
+				if (Tlf.PagConferencia)
+				{
+					int numpages = Tlf.NumDestinations / _NumPositionsByPage;
+					int page = 3;// en asecna siempre es 9, en TWR 3
+					int absConfBtPageBegin = page * _NumPositionsByPage;
+					for (int i = 0; i < _NumPositionsByPage; i++)
+					{
+						HMIButton bt = _TlfButtons[i];
+						TlfDst dst = _StateManager.Tlf[i + absConfBtPageBegin];
+						if (dst?.Dst != "")
+						{
+							ConfirmaPaginaConf = true;
+							break;
+						}
+					}
+				}
+				RedimensionaBotonesConferencia(ConfirmaPaginaConf);
+            }
+        }
+
+		public void RedimensionaBotonesConferencia(bool conferencia)
+		{
+            int ancho = _TlfPageConfBT.Left + _TlfPageConfBT.Width - _TlfPageFirstBT.Left;
+			int numb = 2;//numero de botones de paginas
+			if(conferencia) { numb = 3; }
+			int sepb = 5;//separacion botones;
+			int sep = sepb * (numb - 1);//separacion total
+			int anchob = (ancho - sep) / numb ;//ancho de cada boton
+            int pos2 = _TlfPageFirstBT.Left + (anchob + sepb);//posicion segundo boton
+            int pos3 = _TlfPageFirstBT.Left + 2*(anchob + sepb);//posicion tercer boton
+																//230510
+			listaDEParticipantes1.oculto = true;
+			listaDEParticipantes1.Visible= false;
+			if (conferencia)
+			{
+                _TlfPageConfBT.Visible = true;
+                _TlfPageConfBT.Height = 53;
+
+                _TlfPageFirstBT.Width = anchob;//36
+                _TlfPageFirstBT.Height = 53;
+
+                _TlfPageSecondBT.Width = anchob;//36
+                _TlfPageSecondBT.Height = 53;
+				_TlfPageSecondBT.Left = pos2;// 231;
 			}
-		}
+			else
+			{
+                _TlfPageConfBT.Visible = false;
+                //_TlfPageConfBT.Height= 53;
+
+                _TlfPageFirstBT.Height = 53;//33;
+				_TlfPageFirstBT.Width = anchob;// 53;//33;
+
+                _TlfPageSecondBT.Width = anchob;// 56; //36;
+                _TlfPageSecondBT.Height = 53;//33;
+				_TlfPageSecondBT.Left = pos2;// 251;//231;
+            }
+
+        }
 
 		[EventSubscription(EventTopicNames.TlfChanged, ThreadOption.Publisher)]
 		public void OnTlfChanged(object sender, RangeMsg e)
 		{
 			Debug.Assert(e.Count > 0);
+			
+			if ((e.From + e.Count) > Tlf.IaMappedPosition)
+			{
+				HMIButton bt = _TlfButtons[_NumPositionsByPage];
+				TlfDst dst = _StateManager.Tlf[Tlf.IaMappedPosition];
 
+				Reset(bt, dst);
+			}
+			
+			//230526
+			if ((e.From <FirstButtoConf)|| (e.From +e.Count<Tlf.IaMappedPosition))
+			{
+                //OcultaPaticipantes();
+            }
+
+			//230410 deberia ser tflconfchanged
 			if ((e.From + e.Count) > Tlf.IaMappedPosition)
 			{
 				HMIButton bt = _TlfButtons[_NumPositionsByPage];
@@ -239,25 +376,70 @@ namespace HMI.Presentation.Twr.Views
 			{
 				int absPageBegin = _Page * _NumPositionsByPage;
 				int absFirstBtPageBegin = (int.Parse(_TlfPageFirstBT.Text) - 1) * _NumPositionsByPage;
-				int absSecondBtPageBegin = (int.Parse(_TlfPageSecondBT.Text) - 1) * _NumPositionsByPage;
+                int absSecondBtPageBegin = (int.Parse(_TlfPageSecondBT.Text) - 1) * _NumPositionsByPage;
+                int absThirdBtPageBegin = ((_TlfPageConfBT.Text == "3") ? 2: 3)*_NumPositionsByPage;
 
-				for (int i = Math.Max(e.From, absPageBegin), to = Math.Min(e.From + e.Count, absPageBegin + _NumPositionsByPage); i < to; i++)
+                // 230412 Estará en la última página, 
+                //int absConfBtPageBegin = Tlf.NumDestinations- _NumPositionsByPage;
+                //int numpages = Tlf.NumDestinations / _NumPositionsByPage;
+				//LALM 230427
+                //int numpages = 4;
+                //int absConfBtPageBegin = numpages * _NumPositionsByPage - _NumPositionsByPage;
+                //LALM 230427
+                int absConfBtPageBegin = 3 * _NumPositionsByPage;
+				int max = Math.Max(e.From, absPageBegin);
+				int min = Math.Min(e.From + e.Count, absPageBegin + _NumPositionsByPage);
+                for (int i = Math.Max(e.From, absPageBegin), to = Math.Min(e.From + e.Count, absPageBegin + _NumPositionsByPage); i < to; i++)
 				{
-					HMIButton bt = _TlfButtons[i - absPageBegin];
-					TlfDst dst = _StateManager.Tlf[i];
+					if (i >= absConfBtPageBegin)
+					{
+						HMIButton bt = _TlfButtons[i - absPageBegin];
+						TlfDst dst = _StateManager.Tlf[i];
+						if (dst.State == TlfState.Idle)
+                        {
+							listaDEParticipantes1.oculto = true;
+							listaDEParticipantes1.Visible = false;
+							OcultaPaticipantes();
 
-					Reset(bt, dst);
-				}
+						}
+						else if (dst.State == TlfState.Set)
+						{
+                            string sala = _CmdManager.GetSala(i - FirstButtoConf);
+							OcultaVisibiliza(i, sala);
+						}
+                        Reset(bt, dst);
+					}
+					else if (i<absFirstBtPageBegin)
+					{
+                        HMIButton bt = _TlfButtons[i];
+                        TlfDst dst = _StateManager.Tlf[i];
+                        Reset(bt, dst);
+                    }
+                }
 
 				if ((e.From < absFirstBtPageBegin + _NumPositionsByPage) && (e.From + e.Count > absFirstBtPageBegin))
 				{
 					ResetBtPage(_TlfPageFirstBT);
 				}
 
-				if ((e.From < absSecondBtPageBegin + _NumPositionsByPage) && (e.From + e.Count > absSecondBtPageBegin))
+                if ((e.From < absSecondBtPageBegin + _NumPositionsByPage) && (e.From + e.Count > absSecondBtPageBegin))
+                {
+                    ResetBtPage(_TlfPageSecondBT);
+                }
+				//230412 pagina de conferencias
+                if ((e.From < absConfBtPageBegin + _NumPositionsByPage) && (e.From + e.Count > absConfBtPageBegin))
+                {
+                    ResetBtPage(_TlfPageConfBT);
+                }
+				//230417 el principio de la pagina de conferencias está por configuracion en la cuarta
+				//
+                else if (e.From + e.Count > absConfBtPageBegin)
 				{
-					ResetBtPage(_TlfPageSecondBT);
-				}
+                    ResetBtPage(_TlfPageConfBT);
+                }
+
+				//prueba de cuenta de habilitados
+				//var enabledElements = _TlfButtons.Where(item => item.Enabled).ToList();
 			}
 		}
 
@@ -269,8 +451,7 @@ namespace HMI.Presentation.Twr.Views
 		public void OnFacilityChanged(object sender, EventArgs e)
 		{
 			int absPageBegin = _Page * _NumPositionsByPage;
-
-			for (int i = 0; i < _NumPositionsByPage; i++)
+            for (int i = 0; i < _NumPositionsByPage; i++)
 			{
 				HMIButton bt = _TlfButtons[i];
 				TlfDst dst = _StateManager.Tlf[i + absPageBegin];
@@ -285,13 +466,21 @@ namespace HMI.Presentation.Twr.Views
 			Reset(mapBt, mapDst);
 		}
 
-        /// <summary>
-        /// Recibe evento para cambiar la telefonía por altavoz o por cascos.
-        /// Se utiliza para cambiar la imagen del control de volumen, y poner el volumen adecuado
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        [EventSubscription(EventTopicNames.ChangeTlfSpeaker, ThreadOption.Publisher)]
+		//230516
+		[EventSubscription(EventTopicNames.CambioConferenciaPreprogramada, ThreadOption.Publisher)]
+		public void CambioConferenciaPreprogramada(object sender, StateMsg<ConfState> msg)
+		{
+			return;
+		}
+
+
+		/// <summary>
+		/// Recibe evento para cambiar la telefonía por altavoz o por cascos.
+		/// Se utiliza para cambiar la imagen del control de volumen, y poner el volumen adecuado
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		[EventSubscription(EventTopicNames.ChangeTlfSpeaker, ThreadOption.Publisher)]
         public void OnChangeTlfSpeaker(object sender, EventArgs<bool> e)
         {
             if (e.Data == true)
@@ -411,9 +600,36 @@ namespace HMI.Presentation.Twr.Views
 				_SlowBlinkOn = true;
 			}
 
-			int page = int.Parse(bt.Text) - 1;
-			TlfState st = _StateManager.Tlf.GetTlfState(page * _NumPositionsByPage, _NumPositionsByPage);
-			bt.ButtonColor = GetStateColor(bt, st);
+			int page;
+			TlfState st = TlfState.Idle;
+			if (bt.Text.ToUpper() != "C")
+			{
+                _StateManager.Tlf.pageconf = false;
+                // Cuando se pasa de pagina de conferencia a cualquier pagina se borran funciones activas
+                if (pageant == 3)
+				{
+					_StateManager.Tlf.Priority.Reset();
+					_StateManager.Tlf.Listen.Reset();
+				}
+
+                page = pageant = int.Parse(bt.Text) - 1;
+
+				st = _StateManager.Tlf.GetTlfState(page * _NumPositionsByPage, _NumPositionsByPage);
+			}
+			else
+			{
+                // Cuando se pasa de pagina de AD a conferencia se borran funciones activas
+                if (pageant != 3)
+				{
+                    _StateManager.Tlf.Priority.Reset();
+                    _StateManager.Tlf.Listen.Reset();
+                }
+
+                page = pageant = 3;// en Asecna siempre es 9 es TWR 3
+ 
+				st = _StateManager.Tlf.GetTlfState(page * _NumPositionsByPage, _NumPositionsByPage);
+            }
+            bt.ButtonColor = GetStateColor(bt, st);
 		}
 
 		private Color GetStateColor(HMIButton bt, TlfState st)
@@ -438,6 +654,7 @@ namespace HMI.Presentation.Twr.Views
 					break;
 				case TlfState.Set:
 				case TlfState.Conf:
+				case TlfState.ConfPreprogramada:
 					backColor = VisualStyle.Colors.Green;
 					break;
 				case TlfState.Busy:
@@ -616,11 +833,257 @@ namespace HMI.Presentation.Twr.Views
 				_Logger.Error("ERROR solicitando cambio de pagina TLF a " + page, ex);
 			}
 		}
+		private bool esbotonconferencia(int id)
+		{
+			return true ? (id >= FirstButtoConf && id < Tlf.NumDestinations) : false;
+		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		bool EsIzda(int numero) { return (numero + 3) % 4 < 2; }
+		private void GetBotonesAd(int pag,out List<int>izda,out List <int>dcha)
+        {
+			/*List<int> */dcha = new List<int>();// { 47, 48, 51, 52, 55, 56, 59, };
+			/*List<int> */izda = new List<int>();// { 45, 46, 49, 50, 53, 54, 57, 58, };
+			int numero = FirstButtoConf;
+			int mumero = pag * _NumPositionsByPage;
+			int maxbuttonsdcha=(_TlfButtonsTLP.ColumnCount * _TlfButtonsTLP.RowCount) / 2 - 1;
+			while (dcha.Count < maxbuttonsdcha)
+			{
+				if (EsIzda(numero))
+					izda.Add(numero);
+				else
+					dcha.Add(numero);
+				numero++;
+			}
+		}
+		private void VisibilizaAD(int pag)
+        {
+			GetBotonesAd(3, out List<int> izda, out List<int> dcha);
+			listaDEParticipantes1.oculto = true;
+			foreach (HMIButton b in _TlfButtons)
+			{
+				if (dcha.Contains(b.Id) || izda.Contains(b.Id))
+					b.Visible = true ? (_StateManager.Tlf[b.Id].Dst.Length > 0) : false;
+			}
+		}
+		private void VisibilizaIzdaDcha()
+		{
+			bool lpvisible = listaDEParticipantes1.Visible;
+			listaDEParticipantes1.oculto = true;
+			VisibilizaAD(FirstPageConf);
+		}
+
+		private void RellenaListaIds(List<int> izda, List<int> dcha)
+		{
+			int numero = FirstButtoConf;
+			while (dcha.Count < _NumPositionsByPage / 2 + 1)
+			{
+				if (EsIzda(numero))
+					izda.Add(numero);
+				else
+					dcha.Add(numero);
+				numero++;
+			}
+		}
+
+		private void OcultaPaticipantes()
+		{
+			listaDEParticipantes1.oculto = true;
+			List<int> dcha = new List<int>();// { 47, 48, 51, 52, 55, 56, 59, 60, };
+			List<int> izda = new List<int>();// { 45, 46, 49, 50, 53, 54, 57, 58, };
+			RellenaListaIds(izda, dcha);
+			foreach (HMIButton b in _TlfButtons)
+			{
+				b.Visible = true ? (_StateManager.Tlf[b.Id].Dst.Length > 0) : false;
+			}
+		}
+
+
+		//lalm230510
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="sala"></param>
+		/// <param name="pres_configuracion"></param>
+		private void OcultaVisibiliza(int id, string sala, bool pres_configuracion = false)
+		{
+			bool lpvisible = listaDEParticipantes1.Visible;
+
+			List<int> dcha = new List<int>();// { 47, 48, 51, 52, 55, 56, 59, 60, };
+			List<int> izda = new List<int>();// { 45, 46, 49, 50, 53, 54, 57, 58, };
+			int numero = FirstButtoConf;
+			int maxbuttonsdcha = (_TlfButtonsTLP.ColumnCount * _TlfButtonsTLP.RowCount) / 2 - 1;
+			while (dcha.Count < maxbuttonsdcha)
+			{
+				if (EsIzda(numero))
+					izda.Add(numero);
+				else
+					dcha.Add(numero);
+				numero++;
+			}
+			if (!dcha.Contains(id) && !izda.Contains(id))
+			{
+				listaDEParticipantes1.oculto = true;
+				listaDEParticipantes1.Visible = false;
+				return;
+			}
+			lpvisible = listaDEParticipantes1.Visible;
+			listaDEParticipantes1.oculto = lpvisible;
+			listaDEParticipantes1.Visible = false;
+			//prueba solo para saber cuatos etan habilitados.
+			//var enabledElements = _TlfButtons.Where(item => item.Enabled).ToList();
+           
+			foreach (HMIButton b in _TlfButtons)
+			{
+				if (izda.Contains(id))
+				{
+					if (dcha.Contains(b.Id))
+						if (!lpvisible)
+							b.Visible = false;
+						else
+							b.Visible = true ? (_StateManager.Tlf[b.Id].Dst.Length > 0) : false;
+				}
+				/*else*/if (dcha.Contains(id))
+				{
+					if (izda.Contains(b.Id))
+					{
+						if (!lpvisible)
+							b.Visible = false;
+						else
+							b.Visible = true ? (_StateManager.Tlf[b.Id].Dst.Length > 0) :false;
+					}
+				}
+			}
+			if (!lpvisible)
+			{
+                int col = _TlfButtonsTLP.ColumnCount;
+                int rows = _TlfButtonsTLP.RowCount;
+                int coli = col / 2;
+                int cold = col / 2; //col - col / 2;
+                if (izda.Contains(id))
+				{
+					//listaDEParticipantes1.Size = new System.Drawing.Size(186, 427);
+					//listaDEParticipantes1.Size = new System.Drawing.Size(150, 198);
+                    listaDEParticipantes1.Size = new System.Drawing.Size(_TlfDaTLP.Bounds.Width * 2 / 3 - _TlfDaTLP.Bounds.Width / 40, _TlfDaTLP.Bounds.Height);
+                    _TlfDaTLP.ColumnCount = col;
+                    _TlfDaTLP.RowCount = rows;
+                    TableLayoutPanelCellPosition tltcp = _TlfDaTLP.GetCellPosition(listaDEParticipantes1);
+                    tltcp.Column = (col + 1) / 2;
+                    tltcp.Row = 0;
+                    _TlfDaTLP.SetCellPosition(listaDEParticipantes1, tltcp);
+					_TlfDaTLP.SetColumnSpan(listaDEParticipantes1, cold);
+					_TlfDaTLP.SetRowSpan(listaDEParticipantes1,rows);
+					_TlfDaTLP.Update();
+					listaDEParticipantes1.Visible = true;
+					listaDEParticipantes1.SetConfiguracionTodos(pres_configuracion);
+					listaDEParticipantes1.SetSala(sala);
+				}
+				else if (dcha.Contains(id))
+				{
+					TableLayoutPanelCellPosition tltcp = _TlfDaTLP.GetCellPosition(listaDEParticipantes1);
+					tltcp.Column = 0;
+					tltcp.Row = 0;
+	
+					_TlfDaTLP.SetCellPosition(listaDEParticipantes1, tltcp);
+					_TlfDaTLP.SetColumnSpan(listaDEParticipantes1, coli);
+					_TlfDaTLP.SetRowSpan(listaDEParticipantes1, rows);
+					_TlfDaTLP.Update();
+					listaDEParticipantes1.Visible = true;
+					listaDEParticipantes1.SetConfiguracionTodos(pres_configuracion);
+					listaDEParticipantes1.SetSala(sala);
+				}
+
+			}
+			else
+            {
+				// fuerzo presentacion de lista de participantes.
+				_CmdManager.RefrescaListaParticipantesConf(sala);
+				if (!listaDEParticipantes1.oculto)
+					listaDEParticipantes1.Visible = lpvisible; //230524 prueba y error.
+				else
+					listaDEParticipantes1.Visible = false; //230524 prueba y error.
+			}
+		}
+
+		private bool AlgunOtroActivo(int id)
+        {
+			for (int i=0;i<15;i++)
+            {
+				if (i != id)
+					if ((_StateManager.Tlf[i + FirstButtoConf].State == TlfState.Set)
+						|| (_StateManager.Tlf[i + FirstButtoConf].State == TlfState.OutOfService)
+						|| (_StateManager.Tlf[i + FirstButtoConf].State == TlfState.Congestion)
+						|| (_StateManager.Tlf[i + FirstButtoConf].State == TlfState.Hold)
+						|| (_StateManager.Tlf[i + FirstButtoConf].State == TlfState.Out)
+						)
+						return true;
+					else if (_StateManager.Tlf[i + FirstButtoConf].State != TlfState.Idle)
+						return true;
+            }
+			return false;
+        }
+
+		public bool ListaVisible()
+		{
+			if (listaDEParticipantes1.Visible && !listaDEParticipantes1.oculto)
+				return true;
+			return false;
+		}
+
+		bool HayActividadEnOtrasPaginas()
+        {
+			var rango1 = Enumerable.Range(0, FirstButtoConf);
+			var rango2 = Enumerable.Range(Tlf.NumDestinations,  Tlf.NumIaDestinations);
+			var rango3 = rango1.Concat(rango2);
+			foreach (int id1 in rango3)
+			{
+				if (
+					(_StateManager.Tlf[id1].State != TlfState.Idle) &&
+					(_StateManager.Tlf[id1].State != TlfState.Unavailable)
+					)
+					return true;
+			}
+			return false;
+		}
 		private void TlfButton_Click(object sender, EventArgs e)
 		{
 			int id = ((HMIButton)sender).Id;
+            if (false)// CAMBIO LA SEÑALIZACION A LA CONTESTACION DEL COMANDO.
+            {
+                if (esbotonconferencia(id))
+				{
+					string idconferencia = _StateManager.Tlf[id].Dst;
+					//listaDEParticipantes1.SetIdConferencia(idconferencia);
+					string sala = _CmdManager.GetSala(id - FirstButtoConf);
+					listaDEParticipantes1.SetSala(sala);
+					bool activo = AlgunOtroActivo(id - FirstButtoConf);
+					bool visible = ListaVisible();
 
+					if (!HayActividadEnOtrasPaginas())
+					{
+						if (_StateManager.Tlf[id].State == TlfState.Idle)
+						{
+							if (!activo || !visible)
+								;// OcultaVisibiliza(id, sala);
+						}
+						else
+						{
+							if (visible)
+								;// OcultaVisibiliza(id, sala);
+						}
+					}
+
+					//if (activo && visible)
+					//	;
+					//else
+					//{
+					//	OcultaVisibiliza(id, sala);
+					//}
+				}
+			}
 			try
 			{
 				_CmdManager.TlfClick(id);
@@ -632,6 +1095,33 @@ namespace HMI.Presentation.Twr.Views
 				_Logger.Error(msg, ex);
 			}
 		}
+
+
+        private void _TlfPageConfBT_Click(object sender, EventArgs e)
+        {
+			int page = 3;
+			if (_TlfPageConfBT.Text.ToUpper() == "C")
+			{
+				page = 3;
+			}
+			else
+				page = int.Parse(_TlfPageConfBT.Text) - 1;
+
+			try
+			{
+				_CmdManager.TlfLoadDaPage(page);
+			}
+			catch (Exception ex)
+			{
+				_Logger.Error("ERROR solicitando cambio de pagina TLF a " + page, ex);
+			}
+			if (page==3)
+			{
+                //230510 prueba a ver si carga
+                //string sala = _CmdManager.GetSala(0);
+                //_CmdManager.RefrescaListaParticipantesConf(sala);
+            }
+        }
 	}
 }
 

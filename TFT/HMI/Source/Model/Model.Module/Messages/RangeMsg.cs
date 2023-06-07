@@ -201,10 +201,46 @@ namespace HMI.Model.Module.Messages
 		}
 	}
 
-	public sealed class RdInfo
+	public sealed class selectable_frequencies
 	{
-        // Informacion para poder pintar la poscion de una radio.
-        // Incluye el estado de la frecuencia (degradada, disponible o no).
+        List <string> sel_frecuency;
+		int index_to_selectable_frequencies;
+		string SelectedFrecuency;
+
+        public selectable_frequencies() {
+			sel_frecuency = new List<string>();
+            SelectedFrecuency = "";
+		}
+
+		public void setnewfrecuency(string value)
+		{
+			sel_frecuency.Add(value);
+		}
+
+        public List<string> getfrecuencies()
+        {
+            return sel_frecuency;
+        }
+
+        public void setSelectedFrecuency(string selected_frecuency)
+        {
+            SelectedFrecuency = selected_frecuency;
+        }
+
+        public string getSelectedFrecuency()
+        {
+			return SelectedFrecuency;
+        }
+		public bool multifrecuencia()
+		{
+			return (sel_frecuency.Count > 1); 
+        }
+    }
+
+    public sealed class RdInfo
+	{
+		// Informacion para poder pintar la poscion de una radio.
+		// Incluye el estado de la frecuencia (degradada, disponible o no).
 		public readonly string Dst;
 		public readonly string Alias;
 		public string DescDestino;//RQF34
@@ -214,20 +250,20 @@ namespace HMI.Model.Module.Messages
 		public readonly SquelchState Squelch;
 		public readonly RdRxAudioVia AudioVia;
 		public readonly int RtxGroup;
-        public readonly TipoFrecuencia_t TipoFrecuencia;
-        public readonly bool Monitoring;
-		public readonly bool FrecuenciaNoDesasignable;//RQF-14
-        public readonly FrequencyState Estado;
-        public readonly bool RxOnly;
+		public readonly TipoFrecuencia_t TipoFrecuencia;
+		public readonly bool Monitoring;
+		public readonly bool FrecuenciaNoDesasignable;
+		public readonly FrequencyState Estado;
+		public readonly bool RxOnly;
 		/** 20180321. AGL. ALIAS a mostrar en la tecla... */
 		public string KeyAlias { get; set; }
-		//LALM 210223 hay que pasar la prioridad.
 		public int Priority { get; set; }
-		public readonly string IdFrecuency;//RQF34
-		
-		//RQF-14 se pasa el parametro frecuencia no desasignable
+		public readonly string IdFrecuency;
+		public readonly string selectable_frequency;
+		//multifrecuencia
+		public selectable_frequencies frecuencia_sel = new selectable_frequencies();
 		public RdInfo(string dst, string alias, bool tx, bool rx, PttState ptt, SquelchState squelch,
-            RdRxAudioVia audioVia, int rtxGroup, TipoFrecuencia_t tipoFrecuencia, bool monitoring, bool frecuencianodesasignable, FrequencyState estado, bool rxOnly)
+			RdRxAudioVia audioVia, int rtxGroup, TipoFrecuencia_t tipoFrecuencia, bool monitoring, bool frecuencianodesasignable, FrequencyState estado, bool rxOnly, selectable_frequencies sf)
 		{
 			Dst = dst;
 			Alias = alias;
@@ -237,13 +273,25 @@ namespace HMI.Model.Module.Messages
 			Squelch = squelch;
 			AudioVia = audioVia;
 			RtxGroup = rtxGroup;
-            TipoFrecuencia = tipoFrecuencia;
-            Monitoring = monitoring;
+			TipoFrecuencia = tipoFrecuencia;
+			Monitoring = monitoring;
 			FrecuenciaNoDesasignable = frecuencianodesasignable;//RQf-14
-            Estado = estado;
-            RxOnly = rxOnly;
+			Estado = estado;
+			RxOnly = rxOnly;
+			frecuencia_sel = new selectable_frequencies();
+			foreach (string s in sf.getfrecuencies())
+			{
+				frecuencia_sel.setnewfrecuency(s);
+			}
+
         }
-		public override string ToString()
+
+		public bool Multifrecuencia()
+		{
+            return frecuencia_sel.getfrecuencies().Count > 1;
+        }
+
+        public override string ToString()
 		{
 			//RQf-14
             return string.Format("[Dst={0}] [Alias={1}] [Rx={2}] [Tx={3}] [Ptt={4}] [Squelch={5}] [AudioVia={6}] [RxtGroup={7}] [TipoFrecuencia={8}] [Monitoring={9}] [FrecuenciaNoDesasignable={10}] [Estado={11}] [RxOnly={12}] [DescDestino={13}]", Dst, Alias, Rx, Tx, Ptt, Squelch, AudioVia, RtxGroup, TipoFrecuencia, Monitoring, FrecuenciaNoDesasignable, Estado, RxOnly,DescDestino);
@@ -265,9 +313,10 @@ namespace HMI.Model.Module.Messages
         public readonly string QidxResource;
         /** 20190205 RTX Information */
         public readonly string PttSrcId;
+		public string SelectedFrecuency;
 
 		public RdState(bool tx, bool rx, string pttSrcId, PttState ptt, SquelchState squelch, RdRxAudioVia audioVia, int rtxGroup, FrequencyState state,
-            string qidxMethod, uint qidxValue, string qidxResource)
+            string qidxMethod, uint qidxValue, string qidxResource,string selectedfrecuency)
 		{
 			Tx = tx;
 			Rx = rx;
@@ -282,6 +331,7 @@ namespace HMI.Model.Module.Messages
             QidxResource = qidxResource;
 
             PttSrcId = pttSrcId;
+			SelectedFrecuency = selectedfrecuency;
         }
 
 		public override string ToString()

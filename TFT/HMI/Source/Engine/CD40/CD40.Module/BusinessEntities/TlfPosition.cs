@@ -12,6 +12,9 @@ using U5ki.Infrastructure;
 using Utilities;
 using NLog;
 using System.Collections;
+using conferencia;
+using System.Security.Cryptography;
+using System.Linq;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
@@ -30,7 +33,9 @@ namespace HMI.CD40.Module.BusinessEntities
 		public event GenericEventHandler TlfPosStateChanged;
 		public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
         public event GenericEventHandler<string> ForwardedCallMsg;
-
+        private List<string> _participantes_ca;//230516 participantes de conferencia activa
+        private List<string> _participantes_conf;//230530 participantes de conferencia configurados
+        public bool posicion_conferencia=false;
         /// <summary>
         /// 
         /// </summary>
@@ -430,6 +435,9 @@ namespace HMI.CD40.Module.BusinessEntities
             set { _HoldOnEstablish = value; }
         }
 
+        public List<string> Participantes_ca { get => _participantes_ca; set => _participantes_ca = value; }
+        public List<string> Participantes_conf { get => _participantes_conf; set => _participantes_conf = value; }
+        public bool IsConfPreprogramada = false;
         public bool InOperation()
         {
             if (Cfg != null)
@@ -437,6 +445,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 switch (State)
                 {
                     case TlfState.Conf:
+                    case TlfState.ConfPreprogramada:
                     case TlfState.Hold:
                     case TlfState.In:
                     case TlfState.InPrio:
@@ -465,20 +474,23 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
         /// <param name="pos"></param>
-		public TlfPosition(int pos)
+		public TlfPosition(int pos, bool cp = false)
 		{
 			_Pos = pos;
 
 			_CallTout.AutoReset = false;
 			_CallTout.Elapsed += OnCallTimeout;
+            Participantes_ca = new List<string>();//230516
+            Participantes_conf = new List<string>();//230530
+            IsConfPreprogramada= cp;
         }
 
-		#region IDisposable Members
+        #region IDisposable Members
 
         /// <summary>
         /// 
         /// </summary>
-		public void Dispose()
+        public void Dispose()
 		{
 			foreach (SipChannel ch in _Channels)
 			{
@@ -594,10 +606,18 @@ namespace HMI.CD40.Module.BusinessEntities
                         }
                         else
                         {
+                            if (dst.NombreRecurso== "RECURSOCONF")//LALM230426
+                            {
+                                SipChannel ch = new TlfPPChannel(cfg.OrigenR2, dst.NumeroAbonado, dst.NombreRecurso, dst.Prefijo, dst.Interface);
+                                ch.RsChanged += OnRsChanged;
+                                _Channels.Add(ch);
+                                break;
+                            }
                             if (_Channels.Find(delegate(SipChannel channel)
                                 { return ((channel.Prefix == dst.Prefijo) && (channel.Id == dst.NombreRecurso)); }) == null)
                             {
                                 SipChannel ch = new TlfPPChannel(cfg.OrigenR2, dst.NumeroAbonado, dst.NombreRecurso, dst.Prefijo, dst.Interface);
+
                                 ch.RsChanged += OnRsChanged;
 
                                 _Channels.Add(ch);
@@ -663,6 +683,168 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 		}
 
+        public string GetAbonado(string salabkk)
+        {
+            return salabkk;
+        }
+
+        public virtual void Reset(ConferenciaProto cfg)// lalm cambiar a cfgenlaceintenoconf
+        {
+            bool setToIdle = false;
+            _Literal = cfg.IdSalaBkk;
+            _Priority = CORESIP_Priority.CORESIP_PR_NONURGENT;
+            //Si cambia el origen, lo reinicio sin colgar porque ya ha cambiado la cuenta.
+            ConferenciaProto _Cfg = cfg;// se pasará a private de la clase si es necesario
+            if ((_Cfg != null) )
+            {
+                //A la espera de un cambio en el SOAP para que venga el OrigenR2 coherente
+                //tengo que colgar porque puede no ser un cambio de OrigenR2 sino de tipo 
+                //de destino
+                MakeHangUp(0);
+                setToIdle = true;
+                State = TlfState.Idle;
+                _Logger.Warn("Cuelgo llamada con {0} por cambio de identidad", _Literal);
+            }
+            _Channels.Clear();
+            // Supongo que el tipo de conferencia es que particiapna todos.
+            foreach(Tipo_Lista_Participantes par in cfg.Lista_de_Participantes)
+            {
+                //if (cfg.tipo_participante==Tipo_Participante.Tipo_1)
+                if (cfg.TipoConferencia== "1")
+                {
+                    CfgRecursoEnlaceInterno dst = new CfgRecursoEnlaceInterno();
+                    string[] userId = Top.Cfg.GetUserFromAddress(dst.Prefijo, dst.NumeroAbonado);
+
+                    dst.NombreRecurso = cfg.IdSalaBkk;
+                    dst.Prefijo = 3;
+                    dst.NumeroAbonado = GetAbonado(cfg.IdSalaBkk);
+                    //Se crea un canal por cada red
+                    //TlfNet net = Top.Cfg.GetIPNet(dst.Prefijo, ""/*dst.NumeroAbonado*/);
+                    TlfNet net= new TlfNet();
+                    if (net != null)
+                        AddChannel(net, "L2"/*cfg.OrigenR2*/, ""/*dst.NumeroAbonado*/, null, dst.Prefijo);
+                }
+            }
+
+     //       foreach (CfgRecursoEnlaceInterno dst in cfg.ListaRecursos)
+     //       {
+     //           switch (dst.Prefijo)
+     //           {
+     //               case Cd40Cfg.INT_DST:
+     //                   //string hostId = Top.Cfg.GetUserHost(dst.NombreRecurso);
+
+     //                   //if ((hostId != null) && (_Channels.Find(delegate (SipChannel channel)
+     //                   //{ return ((channel.Prefix == dst.Prefijo) && (channel.Id == hostId)); }) == null))
+     //                   //{
+     //                   //    SipChannel ch = new IntChannel(cfg.OrigenR2, hostId, dst.NombreRecurso, dst.Prefijo);
+     //                   //    ch.RsChanged += OnRsChanged;
+
+     //                   //    _Channels.Insert(0, ch);
+     //                   //}
+
+     //                   break;
+
+     ////               case Cd40Cfg.EyM_DEST:  // Destinos EyM 4W para deshabilitar el echoCanceller
+     ////               case Cd40Cfg.PP_DST:
+     ////               case Cd40Cfg.UNKNOWN_DST:
+     ////               case Cd40Cfg.IP_DST:
+     ////                   if (this is TlfIaPosition)
+     ////                   {
+     ////                       StrNumeroAbonado route = null;
+     ////                       TlfNet securityNet = Top.Cfg.GetNet(dst.Prefijo, dst.NumeroAbonado, ref route);
+
+     ////                       if (securityNet != null)
+     ////                       {
+     ////                           SipChannel ch = _Channels.Find(delegate (SipChannel channel) { return ((channel.Prefix == dst.Prefijo) && (channel.Id == securityNet.Id)); });
+
+     ////                           if (ch == null)
+     ////                           {
+     ////                               if ((dst.Prefijo == Cd40Cfg.PP_DST) && (securityNet.Lines[0].RsLine != null))
+     ////                                   ch = new TlfPPChannel(cfg.OrigenR2, dst.NumeroAbonado, securityNet.Lines[0].RsLine.Id, dst.Prefijo, dst.Interface);
+     ////                               else
+     ////                                   ch = new TlfNetChannel(securityNet, cfg.OrigenR2, dst.NumeroAbonado, null, dst.Prefijo, _UnknownResource);
+     ////                               ch.RsChanged += OnRsChanged;
+
+     ////                               _Channels.Add(ch);
+     ////                           }
+     ////                           else
+     ////                           {
+     ////                               ch.AddRemoteDestination(dst.NumeroAbonado, null);
+     ////                           }
+     ////                       }
+     ////                   }
+     ////                   else
+     ////                   {
+     ////                       if (_Channels.Find(delegate (SipChannel channel)
+     ////                       { return ((channel.Prefix == dst.Prefijo) && (channel.Id == dst.NombreRecurso)); }) == null)
+     ////                       {
+     ////                           SipChannel ch = new TlfPPChannel(cfg.OrigenR2, dst.NumeroAbonado, dst.NombreRecurso, dst.Prefijo, dst.Interface);
+     ////                           ch.RsChanged += OnRsChanged;
+
+     ////                           _Channels.Add(ch);
+     ////                       }
+     ////                   }
+     ////                   break;
+     ////               /*
+					////case Cd40Cfg.IP_DST:
+					////	{
+					////		SipChannel ch = new IpChannel(cfg.OrigenR2, dst.NumeroAbonado, dst.Prefijo);
+					////		_Channels.Add(ch);
+					////	}
+					////	break;
+     ////               */
+     //               default:
+     //                   //string[] userId = Top.Cfg.GetUserFromAddress(dst.Prefijo, dst.NumeroAbonado);
+     //                   //if (userId != null)
+     //                   //{
+     //                   //    dst.NombreRecurso = userId[1];
+     //                   //    dst.Prefijo = Cd40Cfg.INT_DST;
+     //                   //    goto case Cd40Cfg.INT_DST;
+     //                   //}
+     //                   ////Se crea un canal por cada red
+     //                   //TlfNet net = Top.Cfg.GetIPNet(dst.Prefijo, dst.NumeroAbonado);
+     //                   //if (net != null)
+     //                   //    AddChannel(net, cfg.OrigenR2, dst.NumeroAbonado, null, dst.Prefijo);
+     //                   //else
+     //                   //    _Logger.Warn("No encuentro red IP para {0} con prefijo {1} ", dst.NumeroAbonado, dst.Prefijo);
+
+     //                   //StrNumeroAbonado altNet = null;
+     //                   //net = Top.Cfg.GetNet(dst.Prefijo, dst.NumeroAbonado, ref altNet);
+     //                   //if (net != null)
+     //                   //    AddChannel(net, cfg.OrigenR2, dst.NumeroAbonado, null, dst.Prefijo);
+     //                   //else
+     //                   //    _Logger.Warn("No encuentro red AVGN para {0} con prefijo {1} ", dst.NumeroAbonado, dst.Prefijo);
+
+     //                   //if (altNet != null)
+     //                   //{
+     //                   //    net = Top.Cfg.GetNet(altNet.Prefijo, altNet.NumeroAbonado, ref altNet);
+     //                   //    if (net != null)
+     //                   //        AddChannel(net, cfg.OrigenR2, altNet.NumeroAbonado, dst.NumeroAbonado, altNet.Prefijo);
+     //                   //    else
+     //                   //        _Logger.Warn("No encuentro red backup/alternativa para {0} con prefijo {1} ", dst.NumeroAbonado, dst.Prefijo);
+     //                   //}
+
+     //                   break;
+     //           }
+     //       }
+
+     //       //if ((_SipCall != null) && (_SipCall.Ch != null))
+     //       //{
+     //       //    if (!_SipCall.IsValid(_Channels))
+     //       //    {
+     //       //        MakeHangUp(0);	// Cortamos llamadas y quitamos busy y congestion
+     //       //        State = TlfState.Idle;
+     //       //        _Logger.Warn("Cuelgo llamada con {0} por cambio de configuracion", _Literal);
+     //       //    }
+     //       //}
+
+     //       //if (_SipCall == null)
+     //       //{
+     //       //    State = GetReachableState(setToIdle);
+     //       //}
+        }
+
+
         private void  AddChannel(TlfNet net, string OrigenAcc, string numeroAbonado, string subNumber, uint prefijo)
         {
                 SipChannel ch = _Channels.Find(delegate(SipChannel channel) { return ((channel.Prefix == prefijo) && (channel.Id == net.Id)); });
@@ -685,15 +867,15 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="conference"></param>
 		public void AddToConference(TlfConference conference)
-		{
-			Debug.Assert((_State == TlfState.Set) || (_State == TlfState.Conf) ||
-				(_State == TlfState.Hold) || (_State == TlfState.RemoteHold));
-			Debug.Assert((_SipCall != null) && _SipCall.IsActive);
-			Debug.Assert(_Conference == null);
+        {
+            Debug.Assert((_State == TlfState.Set) || (_State == TlfState.Conf) ||
+                (_State == TlfState.Hold) || (_State == TlfState.RemoteHold));
+            Debug.Assert((_SipCall != null) && _SipCall.IsActive);
+            Debug.Assert(_Conference == null);
 
-			SipAgent.AddCallToConference(_SipCall.Id);
-			_Conference = conference;
-		}
+            SipAgent.AddCallToConference(_SipCall.Id);
+            _Conference = conference;
+        }
 
         /// <summary>
         /// 
@@ -1248,7 +1430,53 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
 
 			return false;
-		}
+        }
+
+        public bool ConferenciaEnuso(string abonado)
+        {
+            if (Top.Tlf.ActiveCalls.Count == 0)
+                return false;
+            try
+            {
+                var retorno = Top.Tlf.ActiveCalls.Where(e => e.NumeroAbonado[0] == abonado);
+                return (retorno== null) ? false : true;
+            }
+            catch (Exception)
+            {
+                return false;
+                throw;
+            }
+            return false;
+        
+        }
+
+        public bool EsConferencia(string abonado)
+        {
+            int NumEnlacesInternosPag = (int)Top.Cfg.NumEnlacesInternosPag;
+            int NumPagEnlacesInt = (int)Top.Cfg.NumPagEnlacesInt;
+            int firstposition = NumEnlacesInternosPag * NumPagEnlacesInt;
+            try
+            {
+                for (int i = firstposition; i < firstposition + NumEnlacesInternosPag; i++)
+                    {
+                    // Esta condicion hay que ponerla en la otra sentencia.
+                    if (Top.Tlf[i] == null)
+                        return false;
+                    var res = Top.Tlf[i].Cfg.ListaRecursos.Where(e => e.NumeroAbonado == abonado);
+                    if (res != null)
+                        // Esto es repetir lo de arriba, pero al comprobarlo sale distinto alguna vez.
+                        if (Top.Tlf[i].Cfg.ListaRecursos[0].NumeroAbonado==abonado)
+                            return true;
+                }
+
+            }
+            catch (Exception)
+            {
+                return false;
+                throw;
+            }
+            return false;
+        }
 
         public virtual bool IsForMe(CORESIP_CallInfo info, CORESIP_CallInInfo inInfo)
         {
@@ -1270,7 +1498,7 @@ namespace HMI.CD40.Module.BusinessEntities
             //En teclas de AD, sólo se admiten llamada con los datos que coincidan con los configurados
             //reason = null;
             SipCallInfo inCall = SipCallInfo.NewIncommingCall(_Channels, sipCallId, info, inInfo, this is TlfIaPosition, out reason);
-
+            
             if (inCall != null && 
                 (inCall.Ch.Type==TipoInterface.TI_EyM_MARC || 
                  inCall.Ch.Type==TipoInterface.TI_EyM_PP || 
@@ -1284,8 +1512,11 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                         return SipAgent.SIP_DECLINE;
                 }
+                //lalm 230505
+                if (EsConferencia(inCall.RemoteId) && ConferenciaEnuso(inCall.RemoteId) )
+                    return SipAgent.SIP_DECLINE; 
 
-				if (_SipCall != null)
+                if (_SipCall != null)
 				{
 					if ((call2replace >= 0) && (_SipCall.Id == call2replace))
 					{
@@ -1488,7 +1719,8 @@ namespace HMI.CD40.Module.BusinessEntities
 			    {
 				    dstParams += string.Format(";isub={0}", path.Remote.SubId);
 			    }
-			    if ((ch.Prefix != Cd40Cfg.INT_DST) && (ch.Prefix != Cd40Cfg.IP_DST) && (ch.Prefix != Cd40Cfg.UNKNOWN_DST) &&
+			    if ((ch.Prefix != Cd40Cfg.INT_DST) && (ch.Prefix != Cd40Cfg.IP_DST) && (ch.Prefix != Cd40Cfg.UNKNOWN_DST)
+                        && (ch.Prefix != Cd40Cfg.CONFERENCIA_DST) &&
                         ((ch.Prefix != Cd40Cfg.PP_DST) || (string.Compare(remoteId, path.Line.Id, true /*ignoreCase*/) != 0)))
 			    {
 				    dstParams += string.Format(";cd40rs={0}", path.Line.Id);
@@ -1781,6 +2013,7 @@ namespace HMI.CD40.Module.BusinessEntities
 							break;
 						case TlfState.Set:
 						case TlfState.Conf:
+						case TlfState.ConfPreprogramada:
 						case TlfState.RemoteHold:
 							Top.Mixer.Unlink(_SipCall.Id);
 							// Top.Recorder.Rec(CORESIP_CallType.CORESIP_CALL_DIA, false);

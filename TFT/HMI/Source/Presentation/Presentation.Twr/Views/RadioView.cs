@@ -35,6 +35,7 @@ using HMI.Presentation.Twr.UI;
 using Utilities;
 using NLog;
 using System.IO;
+using System.Windows.Interop;
 
 namespace HMI.Presentation.Twr.Views
 {
@@ -44,7 +45,7 @@ namespace HMI.Presentation.Twr.Views
         //VMG Added events for notifying messages
         [EventPublication(EventTopicNames.RdPosPttStateEngine, PublicationScope.Global)]
         public event EventHandler<RangeMsg<PttState>> RdPosPttStateEngine;
-        
+
         [EventPublication(EventTopicNames.ShowNotifMsgEngine, PublicationScope.Global)]
         public event EventHandler<NotifMsg> ShowNotifMsgEngine;
 
@@ -939,7 +940,7 @@ namespace HMI.Presentation.Twr.Views
                 if (Settings.Default.ShowBssProperties)
                 {
                     // RQF34 _Inserto parametro idfrecuency
-                    bt.Reset(dst.IdFrecuency,dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? dst.QidxResource : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    bt.Reset(dst.IdFrecuency, dst.Frecuency, dst.TipoFrecuencia == TipoFrecuencia_t.FD ? dst.QidxResource : alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
                     dst.QidxResource, dst.QidxValue, dst.State);
                 }
                 else
@@ -955,8 +956,27 @@ namespace HMI.Presentation.Twr.Views
                     // RQF34 Se cambia la llamada, y se inserta idfrecuency
                     //bt.Reset(dst.Frecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
                     //dst.State, priority, bloqueado);
-                    bt.Reset(dst.IdFrecuency,dst.NameFrecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
+                    bt.Reset(dst.IdFrecuency, dst.NameFrecuency, alias, dst.Unavailable, allAsOneBt, rtxGroup, ptt, squelch, audio, title, tx, rx, txForeColor, rxForeColor, titleForeColor,
                     dst.State, priority, bloqueado);
+                    bt.Multifrecuencia = dst.Multifrecuencia;
+                    bt.SetFrecuenciaSel(dst.Frecuencia_Sel, dst.Default_Frecuency);
+                    try
+                    {
+                        if (dst.Cause_Frecuency!=null)
+                        if (dst.Cause_Frecuency.ToUpper() != "" /*&& dst.Cause_Frecuency.ToUpper()!="OK"*/)
+                        {
+                            title = VisualStyle.ButtonColor;
+                            string texto = dst.Cause_Frecuency.ToUpper();
+                            NotifMsg msg = new NotifMsg(Resources.TxRxChange, Resources.TxRxChange, texto, 3000, MessageType.Error, MessageButtons.Ok);
+                            General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg);
+                            dst.Cause_Frecuency = "";
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
                 // Las frecuencias co solo RX (RxOnly), tienen deshabilitada la parte TX de la tecla
                 if (dst.RxOnly)
@@ -1297,6 +1317,41 @@ namespace HMI.Presentation.Twr.Views
 				_Logger.Error(msg, ex);
 			}
 		}
+        private void lbf()
+        {
+            // Create an instance of the ListBox.
+            ListBox listBox1 = new ListBox();
+            // Set the size and location of the ListBox.
+            listBox1.Size = new System.Drawing.Size(200, 100);
+            listBox1.Location = new System.Drawing.Point(10, 10);
+            // Add the ListBox to the form.
+            this.Controls.Add(listBox1);
+            // Set the ListBox to display items in multiple columns.
+            listBox1.MultiColumn = true;
+            // Set the selection mode to multiple and extended.
+            listBox1.SelectionMode = SelectionMode.MultiExtended;
+
+            // Shutdown the painting of the ListBox as items are added.
+            listBox1.BeginUpdate();
+            // Loop through and add 50 items to the ListBox.
+            for (int x = 1; x <= 50; x++)
+            {
+                listBox1.Items.Add("Item " + x.ToString());
+            }
+            // Allow the ListBox to repaint and display the new items.
+            listBox1.EndUpdate();
+
+            // Select three items from the ListBox.
+            listBox1.SetSelected(1, true);
+            listBox1.SetSelected(3, true);
+            listBox1.SetSelected(5, true);
+
+            // Display the second selected item in the ListBox to the console.
+            System.Diagnostics.Debug.WriteLine(listBox1.SelectedItems[1].ToString());
+            // Display the index of the first selected item in the ListBox.
+            System.Diagnostics.Debug.WriteLine(listBox1.SelectedIndices[0].ToString());
+            listBox1.Show();
+        }
 
         private void RdButton_TitleLongClick(object sender, EventArgs e)
         {
@@ -1308,7 +1363,24 @@ namespace HMI.Presentation.Twr.Views
                 //LALM 221028
                 _StateManager.Radio.Idsel = id;
                 //no habria que pasar el id.
-                _CmdManager.SwitchRadView("CambioFrecuencia",id,"");
+                bool prueba = false;
+                if (!prueba)
+                {
+                    _CmdManager.SwitchRadView("CambioFrecuencia", id, "");
+                }
+                else
+                {
+                    lbf();
+                    string frecuencias = "";
+                    foreach (string i in _StateManager.Radio[id].Frecuencia_Sel)
+                        frecuencias += i + " \r";
+                    System.Windows.Forms.MessageBox.Show(String.Format("Aqui se pediria seleccionar una frecuencia \r{0}", frecuencias.ToString()));
+                    System.Windows.Forms.ListBox a = new System.Windows.Forms.ListBox();
+                    foreach (string i in _StateManager.Radio[id].Frecuencia_Sel)
+                        a.Items.Add(i);
+                    a.Show();
+                }
+
             }
             catch (Exception ex)
             {

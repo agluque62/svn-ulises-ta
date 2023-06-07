@@ -26,6 +26,7 @@ using Utilities;
 using NLog;
 using ProtoBuf;
 using System.Threading;
+
 /**
  * AGL 17072012. Trata de Rellenar la tabla de Dependencias desde un fichero local.
  * */
@@ -33,8 +34,10 @@ using System.Data;
 using System.Data.OleDb;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Linq;
+using static U5ki.Infrastructure.ConferenceStatus;
 /*
- * Fin de la Modificacion */
+* Fin de la Modificacion */
 
 namespace HMI.CD40.Module.Services
 {
@@ -209,6 +212,10 @@ namespace HMI.CD40.Module.Services
         [EventPublication(EventTopicNames.SiteChangedResultEngine, PublicationScope.Global)]
         public event EventHandler<StateMsg<string>> SiteChangedResultEngine;
 
+        //LALM 230306
+        [EventPublication(EventTopicNames.FrChangedResultEngine, PublicationScope.Global)]
+        public event EventHandler<FrChangeMsg<string>> FrChangedResultEngine;
+
         [EventPublication(EventTopicNames.PickUpStateEngine, PublicationScope.Global)]
         public event EventHandler<ListenPickUpMsg> PickUpStateEngine;
 
@@ -284,6 +291,9 @@ namespace HMI.CD40.Module.Services
                     Top.Tlf.Forward.SetSnmpString += OnSetSnmpString;
                     //LALM 211007
                     Top.Tlf.ResourceChanged += OnTlfResourceChanged;
+                    //230516
+                    Top.Tlf.CambioConferenciaPreprogramada += OnCambioConferenciaPreprogramada;
+                    
                 }
                 if (Top.Lc != null)
                 {
@@ -306,6 +316,7 @@ namespace HMI.CD40.Module.Services
                     Top.Rd.SetSnmpInt += OnSetSnmpInt;
                     Top.Rd.SelCalMessage += OnSelCalMessage;
                     Top.Rd.SiteChangedResultMessage += OnSiteChangedResultMessage;
+                    Top.Rd.FrChangedResultMessage += OnFrChangedResultMessage;//lalm230303
                     Top.Rd.AudioViaNotAvailable += OnAudioViaNotAvailable;
 #if _HF_GLOBAL_STATUS_
                     Top.Rd.HFGlobalStatus += OnHfGlobalStatus;
@@ -466,7 +477,11 @@ namespace HMI.CD40.Module.Services
 
         public bool HayConferencia()
         {
-            return Top.Tlf.HayConferencia;
+            return Top.Tlf.HayConferencia /*|| Top.Tlf.HayConferenciaPreprogramada*/;
+        }
+        public bool HayConferenciaPreprogramada()
+        {
+            return Top.Tlf.HayConferenciaPreprogramada;
         }
 
         public void SetSplitMode(SplitMode mode)
@@ -1144,7 +1159,7 @@ namespace HMI.CD40.Module.Services
             {
                 if (AllowRd(id) && (Twr() || AllowBriefing()))
                 {
-                    Top.Rd.SetNewFrecuency(id, frecuency);//SetNewFrecuency
+                    Top.Rd.SetNewFrecuency(id, frecuency);//lalm 230301
                 }
             });
         }
@@ -1531,12 +1546,57 @@ namespace HMI.CD40.Module.Services
                 Top.Rd.GenerateBadOperationTone(durationInMsec);
             });
         }
+        public string ParserUri(string par,string Sala="")
+        {
+            for (int i = 0; i < Tlf.NumDestinations + Tlf.NumIaDestinations; i++)
+            {
+                if (!par.Contains("sip:"))
+                {
+                    string[] user = Top.Cfg.GetUserFromAddress(3, par);
+                    if (user != null)
+                    {
+                        var dst = user[1];//230523 aqui puedo obtener el parseado!!
+                        var lit = user[0];
+                        return dst;
+                    }
+                }
+                else 
+                {
+                    var resultado = Top.Cfg.confcfg.Where(Conferencia => Conferencia.IdSalaBkk == Sala).
+                                     SelectMany(Conferencia => Conferencia.participantesConferencia).
+                                     Where(Participantes => Participantes.SipUri == par).FirstOrDefault().Descripcion;
+                    if (resultado != null)
+                        return resultado.ToString();
+                }
+            }
+            return par;
+        }
 
+        //230510
+        public List <string> RefrescaListaParticipantesConf(string sala)
+        {
+            //TODO
+            try
+            {
+                List<string> s = Top.Cfg.confcfg.Where(i => i.IdSalaBkk == sala).FirstOrDefault()?.participantesConferencia.Select(j => j.SipUri).ToList();
+                var palabrastraducidas = from palabra in s select (ParserUri(palabra,sala));
+                //return s;
+                List<string> pt = new List<string>(palabrastraducidas?.ToList());
+                return palabrastraducidas?.ToList();
+                //return pt;
+            }
+            catch (Exception)
+            {
+                _Logger.Debug("Error RefrescaListaParticipantesConf {0}", sala);
+                return null;
+            
+            }
+        }
         #endregion
 
-		#region Private Members
+        #region Private Members
 
-		private static Logger _Logger = LogManager.GetCurrentClassLogger();
+        private static Logger _Logger = LogManager.GetCurrentClassLogger();
 
 		private int _ListenOperationTone = 0;
         private int _HoldedPosId = -1;
@@ -1744,7 +1804,8 @@ namespace HMI.CD40.Module.Services
 				General.SafeLaunchEvent(TlfInfoEngine, this, tlfPositions);
             });
 		}
-        //lalam 211007
+
+        //lalm 211007
         //#2629 Presentar via utilizada en llamada saliente.
         private void OnTlfResourceChanged(object sender, RangeMsg<TlfInfo> TlfInfoR)
         {
@@ -1752,6 +1813,12 @@ namespace HMI.CD40.Module.Services
             {
                 General.SafeLaunchEvent(TlfResStateEngine, this, TlfInfoR);
             });
+        }
+
+        //lalm 230516
+        private void OnCambioConferenciaPreprogramada(object sender, RangeMsg<TlfInfo> tlfPositions)
+        {
+            return;
         }
 
         private void OnTlfPositionsChanged(object sender, RangeMsg<TlfState> tlfStates)
@@ -1897,6 +1964,55 @@ namespace HMI.CD40.Module.Services
                 string mensaje = msg.Alias + "," + msg.Frecuency + "," + msg.resultado;
                 StateMsg<string> mes = new StateMsg<string>(mensaje); ;
                 General.SafeLaunchEvent(SiteChangedResultEngine, this, mes);
+            });
+        }
+
+        private void OnFrChangedResultMessage(object sender, FrChangeRsp msg)//lalm 230303
+        {
+            Top.PublisherThread.Enqueue(EventTopicNames.FrChangedResultEngine, delegate ()
+            {
+                if (msg.Code != Identifiers.FR_CHANGE_OK)
+                {
+                    string literal = "";
+                    switch (msg.Code)
+                    {
+                        case Identifiers.FR_CHANGE_OK:
+                            literal = "Cambio de frecuencia OK";
+                            break;
+                        case Identifiers.FR_IS_IN_USE:
+                            literal = "La frecuencia esta seleccionada en algun puesto";
+                            break;
+                        case Identifiers.FR_IN_PROGRESS:
+                            literal = "Otro cambio de frecuencia esta en proceso";
+                            break;
+                        case Identifiers.FR_EQ_NO_RESPOND:
+                            literal = "El equipo radio no responde";
+                            break;
+                        case Identifiers.FR_CH_REJECTED:
+                            literal = "El cambio de frecuencia es rechazado por el equipo radio";
+                            break;
+                        case Identifiers.FR_INCORRECT_FREQ:
+                            literal = "La frecuancia resultante no es la correcta"; 
+                            break;
+                        case Identifiers.FR_GENERIC_ERROR:
+                            literal = "Otros errores";
+                            break;
+                        case Identifiers.FR_TIMEOUT_ERROR:
+                            literal = "Tiempo de espera excesivo";
+                            break;
+                        default:
+                            literal = "Error desconocido";
+                            break;
+                    }
+                    //string mensaje = msg.IdFrecuency + "," + msg.AssignedFrecuency + "," + msg.resultado + "," + literal;
+                    //FrChangeMsg<string> mes = new FrChangeMsg<string>(mensaje);
+                    //General.SafeLaunchEvent(FrChangedResultEngine, this, mes);
+
+                    //230606 cambio el tipo de mensahepara que salga
+                    string mensaje = literal;
+                    NotifMsg msg1 = new NotifMsg(Resources.ActivityError, Resources.DeviceError, mensaje, 30000, MessageType.Error, MessageButtons.Ok);
+                    General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg1);
+                }
             });
         }
 
@@ -2553,8 +2669,78 @@ namespace HMI.CD40.Module.Services
             //TODO
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="numberBook"></param>
+        /// <returns></returns>
+        private bool LoadParticipantesConferencia(Dictionary<string, string> numberBook)
+        {
+            // TODO 230510
+            return false;
+        }
+
+        //public List<string> GetListaSalasActiva()
+        //{
+        //    return Top.Cfg.confstatus?.Where(i => i.RoomName.Length > 0 && i.ActiveParticipants.Count > 0)?.
+        //        Select(i => i.RoomName).ToList();
+        //}
+
+        public List<string> GetListaParticipantesEstado(string sala)
+        {
+            // TODO 230510
+            List<string> result = new List <string>();
+            //List<string> result = Top.Cfg.GetParticipantesConferencia(sala/*"1000"*/);
+            List<string> parsea = new List<string>();
+            if ((Top.Cfg.confstatus!=null) && (Top.Cfg.confstatus.Where(i => i.RoomName == sala).Count() >0))
+            {
+                foreach (ConferenceStatus status in Top.Cfg.confstatus)
+                {
+                    if (status.RoomName == sala)
+                    {
+                        var c = Top.Cfg.TlfLinks.ToList();
+                        foreach (string par in status.ActiveParticipants)
+                        {
+                            string user = ParserUri(par);
+                            if (user != null)
+                            {
+                                parsea.Add(user);
+                            }
+                            else
+                                parsea.Add(par);
+                        }
+                    }
+                }
+                //result = status.ActiveParticipants;
+                result = parsea;
+            }
+            return result;
+        }
+        //List<string> GetListaSalasActvasConf()
+        //{
+        //    return Top.Cfg.confstatus.Select(i => i.RoomName).ToList();
+        //}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="poshmi"></param>
+        /// <returns></returns>
+        public string GetSala(int poshmi)
+        {
+            if (Top.Cfg.confcfg == null)
+                return "";
+            var IdSalaBkk = Top.Cfg.confcfg.Where(i => (i.PosHMI-1) == poshmi).FirstOrDefault()?.IdSalaBkk;
+            return IdSalaBkk;
+        }
+
+        public void ShowAdButtons()
+        {
+            //habra que enviar un mensaje.
+            // pretende mostrar teclas de ad
+            Top.Tlf.EndTlfAll();
+        }
         /**
-         * Fin de Modificacion */
-		#endregion
-	}
+        * Fin de Modificacion */
+        #endregion
+    }
 }

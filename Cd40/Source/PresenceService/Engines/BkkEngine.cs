@@ -82,7 +82,6 @@ namespace U5ki.PresenceService.Engines
             _pbxws = null;
         }
 
-
         #endregion
 
         #region Eventos

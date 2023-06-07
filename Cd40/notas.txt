@@ -15,6 +15,8 @@
 			y el ulises-ta\Sources\Cd40\Source\CfgService\Web References\SoapCfg\Reference.cs
 
 			Se modifica a mano el fichero de esta solucion 'Cd40Cfg.proto'. y Se genera con ulises-ta\Tools\protobuf-net\protogen.exe el Cd40Cfg.proto.cs
+			cd C:\SOURCES_SVN\eduSp23_3\ulises-ta\Sources\Cd40\Source\Infrastructure\Messages\
+			C:\SOURCES_SVN\eduSp23_3\ulises-ta\Tools\protobuf-net\protogen.exe -i:Cd40Cfg.proto -o:Cd40Cfg.proto.cs
 
 			Se modifica el fichero CfgTranslators.cs, la función Translate
 

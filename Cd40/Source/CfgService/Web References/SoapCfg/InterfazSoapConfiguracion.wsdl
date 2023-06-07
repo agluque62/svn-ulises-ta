@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://CD40.es/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://CD40.es/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<wsdl:definitions xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://CD40.es/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://CD40.es/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:types>
     <s:schema elementFormDefault="qualified" targetNamespace="http://CD40.es/">
       <s:element name="GetVersionConfiguracion_XML">
@@ -112,6 +112,8 @@
           <s:element minOccurs="0" maxOccurs="1" name="TiempoVueltaADefecto" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="PorcentajeRSSI" type="s:string" />
           <s:element minOccurs="1" maxOccurs="1" name="PasivoRetransmision" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="SelectableFrequencies" type="tns:ArrayOfString" />
+          <s:element minOccurs="0" maxOccurs="1" name="DefaultFrequency" type="s:string" />
         </s:sequence>
       </s:complexType>
       <s:complexType name="ArrayOfUnsignedInt">
@@ -142,6 +144,7 @@
           <s:element minOccurs="1" maxOccurs="1" name="EnableEventPttSq" type="s:boolean" />
           <s:element minOccurs="0" maxOccurs="1" name="RedundanciaIdPareja" type="s:string" />
           <s:element minOccurs="0" maxOccurs="1" name="RedundanciaRol" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Telemando" type="s:int" />
         </s:sequence>
       </s:complexType>
       <s:complexType name="ArrayOfInt">
@@ -345,6 +348,18 @@
               <s:element minOccurs="1" maxOccurs="1" name="PrioridadSIP" type="s:unsignedInt" />
               <s:element minOccurs="0" maxOccurs="1" name="TipoAcceso" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="Literal" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="DestinosMultiFrecuencia">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:Tablas">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="IdSistema" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IdDestino" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="FrecuenciaDefecto" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="Frecuencia" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -717,6 +732,7 @@
               <s:element minOccurs="0" maxOccurs="1" name="ConRedundancia" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="DescDestino" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="PasivoRetransmision" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="MultiFrecuencia" type="s:boolean" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1074,6 +1090,7 @@
               <s:element minOccurs="0" maxOccurs="1" name="idTIFX" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="DestRad_tipoFrec" type="s:unsignedInt" />
               <s:element minOccurs="0" maxOccurs="1" name="DescDestino" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Telemando" type="s:int" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1249,6 +1266,9 @@
               <s:element minOccurs="0" maxOccurs="1" name="Telefono" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="FechaUltimoAcceso" type="s:dateTime" />
               <s:element minOccurs="0" maxOccurs="1" name="Comentarios" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="TimeoutSesion" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="SesionActiva" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="SesionEstado" type="s:int" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1906,6 +1926,50 @@
           <s:enumeration value="Hz" />
         </s:restriction>
       </s:simpleType>
+      <s:element name="GetConferenciasPreprogramadas">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="id_sistema" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetConferenciasPreprogramadasResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetConferenciasPreprogramadasResult" type="tns:ConferenciasPreprogramadas" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ConferenciasPreprogramadas">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ConferenciaProgramada" type="tns:ArrayOfConferencia" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfConferencia">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Conferencia" nillable="true" type="tns:Conferencia" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Conferencia">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="IdSalaBkk" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="TipoConferencia" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Alias" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="PosHMI" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="ParticipantesConferencia" type="tns:ArrayOfParticipantes" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfParticipantes">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Participantes" nillable="true" type="tns:Participantes" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Participantes">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="SipUri" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Descripcion" type="s:string" />
+        </s:sequence>
+      </s:complexType>
       <s:element name="string" nillable="true" type="s:string" />
       <s:element name="EstadoCluster" type="tns:EstadoCluster" />
       <s:element name="ArrayOfCfgEnlaceExterno" nillable="true" type="tns:ArrayOfCfgEnlaceExterno" />
@@ -1926,6 +1990,7 @@
       <s:element name="ParametrosMulticast" nillable="true" type="tns:ParametrosMulticast" />
       <s:element name="ArrayOfPoolHfElement" nillable="true" type="tns:ArrayOfPoolHfElement" />
       <s:element name="ArrayOfNode" nillable="true" type="tns:ArrayOfNode" />
+      <s:element name="ConferenciasPreprogramadas" nillable="true" type="tns:ConferenciasPreprogramadas" />
     </s:schema>
   </wsdl:types>
   <wsdl:message name="GetVersionConfiguracion_XMLSoapIn">
@@ -2066,6 +2131,12 @@
   <wsdl:message name="GetPoolNMElementsSoapOut">
     <wsdl:part name="parameters" element="tns:GetPoolNMElementsResponse" />
   </wsdl:message>
+  <wsdl:message name="GetConferenciasPreprogramadasSoapIn">
+    <wsdl:part name="parameters" element="tns:GetConferenciasPreprogramadas" />
+  </wsdl:message>
+  <wsdl:message name="GetConferenciasPreprogramadasSoapOut">
+    <wsdl:part name="parameters" element="tns:GetConferenciasPreprogramadasResponse" />
+  </wsdl:message>
   <wsdl:message name="GetVersionConfiguracion_XMLHttpPostIn">
     <wsdl:part name="id_sistema" type="s:string" />
   </wsdl:message>
@@ -2202,6 +2273,12 @@
   <wsdl:message name="GetPoolNMElementsHttpPostOut">
     <wsdl:part name="Body" element="tns:ArrayOfNode" />
   </wsdl:message>
+  <wsdl:message name="GetConferenciasPreprogramadasHttpPostIn">
+    <wsdl:part name="id_sistema" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetConferenciasPreprogramadasHttpPostOut">
+    <wsdl:part name="Body" element="tns:ConferenciasPreprogramadas" />
+  </wsdl:message>
   <wsdl:portType name="InterfazSOAPConfiguracionSoap">
     <wsdl:operation name="GetVersionConfiguracion_XML">
       <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Pasándole el identificador de sistema, devuelve la versión de la configuración activa registrada en la base de datos</wsdl:documentation>
@@ -2318,6 +2395,11 @@
       <wsdl:input message="tns:GetPoolNMElementsSoapIn" />
       <wsdl:output message="tns:GetPoolNMElementsSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="GetConferenciasPreprogramadas">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Pasándole el identificador de sistema, devuelve las conferencias preprogramadas.</wsdl:documentation>
+      <wsdl:input message="tns:GetConferenciasPreprogramadasSoapIn" />
+      <wsdl:output message="tns:GetConferenciasPreprogramadasSoapOut" />
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="InterfazSOAPConfiguracionHttpPost">
     <wsdl:operation name="GetVersionConfiguracion_XML">
@@ -2429,6 +2511,11 @@
       <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Configuración relativa a los equipos N+M (tipo=0) o Audio EE (tipo=1).</wsdl:documentation>
       <wsdl:input message="tns:GetPoolNMElementsHttpPostIn" />
       <wsdl:output message="tns:GetPoolNMElementsHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetConferenciasPreprogramadas">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Pasándole el identificador de sistema, devuelve las conferencias preprogramadas.</wsdl:documentation>
+      <wsdl:input message="tns:GetConferenciasPreprogramadasHttpPostIn" />
+      <wsdl:output message="tns:GetConferenciasPreprogramadasHttpPostOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="InterfazSOAPConfiguracionSoap" type="tns:InterfazSOAPConfiguracionSoap">
@@ -2633,6 +2720,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetPoolNMElements">
       <soap:operation soapAction="http://CD40.es/GetPoolNMElements" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConferenciasPreprogramadas">
+      <soap:operation soapAction="http://CD40.es/GetConferenciasPreprogramadas" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -2850,6 +2946,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetConferenciasPreprogramadas">
+      <soap12:operation soapAction="http://CD40.es/GetConferenciasPreprogramadas" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="InterfazSOAPConfiguracionHttpPost" type="tns:InterfazSOAPConfiguracionHttpPost">
     <http:binding verb="POST" />
@@ -3042,6 +3147,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetPoolNMElements">
       <http:operation location="/GetPoolNMElements" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConferenciasPreprogramadas">
+      <http:operation location="/GetConferenciasPreprogramadas" />
       <wsdl:input>
         <mime:content type="application/x-www-form-urlencoded" />
       </wsdl:input>

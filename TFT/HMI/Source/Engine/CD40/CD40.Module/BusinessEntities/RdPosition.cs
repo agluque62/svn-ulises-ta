@@ -8,6 +8,7 @@ using HMI.Model.Module.BusinessEntities;
 using Utilities;
 using U5ki.Infrastructure;
 using NLog;
+using HMI.Model.Module.Messages;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
@@ -20,6 +21,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		public event GenericEventHandler<string> TxAssignedByOther;
         public event GenericEventHandler<string> SelCalPrepareResponse;
         public event GenericEventHandler<ChangeSiteRsp> SiteChangedResult;
+        public event GenericEventHandler<FrChangeRsp> FrecChangedResponse;//lalm 230301
         public event GenericEventHandler<RdRxAudioVia> AudioViaNotAvailable;
 
 #if _HF_GLOBAL_STATUS_
@@ -192,6 +194,9 @@ namespace HMI.CD40.Module.BusinessEntities
         {
             get { return _QidxResource; }
         }
+        
+
+        public string SelectedFrecuency { get => _SelectedFrecuency;  set => _SelectedFrecuency=value; }
 
         public bool RxOnly
         {
@@ -207,9 +212,9 @@ namespace HMI.CD40.Module.BusinessEntities
             _PttOffTimer.Interval = 100;
             _PttOffTimer.AutoReset = false;
             _PttOffTimer.Elapsed += OnPttOffTimer;
-		}
+        }
 
-		public void Reset()
+        public void Reset()
 		{
             /** 20180626 Redmine #3610 Forzar las asignaciones a OFF cuando desaparecen por configuracion y hay PTT o SQUELCH en la Posicion */
             if (_Literal != "")
@@ -263,11 +268,13 @@ namespace HMI.CD40.Module.BusinessEntities
                 _AssociateRxRs.Clear();
                 _AssociateTxRs.Clear();
             }
-
+            
 			_AssociateFrRs.NewMsg += OnFrMsg;
 			_AssociateFrRs.Changed += OnFrChanged;
             _AssociateFrRs.SelCalMsg += OnSelCalMsg;
             _AssociateFrRs.SiteChanged += OnSiteChanged;
+            _AssociateFrRs.FrChanged += OnFrTxRxChanged;//LALM 230301
+
 
 			_Literal = cfg.Literal;
             //220329
@@ -749,28 +756,14 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
 		//LALM 221102 cambiofrecuencia
-        public void SetNewFrecuency(string frecuency, bool checkAlreadyAssigned)
+        public void SetNewFrecuency(string frecuency, bool checkAlreadyAssigned)//lalm 230301
         {
             //cambiar todo por setnewfrecuency
             if (Available && Top.Rd.PttSource == PttSource.NoPtt && !Top.Rd.ScreenSaverStatus)
             {
-                if ( (_Tx != AssignState.Set))
+                if ( (_Tx == AssignState.Idle))
                 {
-                    _Tx = AssignState.Trying;
-                    if (_Rx == AssignState.Idle)
-                        _Rx = AssignState.Trying;
-
-                    //221028
-                    //_Literal ==> frecuency;//no lo se.
-
-                    //Top.Registry.SetTx(_Literal, true, _Priority, checkAlreadyAssigned);
-                    Top.Registry.SetNewFrecuency(frecuency, Literal, _Priority, false);
-                }
-                else if ( (_Tx != AssignState.Idle))
-                {
-                    _RtxGroup = Math.Min(_RtxGroup, 0);
- 
-                    Top.Registry.SetNewFrecuency(frecuency, Literal, _Priority, false);
+                    Top.Registry.SetNewFrecuency(frecuency, Literal, _Priority, false);//lalm 230301
                 }
             }
         }
@@ -812,8 +805,10 @@ namespace HMI.CD40.Module.BusinessEntities
 		private List<Rs<RdSrvTxRs>> _AssociateTxRs = new List<Rs<RdSrvTxRs>>();
 		private Dictionary<string, int> _RxPorts = new Dictionary<string, int>();
         private Dictionary<string, string> _RscSite = new Dictionary<string, string>();
-
+        //lalm 230323
+        private string _SelectedFrecuency = string.Empty;
         private Timer _PttOffTimer = new Timer();       //Timer que se activa al producirse un PTT off
+        private Timer _CambioFrTimer = new Timer();       //Timer que se activa al solicitar cambio frecuencia
 
         private void OnPttOffTimer(object sender, ElapsedEventArgs e)
         {
@@ -1001,7 +996,16 @@ namespace HMI.CD40.Module.BusinessEntities
                     General.SafeLaunchEvent(HfGlobalStatus, this, (HFStatusCodes)msg);
                     break;
 #endif
-			}
+                case Identifiers.FR_RXTX_CHANGE_RESPONSE_MSG://LALM 220228
+                    {
+                        // lalm 230303 uno de los dos se quitará
+                        // prueba...
+                        //General.SafeLaunchEvent(SiteChangedResult, this,(ChangeSiteRsp) msg);
+                        General.SafeLaunchEvent(FrecChangedResponse, this, (FrChangeRsp)msg);
+                    }
+                    break;
+
+            }
 		}
 
 		private void OnFrChanged(object sender)
@@ -1196,8 +1200,16 @@ namespace HMI.CD40.Module.BusinessEntities
                     _Estado = frRs.FrequencyStatus;
                     changed = true;
                  }
+                //lalm 230306
+                if (frRs.SelectedFrequency!="")
+                {
+                    SelectedFrecuency=frRs.SelectedFrequency;
+                    changed = true;
 
-			}
+
+                }
+
+            }
 
 			if (changed || changedQidx)
 			{
@@ -1294,6 +1306,49 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
+        //lalm 230301
+        private void OnFrTxRxChanged(object msg, short type)//cambiar por FrTxRxChanged
+        {
+            if (type == Identifiers.FR_RXTX_CHANGE_RESPONSE_MSG)
+            {
+                if (((FrChangeRsp)msg).resultado)
+                {
+                    _OldAlias = Alias = ((FrChangeRsp)msg).IdFrecuency;
+                    string newfrecuency = ((FrChangeRsp)msg).AssignedFrecuency;
+                    DescDestino= newfrecuency;
+                }
+                General.SafeLaunchEvent(FrecChangedResponse, this, (FrChangeRsp)msg);
+            }
+        }
+        private bool _FrecuenciaCambiada = true;
+        private string _FrecuenciaCambiadaErrormsg = "";
+        public bool FrecuenciaCambiada { get => _FrecuenciaCambiada; set => _FrecuenciaCambiada = value; }
+        public string FrecuenciaCambiadaErrormsg { get => _FrecuenciaCambiadaErrormsg; set => _FrecuenciaCambiadaErrormsg = value; }
+
+        private void OnCambioFrTimer(object sender, ElapsedEventArgs e)
+        {
+            Top.WorkingThread.Enqueue("OnCambioFrTimer", delegate ()
+            {
+                //Al vencer el timer hay que presentar error en ejecucion de cambio de frecuencia si no hay contestacion
+                if (FrecuenciaCambiada == true)
+                {
+                }
+                else 
+                {
+                    if (FrecuenciaCambiadaErrormsg == "")
+                    {
+                        ;// Messagebox("Error en Cambio de frecuencia", "Tiempo agotado");
+                        //NotifMsg msg = new NotifMsg(Resources.RtxNeedMoreFrecuenties, Resources.MessageErrorCaption, Resources.RtxNeedMoreFrecuenties, Settings.Default.MessageToutSg * 1000, MessageType.Error, MessageButtons.Ok);
+                        //_StateManager.ShowUIMessage(msg);
+                        // Enviar mensaje para ventana de error
+                        //General.SafeLaunchEvent(FrChangeResponse, this, (uint)0xFE);
+                    }
+                    else
+                        ;// Messagebox("Error en Cambio de frecuencia", FrecuenciaCambiadaErrormsg);
+                }
+            });
+        }
+
         private void OnSiteChanged(object msg, short type)
         {
             if (type == Identifiers.SITE_CHANGING_RSP)
@@ -1335,6 +1390,11 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
+        private void PresentaPanelRadio()
+        {
+            
+        }
+
         #endregion
-	}
+    }
 }

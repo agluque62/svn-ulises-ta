@@ -471,6 +471,11 @@
       <Component Id='u5ki.RemoteControlService' Guid='{D34B1DD6-9A4C-4304-934A-1660FEA98AC7}'>
         <File Id='u5ki.RemoteControlService' Name='u5ki.RemoteControlService.dll' />
       </Component>
+
+      <Component Id='u5ki.ConferenceService' Guid='{F157AE15-528B-6FA3-336C-F52927AC739D}'>
+        <File Id='u5ki.ConferenceService' Name='u5ki.ConferenceService.dll' />
+      </Component>
+      
     </ComponentGroup>
   </Fragment>
 

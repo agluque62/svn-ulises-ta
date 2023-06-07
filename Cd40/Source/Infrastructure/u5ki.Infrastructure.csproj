@@ -132,6 +132,7 @@
     <Compile Include="Code\Servers\SNMPListener.cs" />
     <Compile Include="Code\Servers\UDPListener.cs" />
     <Compile Include="GlobalTypes.cs" />
+    <Compile Include="Messages\conferencia.proto.cs" />
     <Compile Include="SipAgentCoresip.cs" />
     <Compile Include="U5kiIncidencias.cs" />
     <Compile Include="Code\Globals.cs" />
@@ -173,6 +174,7 @@
     </None>
     <None Include="Messages\Cd40Cfg.proto" />
     <None Include="Messages\Common.proto" />
+    <None Include="Messages\Conferencia.proto" />
     <None Include="Messages\NbxHist.proto" />
     <None Include="Messages\RdSrvMessages.proto" />
     <None Include="Messages\RegistryMessages.proto" />

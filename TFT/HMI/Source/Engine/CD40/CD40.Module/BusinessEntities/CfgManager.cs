@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Diagnostics;
+using System.Linq;
 
 using HMI.Model.Module.BusinessEntities;
 using HMI.CD40.Module.Properties;
@@ -10,6 +11,11 @@ using HMI.CD40.Module.Properties;
 using U5ki.Infrastructure;
 using Utilities;
 using NLog;
+using conferencia;
+using static System.Windows.Forms.LinkLabel;
+using NAudio.SoundFont;
+using static HMI.CD40.Module.BusinessEntities.TopRegistry;
+
 namespace HMI.CD40.Module.BusinessEntities
 {
 #if DEBUG
@@ -78,8 +84,10 @@ namespace HMI.CD40.Module.BusinessEntities
         private string STR_PUESTO_FS = "__FS__";
 
 		public event GenericEventHandler ConfigChanged;
+        public event GenericEventHandler<List <Conferencia>> ConferenciaGChanged;
         public event GenericEventHandler<bool> ProxyStateChangeCfg;
-		public string MainId
+        public event GenericEventHandler<ConferenceStatus> CambioConferenciaPreprogramada;//230516
+        public string MainId
 		{
 			get 
             {
@@ -100,7 +108,17 @@ namespace HMI.CD40.Module.BusinessEntities
 			get { return _UserCfg != null ? _UserCfg.User.ParametrosDelSector.NumFrecPagina : 0; }
 		}
 
-		public Permissions Permissions
+        public uint NumEnlacesInternosPag
+        {
+            get { return _UserCfg != null ? _UserCfg.User.ParametrosDelSector.NumEnlacesInternosPag : 0; }
+        }
+
+        public uint NumPagEnlacesInt
+        {
+            get { return _UserCfg != null ? _UserCfg.User.ParametrosDelSector.NumPagEnlacesInt : 0; }
+        }
+
+        public Permissions Permissions
 		{
 			get
 			{
@@ -178,6 +196,184 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 			}
 		}
+
+        struct EstructuraParticipante
+        {
+            public string uri;
+        }
+
+        struct EstructuraConferencia
+        {
+            public string nombresala;
+            public string IdConferencia;
+            public string IdSalaBkk;
+            public string PosHMI;
+            public string TipoConferencia;
+            public string alias;
+            public List<EstructuraParticipante> participante;
+        }
+        void rellenaconferencia(Conferencias c1)
+        {
+            // defino 4 confencias
+            // en la conferencias 1 cuatro participantes
+            // el la conferencias 2 tres participantes
+            // el la conferencias 3 dos participantes
+            // el la conferencias 4  un participantes
+            List<EstructuraConferencia> listaDeEstructuras = new List<EstructuraConferencia>();
+            List<EstructuraParticipante> listaParticipante = new List<EstructuraParticipante>();
+            EstructuraParticipante participante1 = new EstructuraParticipante();
+            EstructuraParticipante participante2 = new EstructuraParticipante();
+            EstructuraParticipante participante3 = new EstructuraParticipante();
+            EstructuraParticipante participante4 = new EstructuraParticipante();
+            List <EstructuraConferencia> conferencia = new List<EstructuraConferencia>();
+            EstructuraConferencia conferencia1 = new EstructuraConferencia();
+            EstructuraConferencia conferencia2 = new EstructuraConferencia();
+            EstructuraConferencia conferencia3 = new EstructuraConferencia();
+            EstructuraConferencia conferencia4 = new EstructuraConferencia();
+            
+            conferencia1.nombresala = "sala 1";
+            conferencia1.IdConferencia = "idconferencia1";
+            conferencia1.IdSalaBkk  = "1000";
+            conferencia1.PosHMI = "0";
+            conferencia1.TipoConferencia = "1";
+            conferencia1.alias = "Asala-1";
+            conferencia1.participante = new List <EstructuraParticipante>();
+            conferencia1.participante.Add(participante1);
+            conferencia1.participante.Add(participante2);
+            conferencia1.participante.Add(participante3);
+            conferencia1.participante.Add(participante4);
+
+            conferencia2.nombresala = "sala 2";
+            conferencia2.IdSalaBkk = "1001";
+            conferencia1.IdConferencia = "idconferencia2";
+            conferencia2.PosHMI = "1";
+            conferencia2.TipoConferencia = "1";
+            conferencia2.alias = "Asala-2";
+            conferencia2.participante = new List<EstructuraParticipante>();
+            conferencia2.participante.Add(participante1);
+            conferencia2.participante.Add(participante2);
+            conferencia2.participante.Add(participante3);
+
+            conferencia3.nombresala = "sala 3";
+            conferencia3.IdSalaBkk = "1002";
+            conferencia1.IdConferencia = "idconferencia3";
+            conferencia3.PosHMI = "2";
+            conferencia3.TipoConferencia = "3";
+            conferencia3.alias = "Asala-3";
+            conferencia3.participante = new List<EstructuraParticipante>();
+            conferencia3.participante.Add(participante1);
+            conferencia3.participante.Add(participante2);
+
+            conferencia4.nombresala = "sala 4";
+            conferencia4.IdSalaBkk = "2000";
+            conferencia1.IdConferencia = "idconferencia4";
+            conferencia4.PosHMI = "3";
+            conferencia4.TipoConferencia = "3";
+            conferencia4.alias = "Asala-4";
+            conferencia4.participante = new List<EstructuraParticipante>();
+            conferencia4.participante.Add(participante1);
+            conferencia3.participante.Add(participante2);
+            conferencia3.participante.Add(participante3);
+            conferencia3.participante.Add(participante4);
+
+            conferencia.Add(conferencia1);
+            conferencia.Add(conferencia2);
+            conferencia.Add(conferencia3);
+            conferencia.Add(conferencia4);
+
+            participante1.uri = "318011";
+            participante2.uri = "318012";
+            participante3.uri = "318013";
+            participante4.uri = "318014";
+
+            conferencia[0].participante.Add(participante1);
+            conferencia[0].participante.Add(participante2);
+            conferencia[0].participante.Add(participante3);
+            conferencia[0].participante.Add(participante4);
+
+            conferencia[1].participante.Add(participante1);
+            conferencia[1].participante.Add(participante2);
+            conferencia[1].participante.Add(participante3);
+            conferencia[1].participante.Add(participante4);
+
+            conferencia[2].participante.Add(participante1);
+            conferencia[2].participante.Add(participante2);
+            conferencia[2].participante.Add(participante3);
+            conferencia[2].participante.Add(participante4);
+
+            conferencia[3].participante.Add(participante1);
+            conferencia[3].participante.Add(participante2);
+            conferencia[3].participante.Add(participante3);
+            conferencia[3].participante.Add(participante4);
+
+            //test de prueba
+            for (int i = 0; i < conferencia.Count; i++)
+            {
+                ConferenciaProto c = new ConferenciaProto();
+                c.IdSistema = "1";
+                c.IdSalaBkk = conferencia[i].IdSalaBkk;// conferencia[i].alias;// "SConferencia-" + i.ToString();
+                c.IdConferencia = conferencia[i].IdConferencia;
+                c.Descripcion = "";
+                c.PosHMI = conferencia[i].PosHMI;// (i).ToString();
+                c.TipoConferencia = conferencia[i].TipoConferencia;// "1";
+                c.Alias = conferencia[i].alias;
+                for (int j = 0; j < 15; j++)
+                {
+                    Tipo_Lista_Participantes par = new Tipo_Lista_Participantes();
+                    //par.Tipo = "1";
+                    par.Descripcion = "";
+                    par.SipUri = "31801" + j.ToString();
+                    //par.Abonado_Sector = "abonado" + j.ToString();
+                    c.Lista_de_Participantes.Add(par);
+                }
+                c1.conferencia.Add(c);
+            }
+        }
+
+        public Conferencias conf = null;
+        public List<Conferencia> confcfg;// cambiada por conf.
+        public List<ConferenceStatus> confstatus = null;
+  
+        public IEnumerable<CfgEnlaceInterno> TlfLinksConf1(List<Conferencia>p1)
+        {
+            confcfg = p1;
+            foreach (Conferencia c in confcfg) c.Alias = (c.Alias == "") ? c.IdSalaBkk : c.Alias;
+            int NumPositionsByPage = (int)Top.Cfg.NumEnlacesInternosPag;
+            int max_a_presentar = NumPositionsByPage;
+            int numpages = Tlf.NumDestinations / NumPositionsByPage;
+            int firstposition = (numpages - 1) * NumPositionsByPage;//ultima pagina
+            List<CfgEnlaceInterno> lei = new List<CfgEnlaceInterno>();
+            string OrigenR2 = GetMainUser(Top.HostId);// "L2";
+            string abonado = GetNumeroAbonado(OrigenR2, 3);
+            foreach (Conferencia conf2 in p1)
+            {
+                foreach (Participantes p in conf2.participantesConferencia)
+                {
+                    if ((p.SipUri == abonado && conf2.PosHMI>0) /*|| (conf2.TipoConferencia == 1)*/)
+                    {
+                        CfgEnlaceInterno ei = new CfgEnlaceInterno();
+
+                        ei.Dependencia = GetProxyIp(out string idDependencia);
+                        ei.TipoEnlaceInterno = "DA";
+                        ei.OrigenR2 = OrigenR2;// "L2";
+                        CfgRecursoEnlaceInterno crei = new CfgRecursoEnlaceInterno();
+                        crei.Prefijo = Cd40Cfg.CONFERENCIA_DST;
+                        // Este es el numero de abonado al que llama, es decir la conferencia.
+                        crei.NumeroAbonado = conf2.IdSalaBkk;// "1000";
+                        crei.NombreRecurso = "RECURSOCONF";
+                        crei.Interface = TipoInterface.TI_BC;
+                        ei.ListaRecursos.Add(crei);
+                        ei.Literal = conf2.Alias;
+                        ei.Prioridad = 3;
+                        ei.PosicionHMI = (uint)conf2.PosHMI + (NumEnlacesInternosPag * NumPagEnlacesInt);// 45 /*+ 1*/;
+
+                        lei.Add(ei);
+                    }
+                }
+            }
+            return lei;
+        }
+
         public IEnumerable<CfgEnlaceInterno> MdTlfLinksPropios
         {
             get
@@ -307,8 +503,9 @@ namespace HMI.CD40.Module.BusinessEntities
             //LALM 210507 Comprobacion necesaria.
             if (Top.Registry!=null)
 			    Top.Registry.NewConfig += OnNewConfig;
-
-			_HostAddresses = new List<StrNumeroAbonado>();
+            if (Top.Registry != null) Top.Registry.NewConferenciaGlobal += OnNewConferenciaGlobal;
+            if (Top.Registry != null) Top.Registry.CambioConferenciaPreprogramada += OnCambioConferenciaPreprogramada;//230516
+            _HostAddresses = new List<StrNumeroAbonado>();
 		}
 
 		public void Start()
@@ -629,7 +826,7 @@ namespace HMI.CD40.Module.BusinessEntities
 			}
             // Por acceso indirecto, el prefijo PP
             // se comporta como un abonado con marcación
-            else if (prefix == Cd40Cfg.PP_DST)   
+            else if (prefix == Cd40Cfg.PP_DST || prefix== Cd40Cfg.CONFERENCIA_DST)   //LALM230428
             {
                 TlfNet net = new TlfNet();
                 Rs<GwTlfRs> rs = null;
@@ -646,7 +843,8 @@ namespace HMI.CD40.Module.BusinessEntities
                         rsIp = GetProxyIp(out idEquipo);
                         rs = Top.Registry.GetRs<GwTlfRs>(idEquipo);
                     }
-                    _Logger.Warn("Number not found in configurated resources {0}, use {1} instead", number, idEquipo);
+                    if (prefix!= Cd40Cfg.CONFERENCIA_DST)
+                        _Logger.Warn("Number not found in configurated resources {0}, use {1} instead", number, idEquipo);
                 }
                 //rs.Reset(null, new GwTlfRs());
                 if (rs != null)
@@ -937,7 +1135,7 @@ namespace HMI.CD40.Module.BusinessEntities
         /// Suitable for searches of groups of users                                                                                                                                                                                                                                                                                                                                                            º37t689
         /// </summary>
         private List<OperatorData> _Operators = new List<OperatorData>();
-
+        private Conferencias _conferencias;//230419
         private void OnProxyStateChangeCfg(object sender, bool state)
         {
             General.SafeLaunchEvent(ProxyStateChangeCfg, this, state);
@@ -985,6 +1183,26 @@ namespace HMI.CD40.Module.BusinessEntities
             
             General.SafeLaunchEvent(ConfigChanged, this);
         }
+        /// <summary>
+        /// Fills _Operators struct with  config received
+        /// </summary>
+
+#if DEBUG
+        public void OnNewConferenciaGlobal(object sender, List <Conferencia> confe)
+#else
+	    private void OnNewConferenciaGlobal(object sender, List<Conferencia> confe)
+#endif
+        {
+            General.SafeLaunchEvent(ConferenciaGChanged, this,confe);
+        }
+
+
+        //230516
+        public void OnCambioConferenciaPreprogramada(object sender, ConferenceStatus confe)
+        {
+            General.SafeLaunchEvent(CambioConferenciaPreprogramada, this, confe);
+        }
+
         /// <summary>
         /// Fills _Operators struct with  config received
         /// </summary>

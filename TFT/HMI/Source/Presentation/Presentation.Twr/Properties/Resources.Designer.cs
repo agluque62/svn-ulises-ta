@@ -930,6 +930,15 @@ namespace HMI.Presentation.Twr.Properties {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Cambio Frecuencia .
+        /// </summary>
+        internal static string TxRxChange {
+            get {
+                return ResourceManager.GetString("TxRxChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Unhang {

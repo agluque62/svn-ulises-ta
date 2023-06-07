@@ -1,0 +1,6 @@
+[
+{DescDestino: "132.000", SelectableFrequencies: ["120.000","121.000","122.000"], DefaultFrequency:"111.000", SelectedFrequency:"111.000"},
+{DescDestino: "131.000", SelectableFrequencies: ["123.000","124.000","125.000"], DefaultFrequency:"114.000", SelectedFrequency:"114.000"},
+{DescDestino: "130.000", SelectableFrequencies: ["111.000","127.000","128.000"], DefaultFrequency:"120.000", SelectedFrequency:""},
+{DescDestino: "133.000", SelectableFrequencies: ["129.000","129.005","129.010"], DefaultFrequency:"120.000", SelectedFrequency:""}
+]

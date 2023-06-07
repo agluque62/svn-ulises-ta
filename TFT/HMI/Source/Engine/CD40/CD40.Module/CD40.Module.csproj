@@ -111,6 +111,7 @@
     <Compile Include="BusinessEntities\AsioChannels.cs" />
     <Compile Include="BusinessEntities\CBinauralHwManager.cs" />
     <Compile Include="BusinessEntities\CfgManager.cs" />
+    <Compile Include="BusinessEntities\TlfConferencePrepro.cs" />
     <Compile Include="BusinessEntities\TlfForward.cs" />
     <Compile Include="BusinessEntities\TlfPickUp.cs" />
     <Compile Include="BusinessEntities\Scv.cs" />

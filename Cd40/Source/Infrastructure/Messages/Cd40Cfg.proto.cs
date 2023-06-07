@@ -1386,6 +1386,15 @@ namespace U5ki.Infrastructure
       get { return _RedundanciaRol; }
       set { _RedundanciaRol = value; }
     }
+
+    private int _Telemando = default(int);
+    [global::ProtoBuf.ProtoMember(15, IsRequired = false, Name=@"Telemando", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int Telemando
+    {
+      get { return _Telemando; }
+      set { _Telemando = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1632,6 +1641,22 @@ namespace U5ki.Infrastructure
     {
       get { return _PasivoRetransmision; }
       set { _PasivoRetransmision = value; }
+    }
+    private readonly global::System.Collections.Generic.List<string> _SelectableFrequencies = new global::System.Collections.Generic.List<string>();
+    [global::ProtoBuf.ProtoMember(28, Name=@"SelectableFrequencies", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<string> SelectableFrequencies
+    {
+      get { return _SelectableFrequencies; }
+    }
+  
+
+    private string _DefaultFrequency = "";
+    [global::ProtoBuf.ProtoMember(29, IsRequired = false, Name=@"DefaultFrequency", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string DefaultFrequency
+    {
+      get { return _DefaultFrequency; }
+      set { _DefaultFrequency = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -2139,6 +2164,87 @@ namespace U5ki.Infrastructure
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Participantes")]
+  public partial class Participantes : global::ProtoBuf.IExtensible
+  {
+    public Participantes() {}
+    
+
+    private string _SipUri = "";
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"SipUri", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string SipUri
+    {
+      get { return _SipUri; }
+      set { _SipUri = value; }
+    }
+
+    private string _Descripcion = "";
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"Descripcion", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string Descripcion
+    {
+      get { return _Descripcion; }
+      set { _Descripcion = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Conferencia")]
+  public partial class Conferencia : global::ProtoBuf.IExtensible
+  {
+    public Conferencia() {}
+    
+
+    private string _IdSalaBkk = "";
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"IdSalaBkk", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string IdSalaBkk
+    {
+      get { return _IdSalaBkk; }
+      set { _IdSalaBkk = value; }
+    }
+
+    private string _Alias = "";
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"Alias", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string Alias
+    {
+      get { return _Alias; }
+      set { _Alias = value; }
+    }
+
+    private int _TipoConferencia = default(int);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"TipoConferencia", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int TipoConferencia
+    {
+      get { return _TipoConferencia; }
+      set { _TipoConferencia = value; }
+    }
+
+    private int _PosHMI = default(int);
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"PosHMI", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int PosHMI
+    {
+      get { return _PosHMI; }
+      set { _PosHMI = value; }
+    }
+    private readonly global::System.Collections.Generic.List<U5ki.Infrastructure.Participantes> _participantesConferencia = new global::System.Collections.Generic.List<U5ki.Infrastructure.Participantes>();
+    [global::ProtoBuf.ProtoMember(5, Name=@"participantesConferencia", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<U5ki.Infrastructure.Participantes> participantesConferencia
+    {
+      get { return _participantesConferencia; }
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Cd40Cfg")]
   public partial class Cd40Cfg : global::ProtoBuf.IExtensible
   {
@@ -2188,6 +2294,13 @@ namespace U5ki.Infrastructure
     public global::System.Collections.Generic.List<U5ki.Infrastructure.Node> NodesEE
     {
       get { return _NodesEE; }
+    }
+  
+    private readonly global::System.Collections.Generic.List<U5ki.Infrastructure.Conferencia> _ConferenciasPreprogramadas = new global::System.Collections.Generic.List<U5ki.Infrastructure.Conferencia>();
+    [global::ProtoBuf.ProtoMember(7, Name=@"ConferenciasPreprogramadas", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<U5ki.Infrastructure.Conferencia> ConferenciasPreprogramadas
+    {
+      get { return _ConferenciasPreprogramadas; }
     }
   
     private global::ProtoBuf.IExtension extensionObject;

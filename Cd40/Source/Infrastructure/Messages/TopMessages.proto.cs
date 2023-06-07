@@ -332,4 +332,115 @@ namespace U5ki.Infrastructure
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"FrChangeAsk")]
+  public partial class FrChangeAsk : global::ProtoBuf.IExtensible
+  {
+    public FrChangeAsk() {}
+    
+    private string _HostId;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"HostId", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string HostId
+    {
+      get { return _HostId; }
+      set { _HostId = value; }
+    }
+    private string _IdFrecuency;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"IdFrecuency", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string IdFrecuency
+    {
+      get { return _IdFrecuency; }
+      set { _IdFrecuency = value; }
+    }
+    private string _NewFrecuency;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"NewFrecuency", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string NewFrecuency
+    {
+      get { return _NewFrecuency; }
+      set { _NewFrecuency = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"FrChangeRsp")]
+  public partial class FrChangeRsp : global::ProtoBuf.IExtensible
+  {
+    public FrChangeRsp() {}
+    
+    private bool _resultado;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"resultado", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public bool resultado
+    {
+      get { return _resultado; }
+      set { _resultado = value; }
+    }
+    private string _IdFrecuency;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"IdFrecuency", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string IdFrecuency
+    {
+      get { return _IdFrecuency; }
+      set { _IdFrecuency = value; }
+    }
+    private string _AssignedFrecuency;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"AssignedFrecuency", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string AssignedFrecuency
+    {
+      get { return _AssignedFrecuency; }
+      set { _AssignedFrecuency = value; }
+    }
+    private uint _Code;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"Code", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint Code
+    {
+      get { return _Code; }
+      set { _Code = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ConferenceStatus")]
+  public partial class ConferenceStatus : global::ProtoBuf.IExtensible
+  {
+    public ConferenceStatus() {}
+    
+    private string _RoomName;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"RoomName", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string RoomName
+    {
+      get { return _RoomName; }
+      set { _RoomName = value; }
+    }
+    private U5ki.Infrastructure.ConferenceStatus.ConfStatus _Status;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"Status", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public U5ki.Infrastructure.ConferenceStatus.ConfStatus Status
+    {
+      get { return _Status; }
+      set { _Status = value; }
+    }
+    private readonly global::System.Collections.Generic.List<string> _ActiveParticipants = new global::System.Collections.Generic.List<string>();
+    [global::ProtoBuf.ProtoMember(3, Name=@"ActiveParticipants", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<string> ActiveParticipants
+    {
+      get { return _ActiveParticipants; }
+    }
+  
+    [global::ProtoBuf.ProtoContract(Name=@"ConfStatus")]
+    public enum ConfStatus
+    {
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"Ok", Value=0)]
+      Ok = 0,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"Error", Value=1)]
+      Error = 1
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
 }

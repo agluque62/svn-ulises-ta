@@ -64,6 +64,10 @@ namespace HMI.Model.Module.Services
 		void PlayRadioClick();
 		void StopAudioReproduccion();
 		void SetNewFrecuency(int id, string fr);//LALM 221102 cambiofrecuencia
-
+		List<string> RefrescaListaParticipantesConf(string sala);//lalm 230510 model 
+		List<string> GetListaParticipantesEstado(string sala);//lalm 230510 model 
+		string GetSala(int poshmi);//lalm 230517
+		void DisableFunctionsPagConferencia(bool disable=true);
+		void ShowAdButtons(int page);
 	}
 }

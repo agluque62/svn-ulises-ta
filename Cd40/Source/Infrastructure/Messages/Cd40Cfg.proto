@@ -12,31 +12,31 @@ enum Tipo_Elemento_HW
 
 enum TipoInterface 
 {
-  TI_Radio = 0;
-  TI_LCEN = 1;
-  TI_BC = 2;
-  TI_BL = 3;
-  TI_AB = 4;
-  TI_ATS_R2 = 5;
-  TI_ATS_N5 = 6;
-  TI_ATS_QSIG = 7;
-  TI_ISDN_2BD = 8;
-  TI_ISDN_30BD = 9;
-  TI_I_O = 10;
-  TI_DATOS = 11;
-  TI_RRC = 12;
-  TI_EyM_PP = 13;
-  TI_EyM_MARC = 14;
-  TI_IP = 15;
-  TI_IP_PROXY = 16;
+	TI_Radio = 0;
+	TI_LCEN = 1;
+	TI_BC = 2;
+	TI_BL = 3;
+	TI_AB = 4;
+	TI_ATS_R2 = 5;
+	TI_ATS_N5 = 6;
+	TI_ATS_QSIG = 7;
+	TI_ISDN_2BD = 8;
+	TI_ISDN_30BD = 9;
+	TI_I_O = 10;
+	TI_DATOS = 11;
+	TI_RRC = 12;
+	TI_EyM_PP = 13;
+	TI_EyM_MARC = 14;
+	TI_IP = 15;
+	TI_IP_PROXY = 16;
 }
 
 enum Tipo_Frecuencia 
 {
-    Basica = 0;
-    HF = 1;
-    VHF = 2;
-    UHF = 3;
+		Basica = 0;
+		HF = 1;
+		VHF = 2;
+		UHF = 3;
 	DUAL = 4;
 	FD = 5;
 	ME = 6;
@@ -48,62 +48,62 @@ enum Tipo_Canal
 	Multicanal = 1;
 	Otros = 2;
 }
-    
+		
 enum Tipo_Formato_Trabajo 
 {
-    Principal = 0;
-    Reserva = 1;
-    Ambos = 2;
+		Principal = 0;
+		Reserva = 1;
+		Ambos = 2;
 }
 
 enum Tipo_Formato_Frecuencia 
 {
-    MHz = 0;
+		MHz = 0;
 	Hz = 1;
 }
 
 enum GearChannelSpacings
 {
 	ChannelSpacingsDefault = 0;
-    kHz_8_33 = 1; 
-    kHz_12_5 = 2;
-    kHz_25_00 = 3;
+		kHz_8_33 = 1; 
+		kHz_12_5 = 2;
+		kHz_25_00 = 3;
 }
 
 enum GearCarrierOffStatus
 {
-    Off = 0;
-    kHz_7_5 = 1;
-    kHz_5_0 = 2;
-    kHz_2_5 = 3;
-    Hz_0_0 = 4;
-    kHz_minus_2_5 = 5;
-    kHz_minus_5_0 = 6;
-    kHz_minus_7_5 = 7;
-    kHz_8 = 8;
-    kHz_4 = 9;
-    kHz_minus_4 = 10;
-    kHz_minus_8 = 11;
-    kHz_7_3 = 12;
-    kHz_minus_7_3 = 13;
+		Off = 0;
+		kHz_7_5 = 1;
+		kHz_5_0 = 2;
+		kHz_2_5 = 3;
+		Hz_0_0 = 4;
+		kHz_minus_2_5 = 5;
+		kHz_minus_5_0 = 6;
+		kHz_minus_7_5 = 7;
+		kHz_8 = 8;
+		kHz_4 = 9;
+		kHz_minus_4 = 10;
+		kHz_minus_8 = 11;
+		kHz_7_3 = 12;
+		kHz_minus_7_3 = 13;
 }
 
 enum GearModulations
 {
-    AM = 0;
-    Reserved = 1;
-    ACARS = 2;
-    VDL2 = 3;
-    AM_CT = 4;
+		AM = 0;
+		Reserved = 1;
+		ACARS = 2;
+		VDL2 = 3;
+		AM_CT = 4;
 }
 
 enum GearPowerLevels
 {
 	PowerLevelsDefault = 0;
-    Low = 1;
-    Normal = 2;
+		Low = 1;
+		Normal = 2;
 }
-    
+		
 enum Tipo_MetodoCalculoClimax
 {
 	Relativo = 0;
@@ -112,10 +112,10 @@ enum Tipo_MetodoCalculoClimax
 
 enum Tipo_ModoTransmision
 {
-    Climax = 0;
+		Climax = 0;
 	UltimoReceptor = 1;
 	Manual = 2;
-    Ninguno = 3;
+		Ninguno = 3;
 }
 message ParametrosGeneralesSistema 
 {
@@ -334,11 +334,12 @@ message CfgRecursoEnlaceExterno
 	optional string NombreZona = 7;
 	optional uint32 MetodoBss = 8;
 	optional string IdMetodoBss = 9;
-    optional int32 GrsDelay = 10;
+		optional int32 GrsDelay = 10;
 	optional int32 OffSetFrequency = 11;
 	optional bool EnableEventPttSq = 12;
 	optional string RedundanciaIdPareja = 13;
 	optional string RedundanciaRol = 14;
+	optional int32 Telemando = 15; 
 }
 
 message CfgEnlaceExterno
@@ -366,10 +367,12 @@ message CfgEnlaceExterno
 	optional int32 CldSupervisionTime = 21;
 	optional int32 MetodosBssOfrecidos = 22;	
 	optional Tipo_ModoTransmision ModoTransmision = 23;
-    optional string EmplazamientoDefecto = 24;
+		optional string EmplazamientoDefecto = 24;
 	optional int32 TiempoVueltaADefecto = 25;
 	optional uint32 PorcentajeRSSI = 26;
 	optional bool PasivoRetransmision = 27;
+	repeated string SelectableFrequencies = 28;
+	optional string DefaultFrequency = 29;
 }
 
 message CfgRecursoEnlaceInterno
@@ -436,13 +439,13 @@ message Node
 	required string IpGestor = 3;
 	required string Oid = 4;
 	repeated HfRangoFrecuencias Frecs = 5;
-    required bool EsReceptor = 6;
-    required bool EsTransmisor = 7;
-    required Tipo_Frecuencia TipoDeFrecuencia = 8;
+		required bool EsReceptor = 6;
+		required bool EsTransmisor = 7;
+		required Tipo_Frecuencia TipoDeFrecuencia = 8;
 	required string FrecuenciaPrincipal = 9;
-    required Tipo_Canal TipoDeCanal = 10;
-    required Tipo_Formato_Trabajo FormaDeTrabajo = 11;
-    required int32 Prioridad = 12;
+		required Tipo_Canal TipoDeCanal = 10;
+		required Tipo_Formato_Trabajo FormaDeTrabajo = 11;
+		required int32 Prioridad = 12;
 	optional uint32 Puerto = 13;
 	optional GearCarrierOffStatus Offset = 14;
 	optional GearChannelSpacings Canalizacion = 15;
@@ -455,7 +458,22 @@ message Node
 	optional string idEmplazamiento = 22;
 }
 
-message Cd40Cfg 
+message Participantes
+{
+	optional string SipUri=1;
+	optional string Descripcion=2;
+}
+
+message Conferencia
+{
+	optional string IdSalaBkk = 1;
+	optional string Alias = 2;
+	optional int32 TipoConferencia = 3;
+	optional int32 PosHMI = 4;
+	repeated Participantes participantesConferencia = 5;
+}
+
+message Cd40Cfg
 {
 	optional string Version = 1;
 	optional ConfiguracionSistema ConfiguracionGeneral = 2;
@@ -463,4 +481,5 @@ message Cd40Cfg
 	repeated PoolHfElement PoolHf = 4;
 	repeated Node NodesMN = 5;
 	repeated Node NodesEE = 6;
+	repeated Conferencia ConferenciasPreprogramadas = 7;
 }

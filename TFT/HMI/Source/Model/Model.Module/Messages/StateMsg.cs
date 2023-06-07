@@ -52,5 +52,20 @@ namespace HMI.Model.Module.Messages
 			return string.Format("[Oid={0}] | [Value={1}]", Oid, Value);
 		}
 	}
+	
+	//lalm 230303
+    public sealed class FrChangeMsg<T1> : EventArgs
+    {
+        public readonly T1 State;
 
+        public FrChangeMsg(T1 st)
+        {
+            State = st;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[State={0}", State);
+        }
+    }
 }

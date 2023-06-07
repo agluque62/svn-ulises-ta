@@ -865,7 +865,7 @@ namespace u5ki.RemoteControlService
         /// <param name="frecuency"></param>
         /// <param name="openSession"></param>
         /// <returns></returns>
-        private GearOperationStatus SNMPFrecuencySet(String targetIp, String frecuency, Boolean openSession = true)
+        public GearOperationStatus SNMPFrecuencySet(String targetIp, String frecuency, Boolean openSession = true)
         {
             String logMethod = "FRECUENCY SET";
 #if DEBUG
@@ -928,7 +928,7 @@ namespace u5ki.RemoteControlService
         /// </summary>
         /// <param name="targetIp"></param>
         /// <returns></returns>
-        private String SNMPFrecuencyGet(String targetIp)
+        public String SNMPFrecuencyGet(String targetIp)
         {
             String logMethod = "FRECUENCY GET";
 #if DEBUG

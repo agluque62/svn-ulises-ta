@@ -125,6 +125,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="RdFrecuency.cs" />
+    <Compile Include="RdFreqRdCtrl.cs" />
     <Compile Include="RdGestorHF.cs" />
     <Compile Include="RdMixer.cs" />
     <Compile Include="RdRegistry.cs" />

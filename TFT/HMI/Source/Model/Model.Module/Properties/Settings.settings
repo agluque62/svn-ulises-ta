@@ -131,5 +131,14 @@
     <Setting Name="DirectorioGLPRxRadio" Type="System.String" Scope="Application">
       <Value Profile="(Default)">DirectorioGLPRxRadio</Value>
     </Setting>
+    <Setting Name="NumPagEnlacesInt" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="PagConferencia" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="NumTlfDestinationsCP" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

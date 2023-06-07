@@ -10,6 +10,7 @@ using U5ki.Infrastructure;
 using Utilities;
 using ProtoBuf;
 using NLog;
+using conferencia;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
@@ -20,18 +21,21 @@ namespace HMI.CD40.Module.BusinessEntities
 #endif     	
 	{
 		public event GenericEventHandler<Cd40Cfg> NewConfig;
+        public event GenericEventHandler<List<Conferencia>> NewConferenciaGlobal;
+        public event GenericEventHandler<ConferenceStatus> CambioConferenciaPreprogramada;//230516
 
-		//public static string Id
-		//{
-		//   get { return _Registry.Id; }
-		//}
 
-		//public static string UserName
-		//{
-		//   set { _UserName = value; }
-		//}
+        //public static string Id
+        //{
+        //   get { return _Registry.Id; }
+        //}
 
-		public TopRegistry()
+        //public static string UserName
+        //{
+        //   set { _UserName = value; }
+        //}
+
+        public TopRegistry()
 			: base("Cd40Top")
 		{
 		}
@@ -49,9 +53,11 @@ namespace HMI.CD40.Module.BusinessEntities
 			SubscribeToTopic<RdSrvRxRs>(Identifiers.RdTopic);
 			SubscribeToTopic<RdSrvTxRs>(Identifiers.RdTopic);
 			SubscribeToTopic<RdSrvFrRs>(Identifiers.RdTopic);
-		}
+			//280418
+			//SubscribeToTopic<Cd40Cfg>(Identifiers.CfgTopic);
+        }
 
-		public void Start()
+        public void Start()
 		{
 			Join(Identifiers.CfgTopic, Identifiers.TopTopic, Identifiers.GwTopic, Identifiers.RdTopic);
 
@@ -87,7 +93,9 @@ namespace HMI.CD40.Module.BusinessEntities
 				// Incidencia #4682
 				// si el recurso ya esta creado, hay que volver ha obtenerlo para su posterior comprobacion.
 				rs = _Resources[rsUid];
-				if ((rs is Rs<GwTlfRs>) || (rs is Rs<GwLcRs>))
+				if (rs.Id=="RECURSOCONF")//LALM230426
+                    rs.Reset(null, new T());   //Se inicializa sin ASPA
+                if ((rs is Rs<GwTlfRs>) || (rs is Rs<GwLcRs>))
 				{
 					DireccionamientoIP hostInfo = Top.Cfg.GetGwRsHostInfo(rsName);
 					if ((hostInfo != null) && (hostInfo.TipoHost != Tipo_Elemento_HW.TEH_TOP) &&
@@ -216,20 +224,18 @@ namespace HMI.CD40.Module.BusinessEntities
 		public void SetNewFrecuency(string fr, string literal, uint pttType, bool checkAlreadyAssigned)
 		{
 			_Logger.Trace($"SetNewFrecuency <{fr}>: {fr}, Literal {literal}, AlreadyAssigned {checkAlreadyAssigned}");
-			// Aqui habría que crear otra estructura, con protobuf.
-			FrTxChangeAsk change = new FrTxChangeAsk();
+			FrChangeAsk change = new FrChangeAsk();
 			change.HostId = Top.HostId;
-			change.Frecuency = fr;
-			//change.Tx = tx;
-			//change.PttType = pttType;
-			//change.CheckAlreadyAssigned = checkAlreadyAssigned;
+			change.IdFrecuency = literal;
+			change.NewFrecuency= fr;
 
 			Send(Identifiers.RdMasterTopic, Identifiers.FR_RXTX_CHANGE_ASK_MSG, change);
-		}
+            _Logger.Trace("SetNewFrecuency {0} {1} {2}",change.HostId,change.IdFrecuency,change.NewFrecuency);
+        }
 
-		#region Private Members
+        #region Private Members
 
-		private static Logger _Logger = LogManager.GetLogger("TopRegistry");
+        private static Logger _Logger = LogManager.GetLogger("TopRegistry");
 		//private static Logger _Logger = LogManager.GetCurrentClassLogger();
 		private Dictionary<string, Resource> _Resources = new Dictionary<string, Resource>();
 
@@ -425,29 +431,121 @@ namespace HMI.CD40.Module.BusinessEntities
 					});
                 }
 #if _HF_GLOBAL_STATUS_
-                else if (msg.Type == Identifiers.HF_STATUS)
-                {
-                    HFStatus status = Deserialize<HFStatus>(msg.Data, msg.Length);
+				else if (msg.Type == Identifiers.HF_STATUS)
+				{
+					HFStatus status = Deserialize<HFStatus>(msg.Data, msg.Length);
 
-                    string type = "_" + Identifiers.TypeId(typeof(RdSrvFrRs));
+					string type = "_" + Identifiers.TypeId(typeof(RdSrvFrRs));
 
-                    Top.WorkingThread.Enqueue("HFStatus", delegate()
+					Top.WorkingThread.Enqueue("HFStatus", delegate ()
+					{
+						foreach (KeyValuePair<string, Resource> par in _Resources)
+						{
+							if (par.Key.Contains(type))
+							{
+								par.Value.NotifNewMsg(msg.Type, status.code);
+							}
+						}
+					}
+					);
+				}
+#endif
+				else if (msg.Type == Identifiers.CONFERENCE_STATUS)
+				{
+					ConferenceStatus status = Deserialize<ConferenceStatus>(msg.Data, msg.Length);
+					Top.WorkingThread.Enqueue("ConferenceStatus", delegate ()
+					{
+						string type = "_" + Identifiers.TypeId(typeof(ConferenceStatus));
+						type = status.RoomName;
+						List<string> par = status.ActiveParticipants;
+						if (Top.Cfg.confstatus == null) Top.Cfg.confstatus = new List<ConferenceStatus>();
+						if (Top.Cfg.confstatus.Where(i => i.RoomName == status.RoomName).Count() == 0)
+						{
+							Top.Cfg.confstatus.Add(status);
+							General.SafeLaunchEvent(CambioConferenciaPreprogramada, this, status);
+						}
+						// inserto los que estan
+						foreach (string p in status.ActiveParticipants)
+						{
+							foreach (ConferenceStatus c in Top.Cfg.confstatus)
+							{
+								if (c.RoomName == status.RoomName)
+								{
+									foreach (string par1 in status.ActiveParticipants)
+									{
+										if (!c.ActiveParticipants.Contains(par1))
+										{
+											c.ActiveParticipants.Add(par1);
+											foreach (KeyValuePair<string, Resource> park in _Resources)
+											{
+												if (park.Key.Contains(type))
+												{
+													park.Value.NotifCambioParticipantes(msg.Type, status);
+													//General.SafeLaunchEvent(Top.Tlf.CambioConferenciaPreprogramada, this, null);
+													General.SafeLaunchEvent(CambioConferenciaPreprogramada, this, status);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						// borro los que no estan
+						//Top.Cfg.confstatus.RemoveAll(c => c.RoomName == status.RoomName && !c.ActiveParticipants.Contains(status.ActiveParticipants));
+
+
+						var select = Top.Cfg.confstatus.FirstOrDefault(r => r.RoomName == status.RoomName)?
+							.ActiveParticipants.RemoveAll(e => status.ActiveParticipants.Contains(e) == false);
+						if (select!=0)
+							Top.Cfg.confstatus.FirstOrDefault(r => r.RoomName == status.RoomName)?
+							.ActiveParticipants.RemoveAll(e => status.ActiveParticipants.Contains(e) == false);
+
+						//foreach (ConferenceStatus c in Top.Cfg.confstatus)
+						//{
+						//	if (c.RoomName == status.RoomName)
+						//	{
+						//		Top.Cfg.confstatus.RemoveAll(elemento => status.c.!listaReferencia.Contains(elemento));
+						//		foreach (string p1 in c.ActiveParticipants)
+						//		{
+						//			if (status.ActiveParticipants.Contains(p1))
+						//			{
+						//				c.ActiveParticipants.Remove(p1);
+						//			}
+						//		}
+						//	}
+						//}
+					});
+				}
+				else if (msg.Type==Identifiers.FR_RXTX_CHANGE_RESPONSE_MSG)
+				{
+                    FrChangeRsp resp = Deserialize<FrChangeRsp>(msg.Data, msg.Length);
+                    string type = Identifiers.TypeId(typeof(RdSrvFrRs));
+                    string rsUid = resp.IdFrecuency.ToUpper() + "_" + type;
+					string id = resp.IdFrecuency;
+					string newfrecuency = resp.AssignedFrecuency;
+					bool resultado = resp.resultado;
+					uint code = resp.Code;
+
+                    _Logger.Trace($"OnMsg Fr_rxtx Change Response <{resp.IdFrecuency}>: {newfrecuency}");
+
+                    Top.WorkingThread.Enqueue("ChangingFrecuencyResponse", delegate ()
                     {
-                        foreach (KeyValuePair<string, Resource> par in _Resources)
+                        Resource resource;
+                        if (_Resources.TryGetValue(rsUid, out resource))
                         {
-                            if (par.Key.Contains(type))
-                            {
-                                par.Value.NotifNewMsg(msg.Type, status.code);
-                            }
+                            resource.NotifFrChanged(msg.Type, resp);
                         }
-                    }
-                    );
+                        else
+                        {
+                            _Logger.Error($"OnMsg Site Change Response Error. Resource not Found <{rsUid}>");
+                        }
+                    });
+
                 }
-				else
+                else
 				{
 					_Logger.Error($"OnMsgReceived Error. Unknown type <{msg.Type}>");
 				}
-#endif
 			}
 			catch (Exception ex)
 			{
@@ -467,8 +565,13 @@ namespace HMI.CD40.Module.BusinessEntities
                 });
             }
         }
+		public Conferencias CfgConferencia()
+		{
+			
+            return new Conferencias();
+        }
 
-		private void CfgChanged(RsChangeInfo change)
+        private void CfgChanged(RsChangeInfo change)
 		{
             Cd40Cfg cfg = Deserialize<Cd40Cfg>(Tools.Decompress(change.Content));
 
@@ -502,12 +605,18 @@ namespace HMI.CD40.Module.BusinessEntities
 						}
 					}
 					LogResourcesConfig();
+                    //230418
+					List<Conferencia> c1 = cfg.ConferenciasPreprogramadas;
+					if (c1.Count>0)
+						if (c1.Where(i => i.IdSalaBkk.Contains("NOCONFERENCIA")).Count()==0)
+							General.SafeLaunchEvent(NewConferenciaGlobal, this, c1);
 				});
 			}
 		}
 
-		//RQF-49
-		public class dependencia
+
+        //RQF-49
+        public class dependencia
 		{
 			private string id;
 			private string ip;

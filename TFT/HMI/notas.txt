@@ -1,3 +1,126 @@
+/** 2014-02-18 */
+
+	Procedimiento para una actualización de formato de la configuracion...
+
+		1. Actualizar la referencia al servicio WEB...
+			Actualizará las clases de referencia SOAP.
+
+		1.1 Se obtiene el fichero WSDL y el Reference.cs 
+			Dentro del Proyecto u5ki.CfgService/Web References está SoapCfg. En sus Propiedades se pone:			
+			http://192.168.1.4/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx
+			
+			Después con botón derecho del ratón sobre SoapCfg se actualiza la referencia Web.
+
+			Con eso se actualiza el fichero  ulises-ta\Sources\Cd40\Source\CfgService\Web References\SoapCfg\InterfazSoapConfiguracion.wsdl
+			y el ulises-ta\Sources\Cd40\Source\CfgService\Web References\SoapCfg\Reference.cs
+
+			Se modifica a mano el fichero de esta solucion 'Cd40Cfg.proto'. y Se genera con ulises-ta\Tools\protobuf-net\protogen.exe el Cd40Cfg.proto.cs
+			cd C:\SOURCES_SVN\eduSp23_3\ulises-ta\Sources\Cd40\Source\Infrastructure\Messages\
+			C:\SOURCES_SVN\eduSp23_3\ulises-ta\Tools\protobuf-net\protogen.exe -i:Cd40Cfg.proto -o:Cd40Cfg.proto.cs
+			C:\Proyectos\sprintLuis2303_2839\Tools\protobuf-net\protogen.exe -i:Cd40Cfg.proto -o:Cd40Cfg.proto.cs
+			C:\Proyectos\sprintLuis2303_maspaginas\Tools\protobuf-net\protogen.exe -i:Cd40Cfg.proto -o:Cd40Cfg.proto.cs
+			Se modifica el fichero CfgTranslators.cs, la función Translate
+
+
+		2. Actualizar fichero 'protobuf'
+			Actualizar ficheros '.proto'
+			Compilar ficheros. Generan las clases de referencia 'protobuf'.
+				'protogen.exe"
+
+		3. Modificar los 'traductores' para copiar los datos de formato SOAP --> PROTOBUF
+
+		4. Los nuevos parámetros se acceden desde el formato PROTOBUF para su utilizacion.
+
+
+	Ideas para el desarrollo...
+
+		1. Servicio WEB de configuracion sin enlace a base de datos...
+		2. Agente SNMP para simular el telemando...
+
+
+Envio 14-10-2014
+	
+	1. Actualizar NLOG 3. Incluir defecto escritura 'event-log'
+	2. En config nodebox puerto presencia = 1022
+	3. Al arrancar ir al directorio de trabajo del servicio.
+	4. Proteccion CALLBACK WebServer frente a errores internos.
+	5. SipLogLevel Default=3.
+	6. Centrar login en IE.
+	7. Controlar con excepciones, el arranque y parada del NODEBOX.
+
+	14-10-2014. Ideas para el Desarrollo...
+	
+Envio 18-11-2014
+
+	Define:
+		_LOCKING_
+			En RdService, CfgService y TifxService. Activa un LOCK global en sus funciones. 
+			Por defecto 'desactivado'.
+		
+		_HF_RTPOLL_
+			En RdService, permite un Polling Multitarea a los equipos HF. Por defecto Activado...
+			
+		_HF_GLOBAL_STATUS_
+			En RdService, envia de forma periódica (2seg) y en los cambios el estado global del
+			Subsistema HF...
+		
+		_NETWORK_SUP_
+		_NETWORK_SUP_POLLING_
+			En Nodebox. Supervisa el estado de la RED. Por defecto activados.
+		
+		_IPE_NOSPREAD_
+			En Infrastrure. Comunicacion entre procesos sin 'SPREAD'. Por defecto activado....
+		
+		_SPREAD_ALL_MEMBERS_
+			En Infrastructure. Activa la nueva gestion de MASTER. Por defecto activado...
+		
+
+	1. coresip.dll sin mensajes "Arrancando TIMER SESSION" y "Decodificando SDP"
+	2. Mecanismo de seleccion determinista del MASTER. Basado en 'spread.conf'
+	3. Quita de Infraestructure: SpreadTest.
+	4. Compatibilidad con 'spread 4.4.0'
+	5. Gestor de Incidencias sin 'spread'
+	6. Incidencia HF-DESCONECTADO solo en transiciones.
+	7. Polling 'multithread' al estado de los equipos radio HF.
+	8. TIFX. Selecciona FUENTE Multicast. Nuevo parámetro 'tifxmcastSrc'
+	9. Supervision de la RED. Sin red se desactivan los 'servicios'.
+	10. Nuevo parámetro 'AdaptadorRed'. Marca la interfaz de red a supervisar...
+	11. Estado Equipo HF => stdNoResource solo si no estaba en 'stdNoinfo'
+	12. 'RdRegistry'. Activate <= ON. Retraso un segundo entre Dispose e INIT
+
+
+	GRUPO DE RETRANSMISION
+	----------------------
+
+	El mensaje para formarlo es RTX_GROUP_CHANGE_ASK_MSG
+	Cuando llega ese mensaje se llama a ProcessRtxGroupChangeAsk
+	Con el requisito RQF-36 hay que permitir sólo que se deshaga completamente la retransmisión con squelch en el hmi. Y cuando se llama 
+	ProcessRtxGroupChangeAsk, la estructura RtxGroupChangeAsk, tiene que tener todos los change en delete
+
+
+
+
+	
+	
+	
+	
+
+	
+	
+	
+	
+
+
+
+
+
+
+11-4-23
+Para poder modificar los recursos es necesario que los modulos esten compilados en anycpu
+hay dudas con coresip-voter que usa x86, ese modulo dejarlo en x86 y probar
+u5ki.Infraestructure debe tener x86
+
+
 10-01-23 Sprint23-01
 04-10-2022 Nueva entrega con la grabación probada.
 01-09-2022 Sprint 12
@@ -7,49 +130,116 @@ La primera vez que se compila en version release genera fallos, que se arreglan 
 Sale con el atavoz hf puesto
 Salen con los jacks insertados (simlador de audio)
 
-14-6-2022 Spring 8
-01-6-2022 Version preliminar de 2.6.2.spring8
-23-5-2022 Fin Spring#7 c2.6.2
-03-5-2022 Fin Spring#6 v2.6.2
-27-1-2022 Fin Spring#2.6.2
-16-12-2021 Fin Spring#1
+	Procedimiento para una actualización de formato de la configuracion...
 
-Notas Envio 18-11-2014
+		1. Actualizar la referencia al servicio WEB...
+			Actualizará las clases de referencia SOAP.
+
+		1.1 Se obtiene el fichero WSDL y el Reference.cs 
+			Dentro del Proyecto u5ki.CfgService/Web References está SoapCfg. En sus Propiedades se pone:			
+			http://192.168.1.4/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfiguracion.asmx
+			
+			Después con botón derecho del ratón sobre SoapCfg se actualiza la referencia Web.
+
+			Con eso se actualiza el fichero  ulises-ta\Sources\Cd40\Source\CfgService\Web References\SoapCfg\InterfazSoapConfiguracion.wsdl
+			y el ulises-ta\Sources\Cd40\Source\CfgService\Web References\SoapCfg\Reference.cs
+
+			Se modifica a mano el fichero de esta solucion 'Cd40Cfg.proto'. y Se genera con ulises-ta\Tools\protobuf-net\protogen.exe el Cd40Cfg.proto.cs
+			cd C:\SOURCES_SVN\eduSp23_3\ulises-ta\Sources\Cd40\Source\Infrastructure\Messages\
+			C:\SOURCES_SVN\eduSp23_3\ulises-ta\Tools\protobuf-net\protogen.exe -i:Cd40Cfg.proto -o:Cd40Cfg.proto.cs
+			C:\Proyectos\sprintLuis2303_2839\Tools\protobuf-net\protogen.exe -i:Cd40Cfg.proto -o:Cd40Cfg.proto.cs
+
+			Se modifica el fichero CfgTranslators.cs, la función Translate
+
+
+		2. Actualizar fichero 'protobuf'
+			Actualizar ficheros '.proto'
+			Compilar ficheros. Generan las clases de referencia 'protobuf'.
+				'protogen.exe"
+
+		3. Modificar los 'traductores' para copiar los datos de formato SOAP --> PROTOBUF
+
+		4. Los nuevos parámetros se acceden desde el formato PROTOBUF para su utilizacion.
+
+
+	Ideas para el desarrollo...
+
+		1. Servicio WEB de configuracion sin enlace a base de datos...
+		2. Agente SNMP para simular el telemando...
+
+
+Envio 14-10-2014
+	
+	1. Actualizar NLOG 3. Incluir defecto escritura 'event-log'
+	2. En config nodebox puerto presencia = 1022
+	3. Al arrancar ir al directorio de trabajo del servicio.
+	4. Proteccion CALLBACK WebServer frente a errores internos.
+	5. SipLogLevel Default=3.
+	6. Centrar login en IE.
+	7. Controlar con excepciones, el arranque y parada del NODEBOX.
+
+	14-10-2014. Ideas para el Desarrollo...
+	
+Envio 18-11-2014
 
 	Define:
-		_AUDIOGENERIC_: Modificaciones en Gestión Dispositivos de Audio...
-
-			Nuevos Parámetros:
-				'TipoAudioUsb'...
-				'RdSpkAsioId'
-				'LcSpkAsioId'
-				'MicAsioId'
-				'CasAsioId'
-				
-			Modificado HwManager, para incluir las diferentes opciones.
-			Modificado MixedManager, para incluir las dos opciones.
-			Modificado RecorderManager para nueva interfaz de señalizacion de grabacion.
-			Añadidos:
-				Source/Engine/CD40/CD40.Module/BusinessEntities/CMediaHwManager.cs
-				Source/Engine/CD40/CD40.Module/BusinessEntities/GenericHwManager.cs
-				Source/Engine/CD40/CD40.Module/BusinessEntities/Hid.cs
-
-			Añadido:
-				Source/Infrastructure/BlueWave.Interop.Asio: Nueva DLL, para detectar los canales de audio.
-				
-			Supervision de Errores en Tarjetas de AUDIO. 
-				!!! Sin Terminar ¡¡¡¡
+		_LOCKING_
+			En RdService, CfgService y TifxService. Activa un LOCK global en sus funciones. 
+			Por defecto 'desactivado'.
 		
-		_NEWSTART_: Modificado nuevo arranque del modulo 'Top', para detectar errores...
-		
-			Modificado INIT y START de TOP
+		_HF_RTPOLL_
+			En RdService, permite un Polling Multitarea a los equipos HF. Por defecto Activado...
 			
-		_HF_GLOBAL_STATUS_: Código Correspondiente al estado global HF.
+		_HF_GLOBAL_STATUS_
+			En RdService, envia de forma periódica (2seg) y en los cambios el estado global del
+			Subsistema HF...
 		
-			Gestion del estado global del subsistema HF.
+		_NETWORK_SUP_
+		_NETWORK_SUP_POLLING_
+			En Nodebox. Supervisa el estado de la RED. Por defecto activados.
+		
+		_IPE_NOSPREAD_
+			En Infrastrure. Comunicacion entre procesos sin 'SPREAD'. Por defecto activado....
+		
+		_SPREAD_ALL_MEMBERS_
+			En Infrastructure. Activa la nueva gestion de MASTER. Por defecto activado...
+		
+
+	1. coresip.dll sin mensajes "Arrancando TIMER SESSION" y "Decodificando SDP"
+	2. Mecanismo de seleccion determinista del MASTER. Basado en 'spread.conf'
+	3. Quita de Infraestructure: SpreadTest.
+	4. Compatibilidad con 'spread 4.4.0'
+	5. Gestor de Incidencias sin 'spread'
+	6. Incidencia HF-DESCONECTADO solo en transiciones.
+	7. Polling 'multithread' al estado de los equipos radio HF.
+	8. TIFX. Selecciona FUENTE Multicast. Nuevo parámetro 'tifxmcastSrc'
+	9. Supervision de la RED. Sin red se desactivan los 'servicios'.
+	10. Nuevo parámetro 'AdaptadorRed'. Marca la interfaz de red a supervisar...
+	11. Estado Equipo HF => stdNoResource solo si no estaba en 'stdNoinfo'
+	12. 'RdRegistry'. Activate <= ON. Retraso un segundo entre Dispose e INIT
+
+
+	GRUPO DE RETRANSMISION
+	----------------------
+
+	El mensaje para formarlo es RTX_GROUP_CHANGE_ASK_MSG
+	Cuando llega ese mensaje se llama a ProcessRtxGroupChangeAsk
+	Con el requisito RQF-36 hay que permitir sólo que se deshaga completamente la retransmisión con squelch en el hmi. Y cuando se llama 
+	ProcessRtxGroupChangeAsk, la estructura RtxGroupChangeAsk, tiene que tener todos los change en delete
+
+
+
 
 	
-	Actualizacion NLOG a version 3.
-
+	
+	
+	
 
 	
+	
+	
+	
+
+
+
+

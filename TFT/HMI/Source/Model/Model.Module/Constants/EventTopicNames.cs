@@ -63,6 +63,7 @@ namespace HMI.Model.Module.Constants
         public const string HfGlobalStatus = "HfGlobalStatus";
         public const string SiteManagerChanged = "SiteManagerChanged";
         public const string SiteChanged = "SiteChanged";
+        public const string FrChanged = "FrChanged";
         public const string ChangeTlfSpeaker = "ChangeTlfSpeaker";
         public const string TlfForwardChanged = "TlfForwardChanged";
         public const string TlfRemoteForwardChanged = "TlfRemoteForwardChanged";
@@ -151,6 +152,7 @@ namespace HMI.Model.Module.Constants
         public const string HfGlobalStatusEngine = "HfGlobalStatusEngine";
         public const string SiteManagerEngine = "SiteManagerEngine";
         public const string SiteChangedResultEngine = "SiteChangedResultEngine";
+		public const string FrChangedResultEngine = "FrChangedResultEngine";//lalm 230303
         public const string ChangedRTXSQU= "ChangedRTXSQU";//RQF36
         public const string ChangedRTXConf= "ChangedRTXConf";
 
@@ -177,7 +179,8 @@ namespace HMI.Model.Module.Constants
 		//LAlM 211008
 		//#2629 Presentar via utilizada en llamada saliente.
 		public const string TlfResStateEngine = "TlfResStateEngine";
-        
+        //230228
+        //public const string RdListaFrecuencias = "RdListaFrecuencias";
         #endregion
     }
 }

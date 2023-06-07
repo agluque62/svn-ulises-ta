@@ -52,6 +52,10 @@ namespace U5ki.RdService
         int SipCallId
         { get; }
 
+        //Si vale true quiere decir que el recurso esta sintonizado con la frecuencia correcta
+        bool TunedFrequencyOK
+        { get; set; }        
+
         bool MasterMN
         { get; set; }
 

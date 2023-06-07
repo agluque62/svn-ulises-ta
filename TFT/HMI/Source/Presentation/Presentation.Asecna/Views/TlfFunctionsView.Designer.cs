@@ -226,6 +226,19 @@ namespace HMI.Presentation.Asecna.Views
 		private System.Windows.Forms.Timer _FastBlinkTimer;
         private Model.Module.UI.HMIButton _ConfBT;
         private Model.Module.UI.HMIButton _ReplayBT;
-	}
+       
+
+        public void setHoldNuevo(HMI.Model.Module.UI.HMIButton button)
+        {
+            this._HoldBT = button;
+         }
+
+        public HMI.Model.Module.UI.HMIButton getHoldNuevo()
+        {
+            return this._HoldBT;
+        }
+
+    }
+
 }
 

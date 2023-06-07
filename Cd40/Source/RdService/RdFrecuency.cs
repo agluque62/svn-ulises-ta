@@ -13,7 +13,7 @@ namespace U5ki.RdService
     /// <summary>
     /// 
     /// </summary>
-    public class RdFrecuency : BaseCode, IDisposable
+    public partial class RdFrecuency : BaseCode, IDisposable
     {
         private readonly int TIME_DELAY_TO_RTX = U5ki.RdService.Properties.Settings.Default.RtxDelay;
         private readonly int TIME_DELAY_TO_DISABLE_FREQUENCY = U5ki.RdService.Properties.Settings.Default.FrequencyDisabled * 1000;
@@ -63,8 +63,8 @@ namespace U5ki.RdService
             {
                 int Tx = _RdRs.Values.Where(r => r.isTx).Count();
                 int Rx = _RdRs.Values.Where(r => r.isRx).Count();
-                int TxConn = _RdRs.Values.Where(r => r.isTx && r.Connected).Count();
-                int RxConn = _RdRs.Values.Where(r => r.isRx && r.Connected).Count();
+                int AvailTxCount = _RdRs.Values.Where(r => r.isTx && r.Connected && r.TunedFrequencyOK).Count();
+                int AvailRxCount = _RdRs.Values.Where(r => r.isRx && r.Connected && r.TunedFrequencyOK).Count();
 
                 _OldStatus = _Status;
 
@@ -73,7 +73,7 @@ namespace U5ki.RdService
                     case CORESIP_FREQUENCY_TYPE.Simple:
                         if (TipoDeFrecuencia == "HF")
                         {
-                            if (TxConn != 0 || RxConn != 0)
+                            if (AvailTxCount != 0 || AvailRxCount != 0)
                             {
                                 _Status = RdSrvFrRs.FrequencyStatusType.Available;
                                 SendLogNewStatus(_OldStatus);
@@ -84,7 +84,7 @@ namespace U5ki.RdService
                         {
                             if (Tx == 1 && Rx == 1)
                             {
-                                if (TxConn == 1 && RxConn == 1)
+                                if (AvailTxCount == 1 && AvailRxCount == 1)
                                 {
                                     _Status = RdSrvFrRs.FrequencyStatusType.Available;
                                     SendLogNewStatus(_OldStatus);
@@ -92,7 +92,7 @@ namespace U5ki.RdService
                                 }
                             }
                             //Caso de frecuencias sólo RX
-                            else if ((Rx == 1) && (Tx == 0) && (RxConn == 1))
+                            else if ((Rx == 1) && (Tx == 0) && (AvailRxCount == 1))
                             {
                                 _Status = RdSrvFrRs.FrequencyStatusType.Available;
                                 SendLogNewStatus(_OldStatus);
@@ -105,9 +105,9 @@ namespace U5ki.RdService
                         /** 20180626. Incidencia #3617. Una FD puede tener un solo TX */
                         if (Tx >= 1 && Tx <= 5)
                         {
-                            if (TxConn > 0 && RxConn > 0)
+                            if (AvailTxCount > 0 && AvailRxCount > 0)
                             {
-                                if (TxConn < Tx || RxConn < Rx)
+                                if (AvailTxCount < Tx || AvailRxCount < Rx)
                                 {
                                     _Status = RdSrvFrRs.FrequencyStatusType.Degraded;
                                     SendLogNewStatus(_OldStatus);
@@ -196,21 +196,36 @@ namespace U5ki.RdService
         ///Guarda el ultimo emplazamiento seleccionado bien por SQ, bien por selección del de defecto. 
         ///Se usa para elegir el _TxRsSelected en la funcion de evaluacion
         private String _LastSelectedSite = "";
+
         /// <summary>
-        /// 
+        /// Corresponde al identificador numerico y unico del destino en la configuracion, llamado tambien Literal.
         /// </summary>
         public string IdDestino
         {
             get { return _IdDestino; }
         }
         /// <summary>
-        /// 
+        /// Corresponde a DescDestino de la configuracion. Es decir el string que describe el destino
         /// </summary>
         public string Frecuency
         {
             get { return _Frecuency; }
             set { _Frecuency = value; }
         }
+
+        /// <summary>
+        /// Corresponde a la frecuencia seleccionada desde el puesto
+        /// </summary>
+        public string SelectedFrequency
+        {
+            get { return _SelectedFrequency; }
+            set { _SelectedFrequency = value; }
+        }
+
+        private bool _MultifreqSupported;
+        private List<string> _SelectableFrequencies;
+        private string _DefaultFrequency;
+
         /// <summary>
         /// 
         /// </summary>
@@ -253,6 +268,12 @@ namespace U5ki.RdService
             NoFirstCheck = false;
             _IdDestino = idDestino;
             _Frecuency = fr;
+            _DefaultFrequency = "";
+            _SelectableFrequencies = new List<string>();            
+            _MultifreqSupported = false;
+            _SelectedFrequency = MSTxPersistence.GetSelectFrequency(_IdDestino);
+            if (_SelectedFrequency == null) _SelectedFrequency = "";
+
             PasivoRetransmision = false;
 
             _RtxSquelchTimer = new Timer(TIME_DELAY_TO_RTX)
@@ -336,12 +357,30 @@ namespace U5ki.RdService
         /// <summary>
         /// Genera los recursos radio (canales físicos) asociados a la frecuencia
         /// </summary>
-        public void Reset(ConfiguracionSistema sysCfg, CfgEnlaceExterno cfg, Dictionary<string, bool> selectedRs)
+        public void Reset(Cd40Cfg cd40cfg, CfgEnlaceExterno cfg, Dictionary<string, bool> selectedRs)
         {
             Debug.Assert(cfg.Literal == _IdDestino);
 
+            ConfiguracionSistema sysCfg = cd40cfg.ConfiguracionGeneral;
+
+            if (cfg.TipoFrecuencia == Tipo_Frecuencia.FD && cfg.TipoFrecuencia == Tipo_Frecuencia.ME)
+            {
+                _MultifreqSupported = false;    //el cambio de frecuencia se aplica solo a destinos simples
+            }  
+            else
+            {
+                foreach (CfgRecursoEnlaceExterno r in cfg.ListaRecursos)
+                {
+                    if (cd40cfg.NodesMN.Where(n => n.Id == r.IdRecurso).FirstOrDefault() != null)
+                    {
+                        _MultifreqSupported = false;    //el cambio de frecuencia se aplica solo a destinos simples que no tengan recursos M+N
+                        break;
+                    }
+                }                
+            }            
+
             // Actualización de los nuevos parámetros de la frecuencia a partir de los recibidos en cfg.
-            bool hayCambiosEnFrecuencia = ResetNewParams(cfg);
+            bool hayCambiosEnFrecuencia = ResetNewParams(cfg);            
 
             //Si _FrRs es null, quiere decir que estamos en un estado previo de ASPA.
             //Vamos a forzar que se reinicien las sesiones por si en la nueva configuracion con las radios que ahora esten presentes desapareciera el ASPA.
@@ -371,8 +410,9 @@ namespace U5ki.RdService
                 {
                     RdResourcePair foundPair = newPairs.FirstOrDefault(x => x.ID.Equals(rsCfg.RedundanciaIdPareja));
                     string[] rdUri = RsUri(rsCfg.IdRecurso, sysCfg);
-                    
-                    RdResource res = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), _IdDestino, _Frecuency, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg, false);
+                    RdResource res = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, 
+                        sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), _IdDestino, _Frecuency, rsCfg.IdEmplazamiento, 
+                        selectedRs[rsCfg.IdRecurso], new_params, rsCfg, false);
                     if (foundPair == null)
                     {
                         foundPair = new RdResourcePair(rsCfg.RedundanciaIdPareja, _IdDestino, _Frecuency);
@@ -495,11 +535,20 @@ namespace U5ki.RdService
                             {
                                 rsKey = rdUri[0].ToUpper() + rsCfg.Tipo;
                             }
+
                             //20180724  #3603 FIN
                             //string rsKey = rdUri[0].ToUpper() + rsCfg.Tipo;
 
+                            bool hay_cambios_en_recurso_para_reiniciarlo = false;
+
+
                             if (rdRsNoPairToRemove.TryGetValue(rsKey, out rdRs))
-                            {
+                            {                                
+                                if (rsCfg.Telemando != (rdRs as RdResource)._TelemandoType)
+                                {
+                                    hay_cambios_en_recurso_para_reiniciarlo = true;
+                                }
+
                                 rdRsNoPairToRemove.Remove(rsKey);
                             }
                             else
@@ -524,7 +573,7 @@ namespace U5ki.RdService
                                 // con los recursos asociados para que esos cambios tengan efecto
                                 // if (hayCambios)
                                 //20180724  #3603
-                                if (hayCambiosEnFrecuencia || hayCambiosEnSip)
+                                if (hayCambiosEnFrecuencia || hayCambiosEnSip || hay_cambios_en_recurso_para_reiniciarlo)
                                 {
                                     hayCambiosEnSip = false; //#3603
                                     if (rdRs.Connected)
@@ -532,7 +581,9 @@ namespace U5ki.RdService
                                     rdRs.Dispose();
                                     bool isReplacedMNTemp = rdRs.ReplacedMN;
                                     bool isMasterMNTemp = rdRs.MasterMN;
-                                    rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), _IdDestino, _Frecuency, rsCfg.IdEmplazamiento, selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313                            }
+                                    rdRs = new RdResource(rsCfg.IdRecurso, rdUri[0], rdUri[1], (RdRsType)rsCfg.Tipo, 
+                                        sysCfg.IsResoureInTIFX(rsCfg.IdRecurso), _IdDestino, _Frecuency, rsCfg.IdEmplazamiento, 
+                                        selectedRs[rsCfg.IdRecurso], new_params, rsCfg);  //EDU 20170223 // JCAM 20170313                            }
                                     rdRs.ReplacedMN = isReplacedMNTemp;
                                     rdRs.MasterMN = isMasterMNTemp;//#3603
                                 }
@@ -833,7 +884,7 @@ namespace U5ki.RdService
             return _TxIds.FindIndex(delegate (string tx) { return (tx == host); }) < 0 ? false : true;
         }
 
-        public void Check_1mas1_Resources_Disabled()
+        public void Check_1mas1_Resources()
         {
             foreach (IRdResource rdRs in _RdRs.Values)
             {
@@ -861,6 +912,7 @@ namespace U5ki.RdService
                                 }
                             }
                         }
+                        rdRsPair.Check_1mas1_Resources_In_MSTxPersistence();
                     }                    
                 }
                 catch (Exception exc)
@@ -914,8 +966,7 @@ namespace U5ki.RdService
             if ((_FrRs != null) && !DisableFrequencyTimer_enabled)
             {
                 try
-                {
-                    StatusCheck = _FrRs.FrequencyStatus;
+                {                    
                     _FrRs.FrequencyStatus = this.Status;
                     if (_FrRs.FrequencyStatus != StatusCheck || !NoFirstCheck)
                     {
@@ -928,13 +979,18 @@ namespace U5ki.RdService
                             RdRegistry.Publish(_IdDestino, _FrRs);
                         }
                     }
-
+                    StatusCheck = _FrRs.FrequencyStatus;
                     NoFirstCheck = true;
                 }
                 catch (Exception x)
                 {
                     LogException<RdFrecuency>("CheckFrecuency", x, false);
                 }
+            }
+
+            if (!DisableFrequencyTimer_enabled)
+            {
+                CheckTunedFreqInAllResources(); 
             }
         }
 
@@ -2017,7 +2073,8 @@ namespace U5ki.RdService
                   existingRdRs.Uri1.Equals(newRdRs.Uri1) == false ||
                   existingRdRs.Uri2.Equals(newRdRs.Uri2) == false ||
                   existingRdRs.Frecuency != newRdRs.Frecuency ||
-                  existingRdRs.IdDestino != newRdRs.IdDestino;
+                  existingRdRs.IdDestino != newRdRs.IdDestino ||
+                  existingRdRs.TelemandoType != newRdRs.TelemandoType;
            return !hayCambios;
         }
         /// <summary>
@@ -2285,11 +2342,17 @@ namespace U5ki.RdService
         /// <summary>
         /// 
         /// </summary>
-        private string _IdDestino = null;       //Es el identificador del destino radio.
+        private string _IdDestino = null;       //Corresponde al identificador numerico y unico del destino en la configuracion, llamado tambien Literal.
         /// <summary>
         /// 
         /// </summary>
-        private string _Frecuency = null;       //Corresponde al literal del destino, tradicionalmente es la frecuencia
+        private string _Frecuency = null;       //Corresponde a DescDestino de la configuracion. Es decir el string que describe el destino
+
+        /// <summary>
+        /// Corresponde a la frecuencia seleccionada desde el puesto
+        /// </summary>
+        public string _SelectedFrequency = null; //Corresponde a la frecuencia seleccionada desde el puesto
+
         /// <summary>
         /// 
         /// </summary>
@@ -2568,6 +2631,7 @@ namespace U5ki.RdService
                     _FrRs.Squelch = RdSrvFrRs.SquelchType.SquelchOnlyPort;
                     _FrRs.SqSite = rdRs.Site;
                 }
+                _FrRs.SelectedFrequency = SelectedFrequency;
                 publish = true;
             }
 
@@ -3286,6 +3350,70 @@ namespace U5ki.RdService
             this.new_params.Cld_supervision_time = cfg.CldSupervisionTime;
             this.new_params.MetodosBssOfrecidos = cfg.MetodosBssOfrecidos;
             this.new_params.PorcentajeRSSI = cfg.PorcentajeRSSI;
+
+            if (_DefaultFrequency != cfg.DefaultFrequency)
+            {
+                hayCambios = true;
+                _DefaultFrequency = cfg.DefaultFrequency;
+            }
+
+            if (cfg.SelectableFrequencies == null)
+            {
+                if (_SelectableFrequencies.Count() > 0)
+                {
+                    hayCambios = true;
+                    _SelectableFrequencies = new List<string>();
+                }                
+            }
+            else if (_SelectableFrequencies.Count() != cfg.SelectableFrequencies.Count())
+            {
+                hayCambios = true;
+                _SelectableFrequencies = new List<string>(cfg.SelectableFrequencies);
+            }
+            else
+            {
+                foreach (string f in _SelectableFrequencies)
+                {
+                    if (!cfg.SelectableFrequencies.Contains(f))
+                    {
+                        hayCambios = true;
+                        _SelectableFrequencies = new List<string>(cfg.SelectableFrequencies);
+                        break;
+                    }
+                }
+            }            
+
+            //Si la lista de frecuencias seleccionables esta vacia entonces no se puede seleccionar la frecuencia
+            if (cfg.SelectableFrequencies == null || cfg.DefaultFrequency == null)
+            {
+                _MultifreqSupported = false;
+            }
+            else if (cfg.SelectableFrequencies.Count() == 0 || cfg.DefaultFrequency.Length == 0)
+            {
+                _MultifreqSupported = false;
+            }
+            else
+            {
+                _MultifreqSupported = true;
+            }
+
+            string selectedFrequency_prev = SelectedFrequency;
+
+            if (!_MultifreqSupported)
+            {
+                SelectedFrequency = "";                
+            }
+            else if (!_SelectableFrequencies.Contains(SelectedFrequency))
+            {
+                hayCambios = true;
+                SelectedFrequency = cfg.DefaultFrequency;
+            }
+
+            if (selectedFrequency_prev != SelectedFrequency)
+            {
+                MSTxPersistence.SelectFrequency(_IdDestino, SelectedFrequency);
+            }
+
             return hayCambios;
         }
 

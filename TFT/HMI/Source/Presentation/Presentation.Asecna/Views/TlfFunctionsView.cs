@@ -113,7 +113,7 @@ namespace HMI.Presentation.Asecna.Views
             {
                 return ((_StateManager.Permissions & Permissions.Conference) == Permissions.Conference) &&
                      _StateManager.Jacks.SomeJack &&
-                     (_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Hold] > 1);
+					 (_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Hold] > 1);
             }
         }
 
@@ -122,7 +122,7 @@ namespace HMI.Presentation.Asecna.Views
             get
             {
                 return ((_StateManager.Permissions & Permissions.Replay) == Permissions.Replay) &&
-                     _StateManager.Jacks.SomeJack;
+					 _StateManager.Jacks.SomeJack;
             }
         }
 

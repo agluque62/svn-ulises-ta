@@ -10,6 +10,12 @@ using Utilities;
 
 namespace HMI.Model.Module.UI
 {
+	public class HMIButtonConference : HMIButton
+	{
+		
+		
+
+    }
 	public class HMIButton : Control
 	{
 		private int _Id = 0;
@@ -21,13 +27,19 @@ namespace HMI.Model.Module.UI
         private Rectangle _TypeRect = new Rectangle(4, 4, 24, 24);
 		//Errores #4805 Las funciones no permitidas no deberian  presentarse
 		private bool _Permitted = true;
-		public bool Permitted
-		{
-			get { return _Permitted; }
-			set { _Permitted = value; }
-		}
+		private bool _IsConferencePreprogramada = false;
+        public bool Permitted
+        {
+            get { return _Permitted; }
+            set { _Permitted = value; }
+        }
+        public bool IsConferencePreprogramada
+        {
+            get { return _IsConferencePreprogramada; }
+            set { _IsConferencePreprogramada = value; }
+        }
 
-		public new event EventHandler Click;
+        public new event EventHandler Click;
 		public event EventHandler LongClick;
 
 		[Browsable(false),

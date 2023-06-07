@@ -26,20 +26,21 @@ namespace HMI.CD40.Module.BusinessEntities
 #if DEBUG
     public class RdManager
 #else
-	class RdManager
+    class RdManager
 #endif
     {
         /// <summary>
         /// 
         /// </summary>
 		public event GenericEventHandler<RangeMsg<RdInfo>> NewPositions;
-		public event GenericEventHandler<RangeMsg<RdState>> PositionsChanged;
+        public event GenericEventHandler<RangeMsg<RdState>> PositionsChanged;
         public event GenericEventHandler<RdFrAsignedToOtherMsg> TxAssign;
         public event GenericEventHandler<RdHfFrAssigned> TxHfAssign;
         public event GenericEventHandler<StateMsg<bool>> PttChanged;
         public event GenericEventHandler<StateMsg<string>> SelCalMessage;
-		public event GenericEventHandler PTTMaxTime;
+        public event GenericEventHandler PTTMaxTime;
         public event GenericEventHandler<ChangeSiteRsp> SiteChangedResultMessage;
+        public event GenericEventHandler<FrChangeRsp> FrChangedResultMessage;//lalm 230301
         public event GenericEventHandler<RdRxAudioVia> AudioViaNotAvailable;
 
 #if _HF_GLOBAL_STATUS_
@@ -55,30 +56,30 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
 		public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
-		public event GenericEventHandler<SnmpIntMsg<string, int>> SetSnmpInt;
+        public event GenericEventHandler<SnmpIntMsg<string, int>> SetSnmpInt;
 
         /// <summary>
         /// 
         /// </summary>
 		public PttSource PttSource
-		{
-			get { return _PttSource; }
-			private set
-			{
-				if (_PttSource != value)
-				{
-					bool oldPttOn = (_PttSource != PttSource.NoPtt);
-					bool newPttOn = (value != PttSource.NoPtt);
+        {
+            get { return _PttSource; }
+            private set
+            {
+                if (_PttSource != value)
+                {
+                    bool oldPttOn = (_PttSource != PttSource.NoPtt);
+                    bool newPttOn = (value != PttSource.NoPtt);
 
                     _OldPttSource = _PttSource;
-					_PttSource = value;
-					if (oldPttOn != newPttOn)
-					{
-						General.SafeLaunchEvent(PttChanged, this, new StateMsg<bool>(newPttOn));
-					}
-				}
-			}
-		}
+                    _PttSource = value;
+                    if (oldPttOn != newPttOn)
+                    {
+                        General.SafeLaunchEvent(PttChanged, this, new StateMsg<bool>(newPttOn));
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// 
@@ -123,7 +124,7 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         //Devuelve true si está conectado sin fallo y configurado
-        public bool HFSpeakerAvailable ()
+        public bool HFSpeakerAvailable()
         {
             return (Top.Hw.HfSpeaker && (Top.Mixer.HfSpeakerDev > 0 || Top.Hw is SimCMediaHwManager));
         }
@@ -146,43 +147,48 @@ namespace HMI.CD40.Module.BusinessEntities
                     return true;
             return false;
         }
-            /// <summary>
-            /// 
-            /// </summary>
-            public void Init()
-		{
-			_PttTimer.AutoReset = false;
-			_PttTimer.Elapsed += OnPttTimerElapsed;
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Init()
+        {
+            _PttTimer.AutoReset = false;
+            _PttTimer.Elapsed += OnPttTimerElapsed;
             _PttBadOpeTimer.AutoReset = false;
             _PttBadOpeTimer.Elapsed += OnPttBadOpeTimerElapsed;
 
             _TimerNetworkStatus.AutoReset = true;
             _TimerNetworkStatus.Elapsed += _TimerNetworkStatus_Elapsed;
 
-			Top.Cfg.ConfigChanged += OnConfigChanged;
-			Top.Hw.PttPulsed += OnPttPulsed;
-			Top.Hw.JacksChangedHw += OnHwChanged;
+            Top.Cfg.ConfigChanged += OnConfigChanged;
+            Top.Hw.PttPulsed += OnPttPulsed;
+            Top.Hw.JacksChangedHw += OnHwChanged;
             Top.Hw.SpeakerExtChangedHw += OnHwChanged;
             Top.Hw.SpeakerChangedHw += OnHwChanged;
             Top.Lc.ActivityChanged += OnLcActivityChanged;
-			Top.Mixer.SplitModeChanged += OnSplitModeChanged;
-			for (int i = 0, to = _RdPositions.Length; i < to; i++)
-			{
-				_RdPositions[i] = new RdPosition(i);
-				_RdPositions[i].StateChanged += OnRdStateChanged;
-				_RdPositions[i].TxAlreadyAssigned += OnRdTxAlreadyAssigned;
+            Top.Mixer.SplitModeChanged += OnSplitModeChanged;
+            for (int i = 0, to = _RdPositions.Length; i < to; i++)
+            {
+                _RdPositions[i] = new RdPosition(i);
+                _RdPositions[i].StateChanged += OnRdStateChanged;
+                _RdPositions[i].TxAlreadyAssigned += OnRdTxAlreadyAssigned;
                 _RdPositions[i].RxAlreadyAssigned += OnRdRxAlreadyAssigned;
-				_RdPositions[i].TxAssignedByOther += OnRdTxAssignedByOther;
+                _RdPositions[i].TxAssignedByOther += OnRdTxAssignedByOther;
                 _RdPositions[i].TxHfAlreadyAssigned += OnRdTxHfAlreadyAssigned;
                 _RdPositions[i].SelCalPrepareResponse += OnRdSelCalPrepareResponse;
                 _RdPositions[i].SiteChangedResult += OnSiteChangedResult;
+                _RdPositions[i].FrecChangedResponse += OnFrecChangedResult;//lalm 230301 
                 _RdPositions[i].AudioViaNotAvailable += OnAudioViaNotAvailable;
 
 #if _HF_GLOBAL_STATUS_
                 _RdPositions[i].HfGlobalStatus += OnRdHFGlobalStatus;
 #endif
-			}
-		}
+            }
+            _FrecuencyTimer.AutoReset = false;
+            _FrecuencyTimer.Elapsed += OnFrecuencyTimerElapsed;
+            _PttTimer.AutoReset = false;
+            _PttTimer.Elapsed += OnPttTimerElapsed;
+        }
 
         static bool dentro_TimerNetworkStatus_Elapsed = false;
         void _TimerNetworkStatus_Elapsed(object sender, ElapsedEventArgs e)
@@ -214,15 +220,15 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
 		public void Start()
-		{
-		}
+        {
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public void End()
-		{
-		}
+        {
+        }
 
         /// <summary>
         /// 
@@ -230,27 +236,27 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="newRtxGroup"></param>
         /// <returns></returns>
 		public int HowManySquelchsInRtxGroup(Dictionary<int, RtxState> newRtxGroup)
-		{
-			int howMany = 0;
-			foreach (KeyValuePair<int, RtxState> p in newRtxGroup)
-			{
-				Debug.Assert(p.Key < _RdPositions.Length);
-				RdPosition rd = _RdPositions[p.Key];
+        {
+            int howMany = 0;
+            foreach (KeyValuePair<int, RtxState> p in newRtxGroup)
+            {
+                Debug.Assert(p.Key < _RdPositions.Length);
+                RdPosition rd = _RdPositions[p.Key];
 
-				// Sólo las frecuencias que están en la página
-				// actual se tienen en cuenta
-				if (Top.Cfg.NumFrecByPage * _Page <= p.Key &&
-					Top.Cfg.NumFrecByPage * (_Page + 1) > p.Key)
-				{
-					if (rd.Squelch != SquelchState.NoSquelch)
-					{
-						howMany++;
-					}
-				}
-			}
+                // Sólo las frecuencias que están en la página
+                // actual se tienen en cuenta
+                if (Top.Cfg.NumFrecByPage * _Page <= p.Key &&
+                    Top.Cfg.NumFrecByPage * (_Page + 1) > p.Key)
+                {
+                    if (rd.Squelch != SquelchState.NoSquelch)
+                    {
+                        howMany++;
+                    }
+                }
+            }
 
-			return howMany;
-		}
+            return howMany;
+        }
 
         /// <summary>
         /// 
@@ -258,10 +264,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="id"></param>
         /// <returns></returns>
 		public int GetRtxGroupPosition(int id)
-		{
-			Debug.Assert(id < _RdPositions.Length);
-			return _RdPositions[id].RtxGroup;
-		}
+        {
+            Debug.Assert(id < _RdPositions.Length);
+            return _RdPositions[id].RtxGroup;
+        }
 
         /// <summary>
         /// 
@@ -270,12 +276,12 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="newPage"></param>
         /// <param name="numPosByPage"></param>
 		public void SetRdPage(int oldPage, int newPage, int numPosByPage)
-		{
-			_Page = newPage;
+        {
+            _Page = newPage;
 
-			for (int i = oldPage * numPosByPage, to = Math.Min(_RdPositions.Length, (oldPage + 1) * numPosByPage); i < to; i++)
-			{
-			    _RdPositions[i].SetRx(false);
+            for (int i = oldPage * numPosByPage, to = Math.Min(_RdPositions.Length, (oldPage + 1) * numPosByPage); i < to; i++)
+            {
+                _RdPositions[i].SetRx(false);
                 _RdPositions[i].SetTx(false, false);
             }
 
@@ -283,7 +289,7 @@ namespace HMI.CD40.Module.BusinessEntities
             {
                 if (_RdPositions[i].Monitoring)
                     _RdPositions[i].SetRx(true);
-			}
+            }
 
             //RQF-14
             for (int i = newPage * numPosByPage, to = Math.Min(_RdPositions.Length, (newPage + 1) * numPosByPage); i < to; i++)
@@ -292,21 +298,21 @@ namespace HMI.CD40.Module.BusinessEntities
                     _RdPositions[i].SetRx(true);
             }
 
-            Top.WorkingThread.Enqueue("SetSnmp", delegate()
-			{
-				General.SafeLaunchEvent(SetSnmpInt, this, new SnmpIntMsg<string, int>(Settings.Default.RadioPageOid, _Page + 1));
-			});
-		}
+            Top.WorkingThread.Enqueue("SetSnmp", delegate ()
+            {
+                General.SafeLaunchEvent(SetSnmpInt, this, new SnmpIntMsg<string, int>(Settings.Default.RadioPageOid, _Page + 1));
+            });
+        }
 
-                
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="on"></param>
         /// <param name="src"></param>
-		public void SetPtt(bool on, PttSource src)
-		{
-			Debug.Assert(src != PttSource.NoPtt);
+        public void SetPtt(bool on, PttSource src)
+        {
+            Debug.Assert(src != PttSource.NoPtt);
 
 #if _PTT_FILTER_SIMPLE_
             if (PttFilter.CanProcessEvent(on, src) == false)
@@ -317,9 +323,9 @@ namespace HMI.CD40.Module.BusinessEntities
 #endif
 
             if (on && ((int)src > (int)_PttSource))
-			{
+            {
                 if ((_RdPositionsInTx.Count > 0) && (!Top.Lc.Activity || (Top.Mixer.SplitMode == SplitMode.LcTf)))
-				{
+                {
 #if _NOT_HOLD_ON_PTT_AND_PRIORITY_CALL
                     if ((Top.Tlf.Activity() && !Top.Tlf.PriorityCall && Top.Mixer.SplitMode == SplitMode.Off) ||
                         Top.Lc.HoldedTlf)
@@ -338,51 +344,51 @@ namespace HMI.CD40.Module.BusinessEntities
 #endif
                     SetPtt(src);
 
-					Top.WorkingThread.Enqueue("SetSnmp", delegate()
-					{
-						string statePtt = "1_" + Top.Cfg.PositionId;
-						//SnmpStringObject.Get(Settings.Default.PttOid).Value = statePtt;
-						General.SafeLaunchEvent(SetSnmpString, this, new SnmpStringMsg<string, string>(Settings.Default.PttOid, statePtt));
-					});
-				}
-				else //if (!Top.Lc.Activity)
-				{
-					BadOperation(true);
+                    Top.WorkingThread.Enqueue("SetSnmp", delegate ()
+                    {
+                        string statePtt = "1_" + Top.Cfg.PositionId;
+                        //SnmpStringObject.Get(Settings.Default.PttOid).Value = statePtt;
+                        General.SafeLaunchEvent(SetSnmpString, this, new SnmpStringMsg<string, string>(Settings.Default.PttOid, statePtt));
+                    });
+                }
+                else //if (!Top.Lc.Activity)
+                {
+                    BadOperation(true);
                     if (Top.Recorder.Briefing)
                         Top.Recorder.SessionGlp(FuentesGlp.Briefing, false);
-				}
+                }
 
-				PttSource = src;
-			}
-			else if (!on && (_PttSource != PttSource.NoPtt) && ((int)src >= (int)_PttSource))
-			{
-				if ((_RdPositionsInTx.Count > 0) && (!Top.Lc.Activity || (Top.Mixer.SplitMode == SplitMode.LcTf)))
-				{
+                PttSource = src;
+            }
+            else if (!on && (_PttSource != PttSource.NoPtt) && ((int)src >= (int)_PttSource))
+            {
+                if ((_RdPositionsInTx.Count > 0) && (!Top.Lc.Activity || (Top.Mixer.SplitMode == SplitMode.LcTf)))
+                {
                     RemovePtt();
 
-					Top.WorkingThread.Enqueue("SetSnmp", delegate()
-					{
-						string statePtt = "0_" + Top.Cfg.PositionId;
-						//SnmpStringObject.Get(Settings.Default.PttOid).Value = statePtt;
+                    Top.WorkingThread.Enqueue("SetSnmp", delegate ()
+                    {
+                        string statePtt = "0_" + Top.Cfg.PositionId;
+                        //SnmpStringObject.Get(Settings.Default.PttOid).Value = statePtt;
 
-						General.SafeLaunchEvent(SetSnmpString, this, new SnmpStringMsg<string, string>(Settings.Default.PttOid, statePtt));
-					});
+                        General.SafeLaunchEvent(SetSnmpString, this, new SnmpStringMsg<string, string>(Settings.Default.PttOid, statePtt));
+                    });
 
                     if (_HoldedByPtt)
-						//if (!Top.Tlf.Activity && Top.Tlf.Holded)
-					{
+                    //if (!Top.Tlf.Activity && Top.Tlf.Holded)
+                    {
                         _HoldedByPtt = false;
                         if (Top.Lc.HoldedTlf == false)
                         {
                             General.SafeLaunchEvent(HoldTlfCall, this, new StateMsg<bool>(_HoldedByPtt));
                         }
-					}
-				}
+                    }
+                }
 
-				BadOperation(false);
-				PttSource = PttSource.NoPtt;
-			}
-		}
+                BadOperation(false);
+                PttSource = PttSource.NoPtt;
+            }
+        }
 
         /// <summary>
         /// 
@@ -390,10 +396,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="id"></param>
         /// <param name="on"></param>
 		public void SetRx(int id, bool on, bool forced)
-		{
-			Debug.Assert(id < _RdPositions.Length);
-			_RdPositions[id].SetRx(on, forced);
-		}
+        {
+            Debug.Assert(id < _RdPositions.Length);
+            _RdPositions[id].SetRx(on, forced);
+        }
 
         /// <summary>
         /// 
@@ -401,10 +407,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="id"></param>
         /// <param name="on"></param>
 		public void SetTx(int id, bool on)
-		{
-			Debug.Assert(id < _RdPositions.Length);
-			_RdPositions[id].SetTx(on, true);
-		}
+        {
+            Debug.Assert(id < _RdPositions.Length);
+            _RdPositions[id].SetTx(on, true);
+        }
 
         /// <summary>
         /// 
@@ -420,10 +426,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="id"></param>
 		public void ConfirmTx(int id)
-		{
-			Debug.Assert(id < _RdPositions.Length);
-			_RdPositions[id].SetTx(true, false);
-		}
+        {
+            Debug.Assert(id < _RdPositions.Length);
+            _RdPositions[id].SetTx(true, false);
+        }
 
         /// <summary>
         /// 
@@ -431,10 +437,10 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="id"></param>
         /// <param name="audioVia"></param>
 		public void SetAudioVia(int id, RdRxAudioVia audioVia)
-		{
-			Debug.Assert(id < _RdPositions.Length);
-			_RdPositions[id].SetAudioVia(audioVia);
-		}
+        {
+            Debug.Assert(id < _RdPositions.Length);
+            _RdPositions[id].SetAudioVia(audioVia);
+        }
 
         /// <summary>
         /// Cambia al siguiente audio via en Rx, según rotación
@@ -452,13 +458,13 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="id"></param>
 		public void SetQuiet(int id)
-		{
-			Debug.Assert(id < _RdPositions.Length);
+        {
+            Debug.Assert(id < _RdPositions.Length);
 
-			//RemovePtt();
-			_RdPositions[id].SetQuiet();
-			//_RdPositions[id].SetRx(false);
-		}
+            //RemovePtt();
+            _RdPositions[id].SetQuiet();
+            //_RdPositions[id].SetRx(false);
+        }
 
         /// <summary>
         /// 
@@ -466,36 +472,36 @@ namespace HMI.CD40.Module.BusinessEntities
         /// <param name="rtxGroup"></param>
         /// <param name="newRtxGroup"></param>
 		public void SetRtxGroup(int rtxGroup, Dictionary<int, RtxState> newRtxGroup)
-		{
-			Debug.Assert(rtxGroup > 0);
+        {
+            Debug.Assert(rtxGroup > 0);
 
-			List<string> frIds = new List<string>();
-			List<RtxGroupChangeAsk.ChangeType> changes = new List<RtxGroupChangeAsk.ChangeType>();
+            List<string> frIds = new List<string>();
+            List<RtxGroupChangeAsk.ChangeType> changes = new List<RtxGroupChangeAsk.ChangeType>();
 
-			foreach (KeyValuePair<int, RtxState> p in newRtxGroup)
-			{
-				Debug.Assert(p.Key < _RdPositions.Length);
+            foreach (KeyValuePair<int, RtxState> p in newRtxGroup)
+            {
+                Debug.Assert(p.Key < _RdPositions.Length);
 
-				// Sólo las frecuencias que están en la página actual se meten en el grupo de retransmisión
-				if (Top.Cfg.NumFrecByPage * _Page <= p.Key &&
-					Top.Cfg.NumFrecByPage * (_Page + 1) > p.Key)
-				{
-					RdPosition rd = _RdPositions[p.Key];
+                // Sólo las frecuencias que están en la página actual se meten en el grupo de retransmisión
+                if (Top.Cfg.NumFrecByPage * _Page <= p.Key &&
+                    Top.Cfg.NumFrecByPage * (_Page + 1) > p.Key)
+                {
+                    RdPosition rd = _RdPositions[p.Key];
 
-					if (rd.Tx)
-					{
-						frIds.Add(rd.Literal);
-						changes.Add((RtxGroupChangeAsk.ChangeType)p.Value);
-					}
-				}
-			}
+                    if (rd.Tx)
+                    {
+                        frIds.Add(rd.Literal);
+                        changes.Add((RtxGroupChangeAsk.ChangeType)p.Value);
+                    }
+                }
+            }
 
-			Top.Registry.ChangeRtxGroup(rtxGroup, frIds, changes);
-		}
+            Top.Registry.ChangeRtxGroup(rtxGroup, frIds, changes);
+        }
 
         public void ChangSite(int pos, string alias)
         {
-                Top.Registry.ChangeSite(_RdPositions[pos].Literal, alias);
+            Top.Registry.ChangeSite(_RdPositions[pos].Literal, alias);
         }
 
         public void PrepareSelCal(bool onOff, string code)
@@ -520,7 +526,7 @@ namespace HMI.CD40.Module.BusinessEntities
         public void UpdateRadioSpeakerLed()
         {
             Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_RD_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.Speaker) ? HwManager.ON : HwManager.OFF);
-            Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.HfSpeaker)|| ring_rad ? HwManager.ON : HwManager.OFF);
+            Top.Hw.OnOffLed(CORESIP_SndDevType.CORESIP_SND_HF_SPEAKER, DetectedAnySquechInSpk(RdRxAudioVia.HfSpeaker) || ring_rad ? HwManager.ON : HwManager.OFF);
         }
 
         /// <summary>
@@ -528,11 +534,17 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
         /// <param name="id"></param>
         /// <param name="on"></param>
-		//LALM 221102 cambiofrecuencia
-		public void SetNewFrecuency(int id, string frecuency)
+        //LALM 221102 cambiofrecuencia
+        public void SetNewFrecuency(int id, string frecuency)//lalm 230301
         {
+            if (_RdPositions[id].Rx)
+                return;
             Debug.Assert(id < _RdPositions.Length);
-            _RdPositions[id].SetNewFrecuency(frecuency, true);//SetNewFrecuency
+            _RdPositions[id].SetNewFrecuency(frecuency, true);
+            _FrecuencyTimer.Enabled = true;
+            idtimerfrecuency = id;
+            strtimerfrecuency = frecuency;
+            timepetchangefrecuency = DateTime.Now;
         }
 
 
@@ -561,14 +573,14 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
-#region Private Members
+        #region Private Members
 
         /// <summary>
         /// 
         /// </summary>
-		private bool _ChangingCfg = false;
-		private RdPosition[] _RdPositions = new RdPosition[Radio.NumDestinations];
-		private PttSource _PttSource = PttSource.NoPtt;
+        private bool _ChangingCfg = false;
+        private RdPosition[] _RdPositions = new RdPosition[Radio.NumDestinations];
+        private PttSource _PttSource = PttSource.NoPtt;
         private PttSource _OldPttSource = PttSource.NoPtt;
         private bool _AnySquelch = false;
         private Timer _PttTimer = new Timer(Settings.Default.PttCheckTime);
@@ -577,8 +589,8 @@ namespace HMI.CD40.Module.BusinessEntities
         const int DELAY_BAD_OPERATION = 1500;
         private Timer _PttBadOpeTimer = new Timer(DELAY_BAD_OPERATION);
         private List<RdPosition> _RdPositionsInTx = new List<RdPosition>();
-		private List<RdPosition> _RdPositionsInPtt = new List<RdPosition>();
-		private int _BadOperationTone = -1;
+        private List<RdPosition> _RdPositionsInPtt = new List<RdPosition>();
+        private int _BadOperationTone = -1;
         private int _Page = 0;
         private bool _HoldedByPtt = false;
         private bool _ScreenSaver = false;
@@ -596,13 +608,16 @@ namespace HMI.CD40.Module.BusinessEntities
         // Guarda el ultimo estado global de HF recibido para enviarlo sólo una vez hacia la presentation
         int _LastStatusHF = -1;
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
-       
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-		private void OnPttTimerElapsed(object sender, ElapsedEventArgs e)
+        private Timer _FrecuencyTimer = new Timer(3000);//Settings.Default.FrecuencyCheckTime
+        private int idtimerfrecuency=0;
+        private string strtimerfrecuency = "";
+        private DateTime timepetchangefrecuency=DateTime.Now;
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnPttTimerElapsed(object sender, ElapsedEventArgs e)
 		{
 			Top.WorkingThread.Enqueue("OnPttTimerElapsed", delegate
 			{
@@ -617,6 +632,31 @@ namespace HMI.CD40.Module.BusinessEntities
 				}
 			});
 		}
+
+        //230315 No funciona este temporizador,no presenta el mensaje que se desea.
+        private void OnFrecuencyTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            Top.WorkingThread.Enqueue("OnFrecuencyimerElapsed", delegate
+            {
+                DateTime fecha1 = DateTime.Now;
+                TimeSpan precision = TimeSpan.FromMilliseconds(100);
+                int resultado = DateTime.Compare(fecha1,timepetchangefrecuency);
+                int ms100 = (int)(Math.Abs(fecha1.Subtract(timepetchangefrecuency).Ticks)/precision.Ticks);
+                if (ms100 >50) //  5 segundos es tiempo suficiente.
+                {
+                    FrChangeRsp res = new FrChangeRsp();
+                    res.Code = Identifiers.FR_TIMEOUT_ERROR;// "Error: Cambio de frecuencia.Tiempo de espera agotado";
+                    res.IdFrecuency = idtimerfrecuency.ToString();
+                    res.AssignedFrecuency = strtimerfrecuency;
+                    res.resultado = false;
+                    General.SafeLaunchEvent(FrChangedResultMessage, this, res);
+                    _PttBadOpeTimer.Enabled = false;
+                    //BadOperation(true);
+
+                }
+
+            });
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -662,7 +702,16 @@ namespace HMI.CD40.Module.BusinessEntities
 						RdPosition rd = _RdPositions[pos];
 						rd.Reset(link);
                             //RQF-14 parametro frecuencianodesasignable
-                            RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, rd.FrecuenciaNoDesasignable, (FrequencyState)rd.Estado, rd.RxOnly);
+
+                            selectable_frequencies sf= new selectable_frequencies();
+                            sf.setSelectedFrecuency("");//lalm 230303
+                            foreach (string s in link.SelectableFrequencies)
+                                sf.setnewfrecuency(s);
+                            // la frecuencia selecionada
+                            sf.setSelectedFrecuency(link.DefaultFrequency);
+
+                            RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, rd.FrecuenciaNoDesasignable, (FrequencyState)rd.Estado, rd.RxOnly, sf);
+                            
                             /** 20180321. AGL. ALIAS a mostrar en la tecla... */
                             posInfo.KeyAlias = rd.KeyAlias;
                             //LALM 220329 introduzco DescDestino.
@@ -683,7 +732,9 @@ namespace HMI.CD40.Module.BusinessEntities
 					rd.Reset();
 
                         //RQf-14 parametro frecuencianodesasignable
-                        RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, rd.FrecuenciaNoDesasignable, (FrequencyState)rd.Estado, rd.RxOnly);
+                        //List <string> listpossiblefrec = new List<string>();
+                        selectable_frequencies sf= new selectable_frequencies();
+                        RdInfo posInfo = new RdInfo(rd.Literal, rd.Alias, rd.Tx, rd.Rx, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, rd.TipoFrecuencia, rd.Monitoring, rd.FrecuenciaNoDesasignable, (FrequencyState)rd.Estado, rd.RxOnly, sf);
                         /** 20180321. AGL. ALIAS a mostrar en la tecla... */
                         posInfo.KeyAlias = rd.KeyAlias;
                         //LALM 210223 Errores #4756 prioridad
@@ -888,7 +939,7 @@ namespace HMI.CD40.Module.BusinessEntities
             //if (_oldAnySquelch != _AnySquelch)
             //    Top.Recorder.SessionGlp(FuentesGlp.RxRadio, _AnySquelch);
 
-			if (rd.Tx && !_RdPositionsInTx.Contains(rd))
+            if (rd.Tx && !_RdPositionsInTx.Contains(rd))
 			{
 				_RdPositionsInTx.Add(rd);
 
@@ -963,7 +1014,7 @@ namespace HMI.CD40.Module.BusinessEntities
             if (!_ChangingCfg)
 			{
 				RdState st = new RdState(rd.Tx, rd.Rx, rd.PttSrcId, rd.Ptt, rd.Squelch, rd.AudioVia, rd.RtxGroup, 
-                                            (FrequencyState)rd.Estado, rd.QidxMethod, rd.QidxValue, rd.QidxResource);
+                                            (FrequencyState)rd.Estado, rd.QidxMethod, rd.QidxValue, rd.QidxResource,rd.SelectedFrecuency);//inserto selected frecuency
 				RangeMsg<RdState> state = new RangeMsg<RdState>(rd.Pos, st);
 				General.SafeLaunchEvent(PositionsChanged, this, state);
 
@@ -1189,6 +1240,15 @@ namespace HMI.CD40.Module.BusinessEntities
                     }
                 }
             }
+        }
+
+        //lalm 230301
+        private void OnFrecChangedResult(object sender, FrChangeRsp res)
+        {
+            RdPosition rd = (RdPosition)sender;
+            
+            if (res.Code!= Identifiers.FR_CHANGE_OK)
+                General.SafeLaunchEvent(FrChangedResultMessage, this, res);
         }
 
         private void OnSiteChangedResult(object sender, ChangeSiteRsp res)

@@ -41,6 +41,7 @@ message RdSrvFrRs
 	optional uint32 QidxValue = 8;
 	optional FrequencyStatusType FrequencyStatus = 9;
 	optional uint32 ErrorCode = 10;
+	optional string SelectedFrequency = 11;
 }
 
 message FrChangeResponse
@@ -74,8 +75,15 @@ message MSNodeInfo
 	required string site=1;
 	required string res=2;
 }
+message MSRdDestination
+{
+	required string id_destino=1;
+	required string selectedfrequency=2;
+}
 message MSStatus
 {
-	repeated MSNodeInfo main_nodes=1;
-	repeated MSNodeInfo disabled_nodes=2;
+	required string datetime=1;
+	repeated MSNodeInfo main_nodes=2;
+	repeated MSNodeInfo disabled_nodes=3;
+	repeated MSRdDestination rd_destination=4;	
 }

@@ -39,27 +39,60 @@ namespace U5ki.RdService
             RdRegRef.ResourceChanged += OnResourceChanged;
             RdRegRef.MasterStatusChanged += (wsender, master_status) =>
             {
-                Log.Trace($"MasterStatusChanged => {master_status}");
                 Master = master_status;
-                if (Master == true)
+                //Sea master o slave mando el fichero que tengo. El otro debera compara las fecha y hora
+                try
                 {
-                    try
-                    {
-                        Status = ServicesHelpers.DeserializeObject<MSStatus>(File.ReadAllText(FileName));
-                        Log.Trace($"OnMasterStatusChanged File loaded. {Status.ListToString()}");
-                    }
-                    catch (Exception x)
-                    {
-                        Status.main_nodes.Clear();
-                        Status.disabled_nodes.Clear();
-                        Log.Error("OnMasterStatusChanged Loading File Exception", x);
-                    }
+                    Status = ServicesHelpers.DeserializeObject<MSStatus>(File.ReadAllText(FileName));
+                    Log.Trace($"OnMasterStatusChanged File loaded. {Status.ListToString()}");
+                    Publish();
+                }
+                catch (Exception x)
+                {
+                    Status.main_nodes.Clear();
+                    Status.disabled_nodes.Clear();
+                    Status.rd_destination.Clear();
+                    Log.Error("OnMasterStatusChanged Loading File Exception", x);
                 }
             };
 
             RdRegRef?.SubscribeToTopic<MSStatus>(Identifiers.RdTopic);
             Log.Trace("Modulo Incializado.");
         }
+
+        static public bool SelectFrequency(string id_dest, string freq)
+        {
+            Log.Trace($"Selecting Frequency {id_dest}. Frequency {freq}");
+
+            if (Master == false) return false;
+
+            var res = DataAccess(() =>
+            {
+                /** Borro si esta*/
+                Status.rd_destination?.RemoveAll(i => i.id_destino == id_dest);
+                /** Añado la frecuencia */
+                Status.rd_destination?.Add(new MSRdDestination() { id_destino = id_dest, selectedfrequency = freq });
+                Log.Trace($"Frequency Selected {id_dest}. selectedfrequency {freq}");
+
+                SaveAndPublish();
+            });
+            return res;
+        }
+
+        static public string GetSelectFrequency(string id_dest)
+        {
+            Log.Trace($"Get Selected Frequency {id_dest}.");
+
+            MSRdDestination found = null;
+            var res = DataAccess(() =>
+            {
+                found = Status.rd_destination.Where(i => i.id_destino == id_dest).ToList().FirstOrDefault();
+                Log.Trace($"Resource {id_dest} is {found}");
+            });
+            return (found == null)? null : found.selectedfrequency;
+        }
+
+
         /// <summary>
         /// Se supone que a esta rutina se llama en modo MASTER.
         /// </summary>
@@ -144,6 +177,7 @@ namespace U5ki.RdService
         /// <param name="cfg"></param>
         static void ProcessNewConfig(Cd40Cfg cfg)
         {
+            int modified = 0;
             Log.Trace($"Procesando Nueva Configuracion {cfg.Version}");
             try
             {
@@ -159,6 +193,7 @@ namespace U5ki.RdService
                 Log.Error("Loading File Exception", x);
                 Status.main_nodes.Clear();
                 Status.disabled_nodes.Clear();
+                modified++;
             }
             /** Ajustar los datos a la nueva configuracion. */
             var allRes = cfg.ConfiguracionUsuarios
@@ -170,11 +205,20 @@ namespace U5ki.RdService
                 .ToList();
 
             /** Borra de las listas aquellos que han sido eliminadas de configuracion */
-            Status.main_nodes.RemoveAll(n => NotInCfg(allRes, n));
-            Status.disabled_nodes.RemoveAll(n => NotInCfg(allRes, n));
-            Log.Trace($"List Fixed. {Status.ListToString()}");
+            modified += Status.main_nodes.RemoveAll(n => NotInCfg(allRes, n));
+            modified += Status.disabled_nodes.RemoveAll(n => NotInCfg(allRes, n));
 
-            SaveAndPublish();
+            var allfreq = cfg.ConfiguracionUsuarios
+                .SelectMany(u => u.RdLinks)
+                .ToList();
+
+            modified += Status.rd_destination.RemoveAll(n => Rd_destination_NotInCfg(allfreq, n.id_destino));           
+
+            if (modified > 0)
+            {
+                Log.Trace($"List Fixed. {Status.ListToString()}");
+                SaveAndPublish();
+            }
         }
         static void OnResourceChanged(object sender, RsChangeInfo e)
         {
@@ -202,22 +246,56 @@ namespace U5ki.RdService
             {
                 try
                 {
+                    //Tomo la fecha y hora de mi fichero actual
+                    MSStatus prevStatus = new MSStatus();
+                    string prev_datetime = null;
+                    try
+                    {
+                        prevStatus = ServicesHelpers.DeserializeObject<MSStatus>(File.ReadAllText(FileName));
+                        prev_datetime = prevStatus.datetime;
+                        Log.Trace($"OnResourceChanged previous File loaded. {Status.ListToString()}");
+                    }
+                    catch (Exception x)
+                    {
+                        prevStatus = null;
+                        prev_datetime = null;
+                        Log.Error("OnResourceChanged Loading File Exception", x);
+                    }
+
                     Log.Trace($"OnResourceChanged MSStatus Event Received.  Master {Master}");
                     MemoryStream ms = new MemoryStream(e.Content);
                     MSStatus MSNodesInfo = Serializer.Deserialize<MSStatus>(ms);
                     Log.Trace($"OnResourceChanged MSStatus Event Received. Master {Master}. Info = { MSNodesInfo.ListToString()}");
                     DataAccess(() =>
                     {
-                        try
+                        Status = MSNodesInfo;
+                        int comp = CompareDateTime(prev_datetime, Status.datetime);
+
+                        //Comparo la fecha y hora del recibido con el que tengo
+                        if (comp < 0)
                         {
-                            Status = MSNodesInfo;
-                            File.WriteAllText(FileName, ServicesHelpers.SerializeObject(MSNodesInfo/*.nodes_info*/));
-                            Log.Trace($"OnResourceChanged MSStatus Event Received. Master {Master}. Saved to {FileName}");
+                            try
+                            {
+                                //El que me llega es posterior y es con el que me quedo
+                                Log.Trace($"OnResourceChanged MSStatus Event Received. Master {Master}. Saved to {FileName}");
+                                File.WriteAllText(FileName, ServicesHelpers.SerializeObject(MSNodesInfo/*.nodes_info*/));                                
+                            }
+                            catch (Exception x)
+                            {
+                                Log.Error("OnResourceChanged Writing File Exception", x);
+                            }
                         }
-                        catch (Exception x)
+                        else
                         {
-                            Log.Error("Writing File Exception", x);
-                        }
+                            //El que me llega es anterior o actual, por tanto lo descarto
+                            Status = prevStatus;
+                            Log.Trace($"OnResourceChanged MSStatus Event Received. It is rejected because it is previous");
+                            if (comp > 0)
+                            {
+                                //Y si es anterior tambien envio el mio para que el resto de puestos se queden con el
+                                Publish();
+                            }
+                        }                            
                     });
                 }
                 catch (Exception x)
@@ -231,9 +309,9 @@ namespace U5ki.RdService
             /** Publico los cambios */
             try
             {
+                SetStatusDateTime();
                 File.WriteAllText(FileName, ServicesHelpers.SerializeObject(Status/*.nodes_info*/));
-                RdRegRef?.SetValue<MSStatus>(Identifiers.RdTopic, "MSStatus", Status);
-                RdRegRef?.Publish();
+                Publish();
                 Log.Trace($"Data Saved and Published. {Status.ListToString()}");
             }
             catch (Exception x)
@@ -241,6 +319,22 @@ namespace U5ki.RdService
                 Log.Error("Writing File or Publishing data Exception", x);
             }
         }
+
+        static void Publish()
+        {
+            /** Publico los cambios */
+            try
+            {
+                RdRegRef?.SetValue<MSStatus>(Identifiers.RdTopic, "MSStatus", Status);
+                RdRegRef?.Publish();
+                Log.Trace($"Data Published. {Status.ListToString()}");
+            }
+            catch (Exception x)
+            {
+                Log.Error("Writing Publishing data Exception", x);
+            }
+        }
+
         static bool DataAccess(Action invoke)
         {
             if (semaphore.WaitOne(TimeSpan.FromSeconds(5)))
@@ -256,6 +350,65 @@ namespace U5ki.RdService
             var inCfg = cfgRecursos.Where(r => r.IdEmplazamiento == node.site && r.IdRecurso == node.res).ToList();
             return inCfg.Count() == 0;
         }
+
+        static bool Rd_destination_NotInCfg(List<CfgEnlaceExterno> cfgRdLinks, string id_dest)
+        {
+            var inCfg = cfgRdLinks.Where(r => r.Literal == id_dest).ToList();
+            return inCfg.Count() == 0;
+        }
+
+        /*
+         * Compara dos fechas/hora
+         * Retorno menor que cero d1 es anterior a d2
+         *          igual a cero son iguales
+         *          mayor que cero d1 es posterior a d2         * 
+         * */
+        static int CompareDateTime(string d1, string d2)
+        {
+            if (d1 == null) return -1;
+            if (d2 == null) return 1;
+
+            string[] sd1 = d1.Split(',');
+            string[] sd2 = d2.Split(',');
+
+            Int32 Year;
+            Int32 month;
+            Int32 day;
+            Int32 hour;
+            Int32 min;
+            Int32 sec;
+            Int32 mil;
+
+            if (!Int32.TryParse(sd1[0], out Year)) Year = 0;
+            if (!Int32.TryParse(sd1[1], out month)) month = 0;
+            if (!Int32.TryParse(sd1[2], out day)) day = 0;
+            if (!Int32.TryParse(sd1[3], out hour)) hour = 0;
+            if (!Int32.TryParse(sd1[4], out min)) min = 0;
+            if (!Int32.TryParse(sd1[5], out sec)) sec = 0;
+            if (!Int32.TryParse(sd1[6], out mil)) mil = 0;
+
+            DateTime D1 = new DateTime(Year, month, day, hour, min, sec, mil);
+
+            if (!Int32.TryParse(sd2[0], out Year)) Year = 0;
+            if (!Int32.TryParse(sd2[1], out month)) month = 0;
+            if (!Int32.TryParse(sd2[2], out day)) day = 0;
+            if (!Int32.TryParse(sd2[3], out hour)) hour = 0;
+            if (!Int32.TryParse(sd2[4], out min)) min = 0;
+            if (!Int32.TryParse(sd2[5], out sec)) sec = 0;
+            if (!Int32.TryParse(sd2[6], out mil)) mil = 0;
+
+            DateTime D2 = new DateTime(Year, month, day, hour, min, sec, mil);
+
+            return DateTime.Compare(D1, D2);
+        }
+
+        static void SetStatusDateTime()
+        {
+            DateTime dateTime = DateTime.Now;
+            Status.datetime = string.Format("{0},{1},{2},{3},{4},{5},{6}",
+                dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond);
+        }
+
         static Logger Log { get => LogManager.GetLogger("MSTxPersistence"); }
         static Registry RdRegRef = null;
         static Semaphore semaphore = new Semaphore(1, 1);

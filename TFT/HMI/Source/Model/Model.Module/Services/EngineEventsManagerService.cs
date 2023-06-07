@@ -302,9 +302,18 @@ namespace HMI.Model.Module.Services
 
             _StateManager.Radio.SetSiteChanged(msg);
         }
-                
 
-		[EventSubscription(EventTopicNames.RdPosPttStateEngine, ThreadOption.UserInterface)]
+
+        [EventSubscription(EventTopicNames.FrChangedResultEngine, ThreadOption.UserInterface)]
+        public void OnFrChangedResultEngine(object sender, FrChangeMsg<string> msg)
+        {
+            _Logger.Trace("Procesando {0}: {1}", EventTopicNames.FrChangedResultEngine, msg);
+
+            _StateManager.Radio.SetFrChanged(msg);
+        }
+
+
+        [EventSubscription(EventTopicNames.RdPosPttStateEngine, ThreadOption.UserInterface)]
 		public void OnRdPosPttStateEngine(object sender, RangeMsg<PttState> msg)
 		{
 			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.RdPosPttStateEngine, msg);
@@ -696,6 +705,8 @@ namespace HMI.Model.Module.Services
                 {   
                     //Aparco las conversaciones establecidas y las salientes (en diferido)
                     _EngineCmdManager.SetHold(id, msg.State, true);
+					// 230529 mostrar botones de ad y quitar los de conferencia
+                    //_EngineCmdManager.ShowAdButtons();
                 }
             }
             else

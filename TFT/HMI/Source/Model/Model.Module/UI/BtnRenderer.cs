@@ -711,7 +711,11 @@ namespace HMI.Model.Module.UI
 			//rr.AddLine(x, y + h - radius, x, y + radius);
 
 			//return rr;
-
+			if (baseRect.Height == 0)
+			{
+				//Assert(baseRect.Height > 0);
+				return null;
+			}
 			GraphicsPath path = new GraphicsPath();
 
 			if (radius <= 0)
@@ -725,7 +729,7 @@ namespace HMI.Model.Module.UI
 					// return horizontal capsule 
 					int diameter = baseRect.Height;
 					Rectangle arc = new Rectangle(baseRect.Location, new Size(diameter, diameter));
-
+					
 					path.AddArc(arc, 90, 180);
 					arc.X = baseRect.Right - diameter;
 					path.AddArc(arc, 270, 180);
@@ -819,7 +823,10 @@ namespace HMI.Model.Module.UI
 			int cornerRadius, Color borderColor, Color innerBorderColor, Color backColor, ColorBlend blend)
 		{
 			Rectangle rr = new Rectangle(rect.X, rect.Y, rect.Width - 1, rect.Height - 1);
-			
+			if (rr.Height<=1)//230529
+			{
+				return;
+			}
 			if (style == BtnStyle.Flat)
 			{
 				using (GraphicsPath path = GetRoundedRect(rr, cornerRadius))
@@ -865,6 +872,13 @@ namespace HMI.Model.Module.UI
 
 					if (innerBorderColor != Color.Transparent)
 					{
+						if (rr.Height == 0)
+						{
+							//230525 esto debe llegar por algun boton de conferencia.
+							//Assert(rr.Height > 0);
+							return;
+						}
+
 						using (GraphicsPath innerPath = GetRoundedRect(rr, cornerRadius))
 						using (Pen p = new Pen(innerBorderColor, 2))
 						{

@@ -9,6 +9,8 @@ using HMI.Model.Module.Constants;
 using HMI.Model.Module.Properties;
 using Utilities;
 using NLog;
+using Newtonsoft.Json.Linq;
+
 
 namespace HMI.Model.Module.BusinessEntities
 {
@@ -102,8 +104,13 @@ namespace HMI.Model.Module.BusinessEntities
         /** 20190205. RTX Information*/
         private string _PttSrcId = string.Empty;
         public string PttSrcId { get { return _PttSrcId; } }
-
-		public int Id
+        
+		//230223 radio
+        private bool _multifrecuencia=false;
+        private List<string> _frecuenciasel = new List<string>();
+		private string _defaultfrecuency;
+		private string _cause;
+        public int Id
 		{
 			get { return _Id; }
 		}
@@ -250,7 +257,33 @@ namespace HMI.Model.Module.BusinessEntities
             get { return _RxOnly; }
         }
 
-		public RdDst(int id)
+        //230223 radio
+        public bool Multifrecuencia
+        {
+            get => _multifrecuencia;
+            set => _multifrecuencia = value;
+        }
+
+        public List<string> Frecuencia_Sel
+        {
+            get => _frecuenciasel;
+            set => _frecuenciasel = value;
+        }
+
+        public string Default_Frecuency
+        {
+			get => _defaultfrecuency;
+            set => _defaultfrecuency = value;
+        }
+
+        public string Cause_Frecuency
+        {
+            get => _cause;
+            set => _cause= value;
+        }
+
+
+        public RdDst(int id)
 		{
 			_Id = id;
 		}
@@ -361,6 +394,10 @@ namespace HMI.Model.Module.BusinessEntities
 				}
 
                 //_PttSrcId = dst.PttSrcId;
+                //Multifrecuencia
+                //230223 radio
+                Multifrecuencia = dst.frecuencia_sel.multifrecuencia();
+				Frecuencia_Sel = dst.frecuencia_sel.getfrecuencies();
 			}
 		}
 
@@ -401,6 +438,7 @@ namespace HMI.Model.Module.BusinessEntities
             _State = st.State;
 
             _PttSrcId = st.PttSrcId;
+			Default_Frecuency = st.SelectedFrecuency;// lalm 230306 podria ser siempre la misma variable seletedfrecuency.
 		}
 
 		public void Reset(RdDestination dst)
@@ -531,12 +569,15 @@ namespace HMI.Model.Module.BusinessEntities
 		[EventPublication(EventTopicNames.SelCalResponse, PublicationScope.Global)]
 		public event EventHandler<StateMsg<string>> SelCalResponse;
 
-		[EventPublication(EventTopicNames.SiteChanged, PublicationScope.Global)]
-		public event EventHandler<StateMsg<string>> SiteChanged;
+        [EventPublication(EventTopicNames.SiteChanged, PublicationScope.Global)]
+        public event EventHandler<StateMsg<string>> SiteChanged;
+
+        [EventPublication(EventTopicNames.FrChanged, PublicationScope.Global)]
+        public event EventHandler<StateMsg<string>> FrChanged;
 
 
 #if _HF_GLOBAL_STATUS_
-		[EventPublication(EventTopicNames.HfGlobalStatus, PublicationScope.Global)]
+        [EventPublication(EventTopicNames.HfGlobalStatus, PublicationScope.Global)]
 		public event EventHandler<StateMsg<string>> HfGlobalStatus;
 #endif
 
@@ -944,11 +985,69 @@ namespace HMI.Model.Module.BusinessEntities
 						_Dst[i].TempAlias = _Dst[i].Alias;
 				}
 			}
+
 			General.SafeLaunchEvent(SiteChanged, this, msg);
 		}
 
+
+		//LALM 230306
+		// Esta funcion cambia la frecuencia en multifrecuencia,
+		// hay que diferenciarla de la anterior que cambia el emplazamiento.
+        public void SetFrChanged(FrChangeMsg<string> msg)
+        {
+            // 0: Alias
+            // 1: Frequency
+            // 2: resultado, ahora es un string,se pasará un codigo de error.
+            string[] ChangeFrRsp = msg.State.Split(',');
+
+            StateMsg<string> statemsg = new StateMsg<string>(msg.State);
+
+            for (int i = 0; i < Radio.NumDestinations; i++)
+            {
+                if (ChangingSite(i))
+                {
+                    if (ChangeFrRsp[2].ToUpper() == "TRUE")
+                        _Dst[i].Reset(_Dst[i].TempAlias);
+                    else
+                        _Dst[i].TempAlias = _Dst[i].Alias;
+                }
+                else if (_Dst[i].Frecuency == ChangeFrRsp[1])
+                {
+                    if (ChangeFrRsp[2].ToUpper() == "TRUE")
+                        _Dst[i].Reset(ChangeFrRsp[0]);
+                    else
+                        _Dst[i].TempAlias = _Dst[i].Alias;
+                }
+				else if (_Dst[i].Literal == ChangeFrRsp[0])
+				{
+                    _Dst[i].Cause_Frecuency = ChangeFrRsp[3];
+                    if (ChangeFrRsp[2].ToUpper() == "TRUE")
+					{
+						_Dst[i].Default_Frecuency = ChangeFrRsp[1];
+                        NotifMsg msg1 = new NotifMsg(Resources.NoJacksError, Resources.BadOperation, Resources.NoJacksError, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(FrChanged, this, statemsg);
+
+                    }
+                    else
+					{
+                        _Dst[i].Cause_Frecuency = ChangeFrRsp[3];
+                        NotifMsg msg1 = new NotifMsg(Resources.NoJacksError, Resources.BadOperation, Resources.NoJacksError, 0, MessageType.Error, MessageButtons.Ok);
+                        General.SafeLaunchEvent(FrChanged, this, statemsg);
+						break;
+                    }
+                }
+				else if (ChangeFrRsp[2]=="False1")
+				{
+                    _Dst[i].Cause_Frecuency = "hola";
+                    NotifMsg msg1 = new NotifMsg(Resources.NoJacksError, Resources.BadOperation, Resources.NoJacksError, 0, MessageType.Error, MessageButtons.Ok);
+					General.SafeLaunchEvent(FrChanged, this, statemsg);
+                    break;
+                }
+            }
+        }
+
 #if _HF_GLOBAL_STATUS_
-		public void SetHfGlobalStatus(StateMsg<string> status)
+        public void SetHfGlobalStatus(StateMsg<string> status)
 		{
 			General.SafeLaunchEvent(HfGlobalStatus, this, status);
 		}
@@ -1025,12 +1124,15 @@ namespace HMI.Model.Module.BusinessEntities
 		//LALM 221102 cambiofrecuencia
 		public int GetFrecuenciaSeleccionada(string equipo)
 		{
-
 			List<string> listafr = GetListaFrecuencias();
 			for (int i = 0, to = NumDestinations; i < to; i++)
 			{
 				if (_Dst[i].Alias == equipo)
+				{
+					if (_Dst[i].AudioVia == RdRxAudioVia.NoAudio)
+						return -1;
 					return i;
+				}
 			}
 			return -1;
 		}

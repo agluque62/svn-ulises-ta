@@ -442,18 +442,6 @@ namespace U5ki.CfgService
                         /**
                          * AGL 20120705. Leo la Última configuracion de disco.
                          * */
-                        else if (File.Exists(_LastCfgFile))
-                        {
-                            using (FileStream file = File.OpenRead(_LastCfgFile))
-                            {
-                                _LastCfg = Serializer.Deserialize<Cd40Cfg>(file);
-
-                                _Registry.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, _LastCfg);
-                                _Registry.Publish(_LastCfg.Version);
-
-                                // _Logger.Info(_LastCfg.ConfiguracionGeneral.ParametrosGenerales.ToString());
-                            }
-                        }
                         else if (File.Exists(_LastCfgFileJson))
                         {
                             using (StreamReader r = new StreamReader(_LastCfgFileJson))
@@ -467,6 +455,18 @@ namespace U5ki.CfgService
                                 // _Logger.Info(_LastCfg.ConfiguracionGeneral.ParametrosGenerales.ToString());
                             }
                         }
+                        else if (File.Exists(_LastCfgFile))
+                        {
+                            using (FileStream file = File.OpenRead(_LastCfgFile))
+                            {
+                                _LastCfg = Serializer.Deserialize<Cd40Cfg>(file);
+
+                                _Registry.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, _LastCfg);
+                                _Registry.Publish(_LastCfg.Version);
+
+                                // _Logger.Info(_LastCfg.ConfiguracionGeneral.ParametrosGenerales.ToString());
+                            }
+                        }                        
                         else
                             LogInfo<CfgService>("No cfg file found", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "CfgService", "MASTER");
                         /**
@@ -517,7 +517,7 @@ namespace U5ki.CfgService
                 }
 #endif
             });
-        }
+        }        
 
         /// <summary>
         /// 
@@ -792,6 +792,14 @@ namespace U5ki.CfgService
                             CfgTranslators.Translate(cfg, extElement, false);
                         }
                     }
+
+                    //Añade las conferencias preprogramadas
+                    SoapCfg.ConferenciasPreprogramadas conferences = soapSrv.GetConferenciasPreprogramadas(systemId);
+                    if (conferences != null)
+                    {
+                        CfgTranslators.Translate(cfg, conferences);
+                    }
+
                     try
                     {
                         /**
@@ -821,7 +829,7 @@ namespace U5ki.CfgService
                             {
                                 _LastCfg = cfg;
                                 LogInfo<CfgService>("Publicando nueva configuración: " + cfg.Version, U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
-                                    "CfgService", CTranslate.translateResource("Publicando nueva configuración: " + cfg.Version));
+                                    "CfgService", CTranslate.translateResource("Publicando nueva configuración: " + cfg.Version));                                
 
                                 _Registry.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, cfg);
                                 _Registry.Publish(cfg.Version);

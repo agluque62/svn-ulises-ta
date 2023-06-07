@@ -138,6 +138,12 @@
     <Compile Include="UI\ControlRecord.Designer.cs">
       <DependentUpon>ControlRecord.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\ListaDeParticipantes.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ListaDeParticipantes.Designer.cs">
+      <DependentUpon>ListaDeParticipantes.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\MemUC.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -272,6 +278,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ControlRecord.resx">
       <DependentUpon>ControlRecord.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ListaDeParticipantes.resx">
+      <DependentUpon>ListaDeParticipantes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MemUC.resx">
       <SubType>Designer</SubType>

@@ -90,5 +90,11 @@ namespace HMI.Model.Module.Services
 		//LALM 211201
 		void Descuelga();
 		void SetTonesLevel(int level);
-	}
+		List <string> RefrescaListaParticipantesConf(string sala);//lalm 230510
+		List <string> GetListaParticipantesEstado(string sala);//lalm 230510
+		string GetSala(int poshmi);//lalm 230517
+		void ShowAdButtons();
+        bool HayConferenciaPreprogramada();
+
+    }
 }

@@ -75,6 +75,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Cd40\Lib\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="Presentation.Rabat, Version=2.6.2.1, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\bin\Debug\Presentation.Rabat.dll</HintPath>
+    </Reference>
+    <Reference Include="Presentation.Twr, Version=2.6.2.1, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\bin\Debug\Presentation.Twr.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -116,6 +124,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Compile Include="UI\ListaDeParticipantesAsecna.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ListaDeParticipantesAsecna.Designer.cs">
+      <DependentUpon>ListaDeParticipantesAsecna.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\MemUC.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -239,6 +253,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.fr-FR.resx">
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ListaDeParticipantesAsecna.resx">
+      <DependentUpon>ListaDeParticipantesAsecna.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MemUC.resx">
       <SubType>Designer</SubType>

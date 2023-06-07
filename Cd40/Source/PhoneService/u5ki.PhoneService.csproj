@@ -183,8 +183,7 @@
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "$(SolutionDir)bin\$(ConfigurationName)\Services\"
-copy /Y "$(TargetDir)\$(TargetName).pdb" "$(SolutionDir)bin\$(ConfigurationName)\Services\"
-xcopy /Y "Tones" "$(SolutionDir)bin\$(ConfigurationName)\Tones\"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

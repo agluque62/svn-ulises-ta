@@ -76,3 +76,34 @@ message ChangeSiteRsp
 	required string Frecuency = 2;
 	required string Alias = 3;
 }
+
+/*Mensaje desde HMI del puesto para solicitar cambio de frecuencia en un destino radio*/
+message FrChangeAsk
+{
+	required string HostId = 1;
+	required string IdFrecuency = 2;    //Corresponde al identificador unico que llamamos Literal
+	required string NewFrecuency = 3;
+}
+
+/*Mensaje respuesta a FrChangeAsk*/
+message FrChangeRsp
+{
+	required bool resultado = 1;
+	required string IdFrecuency = 2;    //Corresponde al identificador unico que llamamos Literal
+	required string AssignedFrecuency = 3;
+	required uint32 Code = 4;
+}
+
+message ConferenceStatus
+{
+	enum ConfStatus
+	{
+		Ok = 0;
+		Error = 1;
+	}
+
+	required string RoomName = 1;
+	required ConfStatus Status = 2;  
+	repeated string ActiveParticipants = 3;
+}
+

@@ -9,18 +9,18 @@ namespace U5ki.CfgService
 {
 	static class CfgTranslators
 	{
-        /// <summary>
-        /// Pasa una configuracion de formato WS a formato 'protobuf', de intercambio en 'spread'
-        /// </summary>
-        /// <param name="cfg">Datos en Formato 'protobuf'. Salida...</param>
-        /// <param name="soapCfg">Datos en Formato del WebService de Configuracion</param>
+		/// <summary>
+		/// Pasa una configuracion de formato WS a formato 'protobuf', de intercambio en 'spread'
+		/// </summary>
+		/// <param name="cfg">Datos en Formato 'protobuf'. Salida...</param>
+		/// <param name="soapCfg">Datos en Formato del WebService de Configuracion</param>
 		public static void Translate(ConfiguracionSistema cfg, SoapCfg.ConfiguracionSistema soapCfg)
 		{
-            /** */
+			/** */
 			cfg.ParametrosGenerales = new ParametrosGeneralesSistema();
 			Translate(cfg.ParametrosGenerales, soapCfg.ParametrosGenerales);
 
-            /** */
+			/** */
 			if (soapCfg.PlanNumeracionATS != null)
 			{
 				foreach (SoapCfg.NumeracionATS soapi in soapCfg.PlanNumeracionATS)
@@ -31,7 +31,7 @@ namespace U5ki.CfgService
 				}
 			}
 
-            /** */
+			/** */
 			if (soapCfg.PlanDireccionamientoIP != null)
 			{
 				foreach (SoapCfg.DireccionamientoIP soapi in soapCfg.PlanDireccionamientoIP)
@@ -42,7 +42,7 @@ namespace U5ki.CfgService
 				}
 			}
 
-            /** */
+			/** */
 			if (soapCfg.PlanTroncales != null)
 			{
 				foreach (SoapCfg.ListaTroncales soapi in soapCfg.PlanTroncales)
@@ -53,7 +53,7 @@ namespace U5ki.CfgService
 				}
 			}
 
-            /** */
+			/** */
 			if (soapCfg.PlanRedes != null)
 			{
 				foreach (SoapCfg.ListaRedes soapi in soapCfg.PlanRedes)
@@ -64,7 +64,7 @@ namespace U5ki.CfgService
 				}
 			}
 
-            /** */
+			/** */
 			if (soapCfg.PlanAsignacionUsuarios != null)
 			{
 				foreach (SoapCfg.AsignacionUsuariosTV soapi in soapCfg.PlanAsignacionUsuarios)
@@ -75,7 +75,7 @@ namespace U5ki.CfgService
 				}
 			}
 
-            /** */
+			/** */
 			if (soapCfg.PlanAsignacionRecursos != null)
 			{
 				foreach (SoapCfg.AsignacionRecursosGW soapi in soapCfg.PlanAsignacionRecursos)
@@ -86,7 +86,7 @@ namespace U5ki.CfgService
 				}
 			}
 
-            /** */
+			/** */
 			if (soapCfg.PlanDireccionamientoSIP != null)
 			{
 				foreach (SoapCfg.DireccionamientoSIP soapi in soapCfg.PlanDireccionamientoSIP)
@@ -98,13 +98,13 @@ namespace U5ki.CfgService
 			}
 		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapUser"></param>
-        /// <param name="soapExLinks"></param>
-        /// <param name="soapInLinks"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapUser"></param>
+		/// <param name="soapExLinks"></param>
+		/// <param name="soapInLinks"></param>
 		public static void Translate(ConfiguracionUsuario cfg, SoapCfg.CfgUsuario soapUser, SoapCfg.CfgEnlaceExterno[] soapExLinks, SoapCfg.CfgEnlaceInterno[] soapInLinks)
 		{
 			cfg.User = new CfgUsuario();
@@ -123,21 +123,21 @@ namespace U5ki.CfgService
 			{
 				foreach (SoapCfg.CfgEnlaceInterno soapi in soapInLinks)
 				{
-                    //Proteccion ante un error del SOAP que envia tags vacios
-                    if (soapi != null)
-                    {
-                        CfgEnlaceInterno i = new CfgEnlaceInterno();
-                        Translate(i, soapi);
-                        cfg.TlfLinks.Add(i);
-                    }
+					//Proteccion ante un error del SOAP que envia tags vacios
+					if (soapi != null)
+					{
+						CfgEnlaceInterno i = new CfgEnlaceInterno();
+						Translate(i, soapi);
+						cfg.TlfLinks.Add(i);
+					}
 				}
 			}
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(ParametrosGeneralesSistema cfg, SoapCfg.ParametrosGeneralesSistema soapCfg)
 		{
 			cfg.TiempoMaximoPTT = soapCfg.TiempoMaximoPTT;
@@ -149,16 +149,16 @@ namespace U5ki.CfgService
 			cfg.TamLiteralEnlAG = soapCfg.TamLiteralEnlAG;
 			cfg.TamLiteralEmplazamiento = soapCfg.TamLiteralEmplazamiento;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(NumeracionATS cfg, SoapCfg.NumeracionATS soapCfg)
 		{
 			cfg.CentralPropia = soapCfg.CentralPropia;
 			cfg.Throwswitching = soapCfg.Throwswitching;
-            cfg.Central = soapCfg.Central;
+			cfg.Central = soapCfg.Central;
 
 			if (soapCfg.RangosOperador != null)
 			{
@@ -173,7 +173,7 @@ namespace U5ki.CfgService
 			{
 				foreach (SoapCfg.Rangos soapi in soapCfg.RangosPrivilegiados)
 				{
-                    RangosSCV i = new RangosSCV();
+					RangosSCV i = new RangosSCV();
 					Translate(i, soapi);
 					cfg.RangosPrivilegiados.Add(i);
 				}
@@ -191,11 +191,11 @@ namespace U5ki.CfgService
 				//cfg.ListaRutas.Sort(delegate(PlanRutas a, PlanRutas b) { return ((a.TipoRuta == b.TipoRuta) ? 0 : ((a.TipoRuta == "D") ? -1 : 1)); });
 			}
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(RangosSCV cfg, SoapCfg.Rangos soapCfg)
 		{
 			ulong inicial, final;
@@ -207,41 +207,41 @@ namespace U5ki.CfgService
 			cfg.Inicial = inicial;
 			cfg.Final = final;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(PlanRutas cfg, SoapCfg.PlanRutas soapCfg)
 		{
 			cfg.TipoRuta = soapCfg.TipoRuta ?? "";
 			cfg.ListaTroncales.AddRange(soapCfg.ListaTroncales);
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(DireccionamientoIP cfg, SoapCfg.DireccionamientoIP soapCfg)
 		{
 			cfg.IdHost = soapCfg.IdHost ?? "";
 			cfg.IpRed1 = soapCfg.IpRed1 ?? "";
 			cfg.IpRed2 = soapCfg.IpRed2 ?? "";
-            cfg.IpRed3 = soapCfg.IpRed3 ?? "";
-            cfg.TipoHost = (Tipo_Elemento_HW)soapCfg.TipoHost;
-            cfg.Interno = soapCfg.Interno;
-            cfg.Min = soapCfg.Min;
-            cfg.Max = soapCfg.Max;
-            cfg.EsCentralIP = soapCfg.EsCentralIP;
-            cfg.SrvPresenciaIpRed1 = soapCfg.SrvPresenciaIpRed1;
-            cfg.SrvPresenciaIpRed2 = soapCfg.SrvPresenciaIpRed2;
-            cfg.SrvPresenciaIpRed3 = soapCfg.SrvPresenciaIpRed3;
+			cfg.IpRed3 = soapCfg.IpRed3 ?? "";
+			cfg.TipoHost = (Tipo_Elemento_HW)soapCfg.TipoHost;
+			cfg.Interno = soapCfg.Interno;
+			cfg.Min = soapCfg.Min;
+			cfg.Max = soapCfg.Max;
+			cfg.EsCentralIP = soapCfg.EsCentralIP;
+			cfg.SrvPresenciaIpRed1 = soapCfg.SrvPresenciaIpRed1;
+			cfg.SrvPresenciaIpRed2 = soapCfg.SrvPresenciaIpRed2;
+			cfg.SrvPresenciaIpRed3 = soapCfg.SrvPresenciaIpRed3;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(ListaTroncales cfg, SoapCfg.ListaTroncales soapCfg)
 		{
 			cfg.IdTroncal = soapCfg.IdTroncal ?? "";
@@ -257,21 +257,21 @@ namespace U5ki.CfgService
 				}
 			}
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(PlanRecursos cfg, SoapCfg.PlanRecursos soapCfg)
 		{
 			cfg.IdRecurso = soapCfg.IdRecurso ?? "";
 			cfg.Tipo = (TipoInterface)soapCfg.Tipo;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(ListaRedes cfg, SoapCfg.ListaRedes soapCfg)
 		{
 			cfg.IdRed = soapCfg.IdRed ?? "";
@@ -287,39 +287,39 @@ namespace U5ki.CfgService
 				}
 			}
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(AsignacionUsuariosTV cfg, SoapCfg.AsignacionUsuariosTV soapCfg)
 		{
 			cfg.IdUsuario = soapCfg.IdUsuario ?? "";
 			cfg.IdHost = soapCfg.IdHost ?? "";
-            cfg.IpGrabador1 = soapCfg.IpGrabador1;
-            cfg.IpGrabador2 = soapCfg.IpGrabador2;
+			cfg.IpGrabador1 = soapCfg.IpGrabador1;
+			cfg.IpGrabador2 = soapCfg.IpGrabador2;
 			cfg.RtspPort = soapCfg.RtspPort;
 			cfg.RtspPort2 = soapCfg.RtspPort1;
 			cfg.TipoGrabacionAnalogica = soapCfg.TipoGrabacionAnalogica;
 			cfg.EnableGrabacionEd137 = soapCfg.EnableGrabacionEd137;
 			cfg.EnableGrabacionAnalogica = soapCfg.EnableGrabacionAnalogica;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(AsignacionRecursosGW cfg, SoapCfg.AsignacionRecursosGW soapCfg)
 		{
 			cfg.IdRecurso = soapCfg.IdRecurso ?? "";
 			cfg.IdHost = soapCfg.IdHost ?? "";
-            cfg.SipPort = soapCfg.SipPort;
+			cfg.SipPort = soapCfg.SipPort;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(DireccionamientoSIP cfg, SoapCfg.DireccionamientoSIP soapCfg)
 		{
 			cfg.IdUsuario = soapCfg.IdUsuario ?? "";
@@ -334,22 +334,22 @@ namespace U5ki.CfgService
 				}
 			}
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(StrNumeroAbonado cfg, SoapCfg.StrNumeroAbonado soapCfg)
 		{
-            cfg.IdAgrupacion = soapCfg.IdAgrupacion;
+			cfg.IdAgrupacion = soapCfg.IdAgrupacion;
 			cfg.Prefijo = soapCfg.Prefijo;
 			cfg.NumeroAbonado = soapCfg.NumeroAbonado ?? "";
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(CfgUsuario cfg, SoapCfg.CfgUsuario soapCfg)
 		{
 			cfg.Nombre = soapCfg.Nombre ?? "";
@@ -388,11 +388,11 @@ namespace U5ki.CfgService
 				}
 			}
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(SectoresSCV cfg, SoapCfg.SectoresSCV soapCfg)
 		{
 			cfg.IdParejaUCS = soapCfg.IdParejaUCS ?? "";
@@ -400,11 +400,11 @@ namespace U5ki.CfgService
 			cfg.PrioridadR2 = soapCfg.PrioridadR2 - 1;
 			cfg.TipoHMI = soapCfg.TipoHMI;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(ParametrosSectorSCVKeepAlive cfg, SoapCfg.ParametrosSectorSCVKeepAlive soapCfg)
 		{
 			cfg.NumLlamadasEntrantesIda = soapCfg.NumLlamadasEntrantesIda;
@@ -417,13 +417,13 @@ namespace U5ki.CfgService
 			cfg.Intruido = soapCfg.Intruido;
 			cfg.KeepAlivePeriod = soapCfg.KeepAlivePeriod;
 			cfg.KeepAliveMultiplier = soapCfg.KeepAliveMultiplier;
-            //cfg.GrabacionEd137 = soapCfg.
+			//cfg.GrabacionEd137 = soapCfg.
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(TeclasSectorSCV cfg, SoapCfg.TeclasSectorSCV soapCfg)
 		{
 			cfg.TransConConsultaPrev = soapCfg.TransConConsultaPrev;
@@ -450,11 +450,11 @@ namespace U5ki.CfgService
 			cfg.PermisoRTXSQ = soapCfg.PermisoRTXSQ;
 			cfg.PermisoRTXSect = soapCfg.PermisoRTXSect;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(NivelesSCV cfg, SoapCfg.NivelesSCV soapCfg)
 		{
 			cfg.CICL = soapCfg.CICL;
@@ -462,32 +462,32 @@ namespace U5ki.CfgService
 			cfg.CPICL = soapCfg.CPICL;
 			cfg.CPIPL = soapCfg.CPIPL;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(NumerosAbonado cfg, SoapCfg.NumerosAbonado soapCfg)
 		{
 			cfg.Prefijo = soapCfg.Prefijo;
 			cfg.Numero = soapCfg.Numero ?? "";
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(PermisosRedesSCV cfg, SoapCfg.PermisosRedesSCV soapCfg)
 		{
 			cfg.IdRed = soapCfg.IdRed ?? "";
 			cfg.Llamar = soapCfg.Llamar;
 			cfg.Recibir = soapCfg.Recibir;
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(CfgEnlaceExterno cfg, SoapCfg.CfgEnlaceExterno soapCfg)
 		{
 			cfg.Literal = soapCfg.Literal ?? "";
@@ -496,23 +496,28 @@ namespace U5ki.CfgService
 			cfg.TipoFrecuencia = (Tipo_Frecuencia)soapCfg.TipoFrecuencia;
 			cfg.ExclusividadTxRx = soapCfg.ExclusividadTxRx;
 			cfg.EstadoAsignacion = soapCfg.EstadoAsignacion ?? "";
-            //cfg.Prioridad = soapCfg.Prioridad - 1;
-            cfg.Prioridad = soapCfg.Prioridad;
-            cfg.SupervisionPortadora = soapCfg.SupervisionPortadora;
-            cfg.FrecuenciaSintonizada = soapCfg.FrecuenciaSintonizada;
+			//cfg.Prioridad = soapCfg.Prioridad - 1;
+			cfg.Prioridad = soapCfg.Prioridad;
+			cfg.SupervisionPortadora = soapCfg.SupervisionPortadora;
+			cfg.FrecuenciaSintonizada = soapCfg.FrecuenciaSintonizada;
 			cfg.ListaPosicionesEnHmi.AddRange(soapCfg.ListaPosicionesEnHmi);
 			cfg.DestinoAudio.AddRange(soapCfg.DestinoAudio);
 
-            cfg.MetodoCalculoClimax = soapCfg.MetodoCalculoClimax;
-            cfg.VentanaSeleccionBss = soapCfg.VentanaSeleccionBss;
-            cfg.SincronizaGrupoClimax = soapCfg.SincronizaGrupoClimax;
-            cfg.AudioPrimerSqBss = soapCfg.AudioPrimerSqBss;
-            cfg.FrecuenciaNoDesasignable = soapCfg.FrecuenciaNoDesasignable;
-            cfg.VentanaReposoZonaTxDefecto = soapCfg.VentanaReposoZonaTxDefecto;
-            cfg.PrioridadSesionSip = soapCfg.PrioridadSesionSIP;
-            cfg.CldSupervisionTime = soapCfg.CldSupervisionTime;
-            cfg.MetodosBssOfrecidos = soapCfg.MetodosBssOfrecidos;
+			cfg.MetodoCalculoClimax = soapCfg.MetodoCalculoClimax;
+			cfg.VentanaSeleccionBss = soapCfg.VentanaSeleccionBss;
+			cfg.SincronizaGrupoClimax = soapCfg.SincronizaGrupoClimax;
+			cfg.AudioPrimerSqBss = soapCfg.AudioPrimerSqBss;
+			cfg.FrecuenciaNoDesasignable = soapCfg.FrecuenciaNoDesasignable;
+			cfg.VentanaReposoZonaTxDefecto = soapCfg.VentanaReposoZonaTxDefecto;
+			cfg.PrioridadSesionSip = soapCfg.PrioridadSesionSIP;
+			cfg.CldSupervisionTime = soapCfg.CldSupervisionTime;
+			cfg.MetodosBssOfrecidos = soapCfg.MetodosBssOfrecidos;
 			cfg.PasivoRetransmision = soapCfg.PasivoRetransmision;
+			if (soapCfg.SelectableFrequencies != null)
+			{
+				cfg.SelectableFrequencies.AddRange(soapCfg.SelectableFrequencies);
+			}
+			cfg.DefaultFrequency = soapCfg.DefaultFrequency;
 			//cfg.NombreZonaTxDefecto = soapCfg.NombreZonaTxDefecto;
 			/*
             if (soapCfg.MetodosBss != null)
@@ -533,58 +538,58 @@ namespace U5ki.CfgService
 					Translate(i, soapi);
 					cfg.ListaRecursos.Add(i);
 				}
-			}            
-            cfg.EmplazamientoDefecto = "";
-            cfg.TiempoVueltaADefecto = 0;
-            if (soapCfg.ModoTransmision == null)
-                cfg.ModoTransmision = Tipo_ModoTransmision.Ninguno;
-            else
-                switch (soapCfg.ModoTransmision)
-                {
-                    case "R":
-                        cfg.ModoTransmision = Tipo_ModoTransmision.UltimoReceptor;
-                        cfg.EmplazamientoDefecto = soapCfg.EmplazamientoDefecto;
-                        cfg.TiempoVueltaADefecto = 0;
-                        if (soapCfg.TiempoVueltaADefecto != null)
-                        {
-                            int tiempo;
-                            if (Int32.TryParse(soapCfg.TiempoVueltaADefecto, out tiempo))
-                                cfg.TiempoVueltaADefecto = tiempo;
-                        }
-                        break;
-                    case "M":
-                        cfg.ModoTransmision = Tipo_ModoTransmision.Manual;
-                        break;
-                    case "C":
-                        cfg.ModoTransmision = Tipo_ModoTransmision.Climax;
-                        break;
-                    default:
-                        cfg.ModoTransmision = Tipo_ModoTransmision.Ninguno;
-                        break;
-                }
-            cfg.PorcentajeRSSI = 0;
-            if (cfg.TipoFrecuencia == Tipo_Frecuencia.FD)
-            {
-                if (soapCfg.PorcentajeRSSI != null)
-                {
-                    uint porcentaje;
-                    if (UInt32.TryParse(soapCfg.PorcentajeRSSI, out porcentaje))
-                        cfg.PorcentajeRSSI = porcentaje;
-                }
-            }
+			}
+			cfg.EmplazamientoDefecto = "";
+			cfg.TiempoVueltaADefecto = 0;
+			if (soapCfg.ModoTransmision == null)
+				cfg.ModoTransmision = Tipo_ModoTransmision.Ninguno;
+			else
+				switch (soapCfg.ModoTransmision)
+				{
+					case "R":
+						cfg.ModoTransmision = Tipo_ModoTransmision.UltimoReceptor;
+						cfg.EmplazamientoDefecto = soapCfg.EmplazamientoDefecto;
+						cfg.TiempoVueltaADefecto = 0;
+						if (soapCfg.TiempoVueltaADefecto != null)
+						{
+							int tiempo;
+							if (Int32.TryParse(soapCfg.TiempoVueltaADefecto, out tiempo))
+								cfg.TiempoVueltaADefecto = tiempo;
+						}
+						break;
+					case "M":
+						cfg.ModoTransmision = Tipo_ModoTransmision.Manual;
+						break;
+					case "C":
+						cfg.ModoTransmision = Tipo_ModoTransmision.Climax;
+						break;
+					default:
+						cfg.ModoTransmision = Tipo_ModoTransmision.Ninguno;
+						break;
+				}
+			cfg.PorcentajeRSSI = 0;
+			if (cfg.TipoFrecuencia == Tipo_Frecuencia.FD)
+			{
+				if (soapCfg.PorcentajeRSSI != null)
+				{
+					uint porcentaje;
+					if (UInt32.TryParse(soapCfg.PorcentajeRSSI, out porcentaje))
+						cfg.PorcentajeRSSI = porcentaje;
+				}
+			}
 		}
 
-        private static void Translate(MetodosBssDelRecurso i, SoapCfg.MetodosBssDelRecurso m)
-        {
-            i.IdMetodo = m.idMetodo;
-            i.NombreMetodo = m.nombreMetodo;
-        }
+		private static void Translate(MetodosBssDelRecurso i, SoapCfg.MetodosBssDelRecurso m)
+		{
+			i.IdMetodo = m.idMetodo;
+			i.NombreMetodo = m.nombreMetodo;
+		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(CfgRecursoEnlaceExterno cfg, SoapCfg.CfgRecursoEnlaceExterno soapCfg)
 		{
 			cfg.IdRecurso = soapCfg.IdRecurso ?? "";
@@ -594,52 +599,53 @@ namespace U5ki.CfgService
 			cfg.NumFlujosAudio = soapCfg.NumFlujosAudio;
 			cfg.IdEmplazamiento = soapCfg.IdEmplazamiento ?? "";
 
-            cfg.NombreZona = soapCfg.NombreZona ?? "";
-            //cfg.NameTablaBss = soapCfg.NameTablaBss ?? "";
-            //cfg.MetodoBss = soapCfg.MetodoBss ?? "";
-            cfg.GrsDelay = soapCfg.GrsDelay;
-            //cfg.CldSupervision = soapCfg.CldSupervisionTime;
-            cfg.OffSetFrequency = soapCfg.OffSetFrequency;
-            cfg.EnableEventPttSq = soapCfg.EnableEventPttSq;
-            cfg.RedundanciaRol = soapCfg.RedundanciaRol;
-            cfg.RedundanciaIdPareja = soapCfg.RedundanciaIdPareja;
+			cfg.NombreZona = soapCfg.NombreZona ?? "";
+			//cfg.NameTablaBss = soapCfg.NameTablaBss ?? "";
+			//cfg.MetodoBss = soapCfg.MetodoBss ?? "";
+			cfg.GrsDelay = soapCfg.GrsDelay;
+			//cfg.CldSupervision = soapCfg.CldSupervisionTime;
+			cfg.OffSetFrequency = soapCfg.OffSetFrequency;
+			cfg.EnableEventPttSq = soapCfg.EnableEventPttSq;
+			cfg.RedundanciaRol = soapCfg.RedundanciaRol;
+			cfg.RedundanciaIdPareja = soapCfg.RedundanciaIdPareja;
+			cfg.Telemando = soapCfg.Telemando;
 		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(CfgEnlaceInterno cfg, SoapCfg.CfgEnlaceInterno soapCfg)
 		{
-                cfg.Literal = soapCfg.Literal ?? "";
-                cfg.PosicionHMI = soapCfg.PosicionHMI;
-                cfg.TipoEnlaceInterno = soapCfg.TipoEnlaceInterno ?? "";
-                cfg.Dependencia = soapCfg.Dependencia ?? ""; //Id grupo
-                cfg.Prioridad = soapCfg.Prioridad - 1;
-                cfg.OrigenR2 = soapCfg.OrigenR2 ?? "";
-                cfg.Dominio = soapCfg.Dominio ?? "";
+			cfg.Literal = soapCfg.Literal ?? "";
+			cfg.PosicionHMI = soapCfg.PosicionHMI;
+			cfg.TipoEnlaceInterno = soapCfg.TipoEnlaceInterno ?? "";
+			cfg.Dependencia = soapCfg.Dependencia ?? ""; //Id grupo
+			cfg.Prioridad = soapCfg.Prioridad - 1;
+			cfg.OrigenR2 = soapCfg.OrigenR2 ?? "";
+			cfg.Dominio = soapCfg.Dominio ?? "";
 
-                if (soapCfg.ListaRecursos != null)
-                {
-                    foreach (SoapCfg.CfgRecursoEnlaceInternoConInterface soapi in soapCfg.ListaRecursos)
-                    {
-                        CfgRecursoEnlaceInterno i = new CfgRecursoEnlaceInterno();
-                        Translate(i, soapi);
-                        cfg.ListaRecursos.Add(i);
-                    }
+			if (soapCfg.ListaRecursos != null)
+			{
+				foreach (SoapCfg.CfgRecursoEnlaceInternoConInterface soapi in soapCfg.ListaRecursos)
+				{
+					CfgRecursoEnlaceInterno i = new CfgRecursoEnlaceInterno();
+					Translate(i, soapi);
+					cfg.ListaRecursos.Add(i);
+				}
 
-                    cfg.ListaRecursos.Sort(delegate(CfgRecursoEnlaceInterno a, CfgRecursoEnlaceInterno b)
-                    {
-                        return (int)a.Prefijo - (int)b.Prefijo;
-                    });
-                }
-            }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="soapCfg"></param>
+				cfg.ListaRecursos.Sort(delegate (CfgRecursoEnlaceInterno a, CfgRecursoEnlaceInterno b)
+				{
+					return (int)a.Prefijo - (int)b.Prefijo;
+				});
+			}
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="soapCfg"></param>
 		public static void Translate(CfgRecursoEnlaceInterno cfg, SoapCfg.CfgRecursoEnlaceInternoConInterface soapCfg)
 		{
 			switch (soapCfg.Prefijo)
@@ -658,75 +664,101 @@ namespace U5ki.CfgService
 			cfg.NombreRecurso = soapCfg.NombreRecurso ?? "";
 			cfg.NumeroAbonado = soapCfg.NumeroAbonado ?? "";
 			cfg.Interface = (TipoInterface)soapCfg.Interface;
-            cfg.NombreMostrar = soapCfg.NombreMostrar ?? "";
+			cfg.NombreMostrar = soapCfg.NombreMostrar ?? "";
 		}
 
-        /// <summary>
-        /// Carga de la Configuracion HF.
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="pool"></param>
-        public static void Translate(Cd40Cfg cfg, SoapCfg.PoolHfElement hf)
-        {
-            PoolHfElement cfghf = new PoolHfElement()
-            {
-                Id = hf.Id, IpGestor = hf.IpGestor,  Oid=hf.Oid, SipUri = hf.SipUri, 
-            };
+		/// <summary>
+		/// Carga de la Configuracion HF.
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="pool"></param>
+		public static void Translate(Cd40Cfg cfg, SoapCfg.PoolHfElement hf)
+		{
+			PoolHfElement cfghf = new PoolHfElement()
+			{
+				Id = hf.Id,
+				IpGestor = hf.IpGestor,
+				Oid = hf.Oid,
+				SipUri = hf.SipUri,
+			};
 
-            if (hf.Frecs != null)
-            {
-                foreach (SoapCfg.HfRangoFrecuencias rango in hf.Frecs)
-                {
-                    cfghf.Frecs.Add(new HfRangoFrecuencias() { fmin = rango.FMin, fmax = rango.FMax });
+			if (hf.Frecs != null)
+			{
+				foreach (SoapCfg.HfRangoFrecuencias rango in hf.Frecs)
+				{
+					cfghf.Frecs.Add(new HfRangoFrecuencias() { fmin = rango.FMin, fmax = rango.FMax });
+				}
+			}
+
+			cfg.PoolHf.Add(cfghf);
+		}
+
+		/// <summary>
+		/// Carga de la Configuracion HF.
+		/// </summary>
+		/// <param name="cfg"></param>
+		/// <param name="pool"></param>
+		public static void Translate(Cd40Cfg cfg, SoapCfg.Node nm, bool mn = true)
+		{
+			Node cfgNode = new Node();
+			new DataHelper().CopyTo(nm, cfgNode);
+			cfgNode.idEmplazamiento = nm.IdEmplazamiento;
+
+			//Node cfgNode = new Node()
+			//{
+			//    Id = nm.Id, 
+			//    IpGestor = nm.IpGestor,  
+			//    Oid=nm.Oid, 
+			//    SipUri = nm.SipUri, 
+			//    EsReceptor = nm.EsReceptor, 
+			//    EsTransmisor=nm.EsTransmisor, 
+			//    FormaDeTrabajo = (Tipo_Formato_Trabajo)nm.FormaDeTrabajo, 
+			//    FrecuenciaPrincipal = nm.FrecuenciaPrincipal, 
+			//    Prioridad = (uint)nm.Prioridad, 
+			//    TipoDeCanal = (Tipo_Canal)nm.TipoDeCanal,
+			//    TipoDeFrecuencia = (Tipo_Frecuencia)nm.TipoDeFrecuencia,
+			//    Puerto = nm.Puerto,
+			//    Canalizacion = (GearChannelSpacings)Enum.Parse(typeof(GearChannelSpacings), nm.Canalizacion.ToString()), 
+			//    Modulacion = nm.Modulacion, 
+			//    Offset = nm.Offset, 
+			//    Potencia = nm.Potencia, 
+			//    FormatoFrecuenciaPrincipal = (Tipo_Formato_Frecuencia) nm.FormatoFrecuenciaPrincipal
+			//};
+
+			if (nm.Frecs != null)
+			{
+				foreach (SoapCfg.HfRangoFrecuencias rango in nm.Frecs)
+				{
+					cfgNode.Frecs.Add(new HfRangoFrecuencias() { fmin = rango.FMin, fmax = rango.FMax });
+				}
+			}
+			if (mn)
+				cfg.NodesMN.Add(cfgNode);
+			else
+				cfg.NodesEE.Add(cfgNode);
+		}
+
+		public static void Translate(Cd40Cfg cfg, SoapCfg.ConferenciasPreprogramadas conferencias)
+		{
+			foreach (SoapCfg.Conferencia conf in conferencias.ConferenciaProgramada)
+			{
+				U5ki.Infrastructure.Conferencia cfg_conf = new U5ki.Infrastructure.Conferencia();
+				cfg_conf.TipoConferencia = conf.TipoConferencia;
+                cfg_conf.IdSalaBkk = conf.IdSalaBkk;
+				cfg_conf.Alias = conf.Alias;
+				cfg_conf.PosHMI = conf.PosHMI;
+				
+				foreach (SoapCfg.Participantes part in conf.ParticipantesConferencia)
+				{
+					U5ki.Infrastructure.Participantes participante = new U5ki.Infrastructure.Participantes();
+					participante.SipUri = part.SipUri;
+					participante.Descripcion = part.Descripcion;
+                    cfg_conf.participantesConferencia.Add(participante);
                 }
-            }
 
-            cfg.PoolHf.Add(cfghf);
-        }
-
-        /// <summary>
-        /// Carga de la Configuracion HF.
-        /// </summary>
-        /// <param name="cfg"></param>
-        /// <param name="pool"></param>
-        public static void Translate(Cd40Cfg cfg, SoapCfg.Node nm, bool mn=true)
-        {
-            Node cfgNode = new Node();
-            new DataHelper().CopyTo(nm, cfgNode);
-            cfgNode.idEmplazamiento = nm.IdEmplazamiento;
-
-            //Node cfgNode = new Node()
-            //{
-            //    Id = nm.Id, 
-            //    IpGestor = nm.IpGestor,  
-            //    Oid=nm.Oid, 
-            //    SipUri = nm.SipUri, 
-            //    EsReceptor = nm.EsReceptor, 
-            //    EsTransmisor=nm.EsTransmisor, 
-            //    FormaDeTrabajo = (Tipo_Formato_Trabajo)nm.FormaDeTrabajo, 
-            //    FrecuenciaPrincipal = nm.FrecuenciaPrincipal, 
-            //    Prioridad = (uint)nm.Prioridad, 
-            //    TipoDeCanal = (Tipo_Canal)nm.TipoDeCanal,
-            //    TipoDeFrecuencia = (Tipo_Frecuencia)nm.TipoDeFrecuencia,
-            //    Puerto = nm.Puerto,
-            //    Canalizacion = (GearChannelSpacings)Enum.Parse(typeof(GearChannelSpacings), nm.Canalizacion.ToString()), 
-            //    Modulacion = nm.Modulacion, 
-            //    Offset = nm.Offset, 
-            //    Potencia = nm.Potencia, 
-            //    FormatoFrecuenciaPrincipal = (Tipo_Formato_Frecuencia) nm.FormatoFrecuenciaPrincipal
-            //};
-
-            if (nm.Frecs != null)
-            {
-                foreach (SoapCfg.HfRangoFrecuencias rango in nm.Frecs)
-                {
-                    cfgNode.Frecs.Add(new HfRangoFrecuencias() { fmin = rango.FMin, fmax = rango.FMax });
-                }
-            }
-            if (mn)
-                cfg.NodesMN.Add(cfgNode);
-            else
-                cfg.NodesEE.Add(cfgNode);
-        }
+				cfg.ConferenciasPreprogramadas.Add(cfg_conf);
+			}
+		}
 	}
 }
+    

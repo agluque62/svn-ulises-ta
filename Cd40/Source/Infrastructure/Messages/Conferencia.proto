@@ -1,0 +1,35 @@
+enum Tipo_Participante
+{
+	Tipo_1 = 1;
+	Tipo_3 = 2;
+}
+
+message Tipo_Lista_Participantes
+{
+	optional string IdSistema=1;
+	optional string IdConferencia=2;
+	optional string SipUri = 3;
+	optional string Descripcion=4;
+
+	optional string IdRecurso_anul = 5;
+	optional string Tipo_anul = 6;
+	optional string Id_anul = 7;
+	optional string URI_anul = 8;
+	optional string Abonado_Sector_anul = 9;
+}
+
+message ConferenciaProto {
+ optional string IdSistema = 1;
+ optional string IdConferencia = 2;
+ optional string IdSalaBkk = 3;
+ optional string TipoConferencia = 4;
+ optional string PosHMI = 5;
+ optional string Descripcion = 6;
+ optional string Alias= 7;
+ repeated Tipo_Lista_Participantes Lista_de_Participantes = 8;
+}
+
+message Conferencias
+{
+ repeated ConferenciaProto conferencia = 1;
+}

@@ -168,6 +168,15 @@ namespace U5ki.Infrastructure
       get { return _ErrorCode; }
       set { _ErrorCode = value; }
     }
+
+    private string _SelectedFrequency = "";
+    [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"SelectedFrequency", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string SelectedFrequency
+    {
+      get { return _SelectedFrequency; }
+      set { _SelectedFrequency = value; }
+    }
     [global::ProtoBuf.ProtoContract(Name=@"SquelchType")]
     public enum SquelchType
     {
@@ -290,23 +299,61 @@ namespace U5ki.Infrastructure
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"MSRdDestination")]
+  public partial class MSRdDestination : global::ProtoBuf.IExtensible
+  {
+    public MSRdDestination() {}
+    
+    private string _id_destino;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"id_destino", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string id_destino
+    {
+      get { return _id_destino; }
+      set { _id_destino = value; }
+    }
+    private string _selectedfrequency;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"selectedfrequency", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string selectedfrequency
+    {
+      get { return _selectedfrequency; }
+      set { _selectedfrequency = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"MSStatus")]
   public partial class MSStatus : global::ProtoBuf.IExtensible
   {
     public MSStatus() {}
     
+    private string _datetime;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"datetime", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string datetime
+    {
+      get { return _datetime; }
+      set { _datetime = value; }
+    }
     private readonly global::System.Collections.Generic.List<U5ki.Infrastructure.MSNodeInfo> _main_nodes = new global::System.Collections.Generic.List<U5ki.Infrastructure.MSNodeInfo>();
-    [global::ProtoBuf.ProtoMember(1, Name=@"main_nodes", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(2, Name=@"main_nodes", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<U5ki.Infrastructure.MSNodeInfo> main_nodes
     {
       get { return _main_nodes; }
     }
   
     private readonly global::System.Collections.Generic.List<U5ki.Infrastructure.MSNodeInfo> _disabled_nodes = new global::System.Collections.Generic.List<U5ki.Infrastructure.MSNodeInfo>();
-    [global::ProtoBuf.ProtoMember(2, Name=@"disabled_nodes", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(3, Name=@"disabled_nodes", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<U5ki.Infrastructure.MSNodeInfo> disabled_nodes
     {
       get { return _disabled_nodes; }
+    }
+  
+    private readonly global::System.Collections.Generic.List<U5ki.Infrastructure.MSRdDestination> _rd_destination = new global::System.Collections.Generic.List<U5ki.Infrastructure.MSRdDestination>();
+    [global::ProtoBuf.ProtoMember(4, Name=@"rd_destination", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<U5ki.Infrastructure.MSRdDestination> rd_destination
+    {
+      get { return _rd_destination; }
     }
   
     private global::ProtoBuf.IExtension extensionObject;

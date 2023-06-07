@@ -4,13 +4,15 @@
     <StartArguments>-console</StartArguments>
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
-    <RemoteDebugMachine>DF1680:4024</RemoteDebugMachine>
+    <RemoteDebugMachine>DF1680:4026</RemoteDebugMachine>
     <StartAction>Project</StartAction>
     <StartProgram>C:\EDUARDO\Debug\U5ki.NodeBox.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <StartArguments>-console</StartArguments>
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <RemoteDebugEnabled>true</RemoteDebugEnabled>
+    <RemoteDebugMachine>DF1680:4026</RemoteDebugMachine>
   </PropertyGroup>
   <PropertyGroup>
     <ProjectView>ProjectFiles</ProjectView>

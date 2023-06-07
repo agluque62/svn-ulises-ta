@@ -450,5 +450,35 @@ namespace HMI.Model.Module.Properties {
                 return ((string)(this["DirectorioGLPRxRadio"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int NumPagEnlacesInt {
+            get {
+                return ((int)(this["NumPagEnlacesInt"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PagConferencia {
+            get {
+                return ((bool)(this["PagConferencia"]));
+            }
+            set {
+                this["PagConferencia"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
+        public int NumTlfDestinationsCP {
+            get {
+                return ((int)(this["NumTlfDestinationsCP"]));
+            }
+        }
     }
 }

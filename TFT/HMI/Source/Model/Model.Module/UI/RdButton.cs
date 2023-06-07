@@ -38,6 +38,7 @@ namespace HMI.Model.Module.UI
 		//RQF34 
 		private string _IdFrecuency = "";
 		private string _NameFrecuency = "";
+		private string _FrecSeleccionada = "";
 
 		private int _RtxGroup = 0;
 		private Timer _Timer = new Timer();
@@ -51,6 +52,9 @@ namespace HMI.Model.Module.UI
         //Color de fondo de la parte superior de la tecla de radio. 
         //Por defecto es gris, pero puede estar en degradado, por ejemplo.
         private Color _CurrentBackColor = VisualStyle.ButtonColor;
+		private bool _multifrecuencia;
+		private List <string> _frecuenciasel = new List<string>();
+		private string _defaultfrecuency;
 
 		public new event EventHandler Click;
 		public event EventHandler TxClick;
@@ -157,7 +161,15 @@ namespace HMI.Model.Module.UI
             set { _CurrentBackColor = value; }
         }
 
-		public RdButton()
+        public bool Multifrecuencia { get => _multifrecuencia; set => _multifrecuencia = value; }
+        public List<string> FrecuencaSel { get => _frecuenciasel; }
+        public void SetFrecuenciaSel(List<string>v,string defaultfrecuency="")
+		{
+			_frecuenciasel = v;
+			_defaultfrecuency = defaultfrecuency;
+		}
+
+        public RdButton()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint, true);
 			SetStyle(ControlStyles.DoubleBuffer, true);
@@ -357,8 +369,8 @@ namespace HMI.Model.Module.UI
             _PttRect = new Rectangle(1, 10, 12, 12);
             _SquelchRect = new Rectangle(Width - (1+12), 10, 12, 12);
 #else
-            _PttRect = new Rectangle(1, 4, 25, 25);
-            _SquelchRect = new Rectangle(Width - 22, 4, 25, 25);
+            _PttRect = new Rectangle(1, 5, 25, 25);
+            _SquelchRect = new Rectangle(Width - 22, 5, 25, 25);
 #endif
 
             _TxBtnInfo.Rect = new Rectangle(0, top, width, Height - top);
@@ -508,12 +520,6 @@ namespace HMI.Model.Module.UI
 			}
 		}
 
-		//221103 Se comprobará que este equipo tiene accesible una lista de frecuencias.
-		bool multifrecuencia()
-        {
-			return false;
-        }
-
 		//221103
 		// Esta funcion permite descartar los eventos de TXRX cuando es una frecuencia multifrecuencia y no se puede
 		// deshabilitar el rdbutton
@@ -526,14 +532,14 @@ namespace HMI.Model.Module.UI
 
 		bool EnabledBt3()
 		{
-			return (Enabled || multifrecuencia());
+			return (Enabled || Multifrecuencia);
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
 //			base.OnPaint(e);
 
-			if (multifrecuencia())
+			if (Multifrecuencia)
 				Enabled = true;//221003 se habilita todo el boton.
 
 			BtnState st = !Enabled ? BtnState.Inactive :
@@ -553,6 +559,12 @@ namespace HMI.Model.Module.UI
 
 			BtnRenderer.Draw(e.Graphics, _BtnInfo[st]);
 
+            if (Multifrecuencia)
+                using (Pen linePen = new Pen(Enabled ? _BtnInfo.GetBorderColor(BtnState.Normal) : _BtnInfo.GetBorderColor(BtnState.Inactive), 1))
+                {
+
+                    e.Graphics.DrawLine(linePen, 1 + 0, _TitleBtnInfo.Rect.Top + 15, Width - 0, _TitleBtnInfo.Rect.Top + 15);
+                }
 			if (_PttImage != null)
 			{
 #if DEBUG1
@@ -561,7 +573,7 @@ namespace HMI.Model.Module.UI
 				e.Graphics.DrawImage(_PttImage, _PttRect.X, _PttRect.Y);
 #endif
             }
-			if (_SquelchImage != null)
+            if (_SquelchImage != null)
 			{
 #if DEBUG1
                 e.Graphics.DrawImage(_SquelchImage, _SquelchRect);
@@ -581,16 +593,17 @@ namespace HMI.Model.Module.UI
             BtnRenderer.Draw(e.Graphics, _RxBtnInfo[stBT2]);
 
 			//221103 En multifrecuencia, se habilita el boton de radio siempre.
-			if (multifrecuencia())
+			if (Multifrecuencia)
 			{
 				Enabled = true;//221003 se habilita todo el boton.
-				BtnRenderer.Draw(e.Graphics, _TitleBtnInfo[stBT3]);
+				//230330 lo quito
+				//BtnRenderer.Draw(e.Graphics, _TitleBtnInfo[stBT3]);
 			}
 
 			//221103 El aspa se dibuja distinto para multifrecuencia.
 			if (_DrawX)
 			{
-				if (!multifrecuencia())
+				if (!Multifrecuencia)
 				{
 					using (Pen p = new Pen(Color.Red, 5))
 					{
@@ -598,7 +611,7 @@ namespace HMI.Model.Module.UI
 						e.Graphics.DrawLine(p, Width - 6, 6, 6, Height - 6);
 					}
 				}
-				if (multifrecuencia())
+				if (Multifrecuencia)
 				{
 					using (Pen p = new Pen(Color.Red, 5))
 					{
@@ -634,8 +647,17 @@ namespace HMI.Model.Module.UI
                 textRect.Offset(0, 13);
                 fontToUse = _SmallFont;
             }
-            BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Alias, fontToUse, ContentAlignment.TopCenter, ForeColor);
-            
+            if (Multifrecuencia)
+            {
+                textRect.Offset(0, +2);
+                BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _defaultfrecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
+            }
+			else
+			{
+                BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Alias, fontToUse, ContentAlignment.TopCenter, ForeColor);
+
+            }
+
             if (_RtxGroup > 0)
 			{
 				string rtxGroup = ((char)('G' + _RtxGroup - 1)).ToString();
@@ -651,12 +673,6 @@ namespace HMI.Model.Module.UI
 				e.Graphics.DrawLine(linePen, 1, _TxBtnInfo.Rect.Top, Width - 1, _TxBtnInfo.Rect.Top);
 
 			}
-			if (multifrecuencia())
-				using (Pen linePen = new Pen(Enabled ? _BtnInfo.GetBorderColor(BtnState.Normal) : _BtnInfo.GetBorderColor(BtnState.Inactive), 1))
-				{
-
-					e.Graphics.DrawLine(linePen, 1, _TitleBtnInfo.Rect.Top + 15, Width - 1, _TitleBtnInfo.Rect.Top + 15);
-				}
 		}
 
 		private void OnLongClick(object sender, EventArgs e)
@@ -676,13 +692,15 @@ namespace HMI.Model.Module.UI
 					Invalidate(_RxBtnInfo.Rect);
 					General.SafeLaunchEvent(RxLongClick, this);
 				}
-				if (titlepushed && multifrecuencia())
+				if (titlepushed && Multifrecuencia)
 				{
 					Invalidate(_TitleBtnInfo.Rect);
 					// 221027 
 					// Cuando se desee habilitar esta funcion quitar este comentario
 ////////////////////////////
-					//General.SafeLaunchEvent(TitleLongClick, this);
+////230606 Tambien se permite aunque hya aspa.
+					//if (this._DrawX==false)
+						General.SafeLaunchEvent(TitleLongClick, this);
 /////////////////////////////////
 				}
 			}

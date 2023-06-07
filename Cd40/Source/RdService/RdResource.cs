@@ -301,7 +301,8 @@ namespace U5ki.RdService
         /// <param name="uri2"></param>
         /// <param name="type"></param>
         /// <param name="frecuency"></param>
-        public RdResource(string id, string uri1, string uri2, RdRsType type, bool isTIFX, string idDestino, string frecuency, string site, bool selected, RdFrecuency.NewRdFrequencyParams newFreqParams, CfgRecursoEnlaceExterno rs, bool connect = true)
+        public RdResource(string id, string uri1, string uri2, RdRsType type, bool isTIFX, string idDestino, string frecuency, string site, bool selected,
+            RdFrecuency.NewRdFrequencyParams newFreqParams, CfgRecursoEnlaceExterno rs, bool connect = true)
         {
             _Id = id;
             _Uri1 = seturi(uri1);
@@ -312,6 +313,7 @@ namespace U5ki.RdService
             _Site = site;
             _SelectedSite = selected;
             _Callflags = 0;
+            _TelemandoType = rs.Telemando;
 
             _FreqParams = newFreqParams;
 
@@ -627,7 +629,7 @@ namespace U5ki.RdService
         /// </summary>
         public void PttOn(CORESIP_PttType srcPtt)
         {
-            if (Connected)
+            if (Connected && TunedFrequencyOK)
                 SipAgent.PttOn(SipCallId, PttId, srcPtt, PttMute);
         }
         /// <summary>
@@ -744,6 +746,18 @@ namespace U5ki.RdService
         /// </summary>
         bool _OldSelected;
 
+        //Si vale true quiere decir que el recurso esta sintonizado con la frecuencia correcta
+        //Si el recurso pertenece a un destino de frecuencia seleccionable, este valor indica si 
+        //la frecuencia sintonizada es la requerida.
+        private bool _TunedFrequencyOK = true;
+        public bool TunedFrequencyOK
+        {
+            get { return _TunedFrequencyOK; }
+            set { _TunedFrequencyOK = value; }
+        }
+
+        public string Last_tuned_freq_log = "";        
+
         /// <summary>
         /// Indica si el recurso se ha asignado por una conmutación M+N
         /// </summary>
@@ -781,6 +795,54 @@ namespace U5ki.RdService
         {
             get { return _SelectedSite; }
             set { _SelectedSite = value; }
+        }
+
+        public enum TelemandoTypes
+        {
+            none = 0,
+            RCRohde4200 = 1,
+            RCJotron7000 = 2
+        }
+
+        public int _TelemandoType = 0;
+        public TelemandoTypes TelemandoType
+        {
+            get {
+                TelemandoTypes ret;
+                switch (_TelemandoType)
+                {
+                    case 0:
+                        ret = TelemandoTypes.none;
+                        break;
+                    case 1:
+                        ret = TelemandoTypes.RCRohde4200;
+                        break;
+                    case 2:
+                        ret = TelemandoTypes.RCJotron7000;
+                        break;
+                    default:
+                        ret = TelemandoTypes.none;
+                        break;
+                }
+                return ret; 
+            }
+            set { 
+                switch (value)
+                {
+                    case TelemandoTypes.none:
+                        _TelemandoType = 0;
+                        break;
+                    case TelemandoTypes.RCRohde4200:
+                        _TelemandoType = 1;
+                        break;
+                    case TelemandoTypes.RCJotron7000:
+                        _TelemandoType = 2;
+                        break;
+                    default:
+                        _TelemandoType = 0;
+                        break;
+                }
+             }
         }
 
         //Parametros de la frecuencia

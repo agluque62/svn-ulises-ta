@@ -1380,6 +1380,15 @@ namespace U5ki.RdService
                     });
                     break;
 
+                case Identifiers.FR_RXTX_CHANGE_ASK_MSG:
+                    _EventQueue.Enqueue("ChangingFrequency", delegate ()
+                    {
+                        FrChangeAsk ask = Serializer.Deserialize<FrChangeAsk>(ms);
+                        ProcessChangingFreq(msg.From, ask);
+                    });
+                    break;
+
+
                 ///** 20180316. MNDISABEDNODES */
                 //case Identifiers.MNDISABLED_NODES:
                 //    _EventQueue.Enqueue("MNDISABLEDNODES", delegate()
@@ -1436,7 +1445,7 @@ namespace U5ki.RdService
                     try
                     {                        
                         rdFr.RetryFailedConnections();
-                        rdFr.Check_1mas1_Resources_Disabled();
+                        rdFr.Check_1mas1_Resources();
                         rdFr.CheckFrequency();
                         //if (rdFr.SanityCheckCalls())
                         //    rdFr.LimpiaLlamadaDeRecurso();
@@ -1695,7 +1704,7 @@ namespace U5ki.RdService
                             rdFr.PasivoRetransmision = rdLink.PasivoRetransmision;
                             /** Genera los  INVITE de los nuevos y BYE de los antiguos por este orden de la frecuencia ***/
 
-                            rdFr.Reset(cfg.ConfiguracionGeneral, rdLink, selectedRs);
+                            rdFr.Reset(cfg, rdLink, selectedRs);
 #if DEBUG
                             base.LogTrace<RdService>("[FRECUENCY] Frecuency added: " + rdLinkId);
 #endif
@@ -2125,6 +2134,26 @@ namespace U5ki.RdService
                 }
 
                 RdRegistry.RespondToChangingSite(from, msg.Frequency, msg.Alias, numFrecuencias);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="msg"></param>
+        private void ProcessChangingFreq(string from, FrChangeAsk msg)
+        {
+            if (_Master)
+            {
+                LogInfo<RdService>(String.Format("ProcessChangingFreq {0}: iddestino {1}: New Frequency {2}", msg.HostId, msg.IdFrecuency, msg.NewFrecuency));
+                foreach (RdFrecuency rdFr in Frecuencies.Values)
+                {
+                    if (rdFr.IdDestino == msg.IdFrecuency)
+                    {                       
+                        rdFr.ProcessChangingFreq(from, msg);
+                    }
+                }                
             }
         }
 

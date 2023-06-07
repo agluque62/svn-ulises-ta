@@ -713,7 +713,7 @@ namespace HMI.Model.Module.Services
                 for (int pos = 0; pos < 32; pos++)
                 {
                     EventOnPos(pos,
-                        new RdState(false, false, string.Empty, PttState.NoPtt, SquelchState.NoSquelch, RdRxAudioVia.NoAudio, 0, FrequencyState.Available, "", 0, "")
+                        new RdState(false, false, string.Empty, PttState.NoPtt, SquelchState.NoSquelch, RdRxAudioVia.NoAudio, 0, FrequencyState.Available, "", 0, "","")//inserto selected frecuency
                         );
                 }
             }

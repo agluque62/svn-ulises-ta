@@ -85,7 +85,8 @@ namespace HMI.Presentation.Twr.Views
                     (_StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.Busy] +
 					_StateManager.Tlf[TlfState.Hold] + _StateManager.Tlf[TlfState.RemoteHold] +
 					_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] +
-					_StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteIn] /*+
+					_StateManager.Tlf[TlfState.ConfPreprogramada] +
+                    _StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteIn] /*+
 					_StateManager.Tlf[TlfState.In] + _StateManager.Tlf[TlfState.InPrio]*/ == 0)));
             }
         }
@@ -104,7 +105,8 @@ namespace HMI.Presentation.Twr.Views
                     (_StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.Busy] +
 					_StateManager.Tlf[TlfState.Hold] + _StateManager.Tlf[TlfState.RemoteHold] +
 					_StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] +
-					_StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteIn] +
+                    _StateManager.Tlf[TlfState.ConfPreprogramada] +
+                    _StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteIn] +
 					_StateManager.Tlf[TlfState.In] + _StateManager.Tlf[TlfState.InPrio] == 0)));
 			}
 		}
@@ -118,7 +120,8 @@ namespace HMI.Presentation.Twr.Views
 					(_StateManager.Tlf.Priority.State == FunctionState.Idle) &&
 					(_StateManager.Tlf.Listen.State == FunctionState.Idle) && 
 					(_StateManager.Tlf.Transfer.State == FunctionState.Idle) &&
-					(_StateManager.Tlf[TlfState.Set] + /* _StateManager.Tlf[TlfState.Conf] */ + _StateManager.Tlf[TlfState.RemoteHold] > 0) &&
+
+                    (_StateManager.Tlf[TlfState.Set] + /* _StateManager.Tlf[TlfState.Conf] */ +_StateManager.Tlf[TlfState.RemoteHold] > 0) &&
                     (_StateManager.Tlf[TlfState.Conf] == 0);
 			}
 		}
@@ -153,6 +156,7 @@ namespace HMI.Presentation.Twr.Views
                     (_StateManager.Tlf[TlfState.Congestion] + _StateManager.Tlf[TlfState.Busy] +
                     _StateManager.Tlf[TlfState.Hold] + _StateManager.Tlf[TlfState.RemoteHold] +
                     _StateManager.Tlf[TlfState.Set] + _StateManager.Tlf[TlfState.Conf] +
+                    _StateManager.Tlf[TlfState.ConfPreprogramada] +
                     _StateManager.Tlf[TlfState.Out] + _StateManager.Tlf[TlfState.RemoteIn] +
 					_StateManager.Tlf[TlfState.In] + _StateManager.Tlf[TlfState.InPrio] == 0)));
             }
@@ -756,6 +760,7 @@ namespace HMI.Presentation.Twr.Views
 					break;
 				case TlfState.Set:
 				case TlfState.Conf:
+				case TlfState.ConfPreprogramada:
 					backColor = VisualStyle.Colors.Green;
 					break;
 				case TlfState.Busy:
