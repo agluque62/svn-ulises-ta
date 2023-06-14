@@ -8,6 +8,7 @@ using NLog;
 using ProtoBuf;
 using Utilities;
 using U5ki.Infrastructure.Properties;
+using System.Runtime.Remoting.Channels;
 
 namespace U5ki.Infrastructure
 {
@@ -59,11 +60,31 @@ namespace U5ki.Infrastructure
 		}
 	}
 
+    public interface IUlisesMcastService : IDisposable
+    {
+        event GenericEventHandler<bool> MasterStatusChanged;
+        event GenericEventHandler<RsChangeInfo> ResourceChanged;
+        event GenericEventHandler<SpreadDataMsg> UserMsgReceived;
+        event GenericEventHandler<string> ChannelError;
+
+        string Id { get; }
+        void Init(string name);
+        void SubscribeToTopic<T>(string topic) where T : class;
+        void SubscribeToMasterTopic(string topic);
+        void Join(params string[] topics);
+        void SetValue<T>(string topic, string instanceId, T rs) where T : class;
+        void Publish();
+        void Publish(string ts);
+        void Publish(bool send);
+        void Publish(string ts, bool send);
+        void Send<T>(string topic, short messType, T mess) where T : class;
+        void PublishMaster(String id, String topic);
+    }
     /// <summary>
     /// 
     /// </summary>
-	public class Registry : IDisposable
-	{
+	public class Registry : IUlisesMcastService
+    {
         /// <summary>
         /// 
         /// </summary>
@@ -98,18 +119,22 @@ namespace U5ki.Infrastructure
 		{
 			get { return _Channel; }
 		}
+        public Registry() { }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
 		public Registry(string name)
 		{
+            Init(name);
+ 		}
+
+        public void Init(string name)
+        {
             _Channel = new SpreadChannel(name);
             _Channel.DataMsg += OnChannelData;
             _Channel.MembershipMsg += OnChannelMembership;
- 		}
-
-
+        }
         /// <summary>
         /// 
         /// </summary>
