@@ -12,7 +12,7 @@ namespace U5ki.CfgService.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -46,18 +46,9 @@ namespace U5ki.CfgService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("192.168.0.211")]
-        public string MCastItf4Config {
-            get {
-                return ((string)(this["MCastItf4Config"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://192.168.1.4/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfi" +
-            "guracion.asmx")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://127.0.0.1/ulisesv5000/u5kcfg/InterfazSOAPConfiguracion/InterfazSOAPConfigu" +
+            "racion.asmx")]
         public string Cd40_CfgService_SoapCfg_InterfazSOAPConfiguracion {
             get {
                 return ((string)(this["Cd40_CfgService_SoapCfg_InterfazSOAPConfiguracion"]));
@@ -70,6 +61,15 @@ namespace U5ki.CfgService.Properties {
         public int CfgRefreshSegTime {
             get {
                 return ((int)(this["CfgRefreshSegTime"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("11.12.60.33")]
+        public string MCastItf4Config {
+            get {
+                return ((string)(this["MCastItf4Config"]));
             }
         }
     }

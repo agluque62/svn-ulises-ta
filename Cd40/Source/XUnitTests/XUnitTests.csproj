@@ -50,6 +50,9 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>8.0.2</Version>
     </PackageReference>
+    <PackageReference Include="protobuf-net">
+      <Version>3.2.26</Version>
+    </PackageReference>
     <PackageReference Include="xunit">
       <Version>2.4.2</Version>
     </PackageReference>

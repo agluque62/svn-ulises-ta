@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Xunit;
+using System.Net;
+using System.Net.Sockets;
 
 namespace XUnitTests
 {
@@ -168,7 +170,6 @@ namespace XUnitTests
             await Task.Delay(1000);
             await Queue.Stop();
         }
-
         [Fact]
         public void LinqWithCancelTest01()
         {
@@ -181,8 +182,8 @@ namespace XUnitTests
                     var output = input
                         .WithCancellation(cts.Token)
                         .Select(i => DelayMult(i))
-                        .Where(i => i%2 == 0)
-                        .Select(i => new {a = DelayMult(i), b=DelayMult(i+2)})
+                        .Where(i => i % 2 == 0)
+                        .Select(i => new { a = DelayMult(i), b = DelayMult(i + 2) })
                         .ToList();
                 }
                 catch (Exception)
@@ -194,6 +195,38 @@ namespace XUnitTests
             Task.Delay(TimeSpan.FromSeconds(20)).Wait();
             cts.Cancel();
             Task.Delay(TimeSpan.FromSeconds(20)).Wait();
+        }
+
+        [Fact]
+        public void UdpClientAsync()
+        {
+            IPAddress ip = IPAddress.Parse("127.0.0.1");
+            IPEndPoint endp = new IPEndPoint(ip, 50000);
+            var udpClient = new UdpClient(endp);
+            var cts = new CancellationTokenSource();
+            Task.Run(() =>
+            {
+                while (!cts.IsCancellationRequested)
+                {
+                    try
+                    {
+                        var receiveTask = udpClient.ReceiveAsync();
+                        if (receiveTask.Wait(100))
+                        {
+                            var res = receiveTask.Result;
+                        }
+                    }
+                    catch (Exception x)
+                    {
+                        Debug.WriteLine($"{x.Message}");
+                    }
+                }
+                Debug.WriteLine("Process aborted...");
+            });
+            Task.Delay(5000).Wait();
+            cts.Cancel();
+            udpClient.Dispose();
+            Task.Delay(5000).Wait();
         }
 
         int DelayMult(int i)

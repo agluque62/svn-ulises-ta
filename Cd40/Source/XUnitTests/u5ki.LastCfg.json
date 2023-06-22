@@ -2149,8 +2149,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2166,8 +2166,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2308,9 +2308,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2330,7 +2328,7 @@
 					"PorcentajeRSSI": 50,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.000",
@@ -2355,8 +2353,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2372,15 +2370,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2400,7 +2396,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.200",
@@ -2425,8 +2421,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2442,15 +2438,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2470,7 +2464,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.500",
@@ -2495,8 +2489,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2512,15 +2506,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2540,7 +2532,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.600",
@@ -2565,8 +2557,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2582,15 +2574,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2610,7 +2600,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "126.000",
@@ -2635,8 +2625,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2652,15 +2642,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2680,7 +2668,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "128.000",
@@ -2705,8 +2693,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2722,15 +2710,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2750,7 +2736,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "129.000",
@@ -2832,9 +2818,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2854,7 +2838,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "131.000",
@@ -2879,8 +2863,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2896,15 +2880,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2924,7 +2906,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "132.000",
@@ -2949,8 +2931,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -2966,15 +2948,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -2994,7 +2974,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "133.000",
@@ -3019,8 +2999,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3036,15 +3016,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3064,7 +3042,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "134.000",
@@ -3089,8 +3067,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3106,15 +3084,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3134,7 +3110,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "135.000",
@@ -3159,15 +3135,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3187,7 +3161,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "Simple12",
@@ -3212,15 +3186,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3240,7 +3212,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "TEST001",
@@ -3265,8 +3237,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3282,8 +3254,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3299,8 +3271,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3316,15 +3288,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3344,7 +3314,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": []
@@ -3447,8 +3417,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3464,8 +3434,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3606,9 +3576,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3628,7 +3596,7 @@
 					"PorcentajeRSSI": 50,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.000",
@@ -3653,8 +3621,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3670,15 +3638,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3698,7 +3664,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.200",
@@ -3723,8 +3689,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3740,15 +3706,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3768,7 +3732,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.500",
@@ -3794,8 +3758,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3811,15 +3775,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3839,7 +3801,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.600",
@@ -3865,8 +3827,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3882,15 +3844,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3910,7 +3870,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "126.000",
@@ -3935,8 +3895,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -3952,15 +3912,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -3980,7 +3938,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "128.000",
@@ -4005,8 +3963,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -4022,15 +3980,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -4050,7 +4006,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "131.000",
@@ -4075,8 +4031,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -4092,15 +4048,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -4120,7 +4074,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "135.000",
@@ -4145,15 +4099,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -4173,7 +4125,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": [
@@ -4381,8 +4333,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -4398,8 +4350,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -4540,9 +4492,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -4562,7 +4512,7 @@
 					"PorcentajeRSSI": 50,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "126.000",
@@ -4587,8 +4537,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -4604,15 +4554,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -4632,7 +4580,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "131.000",
@@ -4657,8 +4605,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -4674,15 +4622,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -4702,7 +4648,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "Simple12",
@@ -4727,15 +4673,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -4755,7 +4699,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "TEST001",
@@ -4780,8 +4724,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -4797,8 +4741,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -4814,8 +4758,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -4831,15 +4775,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -4859,7 +4801,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": [
@@ -5153,8 +5095,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -5170,15 +5112,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -5198,7 +5138,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.200",
@@ -5223,8 +5163,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -5240,15 +5180,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -5268,7 +5206,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.500",
@@ -5293,8 +5231,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -5310,15 +5248,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -5338,7 +5274,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.600",
@@ -5363,8 +5299,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -5380,15 +5316,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -5408,7 +5342,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": [
@@ -5656,8 +5590,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -5673,15 +5607,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -5701,7 +5633,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.200",
@@ -5726,8 +5658,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -5743,15 +5675,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -5771,7 +5701,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.500",
@@ -5796,8 +5726,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -5813,15 +5743,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -5841,7 +5769,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.600",
@@ -5866,8 +5794,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -5883,15 +5811,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -5911,7 +5837,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": []
@@ -6014,8 +5940,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -6031,8 +5957,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -6173,9 +6099,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -6195,7 +6119,7 @@
 					"PorcentajeRSSI": 50,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.000",
@@ -6220,8 +6144,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -6237,15 +6161,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -6265,7 +6187,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "128.000",
@@ -6290,8 +6212,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -6307,15 +6229,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -6335,7 +6255,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "129.000",
@@ -6417,9 +6337,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -6439,7 +6357,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "131.000",
@@ -6464,8 +6382,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -6481,15 +6399,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -6509,7 +6425,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "132.000",
@@ -6534,8 +6450,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -6551,15 +6467,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -6579,7 +6493,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "133.000",
@@ -6604,8 +6518,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -6621,15 +6535,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -6649,7 +6561,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "134.000",
@@ -6674,8 +6586,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -6691,15 +6603,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -6719,7 +6629,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "135.000",
@@ -6744,15 +6654,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -6772,7 +6680,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": [
@@ -7337,8 +7245,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -7354,8 +7262,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -7496,9 +7404,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -7518,7 +7424,7 @@
 					"PorcentajeRSSI": 50,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "126.000",
@@ -7543,8 +7449,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -7560,15 +7466,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -7588,7 +7492,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": [
@@ -7916,8 +7820,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -7933,8 +7837,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -8075,9 +7979,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -8097,7 +7999,7 @@
 					"PorcentajeRSSI": 50,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "126.000",
@@ -8122,8 +8024,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -8139,15 +8041,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -8167,7 +8067,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": []
@@ -8359,8 +8259,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -8376,15 +8276,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -8404,7 +8302,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": [
@@ -8531,8 +8429,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -8548,8 +8446,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -8690,9 +8588,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -8712,7 +8608,7 @@
 					"PorcentajeRSSI": 50,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "Simple12",
@@ -8737,15 +8633,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -8765,7 +8659,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "TEST001",
@@ -8790,8 +8684,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -8807,8 +8701,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -8824,8 +8718,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -8841,15 +8735,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -8869,7 +8761,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": [
@@ -8987,8 +8879,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9004,8 +8896,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9146,9 +9038,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9168,7 +9058,7 @@
 					"PorcentajeRSSI": 50,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.000",
@@ -9193,8 +9083,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9210,15 +9100,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9238,7 +9126,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.200",
@@ -9263,8 +9151,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9280,15 +9168,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9308,7 +9194,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.500",
@@ -9333,8 +9219,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9350,15 +9236,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9378,7 +9262,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "125.600",
@@ -9403,8 +9287,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9420,15 +9304,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9448,7 +9330,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "126.000",
@@ -9473,8 +9355,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9490,15 +9372,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9518,7 +9398,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "128.000",
@@ -9543,8 +9423,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9560,15 +9440,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9588,7 +9466,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "129.000",
@@ -9670,9 +9548,7 @@
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9692,7 +9568,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "131.000",
@@ -9717,8 +9593,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9734,15 +9610,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9762,7 +9636,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "132.000",
@@ -9787,8 +9661,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9804,15 +9678,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9832,7 +9704,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "133.000",
@@ -9857,8 +9729,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9874,15 +9746,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9902,7 +9772,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "134.000",
@@ -9927,8 +9797,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -9944,15 +9814,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -9972,7 +9840,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "135.000",
@@ -9997,15 +9865,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -10025,7 +9891,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "Simple12",
@@ -10050,15 +9916,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -10078,7 +9942,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				},
 				{
 					"Literal": "TEST001",
@@ -10103,8 +9967,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -10120,8 +9984,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -10137,8 +10001,8 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						},
 						{
@@ -10154,15 +10018,13 @@
 							"GrsDelay": 0,
 							"OffSetFrequency": 0,
 							"EnableEventPttSq": false,
-							"RedundanciaIdPareja": null,
-							"RedundanciaRol": null,
+							"RedundanciaIdPareja": "",
+							"RedundanciaRol": "",
 							"Telemando": 0
 						}
 					],
 					"EstadoAsignacion": "R",
-					"DestinoAudio": [
-						null
-					],
+					"DestinoAudio": [],
 					"Prioridad": 1,
 					"SupervisionPortadora": false,
 					"FrecuenciaSintonizada": 0,
@@ -10182,7 +10044,7 @@
 					"PorcentajeRSSI": 0,
 					"PasivoRetransmision": false,
 					"SelectableFrequencies": [],
-					"DefaultFrequency": null
+					"DefaultFrequency": ""
 				}
 			],
 			"TlfLinks": []
@@ -10230,7 +10092,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1000,
 			"idEmplazamiento": "Villanubla"
 		},
@@ -10254,7 +10116,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1000,
 			"idEmplazamiento": "Villanubla"
 		},
@@ -10278,7 +10140,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1001,
 			"idEmplazamiento": "TSS"
 		},
@@ -10302,7 +10164,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1001,
 			"idEmplazamiento": "TSS"
 		},
@@ -10326,7 +10188,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1000,
 			"idEmplazamiento": "TCH"
 		},
@@ -10350,7 +10212,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1000,
 			"idEmplazamiento": "TCH"
 		},
@@ -10374,7 +10236,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1001,
 			"idEmplazamiento": "TSS"
 		},
@@ -10398,7 +10260,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1001,
 			"idEmplazamiento": "TSS"
 		},
@@ -10422,7 +10284,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1001,
 			"idEmplazamiento": "TCH"
 		},
@@ -10446,7 +10308,7 @@
 			"Potencia": 0,
 			"FormatoFrecuenciaPrincipal": 0,
 			"NivelDePotencia": 2,
-			"FrecuenciaClave": null,
+			"FrecuenciaClave": "",
 			"ModeloEquipo": 1000,
 			"idEmplazamiento": "TCH"
 		}

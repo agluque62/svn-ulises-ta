@@ -6,13 +6,14 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Security.Cryptography;
 
 using U5ki.Infrastructure;
 using U5ki.CfgService.Properties;
 
 using Utilities;
 using ProtoBuf;
-using NLog;
+using NLog.Extensions.Logging;
 
 using Translate;
 using Newtonsoft.Json;
@@ -22,6 +23,9 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web.Services.Protocols;
+using System.Web.Services.Description;
+using System.Security.Policy;
+using Microsoft.Extensions.Logging;
 
 namespace U5ki.CfgService
 {
@@ -943,6 +947,8 @@ namespace U5ki.CfgService
         #region DI
         public IUlisesSoapService SoapService { get; set; } = new RealSoapService();
         public IUlisesMcastService McastService { get; set; } = new Registry();
+        public IUlisesMcastNotService NotService { get; set; } = new RealMcastNotService();
+        public ILogger Logger { get; set; } = new LoggerFactory().AddNLog().CreateLogger<CfgServiceAsync>();
         #endregion DI
 
         #region IService
@@ -1030,6 +1036,8 @@ namespace U5ki.CfgService
         #region IDisposable
         public void Dispose()
         {
+            McastService?.Dispose();
+            NotService?.Dispose();
         }
         #endregion IDisposable
 
@@ -1038,7 +1046,10 @@ namespace U5ki.CfgService
             try
             {
                 Master = false;
-                lastCfg = null;
+                NotService.NewConfigAvailable += OnNotifyConfigChange;
+                NotService.Logger = Logger;
+                lastCfg = new FileConfig();
+                works.Logger = Logger;
                 works.Start().Wait();
                 RegistryInit();
                 LogDebug<CfgService>("Service Initiated.", U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO, "CfgService", CTranslate.translateResource("Servicio iniciado."));
@@ -1058,7 +1069,7 @@ namespace U5ki.CfgService
                 {
                     DateTime lastCheck = DateTime.MinValue;
                     UdpClient LanControl = new UdpClient();
-                    SoapControl soap = new SoapControl(SoapService, mainWorkerCancelControl);
+                    SoapControl soap = new SoapControl(Logger, SoapService, mainWorkerCancelControl);
                     Status = ServiceStatus.Running;
 
                     LogDebug<CfgService>("Service running");
@@ -1074,7 +1085,6 @@ namespace U5ki.CfgService
                                     lastCheck = DateTime.Now;
                                     ForceCheck = false;
                                 }
-                                CheckForIpOrder(LanControl).Wait();
                             }
                             return true;
                         });
@@ -1096,43 +1106,38 @@ namespace U5ki.CfgService
             try
             {
                 LogDebug<CfgServiceAsync>($"Checking for new Config");
-                if (await soap.CheckConfig(lastCfg?.Cfg.Version) == false) return;
+                if (await soap.CheckConfig(lastCfg?.Cfg?.Version) == false) return;
                 LogDebug<CfgServiceAsync>($"New Configuration version detected");
                 if (await soap.LoadSoapConfig() == false) return;
                 var newCfg = await soap.GetNewCd40Cfg();
-                if (newCfg == null) return;
-                LogDebug<CfgServiceAsync>($"New Configuration loaded => {newCfg.Version}");
+                if (newCfg?.Cfg == null) return;
+                LogDebug<CfgServiceAsync>($"New Configuration loaded => {newCfg.Cfg.Version}");
 
-                LogInfo<CfgService>("Publicando nueva configuración: " + newCfg.Version, U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
-                    "CfgService", CTranslate.translateResource("Publicando nueva configuración: " + newCfg.Version));
-
-                McastService.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, newCfg);
-                McastService.Publish(newCfg.Version);
-                if (lastCfg == null)
-                    lastCfg = new FileConfig();
-                lastCfg.Cfg = newCfg;
-                FileConfig.Save(ConfFilename, newCfg, lastCfg.McastParams);
-                LogDebug<CfgServiceAsync>($"New Configuration saved => {newCfg.Version}");
+                ActivateConfig(newCfg);
             }
             catch (Exception x)
             {
                 LogException<CfgServiceAsync>("CheckForConfig", x, false);
             }
         }
-        async Task<bool> CheckForIpOrder(UdpClient lan)
+        void ActivateConfig(FileConfig newCfg)
         {
-            try
+            if (newCfg.McastChanged(lastCfg?.McastParams))
             {
-                if (lan.Client.IsBound == false)
-                {
-                }
-                return true;
+                NotService?.Init(Settings.Default.MCastItf4Config, 
+                    newCfg?.McastParams.GrupoMulticastConfiguracion, 
+                    (int)newCfg?.McastParams?.PuertoMulticastConfiguracion);
             }
-            catch (Exception x)
-            {
-                LogException<CfgServiceAsync>("CheckForIpOrder", x, false);
-            }
-            return false;
+
+            LogInfo<CfgServiceAsync>("Publicando nueva configuración: " + newCfg?.Cfg.Version, U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
+                "CfgService", CTranslate.translateResource("Publicando nueva configuración: " + newCfg?.Cfg.Version));
+
+            McastService.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, newCfg.Cfg);
+            McastService.Publish(newCfg?.Cfg.Version);
+
+            lastCfg = newCfg;
+            FileConfig.Save(ConfFilename, newCfg?.Cfg, newCfg?.McastParams);
+            LogDebug<CfgServiceAsync>($"New Configuration saved => {newCfg?.Cfg.Version}");
         }
         #region Registry and Handlers
         void RegistryInit()
@@ -1199,7 +1204,8 @@ namespace U5ki.CfgService
                     }
                     if (e?.Content != null)
                     {
-                        MemoryStream ms = new MemoryStream(Tools.Decompress(e.Content));
+                        var data = Tools.Decompress(e.Content);
+                        MemoryStream ms = new MemoryStream(data);
                         lastCfg.Cfg = Serializer.Deserialize<Cd40Cfg>(ms);
                         FileConfig.Save(ConfFilename, lastCfg.Cfg, lastCfg.McastParams);
                     }
@@ -1260,6 +1266,16 @@ namespace U5ki.CfgService
                 }
             }).Wait();
         }
+        void OnNotifyConfigChange(object sender, string version)
+        {
+            LogDebug<CfgServiceAsync>($"OnNotifyConfigChange Received...");
+            works.Enqueue("OnNotifyConfigChange", () =>
+            {
+                LogDebug<CfgServiceAsync>($"OnNotifyConfigChange => {version}");
+                if (version != lastCfg?.Cfg?.Version)
+                    ForceCheck = true;
+            }).Wait();
+        }
         #endregion Registry and Handlers
         string SetPreconfig(string par)
         {
@@ -1287,16 +1303,11 @@ namespace U5ki.CfgService
             {
                 FileConfig.Load(PreconfFilename(par), (cfg, mscast) =>
                 {
-                    lastCfg = new FileConfig() { Cfg = cfg, McastParams = mscast };
-
-                    McastService.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, lastCfg.Cfg);
-                    McastService.Publish(lastCfg.Cfg.Version);
-
-                    FileConfig.Save(ConfFilename, lastCfg.Cfg, lastCfg.McastParams);
+                    LogInfo<CfgService>("Activada configuración " + par, U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
+                        "CfgService", CTranslate.translateResource("Activada configuración " + par));
+                    var newConfig = new FileConfig() { Cfg = cfg, McastParams = mscast };
+                    ActivateConfig(newConfig);
                 });
-
-                LogInfo<CfgService>("Activada configuración " + par, U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_INFO,
-                    "CfgService", CTranslate.translateResource("Activada configuración " + par));
                 return null;
             }
             else
@@ -1338,18 +1349,16 @@ namespace U5ki.CfgService
         {
             LogDebug<CfgServiceAsync>($"Changing to Master. Waiting for Sync");
             Task.Delay(TimeSpan.FromSeconds(3)).Wait();     // TODO. tiempo configurable.
-            if (lastCfg != null)
+            if (lastCfg.Cfg != null)
             {
-                McastService.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, lastCfg.Cfg);
-                McastService.Publish(lastCfg.Cfg.Version);
+                ActivateConfig(lastCfg);
             }
             else if (File.Exists(ConfFilename))
             {
                 FileConfig.Load(ConfFilename, (cfg, mcast) =>
                 {
-                    lastCfg = new FileConfig() { Cfg = cfg, McastParams = mcast };
-                    McastService.SetValue(Identifiers.CfgTopic, Identifiers.CfgRsId, lastCfg.Cfg);
-                    McastService.Publish(lastCfg.Cfg.Version);
+                    var offCfg = new FileConfig() { Cfg = cfg, McastParams = mcast };
+                    ActivateConfig(offCfg);
                 });
             }
             else
@@ -1372,44 +1381,49 @@ namespace U5ki.CfgService
 
         string PreconfFilename(string cfgnumber) => $"u5ki.DefaultCfg.{cfgnumber}.json";
         string ConfFilename => $"u5ki.Cfg.json";
-        internal class FileConfig 
-        {
-            public Cd40Cfg Cfg { get; set; }
-            public SoapCfg.ParametrosMulticast McastParams { get; set; }
-            public static void Save(string fileName, Cd40Cfg cfg, SoapCfg.ParametrosMulticast mcast)
-            {
-                try
-                {
-                    var fileData = new FileConfig() { Cfg = cfg, McastParams = mcast };
-                    var strData = JsonConvert.SerializeObject(fileData);
-                    File.WriteAllText(fileName, strData);
-                }
-                catch (Exception )
-                {
-                    throw;
-                }
-            }
-            public static void Load(string fileName, Action<Cd40Cfg, SoapCfg.ParametrosMulticast> response)
-            {
-                try
-                {
-                    var strData = File.Exists(fileName) ? File.ReadAllText(fileName) : string.Empty;
-                    if (strData != string.Empty)
-                    {
-                        var fileData = JsonConvert.DeserializeObject<FileConfig>(strData);
-                        response(fileData?.Cfg, fileData?.McastParams);
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
         private FileConfig lastCfg = null;
         private ActionQueueAsync works = new ActionQueueAsync();
         private CancellationTokenSource mainWorkerCancelControl = null;
         private bool ForceCheck = false;
+    }
+    internal class FileConfig
+    {
+        public Cd40Cfg Cfg { get; set; }
+        public SoapCfg.ParametrosMulticast McastParams { get; set; }
+        public bool McastChanged(SoapCfg.ParametrosMulticast actual)
+        {
+            return actual?.GrupoMulticastConfiguracion != this.McastParams?.GrupoMulticastConfiguracion ||
+                actual?.PuertoMulticastConfiguracion != this.McastParams?.PuertoMulticastConfiguracion;
+        }
+        public static void Save(string fileName, Cd40Cfg cfg, SoapCfg.ParametrosMulticast mcast)
+        {
+            try
+            {
+                var fileData = new FileConfig() { Cfg = cfg, McastParams = mcast };
+                var strData = JsonConvert.SerializeObject(fileData);
+                File.WriteAllText(fileName, strData);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public static void Load(string fileName, Action<Cd40Cfg, SoapCfg.ParametrosMulticast> response)
+        {
+            try
+            {
+                var strData = File.Exists(fileName) ? File.ReadAllText(fileName) : string.Empty;
+                if (strData != string.Empty)
+                {
+                    var fileData = JsonConvert.DeserializeObject<FileConfig>(strData);
+                    response(fileData?.Cfg, fileData?.McastParams);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
     internal class SoapControl
     {
@@ -1438,11 +1452,13 @@ namespace U5ki.CfgService
             }
         }
         IUlisesSoapService SoapSrv { get; set; }
+        ILogger _logger;
         CancellationTokenSource CancelControl { get; set; }
-        public SoapControl(IUlisesSoapService service, CancellationTokenSource cancelControl)
+        public SoapControl(ILogger logger, IUlisesSoapService service, CancellationTokenSource cancelControl)
         {
             CancelControl = cancelControl;
             SoapSrv = service;
+            _logger = logger;
         }
         public Task<bool> CheckConfig(string lastVersion)
         {
@@ -1458,7 +1474,10 @@ namespace U5ki.CfgService
             {
                 soapSysCfg = SoapSrv?.GetConfigSistema();
                 if (CancelControl.IsCancellationRequested) return false;
-                
+
+                mcast = SoapSrv?.GetParametrosMulticast();
+                if (CancelControl.IsCancellationRequested) return false;
+
                 picts = soapSysCfg.PlanAsignacionUsuarios
                     .Select(p => p.IdHost)
                     .Distinct();
@@ -1481,7 +1500,7 @@ namespace U5ki.CfgService
                 return true;
             });
         }
-        public Task<Cd40Cfg> GetNewCd40Cfg()
+        public Task<FileConfig> GetNewCd40Cfg()
         {
             return Task.Run(() =>
             {
@@ -1503,7 +1522,8 @@ namespace U5ki.CfgService
 
                 CfgTranslators.Translate(Cfg, conferences);
 
-                return Cfg;
+                var newCfg = new FileConfig() { Cfg = Cfg, McastParams = mcast };
+                return newCfg;
             });
         }
         ConfiguracionUsuario TranslateUser(SoapCfg.CfgUsuario userCfg, SoapCfg.CfgEnlaceExterno[] eLinks, SoapCfg.CfgEnlaceInterno[] iLinks)
@@ -1523,6 +1543,7 @@ namespace U5ki.CfgService
         IEnumerable<SoapCfg.Node> nmPool = null;
         IEnumerable<SoapCfg.Node> eePool = null;
         SoapCfg.ConferenciasPreprogramadas conferences = null;
+        SoapCfg.ParametrosMulticast mcast = null;
     }
 
     public interface IUlisesSoapService
@@ -1536,6 +1557,7 @@ namespace U5ki.CfgService
         SoapCfg.PoolHfElement[] GetPoolHfElement();
         SoapCfg.Node[] GetPoolNMElements(string elementType);
         SoapCfg.ConferenciasPreprogramadas GetConferenciasPreprogramadas();
+        SoapCfg.ParametrosMulticast GetParametrosMulticast();
     }
     internal class RealSoapService : IUlisesSoapService
     {
@@ -1551,12 +1573,82 @@ namespace U5ki.CfgService
         public SoapCfg.Node[] GetPoolNMElements(string elementType) => SoapSrv?.GetPoolNMElements(SystemId, elementType);
         public string GetVersionConfiguracion() => SoapSrv?.GetVersionConfiguracion(SystemId);
         public SoapCfg.LoginTerminalVoz LoginTop(string pict) => SoapSrv?.LoginTop(SystemId, pict);
+        public SoapCfg.ParametrosMulticast GetParametrosMulticast() => SoapSrv?.GetParametrosMulticast(SystemId);
     }
 
+    public interface IUlisesMcastNotService : IDisposable
+    {
+        event GenericEventHandler<string> NewConfigAvailable;
+        void Init(string itf, string mcast, int port);
+        ILogger Logger { get; set; }
+    }
+    internal class RealMcastNotService : IUlisesMcastNotService
+    {
+        public event GenericEventHandler<string> NewConfigAvailable;
+        public ILogger Logger { get; set; } = null;
+        public void Dispose()
+        {
+            CancellationTokenSource?.Cancel();
+            ChangesListener?.Dispose();
+            ReceiveTask?.Wait();
+        }
+        public void Init(string itf, string mcast, int port)
+        {
+            if(IPAddress.TryParse(mcast, out var mcastGroup) && IPAddress.TryParse(itf, out var itfIp))
+            {
+                if (mcastGroup != GroupIp || port != GroupPort)
+                {
+                    if (ChangesListener?.Client?.IsBound == true)
+                    {
+                        Dispose();
+                    }
+                    var endp = new IPEndPoint(itfIp, port);
+                    ChangesListener = new UdpClient(endp);
+                    ChangesListener.JoinMulticastGroup(mcastGroup, itfIp);
+                    CancellationTokenSource = new CancellationTokenSource();
+                    ReceiveTask = Task.Run(() => Receive());
+                    GroupIp = mcastGroup;
+                    GroupPort = port;
+                }
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid IP format => ITF {itf} and/or MCAST {mcast}");
+            }
+        }
+        void Receive()
+        {
+            while (CancellationTokenSource.IsCancellationRequested == false)
+            {
+                try
+                {
+                    var res = ChangesListener.ReceiveAsync().Result;
+                    if (res.Buffer.Length > 0)
+                    {
+                        if (res.Buffer[0] == 0x31)
+                        {
+                            string version = Encoding.ASCII.GetString(res.Buffer, 1, res.Buffer.Length - 1);
+                            NewConfigAvailable?.Invoke(this, version);
+                        }
+                    }
+                }
+                catch (Exception x)
+                {
+                    Logger?.LogError(x, "On RealMcastNotService Receive");
+                }
+            }
+        }
+        CancellationTokenSource CancellationTokenSource { get; set; }
+        Task ReceiveTask { get; set; }
+        IPAddress GroupIp { get; set; }
+        int GroupPort { get; set; }
+        UdpClient ChangesListener { get; set; }
+    }
     internal class ActionQueueAsync
     {
         public int SecondsTimeout { get; set; } = 10;
         public int MillisecondsTick { get; set; } = 50;
+        public ILogger Logger { get; set; } 
         public ActionQueueAsync() { }
         public Task Start()
         {
@@ -1592,9 +1684,9 @@ namespace U5ki.CfgService
                     {
                         retorno = action();
                     }
-                    catch (Exception)
+                    catch (Exception x)
                     {
-                        // todo... Grabar la excepción
+                        Logger.LogError(x, $"On ActionQueueAsync, ExecuteInAsync {id}");
                         throw;
                     }
                     finally
@@ -1616,9 +1708,10 @@ namespace U5ki.CfgService
                     {
                         action();
                     }
-                    catch (Exception)
+                    catch (Exception x)
                     {
-                        // todo... Grabar la excepción
+                        // Grabar la excepción
+                        Logger.LogError(x, $"On ActionQueueAsync, Enqueue {id}");
                         throw;
                     }
                 });
@@ -1659,6 +1752,15 @@ namespace U5ki.CfgService
                 token.ThrowIfCancellationRequested();
                 yield return item;
             }
+        }
+    }
+    public class Cryptography
+    {
+        public static string Hash(byte[] data)
+        {
+            SHA256Managed sha = new SHA256Managed();
+            byte[] hash = sha.ComputeHash(data);
+            return BitConverter.ToString(hash).Replace("-", "");
         }
     }
 }
