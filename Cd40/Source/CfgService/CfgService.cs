@@ -948,7 +948,10 @@ namespace U5ki.CfgService
         public IUlisesSoapService SoapService { get; set; } = new RealSoapService();
         public IUlisesMcastService McastService { get; set; } = new Registry();
         public IUlisesMcastNotService NotService { get; set; } = new RealMcastNotService();
-        public ILogger Logger { get; set; } = new LoggerFactory().AddNLog().CreateLogger<CfgServiceAsync>();
+        public ILogger Logger { get; set; } = LoggerFactory.Create(builder => builder.AddNLog()).CreateLogger<CfgServiceAsync>();
+        public int NoinitTickInterval { get; set; } = 10;
+        public int InitTickInterval { get; set; } = 100;
+        public int ToMasterDelay { get; set; } = 3;
         #endregion DI
 
         #region IService
@@ -1072,7 +1075,8 @@ namespace U5ki.CfgService
                     SoapControl soap = new SoapControl(Logger, SoapService, mainWorkerCancelControl);
                     Status = ServiceStatus.Running;
 
-                    LogDebug<CfgService>("Service running");
+                    //LogDebug<CfgService>("Service running");
+                    Logger.LogDebug($"Service running");
                     while (mainWorkerCancelControl.IsCancellationRequested == false)
                     {
                         await works.ExecuteInAsync("MainWorker", () =>
@@ -1088,7 +1092,7 @@ namespace U5ki.CfgService
                             }
                             return true;
                         });
-                        Task.Delay(100).Wait(); // TODO. En una variable...
+                        Task.Delay(InitTickInterval).Wait(); 
                     }
                     Status = ServiceStatus.Stopped;
                     RegistryDispose();
@@ -1096,7 +1100,7 @@ namespace U5ki.CfgService
                 }
                 else
                 {
-                    Task.Delay(TimeSpan.FromSeconds(10)).Wait(); // TODO. En una variable...
+                    Task.Delay(TimeSpan.FromSeconds(NoinitTickInterval)).Wait(); 
                 }
             }
             mainWorkerCancelControl = null;
@@ -1348,7 +1352,7 @@ namespace U5ki.CfgService
         void ChangeToMaster()
         {
             LogDebug<CfgServiceAsync>($"Changing to Master. Waiting for Sync");
-            Task.Delay(TimeSpan.FromSeconds(3)).Wait();     // TODO. tiempo configurable.
+            Task.Delay(TimeSpan.FromSeconds(ToMasterDelay)).Wait();
             if (lastCfg.Cfg != null)
             {
                 ActivateConfig(lastCfg);
