@@ -44,6 +44,14 @@ namespace HMI.Presentation.Twr.Views
             rellenalista();
             _IsCurrentView = true;
             TiemMax = 3;
+            if (!VisualStyle.ModoNocturno)
+            {
+
+            }
+            else 
+            { 
+                BackColor = Color.Black;
+            }
         }
 
         [EventSubscription(EventTopicNames.ActiveViewChanging, ThreadOption.Publisher)]
@@ -206,8 +214,13 @@ namespace HMI.Presentation.Twr.Views
             {
                 int indice = listboxFr.SelectedIndex;
                 //_HMIButtons[indice].Reset(r.Text, false, Color.Yellow);
+                Color color_activo = Color.Yellow;
+                if (!VisualStyle.ModoNocturno)
+                    ;
+                else
+                    color_activo = Color.Gray;
                 if (indice>=0 && (r == _HMIButtons[indice]))
-                    r.Reset(r.Text, false, Color.Yellow);
+                    r.Reset(r.Text, false, color_activo);
                 else if (r.Text.Length > 0)
                     r.Reset(r.Text, false, Color.Gray);
             }
@@ -218,8 +231,13 @@ namespace HMI.Presentation.Twr.Views
             foreach (var r in this._HMIButtons)
             {
                 int indice = listboxFr.SelectedIndex;
+                Color color_activo = Color.Yellow;
+                if (!VisualStyle.ModoNocturno)
+                    ;
+                else
+                    color_activo = Color.Gainsboro;
                 if ((r == (HMIButton)sender) && indice>=0)
-                    r.Reset(r.Text, false, Color.Yellow);
+                    r.Reset(r.Text, false, color_activo);
                 else if (r.Text.Length > 0)
                     r.Reset(r.Text, false, Color.Gray);
             }

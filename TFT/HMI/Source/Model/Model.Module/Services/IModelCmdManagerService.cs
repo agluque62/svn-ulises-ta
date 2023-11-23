@@ -69,5 +69,10 @@ namespace HMI.Model.Module.Services
 		string GetSala(int poshmi);//lalm 230517
 		void DisableFunctionsPagConferencia(bool disable=true);
 		void ShowAdButtons(int page);
+#if SELECCION_SONIDO_AD
+		void SeleccionSonidoClick();
+#endif
+		void SetToneporllamadaModel(string llamda, string tono, string tonoprio);
+		
 	}
 }

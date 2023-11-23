@@ -241,7 +241,26 @@ namespace HMI.Presentation.Twr.Views
 		{
 
 			InitializeComponent();
-            if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
+			if (!VisualStyle.ModoNocturno)
+			{
+
+			}
+			else
+			{
+				this._TlfFunctionsTLP.BackColor = System.Drawing.Color.Black;
+				_PriorityBT.ForeColor = System.Drawing.Color.White;
+				_ListenBT.ForeColor = System.Drawing.Color.White;
+				_HoldBT.ForeColor = System.Drawing.Color.White;
+				_TransferBT.ForeColor = System.Drawing.Color.White;
+				_TlfViewBT.ForeColor = System.Drawing.Color.White;
+				_CancelBT.ForeColor = System.Drawing.Color.White;
+				_TlfSpeakerBT.ForeColor = System.Drawing.Color.White;
+				_MoreBT.ForeColor = System.Drawing.Color.White;
+				_PickUpBT.ForeColor = System.Drawing.Color.White;
+				_ForwardBT.ForeColor = System.Drawing.Color.White;
+
+			}
+			if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
             {
                 _HoldBT.Font = new System.Drawing.Font("Trebuchet MS", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             }

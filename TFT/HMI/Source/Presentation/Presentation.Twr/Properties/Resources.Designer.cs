@@ -19,7 +19,7 @@ namespace HMI.Presentation.Twr.Properties {
     // a través de una herramienta como ResGen o Visual Studio.
     // Para agregar o quitar un miembro, edite el archivo .ResX y, a continuación, vuelva a ejecutar ResGen
     // con la opción /str o recompile su proyecto de VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -538,6 +538,16 @@ namespace HMI.Presentation.Twr.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap play_no_disponibeN {
+            get {
+                object obj = ResourceManager.GetObject("play_no_disponibeN", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap play_no_disponible {
             get {
                 object obj = ResourceManager.GetObject("play_no_disponible", resourceCulture);
@@ -898,6 +908,16 @@ namespace HMI.Presentation.Twr.Properties {
         internal static System.Drawing.Bitmap TlfPage {
             get {
                 object obj = ResourceManager.GetObject("TlfPage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TlfPageNocturno {
+            get {
+                object obj = ResourceManager.GetObject("TlfPageNocturno", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

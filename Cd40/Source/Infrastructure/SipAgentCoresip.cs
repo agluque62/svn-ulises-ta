@@ -381,6 +381,12 @@ namespace U5ki.Infrastructure
 
     //EDU 20170223
     public enum CORESIP_FREQUENCY_TYPE { Simple = 0, Dual = 1, FD = 2, ME = 3 }         // 0. Normal, 1: 1+1, 2: FD, 3: EM
+    public enum CORESIP_FREQUENCY_MODO_TRANSMISION {
+        Climax = 0,
+        UltimoReceptor = 1,
+        Manual = 2,
+        Ninguno = 3
+    }
     public enum CORESIP_CLD_CALCULATE_METHOD { Relative, Absolute }
     public enum CORESIP_PttMuteType
     {
@@ -449,6 +455,7 @@ namespace U5ki.Infrastructure
         public string Zona;                             //UNIFETM: Este campo falta en ETM. Asignarle el valor 0 en ETM
 
         public CORESIP_FREQUENCY_TYPE FrequencyType;    //UNIFETM: Este campo falta en ETM. Asignarle el valor Simple en ETM
+        public CORESIP_FREQUENCY_MODO_TRANSMISION ModoTransmision;
         public CORESIP_CLD_CALCULATE_METHOD CLDCalculateMethod; //UNIFETM: Este campo falta en ETM. Asignarle el valor Relative en ETM
         public int BssWindows;                          //UNIFETM: Este campo falta en ETM. Asignarle el valor 0 en ETM
         public bool AudioSync;                          //UNIFETM: Este campo falta en ETM. Asignarle el valor 0 en ETM
@@ -595,6 +602,8 @@ namespace U5ki.Infrastructure
         public uint ChannelCount;
         public uint BitsPerSample;
         public uint FrameTime;
+
+        public bool remote_grs_supports_ED137C_Selcal;		//es true si la sesion con el grs remoto soporta selcal de ED137C
     }
 
     /// <summary>

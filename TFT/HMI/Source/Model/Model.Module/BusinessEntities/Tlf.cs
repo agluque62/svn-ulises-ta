@@ -10,6 +10,7 @@ using HMI.Model.Module.Constants;
 using HMI.Model.Module.Properties;
 using Utilities;
 using HMI.Infrastructure.Interface;
+using System.Windows.Forms;
 
 namespace HMI.Model.Module.BusinessEntities
 {
@@ -278,11 +279,16 @@ namespace HMI.Model.Module.BusinessEntities
 			}
 			else
 			{
-				Reset(dst.St);
+
+                //230613 el recurso es cuando se pone en conversacion
+                if (dst.St == TlfState.Set)
+                    this.recused = dst._recused;
+
+                Reset(dst.St);
 			}
 			//lalm 211007
 			//#2629 Presentar via utilizada en llamada saliente.
-			this.recused = dst._recused;
+			
 		}
 
 		public void Reset(TlfDestination dst)
@@ -331,7 +337,7 @@ namespace HMI.Model.Module.BusinessEntities
 			//lalm 211008
 			//#2629 Presentar via utilizada en llamada saliente.
 			_recused = dst._recused;
-
+			
 			Reset(dst.State);
 
 			if (_IaTimer != null)
@@ -1353,6 +1359,23 @@ namespace HMI.Model.Module.BusinessEntities
 
 			for (int i = 0; i < msg.Count; i++)
 			{
+				try
+				{
+					TlfDst tmp = _Dst[i + msg.From];
+				}
+				catch (IndexOutOfRangeException)
+				{
+					// Si ocurre un error debido a una configuración incorrecta (por ejemplo, índice fuera de rango),
+					// se muestra un cuadro de mensaje de advertencia.
+
+					string errorMessage = "¡ADVERTENCIA! CONFIGURACION INCORRECTA\n" +
+										  "Se produjo un error al acceder al elemento en la posición " + (i + msg.From) + "\n" +
+										  "Verifica la configuración del NumTlfDestinations _Dst y los valores de cofniguracion.";
+
+                    System.Windows.Forms.MessageBox.Show(errorMessage, "Error de configuración", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					return;
+				}
+
 				TlfDst dst = _Dst[i + msg.From];
 				dst.Reset(msg.Info[i]);
 

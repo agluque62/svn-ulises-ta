@@ -96,5 +96,7 @@ namespace HMI.Model.Module.Services
 		void ShowAdButtons();
         bool HayConferenciaPreprogramada();
 
+		void SetToneporllamadaEngine(string llamada, string tono, string tonoprio);
+
     }
 }

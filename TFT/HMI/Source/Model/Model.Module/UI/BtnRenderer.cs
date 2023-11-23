@@ -55,7 +55,7 @@ namespace HMI.Model.Module.UI
 		public BtnStateInfo(Rectangle rect, BtnState state, BtnStyle style,
 			int cornerRadius, Color borderColor, Color innerBorderColor, Color backColor, ColorBlend blend,
 			string text, Font font, StringFormat textFormat, Color foreColor, Rectangle textRect,
-			Image image, ContentAlignment imageAlign, GraphicsPath imgPath, Rectangle imgRect)
+			Image image, ContentAlignment imageAlign, GraphicsPath imgPath, Rectangle imgRect,bool IsButtonTlf)
 		{
 			Rect = rect;
 			State = state;
@@ -65,11 +65,16 @@ namespace HMI.Model.Module.UI
 			InnerBorderColor = innerBorderColor;
 			BackColor = backColor;
 			Blend = blend;
-			
-			//Text = text.Length > 20 ? text.Substring(0,17) + "..." : text;
-			Text = GenIdAgrupacion(text);
 
-			Font = font;
+			//Text = text.Length > 20 ? text.Substring(0,17) + "..." : text;
+			//Text = GenIdAgrupacion(text);
+			if (IsButtonTlf)
+				Text = text;
+			else
+				Text = GenIdAgrupacion(text) ;
+			Text = Text.Length > 32 ? Text.Substring(0, 32) : Text;
+			
+            Font = font;
 			TextFormat = textFormat;
 			ForeColor = foreColor;
 			TextRect = textRect;
@@ -90,6 +95,7 @@ namespace HMI.Model.Module.UI
 		private Color?[] _BackColors = { null, null, null, null };
 		private ColorBlend[] _Blends = { new ColorBlend(), new ColorBlend(), new ColorBlend(), new ColorBlend() };
 		private string _Text = "";
+		private bool _IsButtonTlf = false;// 231116 Botn de telefonia
 		private Font _Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
 		private ContentAlignment _TextAlign = ContentAlignment.MiddleCenter;
 		private Color?[] _ForeColors = { null, null, null, null };
@@ -103,8 +109,12 @@ namespace HMI.Model.Module.UI
 		private ContentAlignment _ImageAlign = ContentAlignment.MiddleCenter;
 		private GraphicsPath[] _ImgPaths = { null, null, null, null };
 		private Rectangle[] _ImgRects = new Rectangle[(int)BtnState.MaxBtnStates];
+		// LALM Modo Nocturno 210129 
+		public bool _modoNocturno = VisualStyle.ModoNocturno;
+        public Color _aspaColor = VisualStyle.AspaColor;
+        public Color _textoRadioColor = VisualStyle.TextoRadioColor;
 
-		public Rectangle Rect
+        public Rectangle Rect
 		{
 			get { return _Rect; }
 			set 
@@ -178,7 +188,11 @@ namespace HMI.Model.Module.UI
 			}
 		}
 
-		public BtnStateInfo this[BtnState st]
+        public bool IsButtonTlf
+		{ get => _IsButtonTlf;
+			set => _IsButtonTlf = value; }
+
+        public BtnStateInfo this[BtnState st]
 		{
 			get
 			{
@@ -213,11 +227,13 @@ namespace HMI.Model.Module.UI
 							break;
 					}
 				}
+                Type tipo = base.GetType();
+
 
 				return new BtnStateInfo(_Rect, st, _Style,
 					CornerRadius, borderColor, innerBorderColor, backColor, blend,
 					_Text, _Font, _TextFormat, foreColor, _TextRects[(int)st],
-					img, _ImageAlign, imgPath, imgRect);
+					img, _ImageAlign, imgPath, imgRect, IsButtonTlf);
 			}
 		}
 
@@ -304,6 +320,7 @@ namespace HMI.Model.Module.UI
 					else if ((_BackColors[(int)BtnState.Normal] != null) && (_BackColors[(int)BtnState.Normal] != VisualStyle.ButtonColor))
 					{
 						backColor = _BackColors[(int)BtnState.Normal].Value;
+
 					}
 					else
 					{
@@ -341,9 +358,14 @@ namespace HMI.Model.Module.UI
 				case BtnState.Pushed:
 					foreColor = _ForeColors[(int)st] ?? GetForeColor(BtnState.Normal);
 					break;
-				default:
-					foreColor = _ForeColors[(int)st] ?? Color.Black;
-					break;
+                default:
+					//LALM 210203 Color de letra en hmibutons. Lo cambio para todos
+					// en funcion color letra para radio.
+					if (!VisualStyle.ModoNocturno)
+						foreColor = _ForeColors[(int)st] ?? Color.Black;
+                    else
+						foreColor = _ForeColors[(int)st] ?? VisualStyle.TextoRadioColor;
+                    break;
 			}
 
 			return foreColor;
@@ -597,17 +619,30 @@ namespace HMI.Model.Module.UI
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
-            DrawBackground(g, info.Rect, info.Style, info.State, info.CornerRadius,
+			
+			DrawBackground(g, info.Rect, info.Style, info.State, info.CornerRadius,
                 info.BorderColor, info.InnerBorderColor, info.BackColor, info.Blend);
 
             // Dibuja un aspa
             if (crossed)
             {
-                using (Pen p = new Pen(Color.Red, 5))
+                // LALM: 210129 Aspa configurable.
+                if (!VisualStyle.ModoNocturno)
                 {
-                    g.DrawLine(p, 6, 6, info.Rect.Width - 6, info.Rect.Height - 6);
-                    g.DrawLine(p, info.Rect.Width - 6, 6, 6, info.Rect.Height - 6);
+                    using (Pen p = new Pen(Color.Red, 5))
+	                {
+		                g.DrawLine(p, 6, 6, info.Rect.Width - 6, info.Rect.Height - 6);
+			            g.DrawLine(p, info.Rect.Width - 6, 6, 6, info.Rect.Height - 6);
+				    }
+                }
+                else
+                {
+                    using (Pen p = new Pen(VisualStyle.AspaColor, 5))
+                    {
+                        g.DrawLine(p, 6, 6, info.Rect.Width - 6, info.Rect.Height - 6);
+                        g.DrawLine(p, info.Rect.Width - 6, 6, 6, info.Rect.Height - 6);
+                    }
+
                 }
             }
 
@@ -729,7 +764,7 @@ namespace HMI.Model.Module.UI
 					// return horizontal capsule 
 					int diameter = baseRect.Height;
 					Rectangle arc = new Rectangle(baseRect.Location, new Size(diameter, diameter));
-					
+
 					path.AddArc(arc, 90, 180);
 					arc.X = baseRect.Right - diameter;
 					path.AddArc(arc, 270, 180);
@@ -739,10 +774,14 @@ namespace HMI.Model.Module.UI
 					// return vertical capsule 
 					int diameter = baseRect.Width;
 					Rectangle arc = new Rectangle(baseRect.Location, new Size(diameter, diameter));
-
-					path.AddArc(arc, 180, 180);
-					arc.Y = baseRect.Bottom - diameter;
-					path.AddArc(arc, 0, 180);
+					if (diameter <= 0)
+						return path;
+					{
+						path.AddArc(arc, 180, 180);
+						arc.Y = baseRect.Bottom - diameter;
+						path.AddArc(arc, 0, 180);
+					}
+				
 				}
 				else
 				{
@@ -823,7 +862,7 @@ namespace HMI.Model.Module.UI
 			int cornerRadius, Color borderColor, Color innerBorderColor, Color backColor, ColorBlend blend)
 		{
 			Rectangle rr = new Rectangle(rect.X, rect.Y, rect.Width - 1, rect.Height - 1);
-			if (rr.Height<=1)//230529
+			if ((rr.Width <= 1)|| (rr.Height <= 1))//230529
 			{
 				return;
 			}

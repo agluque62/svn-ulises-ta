@@ -31,6 +31,25 @@ namespace HMI.Presentation.Twr.UI
         {
             _CmdManager = cmdManager;
             _StateManager = stateManager;
+            if (!VisualStyle.ModoNocturno)
+            {
+
+            }
+            else
+            {
+                BackColor = VisualStyle.ButtonColorN;
+                listBox1.BackColor = VisualStyle.ButtonColorN;
+                listBox1.ForeColor = VisualStyle.TextoTfColorN;
+                button1.BackColor = VisualStyle.ButtonColorN;
+                button1.ForeColor = VisualStyle.TextoTfColorN;
+                button2.BackColor = VisualStyle.ButtonColorN;
+                button2.ForeColor = VisualStyle.TextoTfColorN;
+                IdConferencia.BackColor = VisualStyle.ButtonColorN;
+                IdConferencia.ForeColor = VisualStyle.TextoTfColorN;
+                Todos.BackColor = VisualStyle.ButtonColorN;
+                Todos.ForeColor = VisualStyle.TextoTfColorN;
+
+            }
         }
         public ListaDeParticipantes()
         {

@@ -202,6 +202,12 @@ namespace U5ki.RdService
             }
         }
 
+        //es true si la sesion con el grs remoto soporta selcal de ED137C
+        public bool Remote_grs_supports_ED137C_Selcal
+        {
+            get { return _ActiveResource.Remote_grs_supports_ED137C_Selcal; }
+        }
+
         //used only in M+N resources
         public bool MasterMN { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public bool ReplacedMN { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

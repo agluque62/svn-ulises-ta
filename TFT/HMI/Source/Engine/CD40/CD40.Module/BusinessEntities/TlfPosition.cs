@@ -22,43 +22,45 @@ namespace HMI.CD40.Module.BusinessEntities
     /// 
     /// </summary>
 #if DEBUG
-	public class TlfPosition : IDisposable
+    public class TlfPosition : IDisposable
 #else
 	class TlfPosition : IDisposable
-#endif	
-	{
+#endif
+    {
         /// <summary>
         /// 
         /// </summary>
 		public event GenericEventHandler TlfPosStateChanged;
-		public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
+        public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
         public event GenericEventHandler<string> ForwardedCallMsg;
+        public event GenericEventHandler<Dictionary<string, string[]>> TlfRingChanged;
         private List<string> _participantes_ca;//230516 participantes de conferencia activa
         private List<string> _participantes_conf;//230530 participantes de conferencia configurados
-        public bool posicion_conferencia=false;
+
+        public bool posicion_conferencia = false;
         /// <summary>
         /// 
         /// </summary>
 		public int Pos
-		{
-			get { return _Pos; }
-		}
+        {
+            get { return _Pos; }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public string Literal
-		{
-			get { return _Literal; }
-		}
+        {
+            get { return _Literal; }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public TlfState OldState
-		{
-			get { return _OldState; }
-		}
+        {
+            get { return _OldState; }
+        }
 
         ///lalm 211015
         ///#3618 Señal de Llamada Entrante durante CONV en altavoz
@@ -95,79 +97,224 @@ namespace HMI.CD40.Module.BusinessEntities
             return false;
         }
 
+        public string GetPrefix(string numero)
+        {
+            if (numero.StartsWith("01"))
+                return "01";
+            else if (numero.StartsWith("2"))
+                return "02";
+            else if (numero.StartsWith("02"))
+                return "02";
+            if (numero.StartsWith("3")) //posible ATS
+                return "03";
+            else if (numero.StartsWith("03"))
+                return "03";
+            else if (numero.StartsWith("04"))
+                return "04";
+            else if (numero.StartsWith("05"))
+                return "05";
+            else if (numero.StartsWith("06"))
+                return "06";
+            else if (numero.StartsWith("07"))
+                return "07";
+            else if (numero.StartsWith("08"))
+                return "08";
+            else if (numero.StartsWith("09"))
+                return "09";
+            else if (numero.StartsWith("10"))
+                return "10";
+            else if (numero.StartsWith("11"))
+                return "11";
+            else if (numero.StartsWith("12"))
+                return "12";
+            else if (numero.StartsWith("13"))
+                return "13";
+            else if (numero.StartsWith("14"))
+                return "14";
+            else if (numero.StartsWith("15"))
+                return "15";
+            else if (numero.StartsWith("16"))
+                return "16";
+            else if (numero.StartsWith("17"))
+                return "17";
+            else if (numero.StartsWith("18"))
+                return "18";
+            else if (numero.StartsWith("19"))
+                return "19";
+            else if (this.Prefix!="")
+                return this.Prefix;
+            return numero.Substring(0, 2);
+        }
+
+        public string GetTone(string prefijo, bool prioritario)
+        {
+            Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
+            foreach (string key in Top.Tlf.TonosPorLlamada.Keys)
+            {
+                string[] tonos = Top.Tlf.TonosPorLlamada[key];
+                string prf = key.Split(' ')[0];
+
+                if (dict.ContainsKey(prf) == false)
+                {
+                    dict.Add(prf, new string[2]);
+                }
+
+                if (key.Contains("PAP"))
+                {
+                    if (dict.ContainsKey("01") == false) 
+                        dict.Add("01", new string[2]);
+                    dict["01"][0] = tonos[0];
+                    dict["01"][1] = tonos[1];
+                }
+                else if (key.Contains("ATS"))
+                {
+                    if (dict.ContainsKey("02")==false) dict.Add("02", new string[2]);
+                    if (dict.ContainsKey("03")==false) dict.Add("03", new string[2]);
+                    dict["02"][0] = tonos[0];
+                    dict["02"][1] = tonos[1];
+                    dict["03"][0] = tonos[0];
+                    dict["03"][1] = tonos[1];
+                }
+                else if (key.Contains("PRF"))
+                {
+                    if (dict.ContainsKey(prf) == false) dict.Add(prf, new string[2]);
+                    dict[prf][0] = tonos[0];
+                    dict[prf][1] = tonos[1];
+                }
+                
+            }
+            if (prefijo.Length == 1)
+                prefijo = "0" + prefijo;
+
+            string comienzo = dict.Keys.FirstOrDefault(key => key.StartsWith(prefijo));
+
+            if ((comienzo != null) &&
+                (dict.ContainsKey(comienzo)) && 
+                (dict[comienzo] != null) &&
+                 dict[comienzo] is string[] arr &&
+                (arr.Length > 1) && 
+                (dict[comienzo][1] != null)
+                )
+
+            {
+                if (prioritario) 
+                     if (dict[comienzo][1]!=null)
+                        return dict[comienzo][1];
+                     else
+                        return "RingPrio";
+                else
+                    if (dict[comienzo][0]!=null)
+                        return dict[comienzo][0];
+                    else 
+                        return "RingPrio";
+
+            }
+            if (prioritario)
+                return "RingPrio";
+            else
+                return "Ring";
+
+            string keyStartingWithprefix = Top.Tlf.TonosPorLlamada.Keys.FirstOrDefault(key => key.StartsWith(prefijo));
+
+            if (keyStartingWithprefix != null)
+            {
+                if (prioritario)
+                    return Top.Tlf.TonosPorLlamada[keyStartingWithprefix][1];
+                else
+                    return Top.Tlf.TonosPorLlamada[keyStartingWithprefix][0];
+            }
+            if (prioritario)
+                return "RingPrio";
+            else
+                return "Ring";
+        }
+
 
         /// <summary>
         /// 
         /// </summary>
 		public virtual TlfState State
-		{
-			get { return _State; }
-			set 
-			{
+        {
+            get { return _State; }
+            set
+            {
                 if (_State != value)
-				{
-					if (_Tone >= 0)
-					{
-						Top.Mixer.Unlink(_Tone);
-						SipAgent.DestroyWavPlayer(_Tone);
-						_Tone = -1;
-					}
+                {
+                    if (_Tone >= 0)
+                    {
+                        Top.Mixer.Unlink(_Tone);
+                        SipAgent.DestroyWavPlayer(_Tone);
+                        _Tone = -1;
+                    }
 
                     if (((_SipCall != null) && !_SipCall.Monitoring)
-                        || (_SipCall== null))
-					{
-						switch (value)
-						{
-							case TlfState.Congestion:
-								_Tone = SipAgent.CreateWavPlayer("Resources/Tones/Congestion.wav", true);
-								Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
-								break;
-							case TlfState.OutOfService:
-								_Tone = SipAgent.CreateWavPlayer("Resources/Tones/OutOfService.wav", true);
-								Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
-								break;
-							case TlfState.Busy:
-								_Tone = SipAgent.CreateWavPlayer("Resources/Tones/Busy.wav", true);
-								Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
-								break;
+                        || (_SipCall == null))
+                    {
+                        switch (value)
+                        {
+                            case TlfState.Congestion:
+                                _Tone = SipAgent.CreateWavPlayer("Resources/Tones/Congestion.wav", true);
+                                Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
+                                break;
+                            case TlfState.OutOfService:
+                                _Tone = SipAgent.CreateWavPlayer("Resources/Tones/OutOfService.wav", true);
+                                Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
+                                break;
+                            case TlfState.Busy:
+                                _Tone = SipAgent.CreateWavPlayer("Resources/Tones/Busy.wav", true);
+                                Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
+                                break;
 
-							case TlfState.Conf:
-								break;
+                            case TlfState.Conf:
+                                break;
 
-							case TlfState.Out:
-								_Tone = SipAgent.CreateWavPlayer("Resources/Tones/Calling.wav", true);
-								Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
-								break;
-							case TlfState.RemoteHold:
-								_Tone = SipAgent.CreateWavPlayer("Resources/Tones/Hold.wav", true);
-								Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
-								break;
-							case TlfState.In:
+                            case TlfState.Out:
+                                _Tone = SipAgent.CreateWavPlayer("Resources/Tones/Calling.wav", true);
+                                Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
+                                break;
+                            case TlfState.RemoteHold:
+                                _Tone = SipAgent.CreateWavPlayer("Resources/Tones/Hold.wav", true);
+                                Top.Mixer.LinkTlf(_Tone, MixerDir.Send, Mixer.TLF_PRIORITY);
+                                break;
+                            case TlfState.In:
                                 //LALM 211014
                                 //#3618 Señal de Llamada Entrante durante CONV en altavoz
                                 // Si La linea caliente esta ocupada, genero otro tono.
-                                
-                                if ((LineaCalienteEnUso() && (!Top.Replay.Replaying)) || LineaTlfEnUso())
+                                Top.Tlf.AsignaRing();
+                                if ((LineaCalienteEnUso() && (!Top.Replay.Replaying)) || LineaTlfEnUso() ||
+                                    (MixerDev.Ring == MixerDev.MhpRd && Top.Rd.AnySquelch))
                                 {
                                     _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingNoIntrusivo.wav", true);
                                     Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
                                     //Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER);//#5829
                                 }
+                               
                                 else
                                 {
-                                    _Tone = SipAgent.CreateWavPlayer("Resources/Tones/Ring.wav", true);
+                                    
+                                    string prefijo = GetPrefix(this.NumeroAbonado[0]);
+                                    string tone = GetTone(prefijo, false);
+
+                                    _Tone = SipAgent.CreateWavPlayer("Resources/Tones/" + tone + ".wav", true);
                                     Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
                                     Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER);//#5829
                                 }
                                 break;
-							case TlfState.InPrio:
+                            case TlfState.InPrio:
                                 //LALM 211014
                                 //#3618 Señal de Llamada Entrante durante CONV en altavoz
                                 // Si La linea caliente esta ocupada, genero otro tono.
-                                if (LineaCalienteEnUso() || LineaTlfEnUso())
+                                Top.Tlf.AsignaRing();
+                                if (MixerDev.Ring == MixerDev.SpkLc && (LineaCalienteEnUso() || LineaTlfEnUso())||
+                                   (MixerDev.Ring == MixerDev.MhpRd && Top.Rd.AnySquelch))
                                     _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingNoIntrusivo.wav", true);
                                 else
-                                    _Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingPrio.wav", true);
+                                {
+                                    //_Tone = SipAgent.CreateWavPlayer("Resources/Tones/RingPrio.wav", true);
+                                    string prefijo = GetPrefix(this.NumeroAbonado[0]);
+                                    string tone = GetTone(prefijo, true);
+                                    _Tone = SipAgent.CreateWavPlayer("Resources/Tones/" + tone + ".wav", true);
+                                }
                                 Top.Mixer.Link(_Tone, MixerDev.Ring, MixerDir.Send, Mixer.UNASSIGNED_PRIORITY, FuentesGlp.Telefonia);
                                 Top.Mixer.SetVolumeTones(CORESIP_SndDevType.CORESIP_SND_LC_SPEAKER);//#5829
                                 break;
@@ -179,46 +326,46 @@ namespace HMI.CD40.Module.BusinessEntities
                         }
                     }
 
-					if ((_EvSub != IntPtr.Zero) && (value != TlfState.Out))
-					{
-						int code = SipAgent.SIP_ERROR;
+                    if ((_EvSub != IntPtr.Zero) && (value != TlfState.Out))
+                    {
+                        int code = SipAgent.SIP_ERROR;
 
-						switch (value)
-						{
-							case TlfState.Set:
-							case TlfState.Conf:
-							case TlfState.RemoteHold:
-								code = SipAgent.SIP_OK;
-								break;
-							case TlfState.Congestion:
-								code = SipAgent.SIP_CONGESTION;
-								break;
-							case TlfState.OutOfService:
-								code = SipAgent.SIP_NOT_FOUND;
-								break;
-							case TlfState.Busy:
-								code = SipAgent.SIP_BUSY;
-								break;
+                        switch (value)
+                        {
+                            case TlfState.Set:
+                            case TlfState.Conf:
+                            case TlfState.RemoteHold:
+                                code = SipAgent.SIP_OK;
+                                break;
+                            case TlfState.Congestion:
+                                code = SipAgent.SIP_CONGESTION;
+                                break;
+                            case TlfState.OutOfService:
+                                code = SipAgent.SIP_NOT_FOUND;
+                                break;
+                            case TlfState.Busy:
+                                code = SipAgent.SIP_BUSY;
+                                break;
                             //#2855
                             case TlfState.offhook:
                                 break;
                         }
 
                         SipAgent.TransferNotify(_EvSub, code);
-						_EvSub = IntPtr.Zero;
-					}
+                        _EvSub = IntPtr.Zero;
+                    }
 
-					_OldState = _State;
-					_State = value;
+                    _OldState = _State;
+                    _State = value;
 
-					switch (_State)
-					{
-						case TlfState.Out:
-						case TlfState.In:
-						case TlfState.InPrio:
-						case TlfState.RemoteIn:
-							_RemoteHangUp = false;
-							break;
+                    switch (_State)
+                    {
+                        case TlfState.Out:
+                        case TlfState.In:
+                        case TlfState.InPrio:
+                        case TlfState.RemoteIn:
+                            _RemoteHangUp = false;
+                            break;
                         case TlfState.Idle:
                             _SipCall = null;
                             break;
@@ -230,73 +377,73 @@ namespace HMI.CD40.Module.BusinessEntities
 
                     DeleteInScreen();
                     General.SafeLaunchEvent(TlfPosStateChanged, this);
-				}
-			}
-		}
+                }
+            }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public int CallId
-		{
-			get { return (_SipCall != null) ? _SipCall.Id : -1; }
-		}
+        {
+            get { return (_SipCall != null) ? _SipCall.Id : -1; }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public CORESIP_Priority CallPriority
-		{
-			get
-			{
-				if ((_SipCall != null) && _SipCall.IsActive)
-				{
-					return _SipCall.Priority;
-				}
+        {
+            get
+            {
+                if ((_SipCall != null) && _SipCall.IsActive)
+                {
+                    return _SipCall.Priority;
+                }
 
-				return CORESIP_Priority.CORESIP_PR_UNKNOWN;
-			}
-		}
+                return CORESIP_Priority.CORESIP_PR_UNKNOWN;
+            }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public CORESIP_Priority EfectivePriority
-		{
-			get 
-			{
-				if ((_SipCall != null) && _SipCall.IsActive)
-				{
-					return (_Conference != null ? _Conference.Priority : _SipCall.Priority);
-				}
+        {
+            get
+            {
+                if ((_SipCall != null) && _SipCall.IsActive)
+                {
+                    return (_Conference != null ? _Conference.Priority : _SipCall.Priority);
+                }
 
-				return CORESIP_Priority.CORESIP_PR_UNKNOWN; 
-			}
-		}
+                return CORESIP_Priority.CORESIP_PR_UNKNOWN;
+            }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public TlfConference Conference
-		{
-			get { return _Conference; }
-		}
+        {
+            get { return _Conference; }
+        }
 
         /// <summary>
         /// 
         /// </summary>
 		public string Uri
-		{
-			get
-			{
-				if (_Channels.Count > 0)
-				{
-					return _Channels[0].Uri;
-				}
+        {
+            get
+            {
+                if (_Channels.Count > 0)
+                {
+                    return _Channels[0].Uri;
+                }
 
-				return null;
-			}
-		}
+                return null;
+            }
+        }
         public string UriPropia
         {
             get
@@ -341,7 +488,7 @@ namespace HMI.CD40.Module.BusinessEntities
             get
             {
                 if (_Channels.Count > 0)
-                {                    
+                {
                     return _Channels[0].RemoteDestinations[0].Ids;
                 }
 
@@ -349,7 +496,7 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             set //Only for unit testing
             {
-            } 
+            }
         }
         /// <summary>
         /// Devuelve los numeros de abonado del primer canal 
@@ -374,9 +521,9 @@ namespace HMI.CD40.Module.BusinessEntities
         /// 
         /// </summary>
 		public bool IsTop
-		{
-			get { return (_Channels.Count > 0) && (_Channels[0].Prefix == Cd40Cfg.INT_DST); }
-		}
+        {
+            get { return (_Channels.Count > 0) && (_Channels[0].Prefix == Cd40Cfg.INT_DST); }
+        }
 
         public bool IsPP
         {
@@ -386,13 +533,24 @@ namespace HMI.CD40.Module.BusinessEntities
         public bool IsAtsIP
         {
             get
-            {  
-                return (_Channels.Count > 0) && (_Channels[0].Prefix == Cd40Cfg.ATS_DST) && 
-                       (_Channels[0].ListLines.Count > 0) && (_Channels[0].ListLines[0].centralIP) ;
+            {
+                return (_Channels.Count > 0) && (_Channels[0].Prefix == Cd40Cfg.ATS_DST) &&
+                       (_Channels[0].ListLines.Count > 0) && (_Channels[0].ListLines[0].centralIP);
             }
         }
 
-        public bool ChAllowsForward
+        // lalm 230719
+        // obtiene el prefijo de correspondiente.
+        public string Prefix
+        { 
+            get
+            {
+                if ((_Channels.Count > 0) && (_Channels[0].ListLines.Count > 0) /*&& (_Channels[0].ListLines[0].centralIP)*/)
+                    return _Channels[0].Prefix.ToString("D2");
+                else return "00";
+            }
+        }
+public bool ChAllowsForward
         {
             get { return IsPP || IsTop || IsAtsIP; }
         }
@@ -437,6 +595,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
         public List<string> Participantes_ca { get => _participantes_ca; set => _participantes_ca = value; }
         public List<string> Participantes_conf { get => _participantes_conf; set => _participantes_conf = value; }
+
         public bool IsConfPreprogramada = false;
         public bool InOperation()
         {
@@ -483,6 +642,7 @@ namespace HMI.CD40.Module.BusinessEntities
             Participantes_ca = new List<string>();//230516
             Participantes_conf = new List<string>();//230530
             IsConfPreprogramada= cp;
+           
         }
 
         #region IDisposable Members
@@ -502,6 +662,8 @@ namespace HMI.CD40.Module.BusinessEntities
             _Conference.Dispose();
             if (_SipCall != null)
                 _SipCall = null;
+            
+
         }
 
 		#endregion
@@ -948,12 +1110,12 @@ namespace HMI.CD40.Module.BusinessEntities
             _SipCall.Update(sipCallId, channel.AccId, channel.RemoteDestinations[0].Ids[0], channel, path.Remote, path.Line);
 
             _Logger.Info("PickUp call to: {0} {1:X}", dialog.remoteId, sipCallId);
-            if (sipCallId != -1)
+            if (sipCallId > 0)
             {
                 _State = TlfState.Out;
                 _CallTout.Enabled = true;
             }
-            return (sipCallId != -1);
+            return (sipCallId > 0);
         }
         /// <summary>
         /// 
@@ -1833,53 +1995,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 salvado.cont = 1;
             lsalvado.Add(salvado);
         }
-        public tsalvado GetParamLastCall(int sipCallId)
-        {
-            tsalvado salvado = new tsalvado();
-            foreach (tsalvado s in lsalvado)
-            {
-                if (s.sipCallId == sipCallId)
-                    return s;
-            }
-            return salvado;
-        }
 
-/// <summary>
-/// 
-/// </summary>
-/// LALM 211006
-///#2629 Presentar via utilizada en llamada saliente.
-/// <param name="ch"></param>
-/// <param name="path"></param>
-/// <param name="prio"></param>
-/// <param name="remoteId"></param>
-/// <returns></returns>
-/// 220929 Se hace en trycall
-//private static string getdstParams(SipChannel ch, SipPath path, int prio, string remoteId)
-//        {
-//            string dstParams = "";
-//            if (!path.Line.centralIP)
-//            {
-//                //Estos parametros son internos, sirven para dar información a la pasarela
-//                //En encaminamiento IP no se deben usar
-//                if (!string.IsNullOrEmpty(path.Remote.SubId))
-//                {
-//                    dstParams += string.Format(";isub={0}", path.Remote.SubId);
-//                }
-//                if ((ch.Prefix != Cd40Cfg.INT_DST) && (ch.Prefix != Cd40Cfg.IP_DST) && (ch.Prefix != Cd40Cfg.UNKNOWN_DST) &&
-//                        ((ch.Prefix != Cd40Cfg.PP_DST) || (string.Compare(remoteId, path.Line.Id, true /*ignoreCase*/) != 0)))
-//                {
-//                    dstParams += string.Format(";cd40rs={0}", path.Line.Id);
-                  
-//                }
-//                if (ch.Prefix == Cd40Cfg.ATS_DST)
-//                {
-//                    dstParams += string.Format(";cd40prio={0}", prio);
-//                }
-//            }
-
-//            return dstParams;
-//        }
 
         public ArrayList GetUris()
         {

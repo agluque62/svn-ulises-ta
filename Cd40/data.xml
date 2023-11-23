@@ -396,4 +396,8 @@
 		<English>The frequency of the equipment cannot be tuned. Unknown error.</English>
 		<French>La fréquence de l'équipement ne peut pas être syntonisée. Erreur inconnue.</French>
 	</log>
+	<log id="No se puede cambiar de frecuencia porque algun equipo no soporta telemando.">
+		<English>The frequency cannot be changed. Telecontrol is not supported by any device.</English>
+		<French>Il n'est pas possible de changer la fréquence car certains équipements ne disposent pas de télécommande.</French>
+	</log>
 </AppData>

@@ -416,7 +416,7 @@ namespace U5ki.RdService
 
                 _Callflags = (uint) flags;
                 _SipCallId = SipAgent.MakeRdCall(null, _LastUri, _Frecuency, _IdDestino, flags, Settings.Default.McastIp, _McastPort,
-                    _FreqParams.Priority, new_params.zona, _FreqParams.FrequencyType,
+                    _FreqParams.Priority, new_params.zona, _FreqParams.FrequencyType, _FreqParams.ModoTransmision,
                     _FreqParams.CLDCalculateMethod, _FreqParams.BssWindows, _FreqParams.AudioSync,
                     _FreqParams.AudioInBssWindow, _FreqParams.Cld_supervision_time, 
                     ((BssMethods)_FreqParams.MetodosBssOfrecidos).ToString(),
@@ -541,6 +541,7 @@ namespace U5ki.RdService
 				{
 					_SipCallSt = stateInfo.State;
 					_PttId = stateInfo.PttId;
+                    _Remote_grs_supports_ED137C_Selcal = stateInfo.remote_grs_supports_ED137C_Selcal;
 
                     if (isRx)
 					{
@@ -756,7 +757,14 @@ namespace U5ki.RdService
             set { _TunedFrequencyOK = value; }
         }
 
-        public string Last_tuned_freq_log = "";        
+        public string Last_tuned_freq_log = "";
+
+        //es true si la sesion con el grs remoto soporta selcal de ED137C
+        private bool _Remote_grs_supports_ED137C_Selcal = false;
+        public bool Remote_grs_supports_ED137C_Selcal
+        {
+            get { return _Remote_grs_supports_ED137C_Selcal; }
+        }
 
         /// <summary>
         /// Indica si el recurso se ha asignado por una conmutación M+N
@@ -871,6 +879,7 @@ namespace U5ki.RdService
             _PttId = 0;
             _Ptt = RdRsPttType.NoPtt;
             _Squelch = false;
+            _Remote_grs_supports_ED137C_Selcal = false;
             this.new_params.rx_selected = false;
 		}
 

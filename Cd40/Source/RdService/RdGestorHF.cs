@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Timers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
+using System.Text.RegularExpressions;
 
 
 using NLog;
@@ -15,6 +17,8 @@ using Utilities;
 using U5ki.Infrastructure;
 
 using Translate;
+using System.IO;
+using System.Security.Policy;
 
 namespace U5ki.RdService
 {
@@ -391,7 +395,11 @@ namespace U5ki.RdService
                     SnmpPort == otro.SnmpPort);
 
                 // Comparo los rangos...
-                Frecs.ForEach(r1 => retorno = retorno && (otro.Frecs.Where(r2 => r1.fmax == r2.fmax && r1.fmin == r2.fmin).FirstOrDefault() != null));
+                if (Frecs.Count != otro.Frecs.Count) retorno = false;
+                else if (Frecs.Count > 0)
+                {
+                    Frecs.ForEach(r1 => retorno = retorno && (otro.Frecs.Where(r2 => r1.fmax == r2.fmax && r1.fmin == r2.fmin).FirstOrDefault() != null));
+                }
                 return retorno;
             }
 
@@ -423,6 +431,14 @@ namespace U5ki.RdService
             /// <returns></returns>
             public void Sintoniza(int frec)
             {
+                if (U5ki.RdService.Properties.Settings.Default.HF_SimulateEquipmentTelecontrol_OK)
+                {
+                    //Se simula que el equipo HF esta sintonizado bien. Esto sirve para depuracion con una radio que 
+                    //no soporta telemando, como por ejemplo un simulador
+                    Frecuencia = frec;
+                    return;
+                }
+
                 try
                 {
                     if (Properties.Settings.Default.HFSnmpSimula == false)
@@ -462,7 +478,17 @@ namespace U5ki.RdService
             {
                 try
                 {
-                    StdRem = HFSnmpHelper.GetInt(IpRcs, _snmpRComm, Oid + OID_ESTADO, _snmpTimeout, SnmpPort, Lextm.SharpSnmpLib.VersionCode.V2);
+                    if (U5ki.RdService.Properties.Settings.Default.HF_SimulateEquipmentTelecontrol_OK)
+                    {
+                        //Se simula que el estado del equipo HF es OK. Esto sirve para depuracion con una radio que 
+                        //no soporta telemando, como por ejemplo un simulador
+                        StdRem = 1;
+                    }
+                    else
+                    {
+                        StdRem = HFSnmpHelper.GetInt(IpRcs, _snmpRComm, Oid + OID_ESTADO, _snmpTimeout, SnmpPort, Lextm.SharpSnmpLib.VersionCode.V2);
+                    }
+
                     AutomataEstado();
                     // 201710. AGL. Esto parece un control para 'sesiones zombies'. Investigar...
                     if (Estado == EquipoHFStd.stdAsignado && _frAsignada != null && !_frAsignada.FindHost(this.Usuario))
@@ -774,6 +800,14 @@ namespace U5ki.RdService
             /// <returns></returns>
             public bool PrepareSelcal(bool OnOff)
             {
+                if (U5ki.RdService.Properties.Settings.Default.HF_SimulateEquipmentTelecontrol_OK)
+                {
+                    //Se simula que el equipo HF ha ejecutado con exito el Prepare Selcal.
+                    //Esto sirve para depuracion con una radio que 
+                    //no soporta telemando, como por ejemplo un simulador
+                    return true;
+                }
+
                 try
                 {
                     //int NewMod = (int)eModoModulacion.mH3E;
@@ -1383,11 +1417,16 @@ namespace U5ki.RdService
         /// <param name="fr"></param>
         /// <param name="OnOff"></param>
         /// <returns></returns>
-        public bool PrepareSelcal(RdFrecuency fr, string usuario, bool OnOff, string msg="")
+        public bool PrepareSelcal(RdFrecuency fr, string usuario, bool OnOff, ref string error_returned, string msg="")
         {
-            /** Mirar que es una frecuencia HF */
+            /** Mirar que es una frecuencia HF */            
+            error_returned = "Error";
+
             if (fr.TipoDeFrecuencia != "HF")
+            {
+                error_returned = "Error";
                 return false;
+            }
 #if __VERSION_0__
             lock (_equipos)
             {
@@ -1432,8 +1471,51 @@ namespace U5ki.RdService
                 {
                     equipo.acquire();
                     equipo.IsBeingAssigned = true;
+                    IRdResource resource_of_equipo = null;
+                    bool Remote_grs_supports_ED137C_Selcal = false;
 
-                    retorno = equipo.PrepareSelcal(OnOff);
+                    foreach (IRdResource rs in fr.RdRs.Values)
+                    {
+                        if (rs.ID == equipo.IdEquipo)
+                        {
+                            Remote_grs_supports_ED137C_Selcal = rs.Remote_grs_supports_ED137C_Selcal;
+                            resource_of_equipo = rs;
+                            break;
+                        }
+                    }
+
+                    if (Remote_grs_supports_ED137C_Selcal && resource_of_equipo != null)
+                    {
+                        //Si el grs soporta ED137C selcal entonces se envia el INFO del tipo ED137C
+                        if (resource_of_equipo.Ptt != RdRsPttType.NoPtt)
+                        {
+                            //Con un ptt activo en el equipo, no se puede enviar selcal.
+                            HFHelper.Log(LogLevel.Info, "Peticion de Asignacion de Equipo HF ED137C denegada. Equipo con Ptt activo", equipo.IdEquipo, fr.FrecuenciaSintonizada.ToString(), usuario);
+                            error_returned = "ED137C_SELCAL_ERROR";
+                            retorno = false;
+                        }
+                        else
+                        {
+                            HFHelper.Log(LogLevel.Info, "Peticion de Asignacion de Equipo HF ED137C", equipo.IdEquipo, fr.FrecuenciaSintonizada.ToString(), usuario);
+                            string code = msg;
+                            int ret = SipAgent.Send_ED137C_SELCAL(resource_of_equipo.SipCallId, code);
+                            if (ret == 0)
+                            {
+                                error_returned = "ED137C_SELCAL_OK";
+                                retorno = true;
+                            }
+                            else
+                            {
+                                error_returned = "ED137C_SELCAL_ERROR";
+                                retorno = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        retorno = equipo.PrepareSelcal(OnOff);
+                        error_returned = retorno? msg: "Error";
+                    }
                 }
                 catch (Exception x)
                 {
@@ -1777,7 +1859,24 @@ namespace U5ki.RdService
                 lock (_equipos)
                 {
                     // Encuentro el equipo
-                    EquipoHF equipo = _equipos.Where(eq => eq.SipUri == from).FirstOrDefault();
+                    //De la uri nos quedamos solo con sip:user@host, le quitamos el puerto el resto
+                    string pattern_with_port = @"(sip:[^:\>,;]+)";
+                    Match match_from = Regex.Match(from, pattern_with_port, RegexOptions.IgnoreCase);
+
+                    EquipoHF equipo = null;
+                    foreach(EquipoHF eq in _equipos)
+                    {                        
+                        Match match_eq_sipuri = Regex.Match(eq.SipUri, pattern_with_port, RegexOptions.IgnoreCase);
+                        if (match_eq_sipuri.Success && match_from.Success)
+                        {
+                            if (match_from.Value.ToLower() == match_eq_sipuri.Value.ToLower())
+                            {
+                                equipo = eq;
+                                break;
+                            }
+                        }
+                    }
+
                     if (equipo != null)
                     {
                         Task.Factory.StartNew(() =>
@@ -1803,10 +1902,26 @@ namespace U5ki.RdService
                                 finally
                                 {
                                     equipo.IsBeingSipSupervised = false;
-                                    equipo.ConsecutiveOptionsRequestCounter = 0;
                                     equipo.release();
                                 }
                             }
+
+                            try
+                            {
+                                //Si he recibido la respuesta al options, el contador ConsecutiveOptionsRequestCounter
+                                //se resetea en cualquier caso
+                                equipo.acquire();
+                                equipo.ConsecutiveOptionsRequestCounter = 0;
+                            }
+                            catch (Exception x)
+                            {
+                                HFHelper.Log(LogLevel.Error, x.Message, equipo.IdEquipo, equipo.IDFrecuencia, equipo.Usuario);
+                            }
+                            finally
+                            {
+                                equipo.release();
+                            }
+
                         });
                     }
                 }

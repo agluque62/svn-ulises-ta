@@ -661,11 +661,40 @@ namespace U5ki.Infrastructure
             bool masterInfo;
             String otherPublished;
             String myId = Id.Split('#')[2];
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv            
+            if (msg.Topic == "Cd40RdSrv") _Logger.Info("DEBUGMSTRSLV: Entra EvaluaEstadoMaster topic {0}", msg.Topic);
+#endif
+#endregion
+
             if (!_MasterTopicInfo.TryGetValue(msg.Topic, out masterInfo))
+            {
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                if (msg.Topic == "Cd40RdSrv") _Logger.Info("DEBUGMSTRSLV: sale sin masterinfo EvaluaEstadoMaster topic {0} ", msg.Topic);
+#endif
+#endregion
                 return;
+            }
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+            if (_OtherPublishedMaster.TryGetValue(msg.Topic, out otherPublished))
+                if (msg.Topic == "Cd40RdSrv") _Logger.Info($"DEBUGMSTRSLV: EvaluaEstadoMaster a _OtherPublishedMaster[{msg.Topic}] = {_OtherPublishedMaster[msg.Topic]}");
+#endif
+#endregion
+
             switch (msg.Change)
             {
                 case MembershipChange.Leave:
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                    if (msg.Topic == "Cd40RdSrv") _Logger.Info($"DEBUGMSTRSLV: EvaluaEstadoMaster Leave msg.MemberChanged {msg.MemberChanged} topic {msg.Topic}");
+#endif
+#endregion
+
                     if (_OtherPublishedMaster.TryGetValue(msg.Topic, out otherPublished))
                     {
                         String[] subStrings = msg.MemberChanged.Split('#');
@@ -673,11 +702,22 @@ namespace U5ki.Infrastructure
                         {
                             _OtherPublishedMaster[msg.Topic] = NO_OTHER_MASTER_PUB;
                             _Logger.Trace("-- Master Left!! topic {0}", msg.Topic);
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                            if (msg.Topic == "Cd40RdSrv") _Logger.Info("DEBUGMSTRSLV: EvaluaEstadoMaster 1 -- Master Left!! topic {0}", msg.Topic);
+#endif
+#endregion
                         }
                     }
                     break;
                 case MembershipChange.Join:
-                    //Publico si soy master, para que el nuevo miembro lo sepa
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                    if (msg.Topic == "Cd40RdSrv") _Logger.Info($"DEBUGMSTRSLV: EvaluaEstadoMaster Join msg.MemberChanged {msg.MemberChanged} masterInfo {masterInfo} otherPublished {otherPublished} topic {msg.Topic}");
+#endif
+#endregion
+
                     if (_OtherPublishedMaster.TryGetValue(msg.Topic, out otherPublished))
                     {
                         if (masterInfo == true)
@@ -686,6 +726,7 @@ namespace U5ki.Infrastructure
                             if ((otherPublished == NO_OTHER_MASTER_PUB) ||
                             ((otherPublished != NO_OTHER_MASTER_PUB) && (msg.FirstForMaster == true)))
                             {
+                                //Publico si soy master, para que el nuevo miembro lo sepa
                                 PublishMaster(myId, msg.Topic);
                                 _OtherPublishedMaster[msg.Topic] = NO_OTHER_MASTER_PUB;
                             }
@@ -693,16 +734,29 @@ namespace U5ki.Infrastructure
                     }
                     break;
                 default:
-                    //do nothing
                     break;
             }
 
             if (_OtherPublishedMaster.TryGetValue(msg.Topic, out otherPublished))
             {
-                if ((otherPublished == NO_OTHER_MASTER_PUB) && (masterInfo == false) && (msg.FirstForMaster == true))
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                if (msg.Topic == "Cd40RdSrv") _Logger.Info($"DEBUGMSTRSLV: EvaluaEstadoMaster 1.1 msg.Topic {msg.Topic} otherPublished {otherPublished} masterInfo {masterInfo} msg.FirstForMaster {msg.FirstForMaster} ");
+#endif
+#endregion
+
+                if (/*(otherPublished == NO_OTHER_MASTER_PUB) &&*/ (masterInfo == false) && (msg.FirstForMaster == true))
                 {
+                    _OtherPublishedMaster[msg.Topic] = NO_OTHER_MASTER_PUB;
                     _MasterTopicInfo[msg.Topic] = msg.FirstForMaster;
                     _Logger.Trace("-- I become Master !! topic {0}", msg.Topic);
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                    if (msg.Topic == "Cd40RdSrv") _Logger.Info("DEBUGMSTRSLV: EvaluaEstadoMaster 2 -- I become Master !! topic {0}", msg.Topic);
+#endif
+#endregion
                     PublishMaster(myId, msg.Topic);
                     General.SafeLaunchEvent(MasterStatusChanged, msg.Topic, true);
                 }
@@ -711,10 +765,33 @@ namespace U5ki.Infrastructure
                     //Conflicto entre dos master: se resuelve con el primero de la lista de precedencia que llega en msg
                     _MasterTopicInfo[msg.Topic] = false;
                     _Logger.Trace("-- I become Slave !! topic {0}", msg.Topic);
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                    if (msg.Topic == "Cd40RdSrv") _Logger.Info("DEBUGMSTRSLV: EvaluaEstadoMaster 3 -- I become Slave !! topic {0}", msg.Topic);
+#endif
+#endregion
+
                     General.SafeLaunchEvent(MasterStatusChanged, msg.Topic, msg.FirstForMaster);
+                }
+                else
+                {
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                    if (msg.Topic == "Cd40RdSrv") _Logger.Info("DEBUGMSTRSLV: EvaluaEstadoMaster 4 -- Nose hace nada topic {0}", msg.Topic);
+#endif
+#endregion
                 }
                 // En cualquier otro caso no cambio de estado
             }
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+            if (_OtherPublishedMaster.TryGetValue(msg.Topic, out otherPublished))
+                if (msg.Topic == "Cd40RdSrv") _Logger.Info($"DEBUGMSTRSLV: EvaluaEstadoMaster b  _OtherPublishedMaster[{msg.Topic}] = {_OtherPublishedMaster[msg.Topic]}");
+            if (msg.Topic == "Cd40RdSrv") _Logger.Info("DEBUGMSTRSLV: sale EvaluaEstadoMaster topic {0} ", msg.Topic);
+#endif
+#endregion
 
         }
 
@@ -837,31 +914,52 @@ namespace U5ki.Infrastructure
         /// <param name="msg"></param>
         private void ProcessMasterMsg(SpreadDataMsg msg)
         {
-            _Logger.Trace("--ProcessMasterMsg from {0}", msg.From);
+            _Logger.Trace("--ProcessMasterMsg from {0}", msg.From);            
             MemoryStream ms = new MemoryStream(msg.Data, 0, msg.Length);
             SrvMaster masterMsg = Serializer.Deserialize<SrvMaster>(ms);
             String[] subStrings = msg.From.Split('#');
             _OtherPublishedMaster[subStrings[1]] = masterMsg.HostId;
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+            if (subStrings[1] == "Cd40RdSrv") _Logger.Info($"DEBUGMSTRSLV: --ProcessMasterMsg from {msg.From} _MasterTopicInfo[{subStrings[1]}] {_MasterTopicInfo[subStrings[1]]} msg.FirstForMaster {msg.FirstForMaster}");
+#endif
+#endregion
+
             if ((_MasterTopicInfo[subStrings[1]] == true) && (msg.FirstForMaster == false))
             {
                 //Conflicto entre dos master: se resuelve con la prioridad que llega en msg firstForMaster
                 _MasterTopicInfo[subStrings[1]] = false;
                 _Logger.Trace("--ProcessMasterMsg: I become Slave !! topic {0}", subStrings[1]);
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                if (subStrings[1] == "Cd40RdSrv") _Logger.Info("DEBUGMSTRSLV: --ProcessMasterMsg: I become Slave !! topic {0}", subStrings[1]);
+#endif
+#endregion
+
                 General.SafeLaunchEvent(MasterStatusChanged, subStrings[1], msg.FirstForMaster);
             }
             else if ((_MasterTopicInfo[subStrings[1]] == true) && (msg.FirstForMaster == true))
             {
                 _Logger.Trace("--ProcessMasterMsg: refresco master !! topic {0}", subStrings[1]);
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                if (subStrings[1] == "Cd40RdSrv") _Logger.Info("DEBUGMSTRSLV: --ProcessMasterMsg: refresco master !! topic {0}", subStrings[1]);
+#endif
+#endregion
+
                 General.SafeLaunchEvent(MasterStatusChanged, subStrings[1], msg.FirstForMaster);
 
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="msg"></param>
-		private void ProcessTopicChangesMsg(SpreadDataMsg msg)
+        private void ProcessTopicChangesMsg(SpreadDataMsg msg)
 		{
 			if (ResourceChanged != null)
 			{

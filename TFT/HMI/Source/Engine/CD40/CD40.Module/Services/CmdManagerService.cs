@@ -321,6 +321,7 @@ namespace HMI.CD40.Module.Services
 #if _HF_GLOBAL_STATUS_
                     Top.Rd.HFGlobalStatus += OnHfGlobalStatus;
 #endif
+                    Top.Rd.SendSnmpTrapString += OnSendSnmpTrapString;
                 }
                 if (Top.Hw != null) Top.Hw.SetSnmpInt += OnSetSnmpInt;
                 if (Top.Recorder != null) Top.Recorder.SetSnmpString += OnSetSnmpString;
@@ -2008,7 +2009,7 @@ namespace HMI.CD40.Module.Services
                     //FrChangeMsg<string> mes = new FrChangeMsg<string>(mensaje);
                     //General.SafeLaunchEvent(FrChangedResultEngine, this, mes);
 
-                    //230606 cambio el tipo de mensahepara que salga
+                    //230606 cambio el tipo de mensaj para que salga
                     string mensaje = literal;
                     NotifMsg msg1 = new NotifMsg(Resources.ActivityError, Resources.DeviceError, mensaje, 30000, MessageType.Error, MessageButtons.Ok);
                     General.SafeLaunchEvent(ShowNotifMsgEngine, this, msg1);
@@ -2585,7 +2586,7 @@ namespace HMI.CD40.Module.Services
         {
             bool retorno = true;
 
-
+ 
             string ExcelPath = Settings.Default.Path_Dependencias;//"c:\\PlanNumeracionEUROCONTROL.xls";
             string ExcelPage = "[Plan Numeracion$]";
             string connectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + ExcelPath + ";Extended Properties=\"Excel 8.0;HDR=Yes;IMEX=1\";";
@@ -2669,22 +2670,6 @@ namespace HMI.CD40.Module.Services
             //TODO
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="numberBook"></param>
-        /// <returns></returns>
-        private bool LoadParticipantesConferencia(Dictionary<string, string> numberBook)
-        {
-            // TODO 230510
-            return false;
-        }
-
-        //public List<string> GetListaSalasActiva()
-        //{
-        //    return Top.Cfg.confstatus?.Where(i => i.RoomName.Length > 0 && i.ActiveParticipants.Count > 0)?.
-        //        Select(i => i.RoomName).ToList();
-        //}
 
         public List<string> GetListaParticipantesEstado(string sala)
         {
@@ -2739,8 +2724,21 @@ namespace HMI.CD40.Module.Services
             // pretende mostrar teclas de ad
             Top.Tlf.EndTlfAll();
         }
+#if SELECCION_SONIDO_AD
+        public void SeleccionSonido()
+        {
+            
+            Top.Tlf.EndTlfAll();//por poner algo 230627
+        }
+#endif
+        public void SetToneporllamadaEngine(string llamada, string tono, string tonoprio)
+        {
+            //poner punto de parada
+            Top.Tlf.TonosPorLlamada[llamada] = new string[] { tono, tonoprio };
+        }
+
         /**
         * Fin de Modificacion */
-        #endregion
+#endregion
     }
 }

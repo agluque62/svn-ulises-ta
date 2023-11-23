@@ -44,7 +44,7 @@ namespace HMI.Presentation.Twr.Views
 		private void InitializeComponent()
 		{
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TableLayoutPanel _RadioTLP;
+            //System.Windows.Forms.TableLayoutPanel _RadioTLP;
             System.Windows.Forms.Panel _RadioHeadP;
             this._RtxBT = new HMI.Model.Module.UI.HMIButton();
             this._PlayBT = new HMI.Presentation.Twr.UI.ControlRecord();
@@ -58,7 +58,7 @@ namespace HMI.Presentation.Twr.Views
             this._PttBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._SquelchBlinkTimer = new System.Windows.Forms.Timer(this.components);
             this._RtxBlinkTimer = new System.Windows.Forms.Timer(this.components);
-            _RadioTLP = new System.Windows.Forms.TableLayoutPanel();
+            this._RadioTLP = new System.Windows.Forms.TableLayoutPanel();
             _RadioHeadP = new System.Windows.Forms.Panel();
             _RadioTLP.SuspendLayout();
             _RadioHeadP.SuspendLayout();
@@ -102,6 +102,7 @@ namespace HMI.Presentation.Twr.Views
             this._RtxBT.DrawX = false;
             this._RtxBT.Enabled = false;
             this._RtxBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._RtxBT.IsConferencePreprogramada = false;
             this._RtxBT.Location = new System.Drawing.Point(238, 3);
             this._RtxBT.Name = "_RtxBT";
             this._RtxBT.Permitted = true;
@@ -121,8 +122,9 @@ namespace HMI.Presentation.Twr.Views
             this._PlayBT.FileGrabado = false;
             this._PlayBT.Jacks = false;
             this._PlayBT.Location = new System.Drawing.Point(295, 3);
+            this._PlayBT.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this._PlayBT.Name = "_PlayBT";
-            this._PlayBT.Size = new System.Drawing.Size(40, 54);
+            this._PlayBT.Size = new System.Drawing.Size(59, 84);
             this._PlayBT.TabIndex = 5;
             this._PlayBT.TiempoMax = 0;
             this._PlayBT.LevelUp += new System.EventHandler(this._PlayBTStopAudio);
@@ -135,6 +137,7 @@ namespace HMI.Presentation.Twr.Views
             this._PttBT.DrawX = false;
             this._PttBT.Enabled = false;
             this._PttBT.Font = new System.Drawing.Font("Arial Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._PttBT.IsConferencePreprogramada = false;
             this._PttBT.Location = new System.Drawing.Point(185, 3);
             this._PttBT.Name = "_PttBT";
             this._PttBT.Permitted = true;
@@ -167,6 +170,7 @@ namespace HMI.Presentation.Twr.Views
             | System.Windows.Forms.AnchorStyles.Left)));
             this._SiteManagerBT.DrawX = false;
             this._SiteManagerBT.Font = new System.Drawing.Font("Arial Black", 10F, System.Drawing.FontStyle.Bold);
+            this._SiteManagerBT.IsConferencePreprogramada = false;
             this._SiteManagerBT.Location = new System.Drawing.Point(357, 3);
             this._SiteManagerBT.Name = "_SiteManagerBT";
             this._SiteManagerBT.Permitted = true;
@@ -276,7 +280,8 @@ namespace HMI.Presentation.Twr.Views
 #endregion
 
 		private System.Windows.Forms.TableLayoutPanel _RdButtonsTLP;
-		private HMI.Model.Module.UI.HMIButton _RtxBT;
+		private System.Windows.Forms.TableLayoutPanel _RadioTLP;
+        private HMI.Model.Module.UI.HMIButton _RtxBT;
         private HMI.Presentation.Twr.UI.ControlRecord _PlayBT;
 		private HMI.Model.Module.UI.HMIButton _PttBT;
 		private HMI.Presentation.Twr.UI.RdPageButton _RdPageBT;

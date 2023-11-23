@@ -23,6 +23,7 @@ namespace HMI.Model.Module.UI
 		]
 		public new bool DrawX
 		{
+
 			get { return _DrawX; }
 			set 
 			{ 
@@ -47,6 +48,13 @@ namespace HMI.Model.Module.UI
 		public LcButton()
 		{
 			TextAlign = ContentAlignment.TopCenter;
+			if (VisualStyle.ModoNocturno)
+			{
+                VisualStyle.ButtonColor = VisualStyle.ButtonColorN;
+                //_TxBackColor = VisualStyle.ButtonColor;
+                //_RxBackColor = VisualStyle.ButtonColor;
+                VisualStyle.TextoTfColor = VisualStyle.TextoTfColorN;
+            }
 		}
 
 		//LALM 210618
@@ -116,14 +124,33 @@ namespace HMI.Model.Module.UI
 
 			if (_DrawX)
 			{
-				using (Pen p = new Pen(Color.Red, 5))
+				// LALM: 210129 Aspa configurable.
+				if (!VisualStyle.ModoNocturno)
 				{
-					e.Graphics.DrawLine(p, 6, 6, Width - 6, Height - 6);
-					e.Graphics.DrawLine(p, Width - 6, 6, 6, Height - 6);
-				}
-			}
+					using (Pen p = new Pen(Color.Red, 5))
+					{
+						e.Graphics.DrawLine(p, 6, 6, Width - 6, Height - 6);
+						e.Graphics.DrawLine(p, Width - 6, 6, 6, Height - 6);
+					}
+                    //BtnRenderer.DrawString(e.Graphics, ClientRectangle, _TxBackColor, BtnState, Text, Font, ContentAlignment.TopCenter, ForeColor);
+                }
+                else
+                {
+                    using (Pen p = new Pen(VisualStyle.AspaColor, 5))
+                    {
+                        e.Graphics.DrawLine(p, 6, 6, Width - 6, Height - 6);
+                        e.Graphics.DrawLine(p, Width - 6, 6, 6, Height - 6);
+                    }
+                    //BtnRenderer.DrawString(e.Graphics, ClientRectangle, _TxBackColor, BtnState, Text, Font, ContentAlignment.TopCenter, VisualStyle.TextoTfColor);
+                }
+            }
 
-            BtnRenderer.DrawString(e.Graphics, ClientRectangle, _TxBackColor, BtnState, Text, Font, ContentAlignment.TopCenter, ForeColor);
+			if (!VisualStyle.ModoNocturno)
+				BtnRenderer.DrawString(e.Graphics, ClientRectangle, _TxBackColor, BtnState, Text, Font, ContentAlignment.TopCenter, ForeColor);
+			else
+			{
+				BtnRenderer.DrawString(e.Graphics, ClientRectangle, _TxBackColor, BtnState, Text, Font, ContentAlignment.TopCenter, VisualStyle.TextoTfColor);
+			}
 		}
 	}
 }

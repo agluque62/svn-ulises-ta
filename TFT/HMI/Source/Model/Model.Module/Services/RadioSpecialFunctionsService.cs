@@ -1106,13 +1106,14 @@ namespace HMI.Model.Module.Services
                                             }
                                             else
                                             {
-                                                var txSelItems = stateManager.Radio.Destinations.Where(d => d.Tx == true).ToList().Count;
-                                                var inPttItems = stateManager.Radio.Destinations.Where(d => d.Tx == true && (
+                                                var txSelItems = stateManager.Radio.Destinations.Where(d => d.Tx == true && d.TipoFrecuencia!=TipoFrecuencia_t.HF).ToList().Count;
+                                                var inPttItems = stateManager.Radio.Destinations.Where(d => d.Tx == true && d.TipoFrecuencia != TipoFrecuencia_t.HF && (
                                                     d.Ptt == PttState.PttOnlyPort ||
                                                     d.Ptt == PttState.PttPortAndMod ||
                                                     d.Ptt == PttState.ExternPtt ||
-                                                    d.Ptt == PttState.Blocked ||
-                                                    d.Ptt == PttState.CarrierError)).ToList().Count;
+                                                    d.Ptt == PttState.Blocked || 
+                                                    d.Ptt == PttState.CarrierError 
+                                                    )).ToList().Count;
                                                 bool confirmados = txSelItems == inPttItems;
 
                                                 if (!confirmados && confirmados != lastTxStatus)

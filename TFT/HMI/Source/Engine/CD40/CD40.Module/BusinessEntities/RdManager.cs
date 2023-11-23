@@ -42,7 +42,7 @@ namespace HMI.CD40.Module.BusinessEntities
         public event GenericEventHandler<ChangeSiteRsp> SiteChangedResultMessage;
         public event GenericEventHandler<FrChangeRsp> FrChangedResultMessage;//lalm 230301
         public event GenericEventHandler<RdRxAudioVia> AudioViaNotAvailable;
-
+        public event GenericEventHandler<SnmpStringMsg<string, string>> SendSnmpTrapString;
 #if _HF_GLOBAL_STATUS_
         public event GenericEventHandler<HFStatusCodes> HFGlobalStatus;
 #endif
@@ -57,11 +57,12 @@ namespace HMI.CD40.Module.BusinessEntities
         /// </summary>
 		public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
         public event GenericEventHandler<SnmpIntMsg<string, int>> SetSnmpInt;
-
+        private List<int> alarmasfnd_enviadas = null;
+        private Timer timerfnd;
         /// <summary>
         /// 
         /// </summary>
-		public PttSource PttSource
+        public PttSource PttSource
         {
             get { return _PttSource; }
             private set
@@ -188,6 +189,16 @@ namespace HMI.CD40.Module.BusinessEntities
             _FrecuencyTimer.Elapsed += OnFrecuencyTimerElapsed;
             _PttTimer.AutoReset = false;
             _PttTimer.Elapsed += OnPttTimerElapsed;
+	
+			// Timer para supervision de frecuencias no desasignables en Rx.
+            timerfnd = new Timer(10000); // 5000 milisegundos (10 segundos), luego se pasar a 1 segundo.
+            timerfnd.Elapsed += SupervisorFrecuenciaNoDesasignable;
+            timerfnd.AutoReset = true;
+            timerfnd.Start();
+
+            Console.WriteLine("Presiona Enter para detener el proceso.");
+            Console.ReadLine();
+
         }
 
         static bool dentro_TimerNetworkStatus_Elapsed = false;
@@ -330,9 +341,18 @@ namespace HMI.CD40.Module.BusinessEntities
                     if ((Top.Tlf.Activity() && !Top.Tlf.PriorityCall && Top.Mixer.SplitMode == SplitMode.Off) ||
                         Top.Lc.HoldedTlf)
                     {
-                        _HoldedByPtt = true;
-                        General.SafeLaunchEvent(HoldTlfCall, this, new StateMsg<bool>(_HoldedByPtt));
-                        System.Threading.Thread.Sleep(50);
+                        bool pttsinretener = Settings.Default.PttSinRetener;
+                        _Logger.Debug("pttsinretener: {0}", pttsinretener);
+                        if (pttsinretener)
+                        {
+                            ;
+                        }
+                        else
+                        {
+                            _HoldedByPtt = true;
+                            General.SafeLaunchEvent(HoldTlfCall, this, new StateMsg<bool>(_HoldedByPtt));
+                            System.Threading.Thread.Sleep(50);
+                        }
                     }
 #else
 					if (Top.Tlf.Activity() && Top.Mixer.SplitMode == SplitMode.Off)
@@ -1026,7 +1046,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     //Solo puede haber una posicion con Tx seleccionado y con el PTT activado
                     uint prior = IsPttRtx ? (uint)CORESIP_PttType.CORESIP_PTT_COUPLING : rd.GetPttPriority();
-                    if (_PttSource == U5ki.Infrastructure.PttSource.Hmi)
+                    if (_PttSource == U5ki.Infrastructure.PttSource.Hmi || _PttSource == U5ki.Infrastructure.PttSource.SelCal)//230703 pongo tamnbien selcal
                     {
                         //_Logger.Trace("Starting recording PTT:{0} Frequency:{1} Device: {2}", rd.Ptt, rd.Literal, Top.Mixer.AlumnDev);
                         SipAgent.RdPttEvent(true, rd.DescDestino, Top.Mixer.AlumnDev, prior);
@@ -1273,10 +1293,10 @@ namespace HMI.CD40.Module.BusinessEntities
         }
         }
 #endif
-        /// <summary>
-        /// Envío de tonos SELCAL con mensaje INFO
-        /// </summary>
-        /// <param name="tones"></param>
+    /// <summary>
+    /// Envío de tonos SELCAL con mensaje INFO
+    /// </summary>
+    /// <param name="tones"></param>
         private void SendSelCalTonesMessagingInfo(string tones)
         {
             /** AGL. Poner como fuente SELCAL <Estaba Instructor> */
@@ -1478,8 +1498,79 @@ namespace HMI.CD40.Module.BusinessEntities
             return AnySquelchDetected;
         }
 
-#endregion
-	}
+        /// <summary>
+        /// EnviaAlarmafnd
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="nombre"></param>
+        private void EnviaAlarmafnd(string nombre)
+        {
+            Top.WorkingThread.Enqueue("SendSnmpTrap", delegate ()
+            {
+                string snmpString = $"Frecuencia {nombre} Desasignada en RX siendo NO desasignable {Top.Cfg.PositionId}";
+                string snmpOid = Settings.Default.RxDesasignadoOid;
+                //snmpOid = Settings.Default.TlfFacilityOid;// para pruebas descomentar esta linea TlfFacilityOid;
+                General.SafeLaunchEvent(SendSnmpTrapString, this, new SnmpStringMsg<string, string>(snmpOid, snmpString));
+            });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="nombre"></param>
+        /// <param name="activa"></param>
+        private void GenerarHistorico(int pos, string nombre, bool activa)
+        {
+            if (alarmasfnd_enviadas == null)
+            {
+                alarmasfnd_enviadas = new List<int>();
+                timerfnd.Interval = 1000; // 1000 milisegundos (1 segundo)
+            }
+
+            if (activa)
+            {
+                if (!alarmasfnd_enviadas.Contains(pos))
+                {
+                    EnviaAlarmafnd(nombre);
+                    alarmasfnd_enviadas.Add(pos);
+                }
+            }
+            else
+            {
+                if (alarmasfnd_enviadas.Contains(pos))
+                {
+                    alarmasfnd_enviadas.Remove(pos);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SupervisorFrecuenciaNoDesasignable(object sender, ElapsedEventArgs e)
+        {
+            Console.WriteLine("SupervisorFrecuenciaNoDesasignable se ejecutó. Hora: " + DateTime.Now);
+            int page = _Page;
+            var cfg = Top.Cfg;
+            var rdPositions = _RdPositions;
+
+            for (int i = page * (int)cfg.NumFrecByPage, to = ((page + 1) * (int)cfg.NumFrecByPage); i < to; i++)
+            {
+                var rdPosition = rdPositions[i];
+
+                if (rdPosition.FrecuenciaNoDesasignable)
+                {
+                    bool esRx = !rdPosition.Rx;
+                    GenerarHistorico(i, rdPosition.DescDestino, esRx);
+                }
+            }
+        }
+
+        #endregion
+    }
 #region PTT-FILTER
     /** */
     /** 20180509. Para Filtrar Eventos PTT Rapidos */

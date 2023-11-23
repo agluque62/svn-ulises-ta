@@ -42,50 +42,51 @@ namespace HMI.Presentation.Twr.Views
         /// </summary>
         private void InitializeComponent()
         {
-			  this.components = new System.ComponentModel.Container();
-			  this._LcButtonsTLP = new System.Windows.Forms.TableLayoutPanel();
-			  this._SlowBlinkTimer = new System.Windows.Forms.Timer(this.components);
-			  this.SuspendLayout();
-			  // 
-			  // _LcButtonsTLP
-			  // 
-			  this._LcButtonsTLP.ColumnCount = 9;
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-			  this._LcButtonsTLP.Dock = System.Windows.Forms.DockStyle.Fill;
-			  this._LcButtonsTLP.Font = new System.Drawing.Font("Trebuchet MS", 7.25F, System.Drawing.FontStyle.Bold);
-			  this._LcButtonsTLP.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
-			  this._LcButtonsTLP.Location = new System.Drawing.Point(0, 0);
-			  this._LcButtonsTLP.Margin = new System.Windows.Forms.Padding(0);
-			  this._LcButtonsTLP.Name = "_LcButtonsTLP";
-			  this._LcButtonsTLP.RowCount = 2;
-			  this._LcButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			  this._LcButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			  this._LcButtonsTLP.Size = new System.Drawing.Size(800, 175);
-			  this._LcButtonsTLP.TabIndex = 0;
-			  // 
-			  // _SlowBlinkTimer
-			  // 
-			  this._SlowBlinkTimer.Interval = 500;
-			  this._SlowBlinkTimer.Tick += new System.EventHandler(this._SlowBlinkTimer_Tick);
-			  // 
-			  // LcView
-			  // 
-			  this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-			  this.Controls.Add(this._LcButtonsTLP);
-			  this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			  this.Name = "LcView";
-			  this.Size = new System.Drawing.Size(800, 175);
-			  this.BackColorChanged += new System.EventHandler(this.LcView_BackColorChanged);
-			  this.ResumeLayout(false);
+            this.components = new System.ComponentModel.Container();
+            this._LcButtonsTLP = new System.Windows.Forms.TableLayoutPanel();
+            this._SlowBlinkTimer = new System.Windows.Forms.Timer(this.components);
+            this.SuspendLayout();
+            // 
+            // _LcButtonsTLP
+            // 
+            
+            this._LcButtonsTLP.ColumnCount = 9;
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this._LcButtonsTLP.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._LcButtonsTLP.Font = new System.Drawing.Font("Trebuchet MS", 7.25F, System.Drawing.FontStyle.Bold);
+            this._LcButtonsTLP.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
+            this._LcButtonsTLP.Location = new System.Drawing.Point(0, 0);
+            this._LcButtonsTLP.Margin = new System.Windows.Forms.Padding(0);
+            this._LcButtonsTLP.Name = "_LcButtonsTLP";
+            this._LcButtonsTLP.RowCount = 2;
+            this._LcButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this._LcButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this._LcButtonsTLP.Size = new System.Drawing.Size(800, 175);
+            this._LcButtonsTLP.TabIndex = 0;
+            // 
+            // _SlowBlinkTimer
+            // 
+            this._SlowBlinkTimer.Interval = 500;
+            this._SlowBlinkTimer.Tick += new System.EventHandler(this._SlowBlinkTimer_Tick);
+            // 
+            // LcView
+            // 
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
+            this.Controls.Add(this._LcButtonsTLP);
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Name = "LcView";
+            this.Size = new System.Drawing.Size(800, 175);
+            this.BackColorChanged += new System.EventHandler(this.LcView_BackColorChanged);
+            this.ResumeLayout(false);
 
         }
 

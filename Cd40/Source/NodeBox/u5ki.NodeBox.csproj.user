@@ -6,7 +6,7 @@
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
     <RemoteDebugMachine>DF1680:4026</RemoteDebugMachine>
     <StartAction>Project</StartAction>
-    <StartProgram>C:\EDUARDO\Debug\U5ki.NodeBox.exe</StartProgram>
+    <StartProgram>C:\Program Files %28x86%29\UlisesV5000\Ulises5000I-NodeBox\U5ki.NodeBox.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <StartArguments>-console</StartArguments>

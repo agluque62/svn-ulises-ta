@@ -22,25 +22,25 @@
 // Latest version of this Guidance Package: http://go.microsoft.com/fwlink/?LinkId=62182
 //----------------------------------------------------------------------------------------
 
-using System;
-using System.IO;
-using System.Windows.Forms;
 using HMI.Infrastructure.Library;
 using Microsoft.Practices.CompositeUI;
-using System.Threading;
+using System;
 using System.Globalization;
+using System.IO;
+using System.Threading;
+using System.Windows.Forms;
 
 
 
 namespace HMI.Infrastructure.Shell
 {
-	/// <summary>
-	/// Main application entry point class.
-	/// Note that the class derives from CAB supplied base class FormShellApplication, and the 
-	/// main form will be ShellForm, also created by default by this solution template
-	/// </summary>
-	class ShellApplication : SmartClientApplication<WorkItem, ShellForm>
-	{
+    /// <summary>
+    /// Main application entry point class.
+    /// Note that the class derives from CAB supplied base class FormShellApplication, and the 
+    /// main form will be ShellForm, also created by default by this solution template
+    /// </summary>
+    class ShellApplication : SmartClientApplication<WorkItem, ShellForm>
+    {
         // [STAThread]
         //static void Main()
         //{
@@ -82,7 +82,7 @@ namespace HMI.Infrastructure.Shell
                     CultureInfo.DefaultThreadCurrentUICulture = Thread.CurrentThread.CurrentCulture;
                 }
                 SetThreadPoolSize();
- #if (DEBUG)
+#if (DEBUG)
                 RunInDebugMode();
 #else
                 RunInReleaseMode();
@@ -90,9 +90,9 @@ namespace HMI.Infrastructure.Shell
                 RestoreThreadPoolSize();
             }
         }
-        
+
         private static void RunInDebugMode()
-		{
+        {
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(AppDomainUnhandledException);
             try
             {
@@ -103,37 +103,37 @@ namespace HMI.Infrastructure.Shell
             {
                 HandleException(ex);
             }
-		}
+        }
 
-		private static void RunInReleaseMode()
-		{
-			AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(AppDomainUnhandledException);
-			Application.SetCompatibleTextRenderingDefault(false);
-			try
-			{
-				new ShellApplication().Run();
-			}
-			catch (Exception ex)
-			{
-				HandleException(ex);
-			}
-		}
+        private static void RunInReleaseMode()
+        {
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(AppDomainUnhandledException);
+            Application.SetCompatibleTextRenderingDefault(false);
+            try
+            {
+                new ShellApplication().Run();
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
+        }
 
-		private static void AppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
-		{
-			HandleException(e.ExceptionObject as Exception);
-		}
+        private static void AppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            HandleException(e.ExceptionObject as Exception);
+        }
 
-		private static void HandleException(Exception ex)
-		{
-			if (ex == null)
-				return;
+        private static void HandleException(Exception ex)
+        {
+            if (ex == null)
+                return;
 
             string msg = String.Format("An unhandled exception occurred: <{0}>,\n and the application is terminating. For more information, see your Application event log.", ex.Message);
 
-			MessageBox.Show(msg);
-			Application.Exit();
-		}
+            MessageBox.Show(msg);
+            Application.Exit();
+        }
 
         /** 20180605. Modifica el tamaño del pool de thread para agilizar la creacion de los mismos */
         static int minWorker, minIOC;

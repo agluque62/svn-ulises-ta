@@ -106,7 +106,8 @@ namespace U5ki.Infrastructure
                 String msgInci = String.Format("{0},{1},{2}", (Int32)type, issueMessages[0].ToString().Replace(",", ";"), msgOrg);
                 for (int index = 1; index < issueMessages.Count(); index++)
                 {
-                    msgInci += ("," + issueMessages[index].ToString().Replace(",", ";"));
+                    if (issueMessages[index] != null)
+                        msgInci += ("," + issueMessages[index].ToString().Replace(",", ";"));
                 }
                 U5kiIncidencias.GeneraIncidencia(type, msgInci);
             }

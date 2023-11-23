@@ -551,7 +551,7 @@ namespace HMI.Model.Module.Services
 		{
 			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.TlfResStateEngine, msg);
 			//220914 parece que en cualquier cambio de estado esta fucion es llamada.
-			//_StateManager.Tlf.Reset(msg);
+			_StateManager.Tlf.Reset(msg);
 		}
 
 		[EventSubscription(EventTopicNames.LcSpeakerLevelEngine, ThreadOption.UserInterface)]
@@ -738,8 +738,9 @@ namespace HMI.Model.Module.Services
 		{
 			_Logger.Trace("Procesando {0}: {1}", EventTopicNames.AgendaChangedEngine, msg);
 
-			_StateManager.Agenda.Reset(msg);
-		}
+            _StateManager.Agenda.Reset(msg);
+
+        }
 
         [EventSubscription(EventTopicNames.NumberBookChangedEngine, ThreadOption.UserInterface)]
         public void OnNumberBookChangedEngine(object sender, RangeMsg<Area> msg)

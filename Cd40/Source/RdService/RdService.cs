@@ -2021,7 +2021,33 @@ namespace U5ki.RdService
 
                 foreach (RdFrecuency rdFr in Frecuencies.Values)
                 {
-                    rdFr.ReceivePtt(ask.HostId, ask.Src, sndRxPorts);
+                    bool rptt = true;
+                    if (ask.Src == PttSource.SelCal)
+                    {
+                        //Si el tipo del ptt es selcal, entonces solo lo enviamos si algun transmisor no soporta ED137C Selcal                        
+                        int transmiters_count = 0;
+                        int transmiters_support_ED137C_selcal = 0;
+                        foreach (IRdResource rs in rdFr.RdRs.Values)
+                        {
+                            if (rs.isTx)
+                            {
+                                transmiters_count++;
+                                if (rs.Remote_grs_supports_ED137C_Selcal == true)
+                                {
+                                    transmiters_support_ED137C_selcal++;
+                                }
+                                else break;
+                            }
+                        }
+                        if (transmiters_count == transmiters_support_ED137C_selcal)
+                        {
+                            rptt = false;
+                        }
+                    }
+                    if (rptt)
+                    {
+                        rdFr.ReceivePtt(ask.HostId, ask.Src, sndRxPorts);
+                    }
                 }
             }
         }
@@ -2072,8 +2098,9 @@ namespace U5ki.RdService
                     //}
                     Task.Factory.StartNew(() =>
                     {
-                        bool result = _gestorHF.PrepareSelcal(rdFr, msg.HostId, msg.OnOff, msg.Code);
-                        RdGestorHF.HFHelper.RespondToPrepareSelcal(from, rdFr.Frecuency, result, result ? msg.Code : "Error");
+                        string error_returned = "Error";
+                        bool result = _gestorHF.PrepareSelcal(rdFr, msg.HostId, msg.OnOff, ref error_returned, msg.Code);
+                        RdGestorHF.HFHelper.RespondToPrepareSelcal(from, rdFr.IdDestino, result, error_returned);
                     });
                     return;
                 }
@@ -2096,17 +2123,24 @@ namespace U5ki.RdService
                 {
                     if (rdFr.TipoDeFrecuencia == "HF" && rdFr.FindHost(tones.HostId))
                     {
-                        if (rdFr.PttSrc != string.Empty)
+                        //Las frecuencias HF son todas simples
+                        foreach (RdResource rs in rdFr.RdRs.Values)
                         {
-                            //Las frecuencias HF son todas simples
-                            foreach (RdResource rs in rdFr.RdRs.Values)
-                            {
-                                if (rs.Connected && (rs.Type == RdRsType.Tx || rs.Type == RdRsType.Tx))
+                            if (rs.Connected && (rs.Type == RdRsType.Tx || rs.Type == RdRsType.Tx))
+                            {                                   
+                                if (rdFr.PttSrc != string.Empty)
                                 {
-                                    LogInfo<RdService>(String.Format("SelcalSendTones {0}", tones.Code));
-                                    SipAgent.SendInfo(rs.SipCallId, tones.Code);
-                                    break;
+                                    if (rs.Remote_grs_supports_ED137C_Selcal)
+                                    {
+                                        LogError<RdService>(String.Format("Intentando enviar tonos Selcal a un GRS que soporta ED137C. Ya se envian con el mensaje PREPARE_SELCAL"));
+                                    }
+                                    else
+                                    {
+                                        LogInfo<RdService>(String.Format("SelcalSendTones {0}", tones.Code));
+                                        SipAgent.SendInfo(rs.SipCallId, tones.Code);
+                                    }
                                 }
+                                break;
                             }
                         }
                     }

@@ -41,7 +41,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;_VOTER_,CALLFORWARD,_TRACEAGENT_</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;_VOTER_,CALLFORWARD,_TRACEAGENT_,_DEBUGMSTRSLV_</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>

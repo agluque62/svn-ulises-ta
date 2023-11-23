@@ -455,8 +455,6 @@ namespace u5ki.ConferenceService
             {
                 LogTrace<ConferenceService>(String.Format("WebSocket Brekeke: Mensaje Recibido: {0}", e.Message));
 
-                LogInfo<ConferenceService>(String.Format("########### TRAZA: WebSocket Brekeke: Mensaje Recibido: {0}", e.Message));
-
                 if (e.Message.StartsWith("{"))
                 {
                     bkkMessage bkkmsg = JsonConvert.DeserializeObject<bkkMessage>(e.Message);
@@ -546,8 +544,6 @@ namespace u5ki.ConferenceService
 
             LogTrace<ConferenceService>(String.Format("ProcessNotifyStatus: other_number {0} user {1}", bkkmsg.@params.other_number, bkkmsg.@params.user));
 
-            LogInfo<ConferenceService>(String.Format("######## TRAZA: ProcessNotifyStatus: other_number {0} user {1}", bkkmsg.@params.other_number, bkkmsg.@params.user));
-
             //Busca el identificador de la sala de conferencia recibida en roomConferences
             try
             {
@@ -616,7 +612,6 @@ namespace u5ki.ConferenceService
                         {
                             roomConf.participants.Add(participant);
                             LogTrace<ConferenceService>(String.Format("ProcessNotifyStatus: Agrega a {0} room_id {1} user {2}", bkkmsg.@params.other_number, roomConf.room_id, bkkmsg.@params.user));
-                            LogInfo<ConferenceService>(String.Format("######### TRAZA: ProcessNotifyStatus: Agrega a {0} room_id {1} user {2}", bkkmsg.@params.other_number, roomConf.room_id, bkkmsg.@params.user));
                             conference_changed = true;
                         }
                     }
@@ -638,7 +633,6 @@ namespace u5ki.ConferenceService
                         {
                             roomConf.participants.Remove(participant);
                             LogTrace<ConferenceService>(String.Format("ProcessNotifyStatus: Quita de {0} room_id {1} user {2}", bkkmsg.@params.other_number, roomConf.room_id, bkkmsg.@params.user));
-                            LogInfo<ConferenceService>(String.Format("########## TRAZA: ProcessNotifyStatus: Quita de {0} room_id {1} user {2}", bkkmsg.@params.other_number, roomConf.room_id, bkkmsg.@params.user));
                             conference_changed = true;
                         }
                     }

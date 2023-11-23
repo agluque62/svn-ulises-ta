@@ -585,9 +585,13 @@ namespace HMI.Model.Module.UI
                 {
                     Rectangle txtRect = ClientRectangle;
                     txtRect.Offset(32, 2);
-                    BtnRenderer.DrawString(e.Graphics, txtRect, Color.Transparent, st, _QidxValue.ToString(), _MediumFontBold, ContentAlignment.TopCenter, Color.Black);
+                    //210129 Modo Nocturno LALM
+                    if (!VisualStyle.ModoNocturno)
+                        BtnRenderer.DrawString(e.Graphics, txtRect, Color.Transparent, st, _QidxValue.ToString(), _MediumFontBold, ContentAlignment.TopCenter, Color.Black);
+                    else
+                        BtnRenderer.DrawString(e.Graphics, txtRect, Color.Transparent, st, _QidxValue.ToString(), _MediumFontBold, ContentAlignment.TopCenter, Color.Magenta);
                 }
-			}
+            }
 
             BtnRenderer.Draw(e.Graphics, _TxBtnInfo[stBT1]);
             BtnRenderer.Draw(e.Graphics, _RxBtnInfo[stBT2]);
@@ -605,20 +609,42 @@ namespace HMI.Model.Module.UI
 			{
 				if (!Multifrecuencia)
 				{
-					using (Pen p = new Pen(Color.Red, 5))
+					if (!VisualStyle.ModoNocturno)
 					{
-						e.Graphics.DrawLine(p, 6, 6, Width - 6, Height - 6);
-						e.Graphics.DrawLine(p, Width - 6, 6, 6, Height - 6);
+						using (Pen p = new Pen(Color.Red, 5))
+						{
+							e.Graphics.DrawLine(p, 6, 6, Width - 6, Height - 6);
+							e.Graphics.DrawLine(p, Width - 6, 6, 6, Height - 6);
+						}
 					}
-				}
+					else
+					{
+                        using (Pen p = new Pen(VisualStyle.AspaColor, 5))
+                        {
+                            e.Graphics.DrawLine(p, 6, 6, Width - 6, Height - 6);
+                            e.Graphics.DrawLine(p, Width - 6, 6, 6, Height - 6);
+                        }
+                    }
+                }
 				if (Multifrecuencia)
 				{
-					using (Pen p = new Pen(Color.Red, 5))
+					if (!VisualStyle.ModoNocturno)
 					{
-						e.Graphics.DrawLine(p, 6, 6 + Height / 3, Width - 6, Height - 6);
-						e.Graphics.DrawLine(p, Width - 6, 6 + Height / 3, 6, Height - 6);
+						using (Pen p = new Pen(Color.Red, 5))
+						{
+							e.Graphics.DrawLine(p, 6, 6 + Height / 3, Width - 6, Height - 6);
+							e.Graphics.DrawLine(p, Width - 6, 6 + Height / 3, 6, Height - 6);
+						}
 					}
-				}
+					else
+					{
+						using (Pen p = new Pen(VisualStyle.AspaColor, 5))
+						{
+							e.Graphics.DrawLine(p, 6, 6 + Height / 3, Width - 6, Height - 6);
+							e.Graphics.DrawLine(p, Width - 6, 6 + Height / 3, 6, Height - 6);
+						}
+					}
+                }
 			}
 			Rectangle textRect = ClientRectangle;
             /** 20180608. Las frecuencias con ID de mas de 7 Caracteres utilizan un FONT ligeramente inferior */
@@ -633,9 +659,24 @@ namespace HMI.Model.Module.UI
 			Font fontToUse = _NameFrecuency.Length > 7 ? _SmallFontBold1 : _MediumFontBold;
             if (global::HMI.Model.Module.Properties.Settings.Default.BigFonts)
                 fontToUse = _BigFont;
-			// RQF 35 cambio esta linea por la siguiente
-			//BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Frecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
-			BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _NameFrecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
+
+			string fr_presentar = _Alias;
+			if (Multifrecuencia)
+				fr_presentar = _defaultfrecuency;
+			string Lit_presentar = _NameFrecuency;
+			if ((fr_presentar == Lit_presentar) || (fr_presentar == ""))
+			{
+				fr_presentar = Lit_presentar;
+				Lit_presentar = "";
+			}
+
+            // RQF 35 cambio esta linea por la siguiente
+            //BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Frecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
+            if (!VisualStyle.ModoNocturno) 
+				BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _NameFrecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
+			else
+                BtnRenderer.DrawString(e.Graphics, textRect, VisualStyle.TextoFrColor, st, _Frecuency, fontToUse, ContentAlignment.TopCenter, VisualStyle.TextoFrColor);
+
 #endif
             if (global::HMI.Model.Module.Properties.Settings.Default.BigFonts)
             {
@@ -647,26 +688,43 @@ namespace HMI.Model.Module.UI
                 textRect.Offset(0, 13);
                 fontToUse = _SmallFont;
             }
+			// 231116 Arriba siempre la frecuencia, abajo el nombre si existe.
             if (Multifrecuencia)
             {
                 textRect.Offset(0, +2);
-                BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _defaultfrecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
+				//BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _defaultfrecuency, fontToUse, ContentAlignment.TopCenter, ForeColor);
+				BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, Lit_presentar, fontToUse, ContentAlignment.TopCenter, ForeColor);
             }
 			else
 			{
-                BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Alias, fontToUse, ContentAlignment.TopCenter, ForeColor);
+				//BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, _Alias, fontToUse, ContentAlignment.TopCenter, ForeColor);
+				BtnRenderer.DrawString(e.Graphics, textRect, _BtnInfo.GetBackColor(st), st, Lit_presentar, fontToUse, ContentAlignment.TopCenter, ForeColor);
 
             }
 
             if (_RtxGroup > 0)
 			{
 				string rtxGroup = ((char)('G' + _RtxGroup - 1)).ToString();
-				e.Graphics.DrawString(rtxGroup, _MediumFontBold, Brushes.Black, 3, _TxBtnInfo.Rect.Top - 15);
-			}
-			else if (_RtxGroup == -1)
+                // LALM: Modo Nocturno 210201
+                if (!VisualStyle.ModoNocturno)
+                    e.Graphics.DrawString(rtxGroup, _MediumFontBold, Brushes.Black, 3, _TxBtnInfo.Rect.Top - 15);
+                else
+                {
+					Brush pincel = VisualStyle.BrushG(VisualStyle.TextoRColor);
+                    e.Graphics.DrawString(rtxGroup, _MediumFontBold, pincel, 3, _TxBtnInfo.Rect.Top - 15);
+                }
+            }
+            else if (_RtxGroup == -1)
 			{
-				e.Graphics.DrawString("R", _MediumFontBold, Brushes.Black, Width - 15, _TxBtnInfo.Rect.Top - 15);
-			}
+                //LALM 210203 Obtengo brush correpondiente al color.
+                if (!VisualStyle.ModoNocturno)
+                    e.Graphics.DrawString("R", _MediumFontBold, Brushes.Black, Width - 15, _TxBtnInfo.Rect.Top - 15);
+				else
+				{
+                    Brush pincel = VisualStyle.BrushG(VisualStyle.TextoRColor);
+                    e.Graphics.DrawString("R", _MediumFontBold, pincel, Width - 15, _TxBtnInfo.Rect.Top - 15);
+                }
+            }
 
 			using (Pen linePen = new Pen(Enabled ? _BtnInfo.GetBorderColor(BtnState.Normal) : _BtnInfo.GetBorderColor(BtnState.Inactive), 2))
 			{

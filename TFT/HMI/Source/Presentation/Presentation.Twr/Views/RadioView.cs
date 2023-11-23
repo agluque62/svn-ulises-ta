@@ -111,6 +111,18 @@ namespace HMI.Presentation.Twr.Views
 		public RadioView([ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
 		{
 			InitializeComponent();
+            if (!VisualStyle.ModoNocturno)
+            {
+
+            }
+            else
+            { 
+                this._RdButtonsTLP.BackColor = System.Drawing.Color.Black;
+                this._RadioTLP.BackColor = System.Drawing.Color.Black;
+                this._PttBT.ForeColor = Color.White;
+                this._RtxBT.ForeColor = Color.White;
+            }
+
 
             _CmdManager = cmdManager;
 			_StateManager = stateManager;
@@ -237,11 +249,35 @@ namespace HMI.Presentation.Twr.Views
 			_RtxBT.Enabled = _RtxEnabled;
 			_RdPageBT.Enabled = _RdPageEnabled;
             _RtxBT.Text = _Rtx; // Miguel
+            //LALM: 210202 Progress bar Radio.
+            if (VisualStyle.ModoNocturno)
+            {
+                _RdSpeakerUDB.setColor(VisualStyle.cccmnProgressBar);
+                _RdHfSpeakerUDB.setColor(VisualStyle.cccmnProgressBar);
+                _RdHeadPhonesUDB.setColor(VisualStyle.cccmnProgressBar);
+
+            }
 
             // Para Enaire no hay recuperación de estados de asignación
             // 26/01/2017
-			// RecuperaEstadoAsignacionFrecuencias();
-		}
+            // RecuperaEstadoAsignacionFrecuencias();
+
+            // Aqui hay que poner todas las variables del modo nocturno.
+            {
+                // LALM: Modo Nocturno 210201
+                bool _ModoNocturno = VisualStyle.ModoNocturno;
+                if (!_ModoNocturno)
+                {
+                    //this._RtxBT.aspaColor = System.Drawing.Color.Yellow;
+                }
+                else
+                {
+                    //this._RtxBT.aspaColor = System.Drawing.Color.Red;
+                    _PttBT.ForeColor = VisualStyle.TextoRadioColor;
+                    _RtxBT.ForeColor = VisualStyle.TextoRadioColor;
+                }
+            }
+        }
         //#7214 221121 nueva funcion para cuando entren en modo limpieza.
         private bool _ReplayEnabled
         {
@@ -369,8 +405,9 @@ namespace HMI.Presentation.Twr.Views
             //    }
             //}
             //Estados de los botones
-			_PttBT.ButtonColor = _StateManager.Radio.PttOn ? VisualStyle.Colors.Blue : VisualStyle.ButtonColor;
-			_RtxBT.Enabled = _RtxEnabled;
+            _PttBT.ButtonColor = _StateManager.Radio.PttOn ? VisualStyle.Colors.Blue : VisualStyle.ButtonColorN;
+            _PttBT.ForeColor = VisualStyle.TextoRadioColor;
+            _RtxBT.Enabled = _RtxEnabled;
 			_RdPageBT.Enabled = _RdPageEnabled;
 			// LALM 220309 
             if (_PlayBT.Visible)
@@ -609,18 +646,20 @@ namespace HMI.Presentation.Twr.Views
                 if (jacks.LeftJack || jacks.RightJack)
                 {
                     _StateManager.PlayBt.EstadoJacks = true;
-                    //_PlayBT.Habilitado(_StateManager.PlayBt.Estado);
                     _PlayBT.CambiaJacks(true);
                 }
                 else
                 {
-                    //if (_StateManager.PlayBt.Estado == PlayState.estados.Visto)
-                     //_PlayBT.Habilitado(false);
                     _StateManager.PlayBt.EstadoJacks = false;
-                    //_PlayBT.Habilitado(_StateManager.PlayBt.Estado);
                     _PlayBT.CambiaJacks(false);
                 }
             }
+            //231104
+            // Cuando no hay IAO, es necesario habilitar los jacks este visible o no el control _PlayBT
+            else
+            {
+                _PlayBT.Jacks = _StateManager.Jacks.LeftJack || _StateManager.Jacks.RightJack;
+        }
         }
 
         /* VMG 04/09/2018 */
@@ -1183,8 +1222,9 @@ namespace HMI.Presentation.Twr.Views
             //LALM 210224 
             bool up = true;
             TimeSpan tick = new TimeSpan(0, 0, 10);//10 segundos
+            int numero_paginas_radio = _StateManager.Radio.GetNumberOfPagesRd();
             bool confirma = global::HMI.Presentation.Twr.Properties.Settings.Default.ConfCambioPagRad;
-            if (confirma)
+            if (confirma && _StateManager.Radio.GetNumPages()>1)
             {
                 TimeSpan elapsed = DateTime.Now - last;
                 // Si ha pasado mas de 10 segundos pide confirmación
@@ -1203,8 +1243,9 @@ namespace HMI.Presentation.Twr.Views
             //LALM 210224
             bool up = false;
             TimeSpan tick = new TimeSpan(0, 0, 10);//10 segundos
+            int numero_paginas_radio = _StateManager.Radio.GetNumberOfPagesRd();
             bool confirma = global::HMI.Presentation.Twr.Properties.Settings.Default.ConfCambioPagRad;
-            if (confirma)
+            if (confirma && _StateManager.Radio.GetNumPages() > 1)
             {
                 TimeSpan elapsed = DateTime.Now - last;
                 // Si ha pasado mas de 10 segundos pide confirmación

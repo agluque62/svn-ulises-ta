@@ -22,8 +22,13 @@ namespace HMI.Presentation.Twr.UI
 		private BtnInfo _BtnInfo = new BtnInfo();
 		private BtnInfo _UpBtnInfo = new BtnInfo();
 		private BtnInfo _DownBtnInfo = new BtnInfo();
+        // bitmapas dinamicos.
+        private Image _ButtonDownN = null;
+        private Image _ButtonDownDN = null;
+        private Image _ButtonUpN = null;
+        private Image _ButtonUpDN = null;
 
-		public event GenericEventHandler UpClick;
+        public event GenericEventHandler UpClick;
 		public event GenericEventHandler DownClick;
 
 		[CategoryAttribute("Appearance"),
@@ -160,12 +165,60 @@ namespace HMI.Presentation.Twr.UI
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 			SetStyle(ControlStyles.UserPaint, true);
 			BackColor = Color.Transparent;
- 
+            
 			_BtnInfo.Text = (_Page + 1).ToString();
-			_BtnInfo.Font = Font;
+            _BtnInfo.Font = Font;
+            
+			if (!VisualStyle.ModoNocturno)
+			{
+				_BtnInfo.SetForeColor(BtnState.Normal, ForeColor);
 
-			_BtnInfo.SetForeColor(BtnState.Normal, ForeColor);
-			_BtnInfo.SetInnerBorderColor(BtnState.Inactive, Color.Transparent);
+				UpEnabledImage = global::HMI.Presentation.Twr.Properties.Resources.RdPageUp;
+				DownEnabledImage = global::HMI.Presentation.Twr.Properties.Resources.RdPageDown;
+				UpDisabledImage = global::HMI.Presentation.Twr.Properties.Resources.RdPageUpDisabled;
+				DownDisabledImage = global::HMI.Presentation.Twr.Properties.Resources.RdPageDownDisabled;
+
+			}
+			else
+			{
+				_BtnInfo.SetForeColor(BtnState.Normal, VisualStyle.TextoRadioColor);
+
+				if (_ButtonUpN == null)
+				{
+					string bmp1 = "Resources/rdpageupnocturno.gif";
+					try { _ButtonUpN = new Bitmap(bmp1); }
+					catch (Exception /*ex*/) { /*_Logger.Warn("ERROR cargando img (" + bmp1 + ")", ex)*/; }
+				}
+
+				if (_ButtonUpDN == null)
+				{
+					string bmp1 = "Resources/rdpageupdisablednocturno.gif";
+					try { _ButtonUpDN = new Bitmap(bmp1); }
+					catch (Exception /*ex*/) { /*_Logger.Warn("ERROR cargando img (" + bmp1 + ")", ex)*/; }
+				}
+
+				if (_ButtonDownN == null)
+
+				{
+					string bmp1 = "Resources/rdpagedownNocturno.gif";
+					try { _ButtonDownN = new Bitmap(bmp1); }
+					catch (Exception /*ex*/) { /*_Logger.Warn("ERROR cargando img (" + bmp1 + ")", ex)*/; }
+				}
+
+				if (_ButtonDownDN == null)
+				{
+					string bmp1 = "Resources/rdpagedowndisabledNocturno.gif";
+					try { _ButtonDownDN = new Bitmap(bmp1); }
+					catch (Exception /*ex*/) { /*_Logger.Warn("ERROR cargando img (" + bmp1 + ")", ex)*/; }
+				}
+            
+				UpEnabledImage = _ButtonUpN;
+                DownEnabledImage = _ButtonDownN;
+                UpDisabledImage = _ButtonUpDN;
+                DownDisabledImage = _ButtonDownDN;
+            }
+
+            _BtnInfo.SetInnerBorderColor(BtnState.Inactive, Color.Transparent);
 			_BtnInfo.SetInnerBorderColor(BtnState.Normal, Color.Transparent);
 		}
 

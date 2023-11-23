@@ -44,6 +44,41 @@ namespace U5ki.RdService
                 return ret;
             }
 
+            bool allResourcesHaveTelecontrol = true;
+            foreach (IRdResource res in RdRs.Values)
+            {
+                if (res is RdResourcePair)
+                {
+                    RdResourcePair respair = res as RdResourcePair;
+                    if (respair.ActiveResource.TelemandoType == RdResource.TelemandoTypes.none)
+                    {
+                        allResourcesHaveTelecontrol = false;
+                        break;
+                    }
+                    if (respair.StandbyResource.TelemandoType == RdResource.TelemandoTypes.none)
+                    {
+                        allResourcesHaveTelecontrol = false;
+                        break;
+                    }
+                }
+                else
+                {
+                    if ((res as RdResource).TelemandoType == RdResource.TelemandoTypes.none)
+                    {
+                        allResourcesHaveTelecontrol = false;
+                        break;
+                    }
+                }
+            }
+            if (!allResourcesHaveTelecontrol)
+            {
+                LogError<RdFrecuency>("No se puede cambiar de frecuencia porque algun equipo no soporta telemando. " + msg.NewFrecuency,
+                                       U5kiIncidencias.U5kiIncidencia.IGRL_U5KI_NBX_ERROR, this.Frecuency,
+                                       CTranslate.translateResource("No se puede cambiar de frecuencia porque algun equipo no soporta telemando. " + msg.NewFrecuency));
+                RdRegistry.RespondToChangingFreq(from, false, msg.IdFrecuency, msg.NewFrecuency, Identifiers.FR_CH_REJECTED);
+                return ret;
+            }
+
             if (ProcessChangingFreqRunning)
             {
                 RdRegistry.RespondToChangingFreq(from, false, msg.IdFrecuency, msg.NewFrecuency, Identifiers.FR_IN_PROGRESS);
@@ -143,51 +178,6 @@ namespace U5ki.RdService
             return ret;
         }
 
-        private RdSrvFrRs last_FrRs = null;
-        private void Clone_last_FrRs()
-        {
-            if (_FrRs == null) last_FrRs = null;
-            if (last_FrRs == null) last_FrRs = new RdSrvFrRs();
-
-            last_FrRs.PttSrcId = _FrRs.PttSrcId;
-            last_FrRs.Squelch = _FrRs.Squelch;
-            last_FrRs.RtxGroupId = _FrRs.RtxGroupId;
-            last_FrRs.RtxGroupOwner = _FrRs.RtxGroupOwner;
-            last_FrRs.SqSite = _FrRs.SqSite;
-            last_FrRs.ResourceId = _FrRs.ResourceId;
-            last_FrRs.QidxMethod = _FrRs.QidxMethod;
-            last_FrRs.QidxValue = _FrRs.QidxValue;
-            last_FrRs.FrequencyStatus = _FrRs.FrequencyStatus;
-            last_FrRs.ErrorCode = _FrRs.ErrorCode;
-            last_FrRs.SelectedFrequency = _FrRs.SelectedFrequency;
-        }
-
-        private bool IsEqual_last_FrRs()
-        {
-            if (last_FrRs == null && _FrRs == null) return true;
-            if (last_FrRs != null && _FrRs == null) return false;
-            if (last_FrRs == null && _FrRs != null) return false;
-
-            if (last_FrRs.PttSrcId == _FrRs.PttSrcId &&
-                last_FrRs.Squelch == _FrRs.Squelch &&
-                last_FrRs.RtxGroupId == _FrRs.RtxGroupId &&
-                last_FrRs.RtxGroupOwner == _FrRs.RtxGroupOwner &&
-                last_FrRs.SqSite == _FrRs.SqSite && 
-                last_FrRs.ResourceId == _FrRs.ResourceId &&
-                last_FrRs.QidxMethod == _FrRs.QidxMethod &&
-                last_FrRs.QidxValue == _FrRs.QidxValue &&
-                last_FrRs.FrequencyStatus == _FrRs.FrequencyStatus &&
-                last_FrRs.ErrorCode == _FrRs.ErrorCode &&
-                last_FrRs.SelectedFrequency == _FrRs.SelectedFrequency)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         private void SubProcessChangingFreqProcessed(IAsyncResult cookie)
         {
             var target = (Func<string, FrChangeAsk, subProcessChangingFreq_thread>)cookie.AsyncState;
@@ -206,13 +196,10 @@ namespace U5ki.RdService
                     {
                         _FrRs.SelectedFrequency = resultProcess.selectedFrequency;
                         _FrRs.FrequencyStatus = this.Status;
-                        if (!IsEqual_last_FrRs())
-                        {
-                            RdRegistry.Publish(_IdDestino, _FrRs);
-                            if (_FrRs.FrequencyStatus == RdSrvFrRs.FrequencyStatusType.NotAvailable)
-                                RdRegistry.Publish(_IdDestino, null);
-                        }
-                        Clone_last_FrRs();
+
+                        RdRegistry.Publish(_IdDestino, _FrRs);
+                        if (_FrRs.FrequencyStatus == RdSrvFrRs.FrequencyStatusType.NotAvailable)
+                            RdRegistry.Publish(_IdDestino, null);
                     }
                     ProcessChangingFreqRunning = false;
                     MSTxPersistence.SelectFrequency(_IdDestino, resultProcess.selectedFrequency);

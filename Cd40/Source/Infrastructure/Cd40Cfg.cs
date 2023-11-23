@@ -386,7 +386,7 @@ namespace U5ki.Infrastructure
 		public const uint IP_DST = 2;  
 		public const uint ATS_DST = 3; //ATS analógica y digital
 		public const uint RTB_DST = 4;
-		public const uint CONFERENCIA_DST = 5;// Lineas de conferencia.
+		public const uint CONFERENCIA_DST = 98;// Lineas de conferencia.
 		public const uint EyM_DEST = 50;
         public const uint MD_DST = 90;
         public const uint UNKNOWN_DST = 99;  // Destinos entrantes desconocidos

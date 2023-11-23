@@ -32,6 +32,7 @@ using HMI.Model.Module.UI;
 using HMI.Presentation.Twr.Constants;
 using HMI.Presentation.Twr.Properties;
 using NLog;
+using System.Configuration;
 
 namespace HMI.Presentation.Twr.Views
 {
@@ -75,6 +76,8 @@ namespace HMI.Presentation.Twr.Views
         {
             int newWidth;
             int newHeight;
+            if (image == null)
+                image = new Bitmap(size.Width, size.Height);
             if (preserveAspectRatio)
             {
                 int originalWidth = image.Width;
@@ -108,19 +111,52 @@ namespace HMI.Presentation.Twr.Views
 			_CmdManager = cmdManager;
 			_StateManager = stateManager;
 
-            
+
             //_TitleBT.BackgroundImage = _StateManager.Title.Logo;
-            _TitleBT.ImageNormal = CambiarTamanoImagen(_StateManager.Title.Logo, new System.Drawing.Size(_StateManager.Title.WidthLogo, _StateManager.Title.HeightLogo));
+            if (!VisualStyle.ModoNocturno)
+                _TitleBT.ImageNormal = CambiarTamanoImagen(_StateManager.Title.Logo, new System.Drawing.Size(_StateManager.Title.WidthLogo, _StateManager.Title.HeightJacks));
+            else
+                _TitleBT.ImageNormal = CambiarTamanoImagen(_StateManager.Title.LogoMn, new System.Drawing.Size(_StateManager.Title.WidthLogo, _StateManager.Title.HeightLogo));
             _TitleBT.Text = _StateManager.Title.Id;
-			_TitleBT.DrawX = !_StateManager.Engine.Operative;
-            _TitleBT.ButtonColor = VisualStyle.Colors.White;
+            _TitleBT.DrawX = !_StateManager.Engine.Operative;
+            //LALM 210212 Cambio colores del bitmap de AENA.
+            if (!VisualStyle.ModoNocturno)
+                _TitleBT.ButtonColor = VisualStyle.Colors.White;
+            else
+            {
+                _TitleBT.ButtonColor = VisualStyle.Colors.Black;
+                _TitleBT.ForeColor = System.Drawing.Color.White;
+            }
             _TitleBT.ButtonColorDisabled = VisualStyle.Colors.Red;
 			_TitleBT.Enabled = _TitleEnabled;
 
-			_SplitUC.LeftJackOn = _StateManager.Jacks.LeftJack;
-			_SplitUC.RightJackOn = _StateManager.Jacks.RightJack;
-			_SplitUC.Mode = _StateManager.Split.Mode;
-			_SplitUC.Enabled = _SplitEnabled;
+            // LALM Modo Nocturno 210201
+            if (!VisualStyle.ModoNocturno)
+            {
+                _SplitUC.LeftJackOn = _StateManager.Jacks.LeftJack;
+                _SplitUC.RightJackOn = _StateManager.Jacks.RightJack;
+                _SplitUC.Mode = _StateManager.Split.Mode;
+                _SplitUC.Enabled = _SplitEnabled;
+            }
+            else
+            {
+                _SplitUC.JackOff = CambiarTamanoImagen(_StateManager.Title.JackOffMn, new System.Drawing.Size(_StateManager.Title.WidthJaks, _StateManager.Title.HeightLogo));
+                _SplitUC.JackOn = CambiarTamanoImagen(_StateManager.Title.JackOnMn, new System.Drawing.Size(_StateManager.Title.WidthJaks, _StateManager.Title.HeightLogo));
+
+
+                _SplitUC.LeftJackOn = _StateManager.Jacks.LeftJack;
+                _SplitUC.RightJackOn = _StateManager.Jacks.RightJack;
+                _SplitUC.Mode = _StateManager.Split.Mode;
+                _SplitUC.Enabled = _SplitEnabled;
+
+                // LALM 210217 Inicializacion de las imagenes de split.
+                _SplitUC.replacebitmaps(_StateManager.Title.SplitOffMn,
+                _StateManager.Title.SplitLcTfMn,
+                _StateManager.Title.SplitRdLcMn);
+
+
+            }
+
             if (global::HMI.Presentation.Twr.Properties.Settings.Default.JackUse != HMI.Presentation.Twr.Constants.JackUse.Both)
             {
                 this._SplitUC.Size = new System.Drawing.Size(60, 79);
@@ -129,23 +165,80 @@ namespace HMI.Presentation.Twr.Views
                 this._MsgLB.Size = new System.Drawing.Size(320, 66);
                 this._MsgLB.Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
             }
+            // LALM: 210203
+            if (VisualStyle.ModoNocturno)
+            {
+                int r = 255 - VisualStyle.TextoHeaderColor.R;
+                int g = 255 - VisualStyle.TextoHeaderColor.G;
+                int b = 255 - VisualStyle.TextoHeaderColor.B;
+                _MsgLB.BackColor = Color.FromArgb(255, r, g, b);
+                _MsgLB.ForeColor = VisualStyle.TextoHeaderColor;
+            }
+
             _InfoBT.Enabled = _InfoEnabled;
 
             //_CmdManager.SetBrightnessLevel(100); 
-            _BrightnessUDB.Level = _StateManager.Brightness.Level;
-			_BrightnessUDB.Visible = _BrightnessEnabled;
+            // LALM Modo Nocturno 210201
+            if (!VisualStyle.ModoNocturno)
+            {
+                _BrightnessUDB.Level = _StateManager.Brightness.Level;
+                _BrightnessUDB.Visible = _BrightnessEnabled;
+            }
+            else
+            {
+                // CambiarTamanoImagen, en realidad es cambiar imagen, solo se deberia hacer una vez
+                // para no machacar la memoria
+                //LALM 210217 No hago CambioTamanoImagen. Cargo imagen directamente.
+                this._BrightnessUDB.DownImage = _StateManager.Title.BrilloDownImagemenos;
+                this._BrightnessUDB.UpImage = _StateManager.Title.BrilloDownImagemas;
+                // this._BrightnessUDB.DownImage = CambiarTamanoImagen(_StateManager.Title.BrilloDownImagemenos, new System.Drawing.Size(_StateManager.Title.WidthJaks, _StateManager.Title.HeightLogo));
+                // this._BrightnessUDB.UpImage = CambiarTamanoImagen(_StateManager.Title.BrilloDownImagemas, new System.Drawing.Size(_StateManager.Title.WidthJaks, _StateManager.Title.HeightLogo));
+                _BrightnessUDB.Level = _StateManager.Brightness.Level;
+                _BrightnessUDB.Visible = _BrightnessEnabled;
 
-			_BuzzerUDB.Level = _StateManager.Buzzer.Level;
-			_BuzzerUDB.Enabled = _BuzzerEnabled;
+                // LALM 210202 colores en la ProgressBar
+                _BrightnessUDB.setColor(VisualStyle.cccmnProgressBar);
+            }
+
+
+            // LALM Modo Nocturno 210201
+            if (!VisualStyle.ModoNocturno)
+            {
+                _BuzzerUDB.Level = _StateManager.Buzzer.Level;
+                _BuzzerUDB.Enabled = _BuzzerEnabled;
+            }
+            else
+            {
+                //LALM 210217 No hago CambioTamanoImagen. Cargo imagen directamente.
+                this._BuzzerUDB.DownImage = _StateManager.Title.Buzzermenos;
+                this._BuzzerUDB.UpImage = _StateManager.Title.Buzzermas;
+                // this._BuzzerUDB.DownImage = CambiarTamanoImagen(_StateManager.Title.Buzzermenos, new System.Drawing.Size(_StateManager.Title.WidthJaks, _StateManager.Title.HeightLogo));
+                // this._BuzzerUDB.UpImage = CambiarTamanoImagen(_StateManager.Title.Buzzermas, new System.Drawing.Size(_StateManager.Title.WidthJaks, _StateManager.Title.HeightLogo));
+                _BuzzerUDB.Level = _StateManager.Buzzer.Level;
+                _BuzzerUDB.Enabled = _BuzzerEnabled;
+                _BuzzerUDB.setColor(VisualStyle.cccmnProgressBar);
+            }
 
             _InfoBT.Text = _Info;   // Miguel
-		}
+            //LALM 210203
+            if (VisualStyle.ModoNocturno)
+            {
+                this._InfoBT.ForeColor = Color.White;
+                this._InfoBT.BackColor = Color.Black;
+                this._MsgLB.ForeColor = VisualStyle.Colors.White;
+                this._MsgLB.BackColor = VisualStyle.Colors.Black;
+
+            }
+        }
 
         [EventSubscription(EventTopicNames.ProxyPresent, ThreadOption.Publisher)]
         public void OnProxyPresent(object sender, EventArgs e)
         {
             if (Settings.Default.EmergencyModeWarn)
                 BackColor = _StateManager.Scv.ProxyState ? VisualStyle.Colors.HeaderBlue : BackColor = System.Drawing.Color.Khaki;
+            // LALM: 210202
+            if (VisualStyle.ModoNocturno)
+                BackColor = _StateManager.Scv.ProxyState ? VisualStyle.HeaderBlue : VisualStyle.HeaderKhaki;
         }
 
         [EventSubscription(EventTopicNames.TftEnabledChanged, ThreadOption.Publisher)]
@@ -218,7 +311,118 @@ namespace HMI.Presentation.Twr.Views
 			_SplitUC.ShowModeSelection();
 		}
 
-		[EventSubscription(EventTopicNames.SplitModeChanged, ThreadOption.Publisher)]
+        bool cambiohmiexeconfig(string clave,string valor)
+        {
+            return false;
+
+        }
+
+        //LALM 210219-2
+        [EventSubscription(EventTopicNames.ReinicioAppUI, ThreadOption.Publisher)]
+        public void OnReinicioApp(object sender, EventArgs e)
+
+        {
+            //LALM 210219 reiniciar
+            int forma = 3;
+            if (!VisualStyle.ModoNocturno)
+            {
+                // El cambio se hara en la confirmacion
+                if (!HMIConfigHelper.CambioModoNocturno("hmi.exe.config", "ModoNocturno", "False", "True"))
+                {
+                    if (!cambiohmiexeconfig("ModoNocturno", "False"))
+                    {
+
+                        string str = string.Format("El cambio de modo no se puede efectuar en este momento.");
+                        NotifMsg msg = new NotifMsg("Error Cambio de Modo", "Estado", str, 0, MessageType.Information, MessageButtons.Ok);
+                        _StateManager.ShowUIMessage(msg);
+
+
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                if (!HMIConfigHelper.CambioModoNocturno("hmi.exe.config", "ModoNocturno", "True", "False"))
+                {
+                    if (!cambiohmiexeconfig("ModoNocturno", "False"))
+                    {
+                        string str = string.Format("El cambio de modo no se puede efectuar en este momento.");
+                        NotifMsg msg = new NotifMsg("Error Cambio de Modo", "Estado", str, 0, MessageType.Information, MessageButtons.Ok);
+                        _StateManager.ShowUIMessage(msg);
+                        return;
+                    }
+                }
+            }
+
+            if (forma == 0)
+                Process.Start("Launcher.exe", "HMI.exe");
+            if (forma == 1)
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo("cmd.exe");
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                startInfo.Arguments = "/K echo taskkill /F /IM HMI.exe > reinicio.bat";
+                System.Diagnostics.Process.Start(startInfo);
+
+                startInfo = new ProcessStartInfo("cmd.exe");
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                startInfo.Arguments = "/K echo ping 8.8.8.8 >> reinicio.bat";
+                System.Diagnostics.Process.Start(startInfo);
+
+                startInfo = new ProcessStartInfo("cmd.exe");
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                startInfo.Arguments = "/K echo HMI.exe >> reinicio.bat";
+                System.Diagnostics.Process.Start(startInfo);
+
+                startInfo = new ProcessStartInfo("reinicio.bat");
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                startInfo.Arguments = "";
+                System.Diagnostics.Process.Start(startInfo);
+                Application.Exit();
+
+            }
+            if (forma == 2)
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo("cmd.exe");
+                startInfo = new ProcessStartInfo("resources/reinicio.bat");
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                startInfo.Arguments = "";
+                bool probando = false;
+                if (probando)
+                {
+                    string str = string.Format("Cambio a Modo {0}.\n estoy en depuracion", "Nocturno : Diurno");
+                    NotifMsg msg = new NotifMsg("No lo hago", "Estado", str, 0, MessageType.Information, MessageButtons.Ok);
+                    _StateManager.ShowUIMessage(msg);
+                }
+                else
+                {
+                    System.Diagnostics.Process.Start(startInfo);
+                    Application.Exit();
+                }
+            }
+            if (forma == 3)
+            {
+                ProcessStartInfo startInfo= new ProcessStartInfo("PictureBox.exe");
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                startInfo.Arguments = "";
+                bool probando = false;
+                if (probando)
+                {
+                    string str = string.Format("Cambio a Modo {0}.\n estoy en depuracion", "Nocturno : Diurno");
+                    NotifMsg msg = new NotifMsg("No lo hago", "Estado", str, 0, MessageType.Information, MessageButtons.Ok);
+                    _StateManager.ShowUIMessage(msg);
+                }
+                else
+                {
+                    System.Diagnostics.Process.Start(startInfo);
+                    Application.Exit();
+                }
+            }
+
+
+        }
+
+        [EventSubscription(EventTopicNames.SplitModeChanged, ThreadOption.Publisher)]
 		public void OnSplitModeChanged(object sender, EventArgs e)
 		{
 			_SplitUC.Mode = _StateManager.Split.Mode;
@@ -490,6 +694,12 @@ namespace HMI.Presentation.Twr.Views
 
 		private void _BuzzerUDB_LongClick(object sender, EventArgs e)
 		{
+#if SELECCION_SONIDO_AD
+			if (!_StateManager.Buzzer.Enabled)
+            {
+				_CmdManager.SeleccionSonidoClick();
+			}
+#endif
 			bool enabled = !_StateManager.Buzzer.Enabled;
 
 			try

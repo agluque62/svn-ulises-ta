@@ -135,7 +135,9 @@ namespace HMI.Presentation.Twr.Views
             this._BuzzerUDB.UpImage = global::HMI.Presentation.Twr.Properties.Resources.BuzzerUp;
             this._BuzzerUDB.LevelDown += new System.EventHandler(this._BuzzerUDB_LevelDown);
             this._BuzzerUDB.LevelUp += new System.EventHandler(this._BuzzerUDB_LevelUp);
+#if SELECCION_SONIDO_AD
             this._BuzzerUDB.LongClick += new System.EventHandler(this._BuzzerUDB_LongClick);
+#endif
             // 
             // HeaderView
             // 
@@ -154,7 +156,7 @@ namespace HMI.Presentation.Twr.Views
 
 		}
 
-		#endregion
+#endregion
 
 		private HMI.Model.Module.UI.HMIButton _TitleBT;
         private HMI.Model.Module.UI.HMIButton _InfoBT;

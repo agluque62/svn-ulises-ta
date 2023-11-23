@@ -138,7 +138,15 @@ namespace HMI.Presentation.Twr.Views
             _CallBT.Text = _Call;
             _CloseBT.Text = _Close;
             _TitleLB.Text = _Title;
-            label1.Text = _Type;
+			if (VisualStyle.ModoNocturno)
+			{
+				_TitleLB.ForeColor = VisualStyle.TextoHeaderColor;
+				_TitleLB.BackColor = VisualStyle.ButtonColor;
+				_DependencesTV.ForeColor = VisualStyle.TextoHeaderColor;
+				_DependencesTV.BackColor = VisualStyle.ButtonColor;
+			}
+
+			label1.Text = _Type;
             label2.Text = _Function;
             label3.Text = _AGVN;
             label4.Text = _RTB;

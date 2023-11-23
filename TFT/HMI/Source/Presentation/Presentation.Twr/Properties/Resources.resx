@@ -157,17 +157,23 @@
   <data name="BuzzerUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BuzzerUp.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="RxSpeaker" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\RxSpeaker.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Cerrar" xml:space="preserve">
     <value>Cerrar</value>
   </data>
   <data name="Rtx" xml:space="preserve">
     <value>Rtx</value>
   </data>
+  <data name="RdPageUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RdPageUp.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="BadOperation" xml:space="preserve">
     <value>Falsa maniobra</value>
+  </data>
+  <data name="Forward" xml:space="preserve">
+    <value>Desvío</value>
+  </data>
+  <data name="TxRxChange" xml:space="preserve">
+    <value>Cambio Frecuencia </value>
   </data>
   <data name="SpeakerDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SpeakerDown.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -175,14 +181,14 @@
   <data name="Llamar" xml:space="preserve">
     <value>Llamar</value>
   </data>
-  <data name="Num1" xml:space="preserve">
-    <value>Num 1.</value>
-  </data>
   <data name="Escucha" xml:space="preserve">
     <value>Escucha</value>
   </data>
   <data name="Unhang" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Unhang.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TlfPageNocturno" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\TlfPageNocturno.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Anular" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Anular.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -214,6 +220,9 @@
   <data name="group" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\group.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Tecla verde" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tecla verde.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="HeadPhonesUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\HeadPhonesUp.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -229,14 +238,8 @@
   <data name="play" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Num2" xml:space="preserve">
-    <value>Num 2.</value>
-  </data>
   <data name="play_reproduccion_disponible" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\play_reproduccion_disponible.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="AI" xml:space="preserve">
-    <value>AI</value>
   </data>
   <data name="Normal" xml:space="preserve">
     <value>Normal</value>
@@ -259,8 +262,14 @@
   <data name="Tipo" xml:space="preserve">
     <value>Tipo</value>
   </data>
-  <data name="Info" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Info.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="PttBlocked" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PttBlocked.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TxFailure" xml:space="preserve">
+    <value>Fallo en transmisión</value>
+  </data>
+  <data name="SpeakerMissing" xml:space="preserve">
+    <value>No hay altavoz </value>
   </data>
   <data name="HFSpeakerUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\HFSpeakerUp.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -277,8 +286,8 @@
   <data name="RxHeadPhones" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RxHeadPhones.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="RdPageDownDisabled" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\RdPageDownDisabled.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="AI" xml:space="preserve">
+    <value>AI</value>
   </data>
   <data name="SplitRdLc" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SplitRdLc.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -313,26 +322,26 @@
   <data name="HeadPhonesDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\HeadPhonesDown.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="More" xml:space="preserve">
+    <value>Más</value>
+  </data>
   <data name="INF" xml:space="preserve">
     <value>INFO</value>
-  </data>
-  <data name="play_no_disponible" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\play_no_disponible.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="HeadPhonesTlf" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\HeadPhonesTlf.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="RdPageUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\RdPageUp.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="play_no_disponible" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\play_no_disponible.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Wait" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Wait.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="RdPageDownDisabled" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RdPageDownDisabled.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SpeakerTlf" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SpeakerTlf.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="GlobalIsolated" xml:space="preserve">
-    <value>Aislado</value>
+  <data name="Wait" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Wait.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Transferir" xml:space="preserve">
     <value>Transferir</value>
@@ -355,29 +364,29 @@
   <data name="ErrorIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Error.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="TxFailure" xml:space="preserve">
-    <value>Fallo en transmisión</value>
+  <data name="RxSpeaker" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RxSpeaker.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Radio" xml:space="preserve">
     <value>radio</value>
   </data>
-  <data name="SpeakerMissing" xml:space="preserve">
-    <value>No hay altavoz </value>
+  <data name="GlobalIsolated" xml:space="preserve">
+    <value>Aislado</value>
   </data>
   <data name="AGVN" xml:space="preserve">
     <value>AGVN</value>
   </data>
-  <data name="More" xml:space="preserve">
-    <value>Más</value>
+  <data name="Num2" xml:space="preserve">
+    <value>Num 2.</value>
   </data>
-  <data name="Forward" xml:space="preserve">
-    <value>Desvío</value>
+  <data name="Num1" xml:space="preserve">
+    <value>Num 1.</value>
   </data>
   <data name="RdPageUpDisabled" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RdPageUpDisabled.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PttBlocked" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\PttBlocked.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Info" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Info.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="stop_32_50" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\stop_32_50.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -406,10 +415,7 @@
   <data name="JackOnTwr" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\JackOnTwr.gif;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Tecla verde" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Tecla verde.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="TxRxChange" xml:space="preserve">
-    <value>Cambio Frecuencia </value>
+  <data name="play_no_disponibeN" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\play_no_disponibeN.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

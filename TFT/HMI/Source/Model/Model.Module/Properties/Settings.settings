@@ -140,5 +140,50 @@
     <Setting Name="NumTlfDestinationsCP" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">15</Value>
     </Setting>
+    <Setting Name="WidthJacks" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">150</Value>
+    </Setting>
+    <Setting Name="HeightJacks" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">40</Value>
+    </Setting>
+    <Setting Name="LogoMn" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/logo_AENANocturno.png</Value>
+    </Setting>
+    <Setting Name="SQUEncendido" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/Squelch.gif</Value>
+    </Setting>
+    <Setting Name="RdPageDownEncendido" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/RdPageDown.gif</Value>
+    </Setting>
+    <Setting Name="PttEncencido" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/PTT.gif</Value>
+    </Setting>
+    <Setting Name="ddPttBlockedEncendido" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/PttBlocked.gif</Value>
+    </Setting>
+    <Setting Name="JackoffMn" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Resources/jackoffNocturno.gif</Value>
+    </Setting>
+    <Setting Name="JackonMn" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Resources/jackonNocturno.gif</Value>
+    </Setting>
+    <Setting Name="Brillomas" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/BrightnessUp.gif</Value>
+    </Setting>
+    <Setting Name="Brillomenos" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/BrightnessDown.gif</Value>
+    </Setting>
+    <Setting Name="BuzzerUp" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/BuzzerUp.gif</Value>
+    </Setting>
+    <Setting Name="PTTEncendido" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/PTT.gif</Value>
+    </Setting>
+    <Setting Name="PttBlockedEncendido" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/PttBlocked.gif</Value>
+    </Setting>
+    <Setting Name="Buzzerdown" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Resources/Buzzerdown.gif</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

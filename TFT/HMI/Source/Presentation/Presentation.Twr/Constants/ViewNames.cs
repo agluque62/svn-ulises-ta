@@ -8,5 +8,6 @@ namespace HMI.Presentation.Twr.Constants
 	{
 		public const string KeypadView = "KeypadView";
 		public const string MemView = "MemView";
+		public const string SeleccionRingView = "SeleccionRingView";
 	}
 }

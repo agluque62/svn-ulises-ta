@@ -16,6 +16,7 @@ using HMI.Presentation.Twr.Constants;
 using HMI.Presentation.Twr.Properties;
 
 using Utilities;
+using HMI.Model.Module.UI;
 
 namespace HMI.Presentation.Twr.UI
 {
@@ -77,6 +78,14 @@ namespace HMI.Presentation.Twr.UI
             // Miguel
             this._OkBT.Text = _Aceptar;
             this._CancelBT.Text = _Cancelar;
+			if (!VisualStyle.ModoNocturno) ;
+			else
+			{
+				Color FondoColor = Color.Black;
+				this._MemLB.ForeColor = VisualStyle.TextoTfColorN;
+				this._MemLB.BackColor = FondoColor;
+			}
+
 		}
 
 		public void Reset()

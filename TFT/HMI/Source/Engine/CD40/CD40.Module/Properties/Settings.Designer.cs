@@ -12,7 +12,7 @@ namespace HMI.CD40.Module.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -937,6 +937,27 @@ namespace HMI.CD40.Module.Properties {
         public bool RingToHeadSet {
             get {
                 return ((bool)(this["RingToHeadSet"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PttSinRetener {
+            get {
+                return ((bool)(this["PttSinRetener"]));
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".1.3.6.1.4.1.7916.8.2.3.10.0")]
+        public string RxDesasignadoOid {
+            get {
+                return ((string)(this["RxDesasignadoOid"]));
+            }
+            set {
+                this["RxDesasignadoOid"] = value;
             }
         }
     }

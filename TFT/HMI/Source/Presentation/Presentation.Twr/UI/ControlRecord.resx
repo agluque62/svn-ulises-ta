@@ -118,29 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="hmiButtonPlay.ImageNormal" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAS
-        dAAAEnQB3mYfeAAABA9JREFUWEfFl+dOK0EMhfe1QSKI0ESHCAmQQhciEFpE770koffOE/AMZj/rOpqE
-        TeDCXt0fR5ud8djHPp7Ziff4+Pj++vr6/vDwoE/Dy8tL4JjZu2NPT09fjoHn5+e833d3d3EvlUqJ/0Pe
-        3t7EX5gH3/DTWBjwycn5+bns7u4mvb6+Ppmbm5P7+3ud9Jn9U1jwra0tkPD6+/slkUjI0tKS3NzcqIFf
-        ZoUvQQ429huQ5OnpqQbf3NyU7e3thDcwMCBjY2MyNTUly8vLanBxcSFnZ2cK3k9OTuT4+FifNk4WfwPW
-        HB0dEVSD5wgggRGgH6jE/v6+4uDgQFlns1lZXV2VtbU1Xbi3t6dzh4eH3wK2vt669k/pgysAAfphcXEx
-        FwxJIEFV5ufnZXp6Wm1WVlZkY2NDne3s7JQEfrAtSoAeMAKzs7MaiN8LCwtye3ur0qTTae0RnqOjo5JM
-        JmVmZkZtIGMVWl9fzwNjoCiBQgkgQIa8ky0NyOLBwUEdoyeurq7UydDQkK7FDtLIB1kIGYxYUQLsgkIC
-        YHJyUrPkjKAfyGZ4eFggTLDLy0sFZBnHlvXI5xL5kgCZFUoAcDg+Pq4EaCJKTzDGkQ3gmGpQFeQwP6w3
-        Ej+uAIEYdwngEM2xY663t1dGRkZ0HiLYQKKQSKgEKDFABrKGQDwel4mJCT0nIELn06hUEJ+QoBKQ+ESg
-        lASlCLhE6BcaEiLIBAn6A3uI2G6hj6wKv65AIWwNvYFPMr6+vtbzgzlIQgI5CB46AQM+WIdf5PGD6PlB
-        oyIFO8MqEYoELgjAExnw2dXVJS0tLeqPjxGyuFUIvQI4pxl7enqkoaFBmpqaNBgfI74n+IdcXgXCIEBg
-        Go1t2dzcLDU1NdqcfAHZGVSZauCTKoUigZUbW3ZAW1ubVFdX69bLZDKqOf6qqqqkvb1dT0uyD60JccYW
-        6+zslLq6Ounu7lY7ys18eXm51NfX6zwJYk8D2oH0YwKUljkCEhid2XIE5p4QjUaltrZWOjo6ch8wJArl
-        IGIenRsbGzUQdujMpYMyRyIR7QEOJNYzTzXcrfeJQKkKuB8jMjCdOVTsegb5iooKJUX3s4b1ZG37vuS3
-        IOg+ANhOOOM+gAMCYMu9jnLjnMB0fCwW00OHnYBEZM08koGSBIJuRDQM75DgRoQz31gDs7CsrEwlaG1t
-        1aMXOzdrC2xwmy+QgFsBMrB9DagAJOgBdK6srNTGQ2f72kGYNZZ5ECARSMCVAEcY44iMuGpxHWcc/ckY
-        namYBca2MONioI+KVoCAsAQYuyTY7xwkZOzqjJ2t+S7ohzwCnGIEgh2TgN8YE4BgzLvNxZxr/xPkCOAc
-        RvxxsHu8lcl9N/14N1vXzsZ8p0XHeLpjPlKeiPxHiPcBhDesCfGfiQkAAAAASUVORK5CYII=
-</value>
-  </data>
   <data name="hmiButtonStop.ImageNormal" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAW

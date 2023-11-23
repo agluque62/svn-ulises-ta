@@ -178,15 +178,6 @@ namespace U5ki.RdService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
-        public int FrequencyDisabled {
-            get {
-                return ((int)(this["FrequencyDisabled"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int HFSipSupervisionMode {
             get {
@@ -200,6 +191,24 @@ namespace U5ki.RdService.Properties {
         public string McastIp {
             get {
                 return ((string)(this["McastIp"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int FrequencyDisabled {
+            get {
+                return ((int)(this["FrequencyDisabled"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HF_SimulateEquipmentTelecontrol_OK {
+            get {
+                return ((bool)(this["HF_SimulateEquipmentTelecontrol_OK"]));
             }
         }
     }

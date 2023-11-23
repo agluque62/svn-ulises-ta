@@ -95,7 +95,7 @@ namespace HMI.Presentation.Asecna.Views
 				for (int column = 0; column < _TlfButtonsTLP.ColumnCount; column++, pos++)
 				{
 					HMIButton bt = new HMIButton();
-					_TlfButtonsTLP.Controls.Add(bt, column, row);
+                    _TlfButtonsTLP.Controls.Add(bt, column, row);
 					_TlfButtons.Add(bt);
 
 					bt.Dock = DockStyle.Fill;
@@ -388,7 +388,7 @@ namespace HMI.Presentation.Asecna.Views
 					TlfDst dst = _StateManager.Tlf[i];
 
 					Reset(bt, dst);
-				}
+                }
 
                 int pageButtonToReset = (int)(e.From / _NumPositionsByPage);
                 switch (pageButtonToReset)

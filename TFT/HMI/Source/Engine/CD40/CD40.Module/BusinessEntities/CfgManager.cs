@@ -83,7 +83,7 @@ namespace HMI.CD40.Module.BusinessEntities
         private string STR_SECTOR_FS = "**FS**";
         private string STR_PUESTO_FS = "__FS__";
 
-		public event GenericEventHandler ConfigChanged;
+        public event GenericEventHandler ConfigChanged;
         public event GenericEventHandler<List <Conferencia>> ConferenciaGChanged;
         public event GenericEventHandler<bool> ProxyStateChangeCfg;
         public event GenericEventHandler<ConferenceStatus> CambioConferenciaPreprogramada;//230516
@@ -211,123 +211,6 @@ namespace HMI.CD40.Module.BusinessEntities
             public string TipoConferencia;
             public string alias;
             public List<EstructuraParticipante> participante;
-        }
-        void rellenaconferencia(Conferencias c1)
-        {
-            // defino 4 confencias
-            // en la conferencias 1 cuatro participantes
-            // el la conferencias 2 tres participantes
-            // el la conferencias 3 dos participantes
-            // el la conferencias 4  un participantes
-            List<EstructuraConferencia> listaDeEstructuras = new List<EstructuraConferencia>();
-            List<EstructuraParticipante> listaParticipante = new List<EstructuraParticipante>();
-            EstructuraParticipante participante1 = new EstructuraParticipante();
-            EstructuraParticipante participante2 = new EstructuraParticipante();
-            EstructuraParticipante participante3 = new EstructuraParticipante();
-            EstructuraParticipante participante4 = new EstructuraParticipante();
-            List <EstructuraConferencia> conferencia = new List<EstructuraConferencia>();
-            EstructuraConferencia conferencia1 = new EstructuraConferencia();
-            EstructuraConferencia conferencia2 = new EstructuraConferencia();
-            EstructuraConferencia conferencia3 = new EstructuraConferencia();
-            EstructuraConferencia conferencia4 = new EstructuraConferencia();
-            
-            conferencia1.nombresala = "sala 1";
-            conferencia1.IdConferencia = "idconferencia1";
-            conferencia1.IdSalaBkk  = "1000";
-            conferencia1.PosHMI = "0";
-            conferencia1.TipoConferencia = "1";
-            conferencia1.alias = "Asala-1";
-            conferencia1.participante = new List <EstructuraParticipante>();
-            conferencia1.participante.Add(participante1);
-            conferencia1.participante.Add(participante2);
-            conferencia1.participante.Add(participante3);
-            conferencia1.participante.Add(participante4);
-
-            conferencia2.nombresala = "sala 2";
-            conferencia2.IdSalaBkk = "1001";
-            conferencia1.IdConferencia = "idconferencia2";
-            conferencia2.PosHMI = "1";
-            conferencia2.TipoConferencia = "1";
-            conferencia2.alias = "Asala-2";
-            conferencia2.participante = new List<EstructuraParticipante>();
-            conferencia2.participante.Add(participante1);
-            conferencia2.participante.Add(participante2);
-            conferencia2.participante.Add(participante3);
-
-            conferencia3.nombresala = "sala 3";
-            conferencia3.IdSalaBkk = "1002";
-            conferencia1.IdConferencia = "idconferencia3";
-            conferencia3.PosHMI = "2";
-            conferencia3.TipoConferencia = "3";
-            conferencia3.alias = "Asala-3";
-            conferencia3.participante = new List<EstructuraParticipante>();
-            conferencia3.participante.Add(participante1);
-            conferencia3.participante.Add(participante2);
-
-            conferencia4.nombresala = "sala 4";
-            conferencia4.IdSalaBkk = "2000";
-            conferencia1.IdConferencia = "idconferencia4";
-            conferencia4.PosHMI = "3";
-            conferencia4.TipoConferencia = "3";
-            conferencia4.alias = "Asala-4";
-            conferencia4.participante = new List<EstructuraParticipante>();
-            conferencia4.participante.Add(participante1);
-            conferencia3.participante.Add(participante2);
-            conferencia3.participante.Add(participante3);
-            conferencia3.participante.Add(participante4);
-
-            conferencia.Add(conferencia1);
-            conferencia.Add(conferencia2);
-            conferencia.Add(conferencia3);
-            conferencia.Add(conferencia4);
-
-            participante1.uri = "318011";
-            participante2.uri = "318012";
-            participante3.uri = "318013";
-            participante4.uri = "318014";
-
-            conferencia[0].participante.Add(participante1);
-            conferencia[0].participante.Add(participante2);
-            conferencia[0].participante.Add(participante3);
-            conferencia[0].participante.Add(participante4);
-
-            conferencia[1].participante.Add(participante1);
-            conferencia[1].participante.Add(participante2);
-            conferencia[1].participante.Add(participante3);
-            conferencia[1].participante.Add(participante4);
-
-            conferencia[2].participante.Add(participante1);
-            conferencia[2].participante.Add(participante2);
-            conferencia[2].participante.Add(participante3);
-            conferencia[2].participante.Add(participante4);
-
-            conferencia[3].participante.Add(participante1);
-            conferencia[3].participante.Add(participante2);
-            conferencia[3].participante.Add(participante3);
-            conferencia[3].participante.Add(participante4);
-
-            //test de prueba
-            for (int i = 0; i < conferencia.Count; i++)
-            {
-                ConferenciaProto c = new ConferenciaProto();
-                c.IdSistema = "1";
-                c.IdSalaBkk = conferencia[i].IdSalaBkk;// conferencia[i].alias;// "SConferencia-" + i.ToString();
-                c.IdConferencia = conferencia[i].IdConferencia;
-                c.Descripcion = "";
-                c.PosHMI = conferencia[i].PosHMI;// (i).ToString();
-                c.TipoConferencia = conferencia[i].TipoConferencia;// "1";
-                c.Alias = conferencia[i].alias;
-                for (int j = 0; j < 15; j++)
-                {
-                    Tipo_Lista_Participantes par = new Tipo_Lista_Participantes();
-                    //par.Tipo = "1";
-                    par.Descripcion = "";
-                    par.SipUri = "31801" + j.ToString();
-                    //par.Abonado_Sector = "abonado" + j.ToString();
-                    c.Lista_de_Participantes.Add(par);
-                }
-                c1.conferencia.Add(c);
-            }
         }
 
         public Conferencias conf = null;
@@ -1622,7 +1505,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 
         // RQF-22
-        private static string UG5K_REC_ANALOGIC_FILE = "ug5krec-analogic.ini";
+        private static string UG5K_REC_ANALOGIC_FILE = "ug5krec-analogic.data";
         public static void LoadGrabacionAnalogica()
         {
             String fullRecorderAnalogicaFileName = ".\\" + UG5K_REC_ANALOGIC_FILE;
@@ -1705,6 +1588,6 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
-        #endregion
+       #endregion
     }
 }

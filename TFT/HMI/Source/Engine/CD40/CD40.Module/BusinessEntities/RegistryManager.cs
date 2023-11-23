@@ -11,6 +11,7 @@ using Utilities;
 using ProtoBuf;
 using NLog;
 using conferencia;
+using System.Windows.Forms;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
@@ -391,12 +392,28 @@ namespace HMI.CD40.Module.BusinessEntities
                     SelcalPrepareRsp resp = Deserialize<SelcalPrepareRsp>(msg.Data, msg.Length);
                     string type = Identifiers.TypeId(typeof(RdSrvFrRs));
                     string rsUid = resp.Frecuency.ToUpper() + "_" + type;
-
+					
 					_Logger.Trace($"OnMsg SelCal Prepare Response <{resp.Frecuency}>: {rsUid}");
 
                     Top.WorkingThread.Enqueue("SelCalPrepareAnswer", delegate()
 					{
-                        Resource resource;
+						//para ED137C
+						string mensaje = resp.mensaje;
+						if (resp.Code == "ED137C_SELCAL_OK")
+						{
+							//Todo Correcto, no hay que hacer nada
+							return;
+						}
+						if (resp.Code == "ED137C_SELCAL_ERROR")
+						{
+							//Error en salcal
+							string errorMessage = "Error en SelCal: Prepare Response Error. Not confirmed Tones";
+							MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+							return;
+						}
+
+						Resource resource;
 						//if (_Resources.TryGetValue(rsUid, out resource))
 						if (GetResource(rsUid, out resource))
 						{

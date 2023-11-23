@@ -85,7 +85,7 @@ namespace HMI.Presentation.Twr.Views
 			// 
 			_DependencesTLP.ColumnCount = 1;
 			_DependencesTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			_DependencesTLP.Controls.Add(_TitleLB, 0, 0);
+			_DependencesTLP.Controls.Add(this._TitleLB, 0, 0);
 			_DependencesTLP.Controls.Add(this._PathTB, 0, 1);
 			_DependencesTLP.Controls.Add(this._DependencesTV, 0, 2);
 			_DependencesTLP.Controls.Add(panel1, 0, 3);

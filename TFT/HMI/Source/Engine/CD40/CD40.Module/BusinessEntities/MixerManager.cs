@@ -181,7 +181,7 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             set { _TipoGrabacionAnalogica = value; }
         }
-        private static string UG5K_REC_ANALOGIC_FILE = "ug5krec-analogic.ini";
+        private static string UG5K_REC_ANALOGIC_FILE = "ug5krec-analogic.data";
         public void LoadTipoGrabacionAnalogica()
         {
             String fullRecorderFileName = ".\\" + UG5K_REC_ANALOGIC_FILE;
@@ -2991,5 +2991,9 @@ namespace HMI.CD40.Module.BusinessEntities
         }
 
         public int VolumeTones { get => _VolumeTones; set => _VolumeTones = value; }
+        public void setringdevice(MixerDev ringdevice)
+        {
+            _RingDev = ringdevice;
+        }
     }
 }

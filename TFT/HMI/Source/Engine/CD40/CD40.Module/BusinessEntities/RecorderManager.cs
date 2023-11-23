@@ -13,6 +13,7 @@ using HMI.CD40.Module.Properties;
 using U5ki.Infrastructure;
 using Utilities;
 using NLog;
+using System.Threading;
 
 namespace HMI.CD40.Module.BusinessEntities
 {
@@ -71,14 +72,14 @@ namespace HMI.CD40.Module.BusinessEntities
         private object _Sync = new object();
 
         private static Logger _Logger = LogManager.GetCurrentClassLogger();
-        private Timer _SupervisorTimer = new Timer (5*60*1000);
-        private Timer _BriefingSessionTimer = new Timer(Settings.Default.BriefingSessionTimer*60*1000);
-        private Timer _SupervisorLengthRecording = new Timer(15000);
+        private System.Timers.Timer _SupervisorTimer = new System.Timers.Timer (5*60*1000);
+        private System.Timers.Timer _BriefingSessionTimer = new System.Timers.Timer(Settings.Default.BriefingSessionTimer*60*1000);
+        private System.Timers.Timer _SupervisorLengthRecording = new System.Timers.Timer(15000);
 
         public event GenericEventHandler<StateMsg<bool>> BriefingChanged;
         public event GenericEventHandler<StateMsg<bool>> FileRecordedChanged;
         public event GenericEventHandler<SnmpStringMsg<string, string>> SetSnmpString;
-
+        static Semaphore semaforo_move;
         public RecorderManager(bool enable, bool onlyradio = false)
         {
             // TODO: Complete member initialization
@@ -168,6 +169,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 _Logger.Warn("Directorio de grabación no está vacío o no existe.");
             }
 
+            semaforo_move = new Semaphore(1, 1);
         }
 
         /// <summary>
@@ -379,7 +381,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 Seg = seg;
                 Text = path;
             }
-            item()
+            item() 
             {
             }
         }
@@ -564,9 +566,9 @@ namespace HMI.CD40.Module.BusinessEntities
                             SipAgent.DestroyWavRecorder(_SessionsFile[(int)fuente]);
                             _SessionsFile[(int)fuente] = -1;
                             _GlpSessionsStarted[(int)fuente] = false;
-
-                            try
-                            {
+                            semaforo_move.WaitOne();
+                                try
+                           {
                                 File.Move(_SessionsFileName[(int)fuente], _SessionsFileName[(int)fuente].Replace("@", ""));
                                 AjustaTiempoFichero(_SessionsFileName[(int)fuente].Replace("@", ""), (int)_TiempoGrabacionRecorderRadio);
                             }
@@ -575,8 +577,9 @@ namespace HMI.CD40.Module.BusinessEntities
                                 File.Delete(_SessionsFileName[(int)fuente]);
                                 _Logger.Warn("GLP.SesionGlp. El fichero ya existe.");
                             }
-                            
-                            _SessionsFileName[(int)fuente] = string.Empty;
+                           semaforo_move.Release();
+
+                                _SessionsFileName[(int)fuente] = string.Empty;
                             }
                             PurgeFilesRadio();
                         }
@@ -706,7 +709,7 @@ namespace HMI.CD40.Module.BusinessEntities
                                 _SessionsFile[(int)fuente] = -1;
                                 //_SessionsId[(int)fuente] = -1;
                                 _GlpSessionsStarted[(int)fuente] = false;
-
+                                semaforo_move.WaitOne();
                                 try
                                 {
                                     File.Move(_SessionsFileName[(int)fuente], _SessionsFileName[(int)fuente].Replace("@", ""));
@@ -719,6 +722,7 @@ namespace HMI.CD40.Module.BusinessEntities
                                 }
 
                                 _SessionsFileName[(int)fuente] = string.Empty;
+                                semaforo_move.Release();
                             }
 
                             if (fuente == FuentesGlp.Briefing && Settings.Default.SNMPEnabled == 1)
@@ -785,7 +789,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
                 _SessionsFile[(int)fuente] = -1;
                 _GlpSessionsStarted[(int)fuente] = false;
-
+                semaforo_move.WaitOne();
                 try
                 {
                     File.Move(_SessionsFileName[(int)fuente], _SessionsFileName[(int)fuente].Replace("@", ""));
@@ -798,7 +802,7 @@ namespace HMI.CD40.Module.BusinessEntities
                 }
 
                 _SessionsFileName[(int)fuente] = string.Empty;
-
+                semaforo_move.Release();
                 if (fuente == FuentesGlp.Briefing && Settings.Default.SNMPEnabled == 1)
                 {
                     Top.WorkingThread.Enqueue("SetSnmp", delegate()
@@ -1053,7 +1057,7 @@ namespace HMI.CD40.Module.BusinessEntities
                         Top.Mixer.LinkReplay(_ReplayTone, via);
                         _Replaying = true;
 
-                        _StopPlaying = new Timer(1000 * fileLength / 16000);
+                        _StopPlaying = new System.Timers.Timer(1000 * fileLength / 16000);
                         _StopPlaying.Elapsed += new ElapsedEventHandler(StopPlayingElapsed);
                         _StopPlaying.AutoReset = false;
                         _StopPlaying.Enabled = true;
@@ -1080,7 +1084,7 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
 
-        private Timer _StopPlaying;
+        private System.Timers.Timer _StopPlaying;
         private int _ReplayTone = -1;
         private bool _Replaying;
 

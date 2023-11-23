@@ -142,6 +142,8 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='RDRTXREC_Property' Type='raw' />
     </Property>
+
+	  
     <!-- Habilitación Cancelador Manos Libres para Tlf  -->
     <Property Id="ECTLF" Value="False">
       <!--
@@ -157,6 +159,13 @@
                      Key='SOFTWARE\Wix\UV5KI_HMI'
                      Name='ECLC_Property' Type='raw' />
     </Property>
+	  <Property Id="MONO" Value="True">
+		  <RegistrySearch Id='UV5KI_HMI_MONO' Root='HKLM'
+						 Key='SOFTWARE\Wix\UV5KI_HMI'
+						 Name='MONO_Property' Type='raw' />
+	  </Property>
+
+
 	  <!-- Habilitación Ring to Headphones-->
 	  <Property Id="RTOH" Value="False">
 		  <RegistrySearch Id='UV5KI_HMI_RTOH' Root='HKLM'
@@ -275,7 +284,14 @@
       <Component Id='versiones' Guid='{183E4EEC-FBEC-489D-91A9-BB80DC72BF4B}'>
         <File Id='versiones' Name='versiones.json'/>
       </Component>
-      <Component Id='HMI.config' Guid='{B618C38D-4523-4144-B12B-17EB296EE8F5}'>
+		<Component Id='PictureBox' Guid='{B2760AB3-25F0-4315-87B4-1976EA9A4F7D}'>
+			<File Id='PictureBox.exe' Name='PictureBox.exe' />
+			<File Id='PictureBox.dll' Name='PictureBox.dll' />
+			<File Id='PictureBox.runtimeconfig.json' Name='PictureBox.runtimeconfig.json' />
+			<File Id='PictureBox.deps.json' Name='PictureBox.deps.json' />
+		</Component>
+      
+		<Component Id='HMI.config' Guid='{B618C38D-4523-4144-B12B-17EB296EE8F5}'>
         <File Id='HMI.config' Name='HMI.exe.config'/>
         <util:XmlFile Id="IdHost" Action="setValue"
                         File = "[#HMI.config]"
@@ -610,6 +626,13 @@
                   ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='ECHandsFreeLC'[\]]/value"
                   Value="[ECLC]"/>
 
+		  <!-- Modo Nocturno esto es en presentacion Twr-->
+		  <!--voy a probar addvalue-->
+		  <!--<util:XmlFile Id="MODONOCTURNO" Action="setValue"
+					File = "[#HMI.config]"
+			  ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings/setting[\[]@name='ModoNocturno'[\]]/value"
+			  Value="[MONO]"/>-->
+
 		  <!-- Ring to HeadPhones -->
 		  <util:XmlFile Id="RingToHeadSet" Action="setValue"
 					File = "[#HMI.config]"
@@ -621,7 +644,15 @@
                   File = "[#HMI.config]"
                   ElementPath="/configuration/applicationSettings/HMI.CD40.Module.Properties.Settings/setting[\[]@name='LanTeamType'[\]]/value"
                   Value="[NICTEAM]"/>
-      </Component>
+
+		  <!--<util:XmlFile Id="ModoNocturno" Action="setValue"
+		        File = "[#HMI.config]"
+                ElementPath="/configuration/applicationSettings/HMI.Presentation.Twr.Properties.Settings[\[]@name='ModoNocturno'[\]]/value"
+        		Value="[MONO]"/>-->
+
+
+	  </Component>
+		
       
       <Component Id='ConditionalUpdatesForENAIRE' Guid='{D4F30EE1-F85F-4A5C-B233-8C63F6F1A74F}' KeyPath='yes'>
         <Condition >CLIENTE="ENAIRE"</Condition>
@@ -638,6 +669,7 @@
                         ElementPath="/SolutionProfile/Section[\[]@Name='Apps'[\]]/Modules/ModuleInfo"
                         Name="AssemblyFile"
                         Value="Presentation.Twr.dll"/>
+
       </Component>
       <Component Id='ConditionalUpdatesForASECNA' Guid='{E5EDC4B5-F751-4C1E-89FF-AAEE404367DE}' KeyPath='yes'>
         <Condition >CLIENTE="ASECNA"</Condition>
@@ -788,7 +820,10 @@
         File = "[#HMI.config]"
         ElementPath="/configuration/applicationSettings/HMI.Model.Module.Properties.Settings/setting[\[]@name='BigFonts'[\]]/value"
         Value="true"/>
-      </Component>
+
+
+
+	  </Component>
 
       <!-- El doble altavoz condiciona la configuracion de HFSpeaker -->
       <Component Id='ConditionalUpdatesForDoubleRadioSpeaker' Guid='{54DAE262-4D25-49F7-8AD5-484150EFDAA4}' KeyPath='yes'>
@@ -906,6 +941,7 @@
           <RegistryValue Name='TIMESPRX_Property' Value='[TIMESPRX]' Type='string' />
           <RegistryValue Name='PTTFILTER_Property' Value='[PTTFILTER]' Type='string' />
           <!--<RegistryValue Name='ECTLF_Property' Value='[ECTLF]' Type='string' />-->
+			<RegistryValue Name='MONO_Property' Value='[MONO]' Type='string' />
 			<RegistryValue Name='ECLC_Property' Value='[ECLC]' Type='string' />
 			<RegistryValue Name='RTOH_Property' Value='[RTOH]' Type='string' />
           <RegistryValue Name='NICTEAM_Property' Value='[NICTEAM]' Type='string' />
@@ -1337,8 +1373,15 @@
             <ListItem Value="False" Text="No" />
           </ComboBox>
         </Control>
+		  <Control Id="MONOLabel"  Type="Text"     X="190" Y="192" Width="100" Height="18" TabSkip="no" Text="Modo Nocturno" />
+		  <Control Id="MONO_value"  Type="ComboBox" X="300" Y="190" Width="50"  Height="18" Property="MONO" ComboList="yes" >
+			  <ComboBox Property="MONO" >
+				  <ListItem Value="True"  Text="Si" />
+				  <ListItem Value="False" Text="No" />
+			  </ComboBox>
+		  </Control>
 
-        <Control Id="ECTlfLabel"  Type="Text"     X="10" Y="172" Width="100" Height="18" TabSkip="no" Text="Cancelador manos libres Tlf" />
+		  <Control Id="ECTlfLabel"  Type="Text"     X="10" Y="172" Width="100" Height="18" TabSkip="no" Text="Cancelador manos libres Tlf" />
         <Control Id="ECTlf_value"  Type="ComboBox" X="125" Y="170" Width="50"  Height="18" Property="ECTLF" ComboList="yes" >
           <ComboBox Property="ECTLF" >
             <ListItem Value="True"  Text="Si" />

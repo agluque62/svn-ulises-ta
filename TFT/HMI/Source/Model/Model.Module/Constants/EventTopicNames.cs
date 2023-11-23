@@ -87,17 +87,22 @@ namespace HMI.Model.Module.Constants
         public const string BriefingSessionUI = "BriefingSessionUI";
         public const string ReplayUI = "ReplayUI";
         public const string DeleteSessionGlp = "DeleteSessionGlp";
+        public const string ReinicioAppUI = "ReinicioAppUI";
 
-		//LALM 210224 Errores #4755 confirmación de cambio de página radio
-		public const string CambioPaginaRadioUp = "CambioPaginaRadioUp";
+        //LALM 210224 Errores #4755 confirmación de cambio de página radio
+        public const string CambioPaginaRadioUp = "CambioPaginaRadioUp";
 		public const string CambioPaginaRadioDown = "CambioPaginaRadioDown";
 		public const string PlayRadio= "PlayRadio";
+#if SELECCION_SONIDO_AD
+		public const string SeleccionSonido= "SeleccionSonido";
+#endif
+		public const string SetToneporllamadaModel = "SetToneporllamadaModel";
 
-		#endregion
+#endregion
 
-		#region Engine Events
+#region Engine Events
 
-		public const string ConnectionStateEngine = "ConnectionStateEngine";
+        public const string ConnectionStateEngine = "ConnectionStateEngine";
 		public const string IsolatedStateEngine = "IsolatedStateEngine";
 		public const string ActiveScvEngine = "ActiveScvEngine";
 		public const string PositionIdEngine = "PositionIdEngine";
@@ -181,6 +186,6 @@ namespace HMI.Model.Module.Constants
 		public const string TlfResStateEngine = "TlfResStateEngine";
         //230228
         //public const string RdListaFrecuencias = "RdListaFrecuencias";
-        #endregion
+#endregion
     }
 }

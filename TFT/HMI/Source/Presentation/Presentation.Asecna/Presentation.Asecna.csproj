@@ -71,6 +71,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Lib\Microsoft.Practices.ObjectBuilder.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Cd40\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NLog, Version=3.1.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Cd40\Lib\NLog.dll</HintPath>
@@ -138,6 +142,12 @@
     </Compile>
     <Compile Include="UI\RdPageButton.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\SeleccionRing.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\SeleccionRing.Designer.cs">
+      <DependentUpon>SeleccionRing.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\SplitUC.cs">
       <SubType>UserControl</SubType>
@@ -260,6 +270,9 @@
     <EmbeddedResource Include="UI\MemUC.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MemUC.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\SeleccionRing.resx">
+      <DependentUpon>SeleccionRing.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\SplitUC.resx">
       <DependentUpon>SplitUC.cs</DependentUpon>

@@ -1,4 +1,6 @@
 ﻿
+using HMI.Model.Module.UI;
+
 namespace HMI.Presentation.Twr.UI
 {
     partial class ControlRecord
@@ -48,19 +50,20 @@ namespace HMI.Presentation.Twr.UI
             this.panel1.Controls.Add(this.hmiButtonStop);
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(34, 48);
+            this.panel1.Size = new System.Drawing.Size(39, 48);
             this.panel1.TabIndex = 3;
             // 
             // hmiButtonPlay
             // 
             this.hmiButtonPlay.DrawX = false;
-            this.hmiButtonPlay.ImageDisabled = global::HMI.Presentation.Twr.Properties.Resources.play_no_disponible;
-            this.hmiButtonPlay.ImageNormal = ((System.Drawing.Image)(resources.GetObject("hmiButtonPlay.ImageNormal")));
+            this.hmiButtonPlay.ImageDisabled = global::HMI.Presentation.Twr.Properties.Resources.play_no_disponibeN;
+            this.hmiButtonPlay.ImageNormal = global::HMI.Presentation.Twr.Properties.Resources.play_no_disponible;
+            this.hmiButtonPlay.IsConferencePreprogramada = false;
             this.hmiButtonPlay.Location = new System.Drawing.Point(0, 0);
             this.hmiButtonPlay.Margin = new System.Windows.Forms.Padding(0);
             this.hmiButtonPlay.Name = "hmiButtonPlay";
             this.hmiButtonPlay.Permitted = true;
-            this.hmiButtonPlay.Size = new System.Drawing.Size(34, 42);
+            this.hmiButtonPlay.Size = new System.Drawing.Size(37, 42);
             this.hmiButtonPlay.TabIndex = 1;
             this.hmiButtonPlay.Text = "play";
             this.hmiButtonPlay.MouseUp += new System.Windows.Forms.MouseEventHandler(this.hmiButtonPlay_MouseUp);
@@ -82,10 +85,11 @@ namespace HMI.Presentation.Twr.UI
             this.hmiButtonStop.DrawX = false;
             this.hmiButtonStop.ImageDisabled = global::HMI.Presentation.Twr.Properties.Resources.play_disabled;
             this.hmiButtonStop.ImageNormal = ((System.Drawing.Image)(resources.GetObject("hmiButtonStop.ImageNormal")));
+            this.hmiButtonStop.IsConferencePreprogramada = false;
             this.hmiButtonStop.Location = new System.Drawing.Point(0, 0);
             this.hmiButtonStop.Name = "hmiButtonStop";
             this.hmiButtonStop.Permitted = true;
-            this.hmiButtonStop.Size = new System.Drawing.Size(34, 32);
+            this.hmiButtonStop.Size = new System.Drawing.Size(39, 32);
             this.hmiButtonStop.TabIndex = 4;
             this.hmiButtonStop.Visible = false;
             this.hmiButtonStop.Click += new System.EventHandler(this.hmiButtonStop_Click);
@@ -115,7 +119,7 @@ namespace HMI.Presentation.Twr.UI
             this.BackColor = System.Drawing.SystemColors.ControlDark;
             this.Controls.Add(this.panel1);
             this.Name = "ControlRecord";
-            this.Size = new System.Drawing.Size(40, 54);
+            this.Size = new System.Drawing.Size(45, 54);
             this.Leave += new System.EventHandler(this.ControlRecord_Leave);
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.uiTimer1)).EndInit();

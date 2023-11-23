@@ -10,6 +10,10 @@ using HMI.Model.Module.Properties;
 using HMI.Model.Module.Constants;
 using HMI.Model.Module.Messages;
 using Utilities;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.IO;
+using System.Linq;
 
 namespace HMI.Model.Module.Services
 {
@@ -38,8 +42,9 @@ namespace HMI.Model.Module.Services
         private HistoricOfLocalCalls _HistoricalOfCalls;
         private bool _ManagingSite;
 		private PlayState _PlayBt;
-
-		[EventPublication(EventTopicNames.ShowNotifMsgUI, PublicationScope.Global)]
+		private Dictionary<string, string[]> _tonosPorLlamada = new Dictionary<string, string[]>();
+        
+        [EventPublication(EventTopicNames.ShowNotifMsgUI, PublicationScope.Global)]
 		public event EventHandler<NotifMsg> ShowNotifMsgUI;
 
 		[EventPublication(EventTopicNames.HideNotifMsgUI, PublicationScope.Global)]
@@ -218,6 +223,25 @@ namespace HMI.Model.Module.Services
 			}
 		}
 
+        public Dictionary<string, string[]> tonosPorLlamada
+        {
+            get 
+			{ 
+				return _tonosPorLlamada; 
+			}
+            set { 
+				_tonosPorLlamada = value; 
+			}
+        }
+
+		public void SetTonosPorLlamada(string clave, string valor,string valorprio)
+        {
+			_tonosPorLlamada[clave] = new string[] { valor, valorprio };
+        }
+        public string[] GetTonosPorLlamada(string clave)
+        {
+            return _tonosPorLlamada[clave];
+        }
         public StateManagerService()
 		{
 		}
@@ -230,6 +254,10 @@ namespace HMI.Model.Module.Services
 		public void HideUIMessage(string id)
 		{
 			General.SafeLaunchEvent(HideNotifMsgUI, this, new EventArgs<string>(id));
+		}
+		public string[] GetTono(string tipo_llamada)
+		{
+			return tonosPorLlamada[tipo_llamada];
 		}
 	}
 }

@@ -9,5 +9,6 @@ namespace HMI.Presentation.Asecna.Constants
 		public const string KeypadView = "KeypadView";
         public const string MemView = "MemView";
         public const string HfView = "HfView";
+        public const string SeleccionRingView = "SeleccionRingView";
     }
 }

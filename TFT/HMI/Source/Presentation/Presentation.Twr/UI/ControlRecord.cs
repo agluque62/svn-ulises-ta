@@ -1,5 +1,6 @@
 ﻿using HMI.Infrastructure.Interface.Constants;
 using HMI.Model.Module.BusinessEntities;
+using HMI.Model.Module.UI;
 using HMI.Presentation.Twr.Properties;
 using Microsoft.Practices.CompositeUI.EventBroker;
 using NLog;
@@ -123,10 +124,20 @@ namespace HMI.Presentation.Twr.UI
                 _filegrabado = value;
             }
         }
-        
+
         public ControlRecord()
         {
             InitializeComponent();
+            if (!VisualStyle.ModoNocturno)
+            {
+                this.hmiButtonPlay.ImageNormal = global::HMI.Presentation.Twr.Properties.Resources.play_no_disponible;
+            }
+            else
+            {
+                this.hmiButtonPlay.ImageNormal = global::HMI.Presentation.Twr.Properties.Resources.play;
+                //this.hmiButtonPlay.ImageDisabled = global::HMI.Presentation.Twr.Properties.Resources.logo
+            }
+
             estado = estados.Deshabilitado;
             string dirName = Settings.Default.DirectorioGLPRxRadio;
             if (!System.IO.Directory.Exists(dirName))

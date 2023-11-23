@@ -54,7 +54,11 @@ namespace U5ki.RdService
 
         //Si vale true quiere decir que el recurso esta sintonizado con la frecuencia correcta
         bool TunedFrequencyOK
-        { get; set; }        
+        { get; set; }
+
+        //es true si la sesion con el grs remoto soporta selcal de ED137C
+        bool Remote_grs_supports_ED137C_Selcal
+        { get; }
 
         bool MasterMN
         { get; set; }

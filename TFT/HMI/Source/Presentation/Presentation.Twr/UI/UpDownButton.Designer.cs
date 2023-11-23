@@ -1,3 +1,6 @@
+using System.Drawing;
+using HMI.Presentation.Twr.UI;
+
 namespace HMI.Presentation.Twr.UI
 {
 	partial class UpDownButton
@@ -29,7 +32,10 @@ namespace HMI.Presentation.Twr.UI
 		private void InitializeComponent()
 		{
             System.Windows.Forms.TableLayoutPanel _UpDownButtonTLP;
-            this._LevelBar = new System.Windows.Forms.ProgressBar();
+            //this._LevelBar = new System.Windows.Forms.ProgressBar();
+            this._LevelBar = new ColorProgressBar();
+            // LALM: 210202 Nueva Progress Bar con colores
+
             this._DownBT = new HMI.Model.Module.UI.HMIButton();
             this._UpBT = new HMI.Model.Module.UI.HMIButton();
             _UpDownButtonTLP = new System.Windows.Forms.TableLayoutPanel();
@@ -99,11 +105,32 @@ namespace HMI.Presentation.Twr.UI
             this.ResumeLayout(false);
 
 		}
+        public void setColor(Brush brush)
+        {
+            this._LevelBar.setColor(brush);
 
-		#endregion
+        }
+        public void setColor(Color color)
+        {
+            Brush brush = null;
+            string name = color.ToString().ToUpper().Split('[')[1].Split(']')[0];
+            if (name == "Black".ToUpper()) brush = Brushes.Black;
+            else if (name == "Red".ToUpper()) brush = Brushes.Red;
+            else if (name == "Green".ToUpper()) brush = Brushes.Green;
+            else if (name == "Magenta".ToUpper()) brush = Brushes.Magenta;
+            else if (name == "Blue".ToUpper()) brush = Brushes.Blue;
+            else if (name == "Cyan".ToUpper()) brush = Brushes.Cyan;
+            else brush = Brushes.Green;
 
-		private System.Windows.Forms.ProgressBar _LevelBar;
-		private HMI.Model.Module.UI.HMIButton _DownBT;
+            this._LevelBar.setColor(brush);
+
+        }
+
+        #endregion
+
+        //private System.Windows.Forms.ProgressBar _LevelBar;
+        private HMI.Presentation.Twr.UI.ColorProgressBar _LevelBar;
+        private HMI.Model.Module.UI.HMIButton _DownBT;
 		private HMI.Model.Module.UI.HMIButton _UpBT;
 
 	}

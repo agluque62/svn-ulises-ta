@@ -5,6 +5,8 @@ using System.Runtime.Remoting.Messaging;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using NLog;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace Utilities
 {
@@ -310,5 +312,43 @@ namespace Utilities
 
          return str.ToString();
       }
-   }
+	  public static Dictionary <string,string> ReadXml(
+		  string file= "archivotonos.xml",
+		  string usuario="L2",
+		  string nodo="//usuario",
+		  string cnombre="nombre",
+		  string ctonos="tonos",
+		  string cllamada="llamada"
+		  )
+      {
+			Dictionary<string,string> dict = new Dictionary<string,string>();
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(file);
+
+                XmlNodeList userNodes = xmlDoc.SelectNodes("//usuario");
+                foreach (XmlNode userNode in userNodes)
+                {
+                    string nombreUsuario = userNode.Attributes[cnombre].Value;
+                    if (nombreUsuario == usuario)
+                    {
+                        XmlNodeList tonoNodes = userNode.SelectNodes(ctonos);
+                        foreach (XmlNode tonoNode in tonoNodes)
+                        {
+                            string llamada = tonoNode.Attributes[cllamada].Value;
+                            string tono = tonoNode.InnerText;
+                            dict[llamada] = tono;
+                        }
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar los tonos por llamada: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+			return dict;
+        }
+    }
 }

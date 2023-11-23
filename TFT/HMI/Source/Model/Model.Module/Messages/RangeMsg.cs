@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using HMI.Model.Module.BusinessEntities;
 
 namespace HMI.Model.Module.Messages
@@ -92,9 +93,9 @@ namespace HMI.Model.Module.Messages
 		//#2629 Presentar via utilizada en llamada saliente.
 		public readonly string _recused;
 
-		//LALM 211007
-		//#2629 Presentar via utilizada en llamada saliente.
-		public TlfInfo(string dst, TlfState st, bool priorityAllowed, TlfType type, bool isTop, bool allowsForward, string recused = "")
+
+        
+        public TlfInfo(string dst, TlfState st, bool priorityAllowed, TlfType type, bool isTop, bool allowsForward, string recused = "")
 		{
 			Dst = dst;
 			St = st;
@@ -107,15 +108,13 @@ namespace HMI.Model.Module.Messages
 			// Este parametro ira en la proxima revision.
 			if (recused != "" && recused!=null)
 
-				if (recused.IndexOf("rs=") > 0)
-				{
-					int begin = recused.IndexOf("rs=");
-					_recused = " [" + recused.Substring(begin + 3).Split('>')[0] + "] ";
-					int fpc = recused.Substring(begin + 3).IndexOf(';');
-					if (fpc > 0)
-						_recused = " [" + recused.Substring(begin + 3).Split(';')[0] + "] ";
-				}
-				else if (recused.IndexOf("sip:") > 0)
+                if (recused.IndexOf("rs=") > 0)
+                {
+
+
+					_recused = StringUtil.ObtenerStringEntreMarcadores(recused);
+                }
+                else if (recused.IndexOf("sip:") > 0)
 				{
 					int begin = recused.IndexOf("sip:");
 					_recused = "";
@@ -340,7 +339,7 @@ namespace HMI.Model.Module.Messages
 		}
 	}
 
-	public sealed class TlfIaDestination
+     public sealed class TlfIaDestination
 	{
 		public string Alias;
 		public string Number;
@@ -350,7 +349,8 @@ namespace HMI.Model.Module.Messages
 		//LALM 211008
 		//#2629 Presentar via utilizada en llamada saliente.
 		public string _recused;
-
+        
+        
 		public TlfIaDestination(string alias, string number, TlfState state, bool isTop = true, bool allowsForward = true, string recused = "")
 		{
 			Alias = alias;
@@ -360,12 +360,11 @@ namespace HMI.Model.Module.Messages
             _AllowsForward = allowsForward;
 			//LALM 211008
 			//#2629 Presentar via utilizada en llamada saliente.
-			if (recused != null && recused.IndexOf("rs=") > 0)
+			if (recused != null && recused.IndexOf("cd40rs=") > 0)
 			{
-				int begin = recused.IndexOf("rs=");
-				_recused = " (" + recused.Substring(begin + 3).Split('>')[0] + ")";
-			}
-			else
+                _recused = StringUtil.ObtenerStringEntreMarcadores(recused);
+            }
+            else
 				_recused = "";
 		}
 
@@ -478,4 +477,28 @@ namespace HMI.Model.Module.Messages
 			}
 		}
 	}
+
+
+ 	public static class StringUtil
+	{
+        public static string ObtenerStringEntreMarcadores(string cadena)
+        {
+            if (string.IsNullOrEmpty(cadena))
+                return string.Empty; // Si la cadena es null o está vacía, retorna una cadena vacía directamente
+
+            string marcadorInicio = "cd40rs=";
+            char[] caracteresFinales = { ';', '>', ']' };
+            int startIndex = cadena.IndexOf(marcadorInicio); // Busca el índice del inicio de la subcadena
+            int subcadenaInicioIndex = startIndex + marcadorInicio.Length; // Calcula el índice de inicio de la subcadena real
+            string subcadenaRecortada = cadena.Substring(subcadenaInicioIndex); // Recorta la cadena desde el índice de inicio
+            int lastIndex = subcadenaRecortada.IndexOfAny(caracteresFinales); // Busca el índice del último carácter final encontrado
+            if (lastIndex != -1)
+            {
+                int subcadenaLength = lastIndex;
+                string subcadena = cadena.Substring(subcadenaInicioIndex, subcadenaLength); // Obtiene la subcadena
+                return "[" + subcadena + "]";
+            }
+            return string.Empty;
+        }
+    }
 }

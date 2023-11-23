@@ -1256,10 +1256,15 @@ namespace HMI.CD40.Module.BusinessEntities
                 {
                     //Para redes externas, es necesario enviar el recurso
                     if (Prefix > Cd40Cfg.ATS_DST)
-                        return string.Format("<sip:{0}@{1}{2}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip, dstParams);
-                    return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip);
+                    {
+                        if (_Lines?.Count > 0)
+                            return string.Format("<sip:{0}@{1}{2}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip, dstParams);
+                    }
+                    if (_Lines?.Count > 0)
+                        return string.Format("<sip:{0}@{1}>", _RemoteDestinations[0].Ids[0], _Lines[0].Ip);
+                    return "";
+                }
             }
-        }
         }
         public override string Domain
         {

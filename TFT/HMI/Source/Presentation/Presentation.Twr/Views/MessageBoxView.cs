@@ -16,7 +16,7 @@ using HMI.Model.Module.Constants;
 using HMI.Model.Module.Messages;
 using Utilities;
 using NLog;
-
+using HMI.Model.Module.UI;
 namespace HMI.Presentation.Twr.Views
 {
 	[SmartPart]
@@ -102,6 +102,16 @@ namespace HMI.Presentation.Twr.Views
 		public MessageBoxView([ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
 		{
 			InitializeComponent();
+			//LALM: 210203.
+			if (!VisualStyle.ModoNocturno)
+            {
+
+            }
+			else
+			{
+				this.BackColor = VisualStyle.ButtonColor;
+				this.ForeColor = Color.White;
+			}
 
 			_CmdManager = cmdManager;
 			_StateManager = stateManager;

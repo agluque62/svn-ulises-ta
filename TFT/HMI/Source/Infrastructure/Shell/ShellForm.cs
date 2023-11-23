@@ -11,9 +11,8 @@
 //
 // Latest version of this Guidance Package: http://go.microsoft.com/fwlink/?LinkId=62182
 //----------------------------------------------------------------------------------------
-using System;
-using System.Windows.Forms;
 using HMI.Infrastructure.Interface.Constants;
+using System.Windows.Forms;
 
 #if _AUDIOGENERIC_
 using System.Reflection;

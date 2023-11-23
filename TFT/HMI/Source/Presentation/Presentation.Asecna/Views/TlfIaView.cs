@@ -49,7 +49,8 @@ namespace HMI.Presentation.Asecna.Views
 		private StateManagerService _StateManager;
 		private Keypad _Keypad;
 		private MemUC _Mem;
-		private Dictionary<HMIButton, Color> _SlowBlinkList;
+        private SeleccionRing _SeleccionRing;
+        private Dictionary<HMIButton, Color> _SlowBlinkList;
 		private bool _SlowBlinkOn = true;
 		private bool _IsCurrentView = false;
 		private int? _CallTimestamp = null;
@@ -175,8 +176,10 @@ namespace HMI.Presentation.Asecna.Views
 
 			_Keypad = _WorkItem.SmartParts.AddNew<Keypad>(ViewNames.KeypadView);
 			_Mem = _WorkItem.SmartParts.AddNew<MemUC>(ViewNames.MemView);
+            _SeleccionRing = _WorkItem.SmartParts.AddNew<SeleccionRing>(ViewNames.SeleccionRingView);
+            _SeleccionRing.Setup(_StateManager, _CmdManager);
 
-			_Keypad.NewKey += OnKeypadNewKey;
+            _Keypad.NewKey += OnKeypadNewKey;
 			_Keypad.ClearClick += OnKeypadClear;
 			_Mem.OkClick += OnMemOkClick;
 			_Mem.CancelClick += OnMemCancelClick;
@@ -462,9 +465,12 @@ namespace HMI.Presentation.Asecna.Views
 		public void OnAgendaChanged(object sender, EventArgs e)
 		{
 			_Mem.Reset(_StateManager.Agenda.Numbers);
-		}
+            if (_StateManager?.Title.Id != "")
+                _SeleccionRing.ReadJson(_StateManager?.Title.Id);
 
-		[EventSubscription(EventTopicNames.DependencesNumberCalled, ThreadOption.Publisher)]
+        }
+
+        [EventSubscription(EventTopicNames.DependencesNumberCalled, ThreadOption.Publisher)]
 		public void OnDependencesNumberCalled(object sender, EventArgs<string> e)
 		{
             string num = "03" + e.Data;
@@ -477,7 +483,34 @@ namespace HMI.Presentation.Asecna.Views
 			_CallTimestamp = Environment.TickCount;
 		}
 
-		private void ShowAgenda(bool show)
+        private void ShowSeleccionRing(bool show)
+        {
+            if (_SeleccionRing.Visible)
+            {
+                _SeleccionRing.Hide();
+                _SeleccionRing.Show();
+            }
+            else
+            {
+                _SeleccionRing.Show();
+                _SeleccionRing.Hide();
+            }
+            bool seleccionringShowed = _WorkItem.Workspaces[WorkspaceNames.IaToolsWorkspace].ActiveSmartPart == _SeleccionRing;
+            bool keypadShowed = _WorkItem.Workspaces[WorkspaceNames.IaToolsWorkspace].ActiveSmartPart == _Keypad;
+
+            if (show && !seleccionringShowed)
+            {
+                //_SeleccionRing.Reset();
+                _MemBT.ButtonColor = VisualStyle.Colors.Yellow;
+                _WorkItem.Workspaces[WorkspaceNames.IaToolsWorkspace].Show(_SeleccionRing);
+            }
+            else if (!show && !keypadShowed)
+            {
+                _MemBT.ButtonColor = VisualStyle.ButtonColor;
+                _WorkItem.Workspaces[WorkspaceNames.IaToolsWorkspace].Show(_Keypad);
+            }
+        }
+        private void ShowAgenda(bool show)
 		{
 			bool memShowed = _WorkItem.Workspaces[WorkspaceNames.IaToolsWorkspace].ActiveSmartPart == _Mem;
 			bool keypadShowed = _WorkItem.Workspaces[WorkspaceNames.IaToolsWorkspace].ActiveSmartPart == _Keypad;
@@ -624,14 +657,28 @@ namespace HMI.Presentation.Asecna.Views
 			}
 		}
 
-		private void _MemBT_Click(object sender, EventArgs e)
+        private void ChangeName(string name)
+        {
+            _MemBT.Text = name;
+        }
+        static int cont = 0;
+        private void _MemBT_Click(object sender, EventArgs e)
 		{
-			bool show = _MemBT.ButtonColor != VisualStyle.Colors.Yellow;
-
-			try
-			{
-				ShowAgenda(show);
-			}
+            bool show = _MemBT.ButtonColor != VisualStyle.Colors.Yellow;
+            cont++;
+            try
+            {
+                if (cont % 4 < 2)
+                {
+                    ShowAgenda(show);
+                    ChangeName("MEM");
+                }
+                else if (cont % 4 >= 2)
+                {
+                    ShowSeleccionRing(show);
+                    ChangeName("RING");
+                }
+            }
 			catch (Exception ex)
 			{
 				string msg = string.Format("ERROR {0} agenda tras pulsar boton Mem", show ? "mostrando" : "ocultando");
@@ -697,8 +744,23 @@ namespace HMI.Presentation.Asecna.Views
 				}
 			}
 		}
+        private void OnChgMode(object sender, bool mode)
+        {
+            if (mode != VisualStyle.ModoNocturno)//230804
+            {
+                string str = string.Format("Cambio a Modo {0}.\n El sistema se reinicará de nuevo en menos de un minuto.", (mode) ? "Nocturno" : "Diurno");
+                NotifMsg msg = new NotifMsg("Cambio de Modo", "Estado", str, 0, MessageType.Information, MessageButtons.Ok);
+                _StateManager.ShowUIMessage(msg);
+            }
+            else
+            {
+                string str = string.Format("El cambio de modo no se puede efectuar en este momento.");
+                NotifMsg msg = new NotifMsg("Error Cambio de Modo", "Estado", str, 0, MessageType.Information, MessageButtons.Ok);
+                _StateManager.ShowUIMessage(msg);
+            }
+        }
 
-		private void OnKeypadClear(object sender)
+        private void OnKeypadClear(object sender)
 		{
 			try
 			{

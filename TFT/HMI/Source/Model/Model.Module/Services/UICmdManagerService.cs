@@ -54,21 +54,29 @@ namespace HMI.Model.Module.Services
         [EventPublication(EventTopicNames.DeleteSessionGlp, PublicationScope.Global)]
         public event EventHandler DeleteSessionGlp;
 
-		//LALM 210224 Errores #4755 confirmación de cambio de página radio
-		[EventPublication(EventTopicNames.CambioPaginaRadioUp, PublicationScope.Global)]
+        [EventPublication(EventTopicNames.ReinicioAppUI, PublicationScope.Global)]
+        public event EventHandler ReinicioAppUI;
+
+        //LALM 210224 Errores #4755 confirmación de cambio de página radio
+        [EventPublication(EventTopicNames.CambioPaginaRadioUp, PublicationScope.Global)]
 		public event EventHandler CambioPaginaRadioUp;
 		[EventPublication(EventTopicNames.CambioPaginaRadioDown, PublicationScope.Global)]
 		public event EventHandler CambioPaginaRadioDown;
 		[EventPublication(EventTopicNames.PlayRadio, PublicationScope.Global)]
 		public event EventHandler PlayRadio;
 
-		public UICmdManagerService([ServiceDependency] StateManagerService stateManager, [ServiceDependency] IEngineCmdManagerService engineCmdManager)
+#if SELECCION_SONIDO_AD
+		[EventPublication(EventTopicNames.SeleccionSonido, PublicationScope.Global)]
+		public event EventHandler SeleccionSonido;// 230627
+#endif
+
+        public UICmdManagerService([ServiceDependency] StateManagerService stateManager, [ServiceDependency] IEngineCmdManagerService engineCmdManager)
 		{
 			_StateManager = stateManager;
 			_EngineCmdManager = engineCmdManager;
 		}
 
-		#region IModelCmdManagerService Members
+#region IModelCmdManagerService Members
 
 		public void DisableTft()
 		{
@@ -168,7 +176,18 @@ namespace HMI.Model.Module.Services
 					// se queda igual
 				}
 			}
-		}
+            else if (msg.Id == "Cambio de Modo")
+            {
+                if (response == NotifMsgResponse.Ok)
+                {
+                    General.SafeLaunchEvent(ReinicioAppUI, this);
+                }
+                else
+                {
+                    // voy a intentar llegar al otro reset
+                }
+            }
+        }
 
 		public void ShowSplitModeSelection()
 		{
@@ -1027,7 +1046,7 @@ namespace HMI.Model.Module.Services
 			//Debug.Assert(mode != _StateManager.Light.Mode);
 			_EngineCmdManager.SetCambioRadio( up);
 		}
-		#endregion
+#endregion
 
 		private void TlfClick(string number, bool ia, string givenLiteral = null, int id = Int32.MaxValue)
         {
@@ -1395,5 +1414,30 @@ namespace HMI.Model.Module.Services
 
 			//_EngineCmdManager.ShowAdButtons();
 		}
-	}
+
+#if SELECCION_SONIDO_AD
+		public void SeleccionSonidoClick()
+        {
+			
+			TlfSeleccionSonido();//230626 envio una pagina distinta.
+		}
+		public void TlfSeleccionSonido()
+		{
+			try
+			{
+				General.SafeLaunchEvent(SeleccionSonido, this);
+
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
+		}
+#endif
+		public void SetToneporllamadaModel(string llamda,string tono, string tonoprio)
+		{
+			_EngineCmdManager.SetToneporllamadaEngine(llamda,tono, tonoprio);
+        }
+    }
 }

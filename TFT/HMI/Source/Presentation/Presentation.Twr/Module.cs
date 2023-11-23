@@ -24,33 +24,177 @@ using HMI.Presentation.Twr.Properties;
 
 using System.Threading;
 using System.Globalization;
+using System.IO;
 
 namespace HMI.Presentation.Twr
 {
 	public class Module : ModuleInit
 	{
 		private WorkItem _rootWorkItem;
-
+		public static bool GetModoNocturno()
+		{
+			var filename = "hmi.exe.config";
+			var valor = "True";
+			var clave = "ModoNocturno";
+			var find = $"      <setting name=\"{clave}\" serializeAs=\"String\">\r\n        <value>{valor}</value>\r\n      </setting>";
+			var data = File.ReadAllText(filename);
+			data = data.Trim();
+			find = find.Trim();
+			if (data.IndexOf(find) == -1)
+				return false;
+			return true;
+		}
 		[InjectionConstructor]
 		public Module([ServiceDependency] WorkItem rootWorkItem)
 		{
 			_rootWorkItem = rootWorkItem;
-
 			Settings stts = Settings.Default;
+			if (!GetModoNocturno())
+				VisualStyle.ModoNocturno = false;
+			else VisualStyle.ModoNocturno = true;
+			if (!VisualStyle.ModoNocturno)
+			{
+				VisualStyle.UseModernStyle = stts.ThemeUseModernStyle;
+				VisualStyle.UnknownScv = stts.ThemeUnknownScv;
+				VisualStyle.ScvA = stts.ThemeScvA;
+				VisualStyle.ScvB = stts.ThemeScvB;
+				VisualStyle.InnerBorderColorDisabled = stts.ThemeInnerBorderColorDisabled;
+				VisualStyle.InnerBorderColorNormal = stts.ThemeInnerBorderColorNormal;
+				VisualStyle.InnerBorderColorMouseOver = stts.ThemeInnerBorderColorMouseOver;
+				VisualStyle.InnerBorderColorPushed = stts.ThemeInnerBorderColorPushed;
+				VisualStyle.ButtonColor = stts.ThemeButtonColor;
+				VisualStyle.ButtonColorDisabled = stts.ThemeButtonColorDisabled;
+				VisualStyle.BorderColor = stts.ThemeBorderColor;
+				VisualStyle.BorderColorDisabled = stts.ThemeBorderColorDisabled;
+				VisualStyle.ButtonCornerRadius = stts.ThemeButtonCornerRadius;
 
-			VisualStyle.UseModernStyle = stts.ThemeUseModernStyle;
-			VisualStyle.UnknownScv = stts.ThemeUnknownScv;
-			VisualStyle.ScvA = stts.ThemeScvA;
-			VisualStyle.ScvB = stts.ThemeScvB;
-			VisualStyle.InnerBorderColorDisabled = stts.ThemeInnerBorderColorDisabled;
-			VisualStyle.InnerBorderColorNormal = stts.ThemeInnerBorderColorNormal;
-			VisualStyle.InnerBorderColorMouseOver = stts.ThemeInnerBorderColorMouseOver;
-			VisualStyle.InnerBorderColorPushed = stts.ThemeInnerBorderColorPushed;
-			VisualStyle.ButtonColor = stts.ThemeButtonColor;
-			VisualStyle.ButtonColorDisabled = stts.ThemeButtonColorDisabled;
-			VisualStyle.BorderColor = stts.ThemeBorderColor;
-			VisualStyle.BorderColorDisabled = stts.ThemeBorderColorDisabled;
-			VisualStyle.ButtonCornerRadius = stts.ThemeButtonCornerRadius;
+				// LALM: Modo Nocturno 210201
+				//VisualStyle.ModoNocturno = stts.ModoNocturno;
+				//VisualStyle.AspaColor = stts.aspaColor;
+				//VisualStyle.HeaderBlue = stts.HeaderBlue;
+				//VisualStyle.HeaderKhaki = stts.HeaderKhaki;
+				//VisualStyle.cccmnProgressBar = stts.ColorProgressBar;
+				//VisualStyle.TextoRadioColor = stts.TextoRadioColor;
+				//VisualStyle.TextoTfColor = stts.TextoTfColor;
+				//VisualStyle.TextoHeaderColor = stts.TextoHeaderColor;
+
+
+				//VisualStyle.TextoRColor = stts.TextoRColor;// letra R
+				//VisualStyle.TextoFrColor = stts.TextoFrColor;// Frecuencia
+				//VisualStyle.TextoEmColor = stts.TextoEmColor;// Emplazamiento
+				//VisualStyle.PttColor = stts.PttColor;
+				//VisualStyle.SquColor = stts.SquColor;
+				//VisualStyle.TextColor = stts.TextColor;
+				//VisualStyle.TextColorDisabled = stts.TextColorDisabled;
+				//VisualStyle.FondoColorConversacion = stts.FondoColorConversacion;
+				//VisualStyle.FondoColorBloqueo = stts.FondoColorBloqueo;
+				//VisualStyle.FondoColorConferencia = stts.FondoColorConferencia;
+				////VisualStyle.TextoColorConferencia = stts.TextoColorConferencia;
+				//VisualStyle.FondoColorRetenida = stts.FondoColorRetenida;
+				////VisualStyle.TextoColorRetenida = stts.TextoColorRetenida;
+				//VisualStyle.FondoColorFuncionActiva = stts.FondoColorFuncionActiva;
+
+				//VisualStyle.TextoFondoFuncionActiva = stts.TextoFondoFuncionActiva;
+				//VisualStyle.FondoColorMemorizada = stts.FondoColorMemorizada;
+				//VisualStyle.FondoColorRemoteMem = stts.FondoColorRemoteMem;
+				//VisualStyle.FondoColorHold = stts.FondoColorHold;
+				//VisualStyle.FondoColorFuncionActiva = stts.FondoColorFuncionActiva;
+				//VisualStyle.FondoColorCongestion = stts.FondoColorCongestion;
+				//VisualStyle.FondoColorInPrio = stts.FondoColorInPrio;
+				//VisualStyle.FondoColorNotAllowed = stts.FondoColorNotAllowed;
+				//VisualStyle.FondoColorInProcess = stts.FondoColorInProcess;
+				//// 
+				//VisualStyle.FondoColorOut = stts.FondoColorOut;
+				//VisualStyle.FondoColorConf = stts.FondoColorConf;
+				//VisualStyle.FondoColorbusy = stts.FondoColorbusy;
+				//VisualStyle.FondoColorMem = stts.FondoColorMem;
+				//VisualStyle.FondoColorNotAllow = stts.FondoColorNotAllow;
+				////VisualStyle.TextoFondoFuncionActiva = stts.TextoFondoFuncionActiva;
+
+				//VisualStyle.Color_HfColor = stts.HfColor;
+				//VisualStyle.Color_FDColor = stts.FDColor;
+				//VisualStyle.Color_TlfStateOut = stts.Color_TlfStateOut;
+				//VisualStyle.Color_IsListen = stts.Color_IsListen;
+				//VisualStyle.Color_Busy = stts.Color_Busy;
+				//VisualStyle.Color_blink = stts.Color_blink;
+				//VisualStyle.Color_congestion = stts.Color_congestion;
+
+			}
+			else
+			{
+				
+				VisualStyle.UseModernStyle = stts.ThemeUseModernStyleN;
+                VisualStyle.UnknownScv = stts.ThemeUnknownScvN;
+				VisualStyle.ScvA =  stts.ThemeScvAN;
+				VisualStyle.ScvB = stts.ThemeScvBN;
+                VisualStyle.InnerBorderColorDisabled = stts.ThemeInnerBorderColorDisabledN;
+                VisualStyle.InnerBorderColorNormal = stts.ThemeInnerBorderColorNormalN;
+                VisualStyle.InnerBorderColorMouseOver = stts.ThemeInnerBorderColorMouseOverN;
+                VisualStyle.InnerBorderColorPushed = stts.ThemeInnerBorderColorPushedN;
+                //VisualStyle.ButtonColor = stts.ThemeButtonColorN;
+                VisualStyle.ButtonColorDisabled = stts.ThemeButtonColorDisabledN;
+                VisualStyle.BorderColor = stts.ThemeBorderColorN;
+                VisualStyle.BorderColorDisabled = stts.ThemeBorderColorDisabledN;
+                VisualStyle.ButtonCornerRadius = stts.ThemeButtonCornerRadiusN;
+
+				// LALM: Modo Nocturno 210201
+				VisualStyle.ModoNocturno = stts.ModoNocturno;
+				VisualStyle.AspaColor = stts.aspaColorN;
+				VisualStyle.HeaderBlue = stts.HeaderBlueN;
+				VisualStyle.HeaderKhaki = stts.HeaderKhakiN;
+				VisualStyle.cccmnProgressBar = stts.ColorProgressBarN;
+				VisualStyle.TextoRadioColor = stts.TextoRadioColorN;
+				VisualStyle.TextoTfColor = stts.TextoTfColorN;
+				VisualStyle.TextoHeaderColor = stts.TextoHeaderColorN;
+
+
+				VisualStyle.TextoRColor = stts.TextoRColorN;// letra R
+				VisualStyle.TextoFrColor = stts.TextoFrColorN;// Frecuencia
+				VisualStyle.TextoEmColor = stts.TextoEmColorN;// Emplazamiento
+				VisualStyle.PttColor = stts.PttColorN;
+				VisualStyle.SquColor = stts.SquColorN;
+				VisualStyle.TextColor = stts.TextColorN;
+				VisualStyle.TextColorDisabled = stts.TextColorDisabledN;
+				VisualStyle.FondoColorConversacion = stts.FondoColorConversacionN;
+				VisualStyle.FondoColorBloqueo = stts.FondoColorBloqueoN;
+				VisualStyle.FondoColorConferencia = stts.FondoColorConferenciaN;
+				//VisualStyle.TextoColorConferencia = stts.TextoColorConferenciaN;
+				VisualStyle.FondoColorRetenida = stts.FondoColorRetenidaN;
+				//VisualStyle.TextoColorRetenida = stts.TextoColorRetenidaN;
+				VisualStyle.FondoColorFuncionActiva = stts.FondoColorFuncionActivaN;
+
+				VisualStyle.TextoFondoFuncionActiva = stts.TextoFondoFuncionActivaN;
+				VisualStyle.FondoColorMemorizada = stts.FondoColorMemorizadaN;
+				VisualStyle.FondoColorRemoteMem = stts.FondoColorRemoteMemN;
+				VisualStyle.FondoColorHold = stts.FondoColorHoldN;
+				VisualStyle.FondoColorFuncionActiva = stts.FondoColorFuncionActivaN;
+				VisualStyle.FondoColorCongestion = stts.FondoColorCongestionN;
+				VisualStyle.FondoColorInPrio = stts.FondoColorInPrioN;
+				VisualStyle.FondoColorNotAllowed = stts.FondoColorNotAllowedN;
+				VisualStyle.FondoColorInProcess = stts.FondoColorInProcessN;
+				// 
+				VisualStyle.FondoColorOut = stts.FondoColorOutN;
+				VisualStyle.FondoColorConf = stts.FondoColorConfN;
+				VisualStyle.FondoColorbusy = stts.FondoColorbusyN;
+				VisualStyle.FondoColorMem = stts.FondoColorMemN;
+				VisualStyle.FondoColorNotAllow = stts.FondoColorNotAllowN;
+				//VisualStyle.TextoFondoFuncionActiva = stts.TextoFondoFuncionActivaN;
+
+				VisualStyle.Color_HfColor = stts.HfColorN;
+				VisualStyle.Color_FDColor = stts.FDColorN;
+				VisualStyle.Color_TlfStateOut = stts.Color_TlfStateOutN;
+				VisualStyle.Color_IsListen = stts.Color_IsListenN;
+				VisualStyle.Color_Busy = stts.Color_BusyN;
+				VisualStyle.Color_blink = stts.Color_blinkN;
+				VisualStyle.Color_congestion = stts.Color_congestionN;
+				//otros
+				VisualStyle.ButtonColor = VisualStyle.ButtonColorN;
+				VisualStyle.TextColor = Color.White;
+
+
+
+
+			}
 		}
 
 		public override void Load()

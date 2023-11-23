@@ -1099,7 +1099,9 @@ namespace HMI.Presentation.Asecna.Views
                                 p.Value.Ptt != PttState.PttPortAndMod &&
                                 p.Value.Ptt != PttState.ExternPtt &&
                                 /** 20190205. Cuando esta en BLOQUEO no hay que testear el fallo de confirmacion de TX */
-                                p.Value.Ptt != PttState.Blocked)
+                                p.Value.Ptt != PttState.Blocked &&
+								p.Value.TipoFrecuencia!=TipoFrecuencia_t.HF//230704 Quito la supervision de frecuencias de hf
+								)
                             {
                                 General.SafeLaunchEvent(RdPosPttStateEngine, this, new RangeMsg<PttState>(p.Key.Id, PttState.TxError));//VMG Invented por ahora
                             }

@@ -480,5 +480,146 @@ namespace HMI.Model.Module.Properties {
                 return ((int)(this["NumTlfDestinationsCP"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
+        public int WidthJacks {
+            get {
+                return ((int)(this["WidthJacks"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        public int HeightJacks {
+            get {
+                return ((int)(this["HeightJacks"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/logo_AENANocturno.png")]
+        public string LogoMn {
+            get {
+                return ((string)(this["LogoMn"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/Squelch.gif")]
+        public string SQUEncendido {
+            get {
+                return ((string)(this["SQUEncendido"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/RdPageDown.gif")]
+        public string RdPageDownEncendido {
+            get {
+                return ((string)(this["RdPageDownEncendido"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/PTT.gif")]
+        public string PttEncencido {
+            get {
+                return ((string)(this["PttEncencido"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/PttBlocked.gif")]
+        public string ddPttBlockedEncendido {
+            get {
+                return ((string)(this["ddPttBlockedEncendido"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/jackoffNocturno.gif")]
+        public string JackoffMn {
+            get {
+                return ((string)(this["JackoffMn"]));
+            }
+            set {
+                this["JackoffMn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/jackonNocturno.gif")]
+        public string JackonMn {
+            get {
+                return ((string)(this["JackonMn"]));
+            }
+            set {
+                this["JackonMn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/BrightnessUp.gif")]
+        public string Brillomas {
+            get {
+                return ((string)(this["Brillomas"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/BrightnessDown.gif")]
+        public string Brillomenos {
+            get {
+                return ((string)(this["Brillomenos"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/BuzzerUp.gif")]
+        public string BuzzerUp {
+            get {
+                return ((string)(this["BuzzerUp"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/PTT.gif")]
+        public string PTTEncendido {
+            get {
+                return ((string)(this["PTTEncendido"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/PttBlocked.gif")]
+        public string PttBlockedEncendido {
+            get {
+                return ((string)(this["PttBlockedEncendido"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Resources/Buzzerdown.gif")]
+        public string Buzzerdown {
+            get {
+                return ((string)(this["Buzzerdown"]));
+            }
+        }
     }
 }

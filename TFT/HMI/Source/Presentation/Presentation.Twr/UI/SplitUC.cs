@@ -232,6 +232,13 @@ namespace HMI.Presentation.Twr.UI
 
 			HideModeSelection();
 		}
-    }
+		public void replacebitmaps(Image imageOff, Image imageRdLc, Image imageLcTf)
+		{
+			this._SplitBT.ImageNormal = imageOff;
+			this._SplitOffBT.ImageNormal = imageOff;
+			this._SplitRdLcBT.ImageNormal = imageRdLc;
+			this._SplitLcTfBT.ImageNormal = imageLcTf;
+		}
+	}
 }
 

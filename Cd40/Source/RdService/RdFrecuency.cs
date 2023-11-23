@@ -33,6 +33,8 @@ namespace U5ki.RdService
             public bool AudioInBssWindow { get; set; }
             public int MetodosBssOfrecidos { get; set; }
             public uint PorcentajeRSSI { get; set; }
+            public CORESIP_FREQUENCY_MODO_TRANSMISION ModoTransmision { get; set; }
+
 
             public NewRdFrequencyParams()
             {
@@ -46,6 +48,7 @@ namespace U5ki.RdService
                 Cld_supervision_time = 1000;
                 MetodosBssOfrecidos = (int)RdResource.BssMethods.Ninguno;
                 PorcentajeRSSI = 0;
+                ModoTransmision = CORESIP_FREQUENCY_MODO_TRANSMISION.Ninguno;
             }
         }
         private NewRdFrequencyParams new_params = new NewRdFrequencyParams();
@@ -664,7 +667,9 @@ namespace U5ki.RdService
             foreach (IRdResource res in _RdRs.Values)
             {
                 if (res.isRx && !res.isTx) _NumConfiguredRxResources++;
-                else if (!res.isRx && res.isTx) _NumConfiguredTxResources++;
+                else if (!res.isRx && res.isTx && TipoDeFrecuencia != "HF") _NumConfiguredTxResources++;    //En HF no hay transmisores configurados. 
+                                                                                                            //Los HF que estan en esta coleccion son los asignados
+                                                                                                            //y no configurados.
                 else if (res.isRx && res.isTx) _NumConfiguredTxRxResources++;
 
                 if (res.isRx)
@@ -3319,8 +3324,11 @@ namespace U5ki.RdService
                                 this.new_params.Priority != (CORESIP_Priority)cfg.PrioridadSesionSip ||
                                 this.new_params.Cld_supervision_time != cfg.CldSupervisionTime ||
                                 this.new_params.MetodosBssOfrecidos != cfg.MetodosBssOfrecidos ||
-                                this.new_params.PorcentajeRSSI != cfg.PorcentajeRSSI;
+                                this.new_params.PorcentajeRSSI != cfg.PorcentajeRSSI ||
+                                this.new_params.ModoTransmision != (CORESIP_FREQUENCY_MODO_TRANSMISION) cfg.ModoTransmision;
 
+
+            this.new_params.ModoTransmision = (CORESIP_FREQUENCY_MODO_TRANSMISION)cfg.ModoTransmision;
             this.new_params.CLDCalculateMethod = (CORESIP_CLD_CALCULATE_METHOD)cfg.MetodoCalculoClimax;
             this.new_params.BssWindows = cfg.VentanaSeleccionBss;
             this.new_params.AudioSync = cfg.SincronizaGrupoClimax;

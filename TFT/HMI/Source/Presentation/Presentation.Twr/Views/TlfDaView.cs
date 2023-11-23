@@ -58,7 +58,35 @@ namespace HMI.Presentation.Twr.Views
 		public TlfDaView([ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
 		{
 			InitializeComponent();
-            if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
+			if (!VisualStyle.ModoNocturno)
+			{
+
+			}
+			else
+			{
+				this._TlfDaTLP.BackColor = VisualStyle.ButtonColorN;//System.Drawing.Color.Black;
+				this._TlfButtonsTLP.BackColor = VisualStyle.ButtonColorN;//System.Drawing.Color.Black;
+				this._TlfDaTLP.ForeColor = VisualStyle.TextoTfColorN;// System.Drawing.Color.White;
+				this._TlfButtonsTLP.ForeColor = VisualStyle.TextoTfColorN;// System.Drawing.Color.White;
+				double scaleFactor = 0.7; // 70%
+
+				Bitmap originalImage = global::HMI.Presentation.Twr.Properties.Resources.TlfPageNocturno;
+				int newWidth = (int)(originalImage.Width * scaleFactor);
+				int newHeight = (int)(originalImage.Height * scaleFactor);
+				Bitmap resizedImage = new Bitmap(newWidth, newHeight);
+
+				using (Graphics graphics = Graphics.FromImage(resizedImage))
+				{
+					graphics.DrawImage(originalImage, new Rectangle(0, 0, newWidth, newHeight));
+				}
+
+				this._TlfPageFirstBT.ImageNormal = resizedImage;
+				this._TlfPageSecondBT.ImageNormal = resizedImage;
+				this._TlfPageConfBT.ImageNormal = resizedImage;
+
+
+			}
+			if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
             {
                 this._TlfButtonsTLP.Font = new System.Drawing.Font("Trebuchet MS", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             }
@@ -104,6 +132,8 @@ namespace HMI.Presentation.Twr.Views
 					bt.Dock = DockStyle.Fill;
 					bt.Name = "_TlfButton" + pos;
 					bt.Visible = false;
+					bt.IsButtonTlf = true;//incidencia 10970 teclas de telefonia
+					
 					bt.Id = pos == _NumPositionsByPage ? Tlf.IaMappedPosition : pos;
 
 					bt.Click += TlfButton_Click;
@@ -402,16 +432,16 @@ namespace HMI.Presentation.Twr.Views
 							OcultaPaticipantes();
 
 						}
-						else if (dst.State == TlfState.Set)
+						else if (dst.State == TlfState.Set && dst.PrevState == TlfState.Out)
 						{
                             string sala = _CmdManager.GetSala(i - FirstButtoConf);
 							OcultaVisibiliza(i, sala);
 						}
                         Reset(bt, dst);
 					}
-					else if (i<absFirstBtPageBegin)
+					else if (i < absConfBtPageBegin)
 					{
-                        HMIButton bt = _TlfButtons[i];
+						HMIButton bt = _TlfButtons[i % _NumPositionsByPage];
                         TlfDst dst = _StateManager.Tlf[i];
                         Reset(bt, dst);
                     }
@@ -650,54 +680,81 @@ namespace HMI.Presentation.Twr.Views
 					_SlowBlinkTimer.Enabled = true;
 					break;
 				case TlfState.Out:
-					backColor = VisualStyle.Colors.Blue;
+					if (!VisualStyle.ModoNocturno)
+						backColor = VisualStyle.Colors.Blue;
+					else
+						backColor = VisualStyle.Color_TlfStateOut;
 					break;
 				case TlfState.Set:
 				case TlfState.Conf:
 				case TlfState.ConfPreprogramada:
-					backColor = VisualStyle.Colors.Green;
+					// backColor = VisualStyle.Colors.Green;
+					// LALM 210204: En conversacion pongo el correspondiente configurado.
+					backColor = VisualStyle.FondoColorConversacion;
 					break;
 				case TlfState.Busy:
 				case TlfState.OutOfService:
-					backColor = VisualStyle.Colors.Red;
+					// backColor = VisualStyle.Colors.Red;
+					// LALM 210204: en caso de fuera de servicio o bloqueo
+					backColor = VisualStyle.FondoColorBloqueo;
 					break;
 				case TlfState.Mem:
-					backColor = VisualStyle.Colors.Orange;
+					// LALM 210204: Cambio colores por nombre de estados.
+					// backColor = VisualStyle.Colors.Orange;
+					backColor = VisualStyle.FondoColorMemorizada;
 					break;
 				case TlfState.RemoteMem:
-					backColor = VisualStyle.Colors.DarkGray;
+					// LALM 210204: Cambio colores por nombre de estados.
+					// backColor = VisualStyle.Colors.DarkGray;
+					backColor = VisualStyle.FondoColorRemoteMem;
 					break;
 				case TlfState.Hold:
 				case TlfState.RemoteHold:
-					backColor = _SlowBlinkOn ? VisualStyle.Colors.Green : VisualStyle.ButtonColor;
-					_SlowBlinkList[bt] = VisualStyle.Colors.Green;
+					// LALM 210204: Cambio colores por nombre de estados.
+					// backColor = _SlowBlinkOn ? VisualStyle.Colors.Green : VisualStyle.ButtonColor;
+					// _SlowBlinkList[bt] = VisualStyle.Colors.Green;
+					backColor = _SlowBlinkOn ? VisualStyle.FondoColorHold : VisualStyle.ButtonColor;
+					_SlowBlinkList[bt] = VisualStyle.FondoColorHold;
 					_SlowBlinkTimer.Enabled = true;
 					break;
 				case TlfState.RemoteIn:
-					backColor = _SlowBlinkOn ? VisualStyle.Colors.DarkGray : VisualStyle.ButtonColor;
-					_SlowBlinkList[bt] = VisualStyle.Colors.DarkGray;
+					// LALM 210204: Cambio colores por nombre de estados.
+					// backColor = _SlowBlinkOn ? VisualStyle.Colors.DarkGray : VisualStyle.ButtonColor;
+					// _SlowBlinkList[bt] = VisualStyle.Colors.DarkGray;
+					backColor = _SlowBlinkOn ? VisualStyle.FondoColorRemoteIn : VisualStyle.ButtonColor;
+					_SlowBlinkList[bt] = VisualStyle.FondoColorRemoteIn;
 					_SlowBlinkTimer.Enabled = true;
 					break;
 				case TlfState.Congestion:
-					backColor = _SlowBlinkOn ? VisualStyle.Colors.Red : VisualStyle.ButtonColor;
-					_SlowBlinkList[bt] = VisualStyle.Colors.Red;
+					// LALM 210204: Cambio colores por nombre de estados.
+					// backColor = _SlowBlinkOn ? VisualStyle.Colors.Red : VisualStyle.ButtonColor;
+					// _SlowBlinkList[bt] = VisualStyle.Colors.Red;
+					backColor = _SlowBlinkOn ? VisualStyle.FondoColorCongestion : VisualStyle.ButtonColor;
+					_SlowBlinkList[bt] = VisualStyle.FondoColorCongestion;
 					_SlowBlinkTimer.Enabled = true;
 					break;
 				case TlfState.InPrio:
-					backColor = _FastBlinkOn ? VisualStyle.Colors.Orange : VisualStyle.ButtonColor;
-					_FastBlinkList[bt] = VisualStyle.Colors.Orange;
+					// LALM 210204: Cambio colores por nombre de estados.
+					backColor = _FastBlinkOn ? VisualStyle.FondoColorInPrio : VisualStyle.ButtonColor;
+					_FastBlinkList[bt] = VisualStyle.FondoColorInPrio;
 					_FastBlinkTimer.Enabled = true;
 					break;
 				case TlfState.NotAllowed:
-					backColor = _FastBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
-					_SlowBlinkList[bt] = VisualStyle.Colors.Yellow;
+					// LALM 210204: Cambio colores por nombre de estados.
+					// backColor = _FastBlinkOn ? VisualStyle.Colors.Yellow : VisualStyle.ButtonColor;
+					// _SlowBlinkList[bt] = VisualStyle.Colors.Yellow;
+					backColor = _FastBlinkOn ? VisualStyle.FondoColorNotAllowed : VisualStyle.ButtonColor;
+					_SlowBlinkList[bt] = VisualStyle.FondoColorNotAllowed;
 					_SlowBlinkTimer.Enabled = true;
 					break;
-                case TlfState.InProcess:
-                    backColor = VisualStyle.Colors.Yellow;
-                    break;
+				case TlfState.InProcess:
+					// LALM 210204: Cambio colores por nombre de estados.
+					// backColor = VisualStyle.Colors.Yellow;
+					backColor = VisualStyle.FondoColorInProcess;
+					break;
 				case TlfState.offhook://#2855 220713
-					backColor = VisualStyle.Colors.Yellow;
+					//backColor = VisualStyle.Colors.Yellow;
+					backColor = VisualStyle.FondoColorInProcess;
 					break;
 
 			}
@@ -844,8 +901,10 @@ namespace HMI.Presentation.Twr.Views
 		bool EsIzda(int numero) { return (numero + 3) % 4 < 2; }
 		private void GetBotonesAd(int pag,out List<int>izda,out List <int>dcha)
         {
-			/*List<int> */dcha = new List<int>();// { 47, 48, 51, 52, 55, 56, 59, };
-			/*List<int> */izda = new List<int>();// { 45, 46, 49, 50, 53, 54, 57, 58, };
+			/*List<int> */
+			dcha = new List<int>();// { 47, 48, 51, 52, 55, 56, 59, };
+			/*List<int> */
+			izda = new List<int>();// { 45, 46, 49, 50, 53, 54, 57, 58, };
 			int numero = FirstButtoConf;
 			int mumero = pag * _NumPositionsByPage;
 			int maxbuttonsdcha=(_TlfButtonsTLP.ColumnCount * _TlfButtonsTLP.RowCount) / 2 - 1;
@@ -946,7 +1005,8 @@ namespace HMI.Presentation.Twr.Views
 						else
 							b.Visible = true ? (_StateManager.Tlf[b.Id].Dst.Length > 0) : false;
 				}
-				/*else*/if (dcha.Contains(id))
+				/*else*/
+				if (dcha.Contains(id))
 				{
 					if (izda.Contains(b.Id))
 					{
@@ -1122,6 +1182,68 @@ namespace HMI.Presentation.Twr.Views
                 //_CmdManager.RefrescaListaParticipantesConf(sala);
             }
         }
+		public class DialogForm : Form
+		{
+			public DialogForm()
+			{
+				// Configurar propiedades del formulario
+				this.Text = "Diálogo Independiente";
+				this.StartPosition = FormStartPosition.CenterScreen;
+				this.FormBorderStyle = FormBorderStyle.FixedDialog;
+				this.MaximizeBox = false;
+
+				// Crear controles en el formulario
+				Label label = new Label();
+				label.Text = "Este es un diálogo independiente.";
+				label.AutoSize = true;
+				label.Location = new System.Drawing.Point(20, 20);
+
+				Button button = new Button();
+				button.Text = "Cerrar";
+				button.Location = new System.Drawing.Point(100, 50);
+				button.Click += (sender, e) => this.Close();
+
+				// Agregar controles al formulario
+				this.Controls.Add(label);
+				this.Controls.Add(button);
+	}
+}
+
+
+
+#if SELECCION_SONIDO_AD
+		private void MainForm_MessageSent(object sender, MessageEventArgs e)
+		{
+			string mensaje = e.Message;
+		}
+		[EventSubscription(EventTopicNames.SeleccionSonido, ThreadOption.Publisher)]
+		public void OnSeleccionSonido(object sender, EventArgs e)
+		{
+			if (false)
+			{
+				DialogForm dialogForm = new DialogForm();
+
+				// Mostrar el formulario de diálogo de manera independiente
+				dialogForm.Show();
+
+				Console.WriteLine("La aplicación principal sigue ejecutándose.");
+
+			}
+			else
+			{
+
+				CSeleccionSonido dlg = new CSeleccionSonido();
+				dlg.MessageSent += MainForm_MessageSent;
+				dlg.setup(_CmdManager, _StateManager);
+				dlg.Width = this.Width;
+				dlg.Height = this.Height;
+				dlg.Size = new Size(this.Width, this.Height);
+				dlg.Location = new Point(700, 700/*this.Location.Y*/);
+				dlg.Show();
+				;// _RdPageBT_DownClick_Confirmada(sender);
+			}
+		}
+#endif
 	}
 }
 

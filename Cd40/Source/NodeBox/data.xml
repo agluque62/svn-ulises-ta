@@ -356,4 +356,48 @@
 		<English>Master. Invalid frequency. The unit is disabled.</English>
 		<French>Maître. Fréquence invalide. Désactivation équipement.</French>
 	</log>
+  <log id="Error al intentar sintonizar los equipos.">
+    <English>Error when trying to tune the equipments.</English>
+    <French>Erreur lors de la tentative de réglage de l'équipement.</French>
+  </log>
+  <log id="No se puede volver a sintonizar la frecuencia">
+    <English>Cannot retune frequency</English>
+    <French>Impossible de régler la fréquence</French>
+  </log>
+  <log id="Equipos resintonizados a la frecuencia">
+    <English>Equipments retuned to the frequency</English>
+    <French>Équipement remis à la fréquence</French>
+  </log>
+  <log id="Equipos sintonizados a la frecuencia">
+    <English>Equipments tuned to the frequency</English>
+    <French>L'équipement réglé sur la fréquence</French>
+  </log>
+  <log id="Equipo configurado sin telemando. No se puede sintonizar.">
+    <English>Equipment configured without remote control. It cannot be tuned.</English>
+    <French>Equipement configuré sans télécommande. Il ne peut pas être accordé.</French>
+  </log>
+  <log id="Equipo del grupo 1+1 esta deshabilitado. No se puede establecer ni leer su frecuencia por SNMP.">
+    <English>Equipment of group 1+1 is disabled. Its frequency cannot be set or get by SNMP.</English>
+    <French>L'équipement du groupe 1+1 est désactivé. Sa fréquence ne peut pas être définie ou lue par SNMP.</French>
+  </log>
+  <log id="Frecuencia del equipo sintonizada con exito.">
+    <English>The frequency of the equipment is successfully tuned.</English>
+    <French>Fréquence de l'équipement réglée avec succès.</French>
+  </log>
+  <log id="Frecuencia del equipo no puede ser sintonizada. Rechazada.">
+    <English>The frequency of the equipment cannot be tuned. Rejected.</English>
+    <French>La fréquence de l'équipement ne peut pas être syntonisée. Rejeté.</French>
+  </log>
+  <log id="Frecuencia del equipo no puede ser sintonizada. Timeout.">
+    <English>The frequency of the equipment cannot be tuned. Timeout.</English>
+    <French>La fréquence de l'équipement ne peut pas être syntonisée. Timeout.</French>
+  </log>
+  <log id="Frecuencia del equipo no puede ser sintonizada. Error desconocido.">
+    <English>The frequency of the equipment cannot be tuned. Unknown error.</English>
+    <French>La fréquence de l'équipement ne peut pas être syntonisée. Erreur inconnue.</French>
+  </log>
+  <log id="No se puede cambiar de frecuencia porque algun equipo no soporta telemando.">
+    <English>The frequency cannot be changed. Telecontrol is not supported by any device.</English>
+    <French>Il n'est pas possible de changer la fréquence car certains équipements ne disposent pas de télécommande.</French>
+  </log>
 </AppData>

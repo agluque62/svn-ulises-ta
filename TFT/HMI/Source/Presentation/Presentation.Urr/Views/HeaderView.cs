@@ -219,6 +219,7 @@ namespace HMI.Presentation.Urr.Views
             _SplitUC.ShowModeSelection();
         }
 
+
         [EventSubscription(EventTopicNames.SplitModeChanged, ThreadOption.Publisher)]
         public void OnSplitModeChanged(object sender, EventArgs e)
         {

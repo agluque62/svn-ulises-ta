@@ -28,7 +28,8 @@ namespace HMI.Model.Module.UI
 		//Errores #4805 Las funciones no permitidas no deberian  presentarse
 		private bool _Permitted = true;
 		private bool _IsConferencePreprogramada = false;
-        public bool Permitted
+		private bool _IsButtonTlf = false;
+		public bool Permitted
         {
             get { return _Permitted; }
             set { _Permitted = value; }
@@ -38,8 +39,18 @@ namespace HMI.Model.Module.UI
             get { return _IsConferencePreprogramada; }
             set { _IsConferencePreprogramada = value; }
         }
-
-        public new event EventHandler Click;
+		
+		//incidencia 10970 teclas de telefonia
+		public bool IsButtonTlf
+		{
+			get { return _IsButtonTlf; }
+			set
+			{
+				_IsButtonTlf = value;
+				_BtnInfo.IsButtonTlf = value;
+			}
+		}
+		public new event EventHandler Click;
 		public event EventHandler LongClick;
 
 		[Browsable(false),
@@ -454,8 +465,8 @@ namespace HMI.Model.Module.UI
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-
-			BtnRenderer.Draw(e.Graphics, _BtnInfo[_BtnState], _DrawX);
+				
+            BtnRenderer.Draw(e.Graphics, _BtnInfo[_BtnState], _DrawX);
 
             /*
 			if (_DrawX)

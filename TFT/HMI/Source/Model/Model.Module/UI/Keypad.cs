@@ -20,11 +20,14 @@ namespace HMI.Model.Module.UI
 	{
 		public event GenericEventHandler<char> NewKey;
 		public event GenericEventHandler ClearClick;
+        public event GenericEventHandler<bool> ChgMode;//230804
 
-		private const string _Exit = "#13790*";
+        private const string _Exit = "#13790*";
 		private const string _Reset = "#13791*";
 		private const string _EngineInfo = "#13792*";
 		private const string _StateInfo = "#13793*";
+		private const string _ModoDiurno = "#13707*";
+		private const string _ModoNocturno = "#13723*";
         private const string _Pause = ",";
 
 		private StateManagerService _StateManager;
@@ -153,9 +156,26 @@ namespace HMI.Model.Module.UI
 				NotifMsg msg = new NotifMsg("StateInfo", "Estado", str, 0, MessageType.Information, MessageButtons.Ok);
 				_StateManager.ShowUIMessage(msg);
 			}
-		}
+            else if (Display == _ModoNocturno)
+            {
+                BtChgMode(true);//230804
+            }
+            else if (Display == _ModoDiurno)
+            {
+                BtChgMode(false);//230804
+            }
+            else if (Display == "***")
+            {
+                BtChgMode(true);//230804
+            }
+            else if (Display == "###")
+            {
+                BtChgMode(false);//230804
+            }
 
-		private void _ClearBT_Click(object sender, EventArgs e)
+        }
+
+        private void _ClearBT_Click(object sender, EventArgs e)
 		{
 			if (_Digits.Length > 0)
 			{
@@ -179,5 +199,9 @@ namespace HMI.Model.Module.UI
 
             General.SafeLaunchEvent(NewKey, this, _Pause[0]);
         }
-	}
+        private void BtChgMode(bool modo)
+        {
+            General.SafeLaunchEvent(ChgMode, this, modo);
+        }
+    }
 }

@@ -73,6 +73,7 @@ namespace U5ki.Infrastructure
 		public bool FirstForMaster;
 		public MembershipChange Change;
 		public string MemberChanged;
+        public List<string> PresentedMembersInNetworkForThisTopic;
         /// <summary>
         /// 
         /// </summary>
@@ -80,13 +81,18 @@ namespace U5ki.Infrastructure
         /// <param name="firstForMaster">Indica si soy el primero en caso de conflicto de masters</param>
         /// <param name="change"></param>
         /// <param name="memberChanged"></param>
-        public SpreadMembershipMsg(string topic, bool firstForMaster, MembershipChange change, string memberChanged)
+        public SpreadMembershipMsg(string topic, bool firstForMaster, MembershipChange change, string memberChanged, List<string> presentedMembersInNetworkForThisTopic)
 		{
 			Topic = topic;
             FirstForMaster = firstForMaster;
 			Change = change;
 			MemberChanged = memberChanged;
-		}
+            PresentedMembersInNetworkForThisTopic = new List<string>();
+            foreach (string mem in presentedMembersInNetworkForThisTopic)
+            {
+                PresentedMembersInNetworkForThisTopic.Add(mem);
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -602,19 +608,16 @@ namespace U5ki.Infrastructure
             Trace(_Name, "{0}::{1} SpreadChannel Finalizado...", _Name, _Id);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-		private void ReceiveThread()
-		{
-            
+        private void ReceiveThread()
+        {
+
             try
-			{
+            {
                 group_name[] groups = new group_name[200];
                 byte[] buffer = new byte[150000];
 
-				while (_Connected)
-				{
+                while (_Connected)
+                {
                     int serviceType = 0;
                     group_name group;
                     int numGroups;
@@ -622,33 +625,33 @@ namespace U5ki.Infrastructure
                     int endianMismatch = 0;
 
                     // Mas información: http://www.spread.org/docs/spread_docs_4/docs/sp_receive.html
-					int ret = SP_receive(_SpreadHandle, ref serviceType, out group, groups.Length, out numGroups, groups,
-						ref messType, ref endianMismatch, buffer.Length, buffer);
+                    int ret = SP_receive(_SpreadHandle, ref serviceType, out group, groups.Length, out numGroups, groups,
+                        ref messType, ref endianMismatch, buffer.Length, buffer);
 
-                    Trace(_Name, "{1}<--{2} MEN. RECIBIDO, numGroups={3}, messType={4}, data={5}", 
+                    Trace(_Name, "{1}<--{2} MEN. RECIBIDO, numGroups={3}, messType={4}, data={5}",
                         _Name, _Id, group.Name, numGroups, messType, BitConverter.ToString(buffer, 0, buffer.Length > 16 ? 16 : buffer.Length));
-                    
-                    if (ret < 0)
-					{
-						Debug.Assert(ret != GROUPS_TOO_SHORT);
-						Debug.Assert(ret != BUFFER_TOO_SHORT);
 
-						if ((ret != ILLEGAL_MESSAGE) && _Connected) 
-						{
-							throw new Exception("ERROR obteniendo mensaje: " + ret);
-						}
-					}
-					else if ((serviceType & REJECT_MESS) != 0)
-					{
-						_Logger.Warn("Mensaje rechazado [Type: {0}]", messType);
+                    if (ret < 0)
+                    {
+                        Debug.Assert(ret != GROUPS_TOO_SHORT);
+                        Debug.Assert(ret != BUFFER_TOO_SHORT);
+
+                        if ((ret != ILLEGAL_MESSAGE) && _Connected)
+                        {
+                            throw new Exception("ERROR obteniendo mensaje: " + ret);
+                        }
+                    }
+                    else if ((serviceType & REJECT_MESS) != 0)
+                    {
+                        _Logger.Warn("Mensaje rechazado [Type: {0}]", messType);
                         Trace(_Name, "..... Mensaje rechazado [Type: {0}]", messType);
                     }
-					else if ((serviceType & REGULAR_MESS) != 0)
-					{
+                    else if ((serviceType & REGULAR_MESS) != 0)
+                    {
                         bool firstForMaster = false;
                         List<string> precedingMemb;
                         if (_PrecedingMembers.TryGetValue(groups[0].Name, out precedingMemb))
-                           firstForMaster = (precedingMemb.Count == 0);
+                            firstForMaster = (precedingMemb.Count == 0);
 
                         /** 20180404. AGL. A la clase SpreadDataMsg, no se le puede pasar directamente el buffer de recepcion
                           porque la referencia que se inserta se pasa a otros THREAD via (Thread.Enqueue), y a la vez, queda libre
@@ -660,9 +663,9 @@ namespace U5ki.Infrastructure
 
                         Trace(_Name, "..... Decodifica Mensaje de datos: {0}, {1}", msg.Length, BitConverter.ToString(msg.Data, 0, ret > 32 ? 32 : ret));
 
-						General.SafeLaunchEvent(DataMsg, this, msg);
-					}
-					else if ((serviceType & MEMBERSHIP_MESS) != 0)
+                        General.SafeLaunchEvent(DataMsg, this, msg);
+                    }
+                    else if ((serviceType & MEMBERSHIP_MESS) != 0)
                     {
 #if _SPREAD_ALL_MEMBERS_
                         membership_info info = new membership_info();
@@ -695,7 +698,7 @@ namespace U5ki.Infrastructure
 
                                 vs_set_info[] vsSets = new vs_set_info[128];
                                 int myVsSetIndex;
-          
+
                                 // Mas Informacion: http://www.spread.org/docs/spread_docs_4/docs/sp_get_vs_sets_info.html
                                 int numVsSets = SP_get_vs_sets_info(buffer, vsSets, vsSets.Length, out myVsSetIndex);
                                 if ((numVsSets <= 0) || (myVsSetIndex >= numVsSets))
@@ -739,7 +742,37 @@ namespace U5ki.Infrastructure
                                     }
 
                                 }
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                                if (group.Name == "Cd40RdSrv")
+                                {
+                                    _Logger.Info($"DEBUGMSTRSLV: precedingMembers CAUSED_BY_NETWORK _Id {_Id} group.Name {group.Name} ini");
+                                    foreach (string mem in precedingMembers)
+                                    {
+                                        _Logger.Info($"DEBUGMSTRSLV: CAUSED_BY_NETWORK group.Name {group.Name} member {mem}");
+                                    }
+                                    _Logger.Info($"DEBUGMSTRSLV: precedingMembers CAUSED_BY_NETWORK _Id {_Id} group.Name {group.Name} fin");
+                                }
+#endif
+#endregion
+
                                 SearchPresentMembers(buffer, group, vsSets, numVsSets, precedingMembers.Count == 0);
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                                if (group.Name == "Cd40RdSrv")
+                                {
+                                    _Logger.Info($"DEBUGMSTRSLV: _PresentMembersInNetwork CAUSED_BY_NETWORK _Id {_Id} group.Name {group.Name} ini");
+                                    foreach (string mem in _PresentMembersInNetwork[group.Name])
+                                    {
+                                        _Logger.Info($"DEBUGMSTRSLV: CAUSED_BY_NETWORK group.Name {group.Name} member {mem}");
+                                    }
+                                    _Logger.Info($"DEBUGMSTRSLV: _PresentMembersInNetwork CAUSED_BY_NETWORK _Id {_Id} group.Name {group.Name} fin");
+                                }
+#endif
+#endregion
+
                             }
                             else
                             {
@@ -750,7 +783,7 @@ namespace U5ki.Infrastructure
 
                                 // Mas Informacion: http://www.spread.org/docs/spread_docs_4/docs/SP_get_memb_info.html
                                 int err = SP_get_memb_info(buffer, serviceType, info);
-                                if ( err <= 0)
+                                if (err <= 0)
                                 {
                                     throw new Exception(String.Format("Error {0}, Grupo {1} en SP_get_memb_info...", err, group.Name));
                                 }
@@ -775,7 +808,7 @@ namespace U5ki.Infrastructure
                                                 precedingMembers.Add(groups[i].Name);
                                                 Trace(_Name, "precedingMembers.Add({0})\n", groups[i].Name);
                                             }
-                                             //Significa que yo he entrado en la red, tengo que guardar todos los miembros ya presentes en la red
+                                            //Significa que yo he entrado en la red, tengo que guardar todos los miembros ya presentes en la red
                                             if (!presentMembers.Contains(groups[i].Name))
                                             {
                                                 presentMembers.Add(groups[i].Name);
@@ -789,7 +822,29 @@ namespace U5ki.Infrastructure
                                         presentMembers.Add(changedMember);
                                         Trace(_Name, "{0} presente J", changedMember);
                                     }
-                            }
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                                    if (group.Name == "Cd40RdSrv")
+                                    {
+                                        _Logger.Info($"DEBUGMSTRSLV: _PresentMembersInNetwork CAUSED_BY_JOIN _Id {_Id} group.Name {group.Name} ini");
+                                        foreach (string mem in _PresentMembersInNetwork[group.Name])
+                                        {
+                                            _Logger.Info($"DEBUGMSTRSLV: CAUSED_BY_JOIN group.Name {group.Name} member {mem}");
+                                        }
+                                        _Logger.Info($"DEBUGMSTRSLV: _PresentMembersInNetwork CAUSED_BY_JOIN _Id {_Id} group.Name {group.Name} fin");
+
+                                        _Logger.Info($"DEBUGMSTRSLV: precedingMembers CAUSED_BY_JOIN _Id {_Id} group.Name {group.Name} ini");
+                                        foreach (string mem in precedingMembers)
+                                        {
+                                            _Logger.Info($"DEBUGMSTRSLV: CAUSED_BY_JOIN group.Name {group.Name} member {mem}");
+                                        }
+                                        _Logger.Info($"DEBUGMSTRSLV: precedingMembers CAUSED_BY_JOIN _Id {_Id} group.Name {group.Name} fin");
+                                    }
+#endif
+#endregion
+
+                                }
                                 else
                                 {
                                     /** AGL */
@@ -807,6 +862,27 @@ namespace U5ki.Infrastructure
                                         presentMembers.Remove(changedMember);
                                         Trace(_Name, "{0} no presente L", changedMember);
                                     }
+
+#region "DEBUGMSTRSLV"
+#if _DEBUGMSTRSLV_  //Para depurar solo con el Topic Cd40RdSrv
+                                    if (group.Name == "Cd40RdSrv")
+                                    {
+                                        _Logger.Info($"DEBUGMSTRSLV: _PresentMembersInNetwork CAUSED_BY_LEAVE _Id {_Id} group.Name {group.Name} ini");
+                                        foreach (string mem in _PresentMembersInNetwork[group.Name])
+                                        {
+                                            _Logger.Info($"DEBUGMSTRSLV: CAUSED_BY_LEAVE group.Name {group.Name} member {mem}");
+                                        }
+                                        _Logger.Info($"DEBUGMSTRSLV: _PresentMembersInNetwork CAUSED_BY_LEAVE _Id {_Id} group.Name {group.Name} fin");
+
+                                        _Logger.Info($"DEBUGMSTRSLV: precedingMembers CAUSED_BY_LEAVE _Id {_Id} group.Name {group.Name} ini");
+                                        foreach (string mem in precedingMembers)
+                                        {
+                                            _Logger.Info($"DEBUGMSTRSLV: CAUSED_BY_LEAVE group.Name {group.Name} member {mem}");
+                                        }
+                                        _Logger.Info($"DEBUGMSTRSLV: precedingMembers CAUSED_BY_LEAVE _Id {_Id} group.Name {group.Name} fin");
+                                    }
+#endif
+#endregion
 
                                 }
 #if _SPREAD_ALL_MEMBERS_
@@ -838,7 +914,7 @@ namespace U5ki.Infrastructure
                                 SpreadMembershipMsg msg = new SpreadMembershipMsg(group.Name, _master, change, changedMember);
 #else
 
-                                SpreadMembershipMsg msg = new SpreadMembershipMsg(group.Name, precedingMembers.Count == 0, change, changedMember);
+                                SpreadMembershipMsg msg = new SpreadMembershipMsg(group.Name, precedingMembers.Count == 0, change, changedMember, _PresentMembersInNetwork[group.Name]);
                                 LogMemberGroup(_Name, group.Name, precedingMembers);
 #endif
                                 General.SafeLaunchEvent(MembershipMsg, this, msg);
@@ -853,28 +929,28 @@ namespace U5ki.Infrastructure
                         }
                         else
                         {
-                            if ((serviceType & TRANSITION_MESS)!=0)
+                            if ((serviceType & TRANSITION_MESS) != 0)
                                 Trace(_Name, "..... Decodifica MEMBERSHIP_MESS & TRANSITION_MESS del Grupo: " + group.Name);
                             else
                                 Trace(_Name, "..... Decodifica MEMBERSHIP_MESS & SELF-LEAVE del Grupo: " + group.Name);
                         }
                     }
-					else
-					{
-						_Logger.Warn("Recibido mensaje de tipo desconocido [ServiceType: {0}]", serviceType);
+                    else
+                    {
+                        _Logger.Warn("Recibido mensaje de tipo desconocido [ServiceType: {0}]", serviceType);
                         Trace(_Name, "Recibido mensaje de tipo desconocido [ServiceType: {0}]", serviceType);
                     }
-				}
-			}
-			catch (Exception ex)
-			{
-				if (_Connected)
-				{
-					General.SafeLaunchEvent(Error, this, ex.Message);
-				}
+                }
+            }
+            catch (Exception ex)
+            {
+                if (_Connected)
+                {
+                    General.SafeLaunchEvent(Error, this, ex.Message);
+                }
                 _Logger.Error(String.Format("SpreadChannel::ReceiveThread {0}.", _Name), ex);
-			}
-		}
+            }
+        }
 
         private void PrintListaRecibida(byte[] buffer)
         {
@@ -930,7 +1006,7 @@ namespace U5ki.Infrastructure
                 {
                     _PresentMembersInNetwork[topic.Name].Remove(elem);
                     Trace(_Name, "{0} no presente N", elem);
-                    msg = new SpreadMembershipMsg(topic.Name, master, MembershipChange.Leave, elem);
+                    msg = new SpreadMembershipMsg(topic.Name, master, MembershipChange.Leave, elem, _PresentMembersInNetwork[topic.Name]);
                     General.SafeLaunchEvent(MembershipMsg, this, msg);
                 }
             foreach (string elem in currentMemberList)
@@ -938,13 +1014,13 @@ namespace U5ki.Infrastructure
                 {
                     _PresentMembersInNetwork[topic.Name].Add(elem);
                     Trace(_Name, "{0} presente N", elem);
-                    msg = new SpreadMembershipMsg(topic.Name, master, MembershipChange.Join, elem);
+                    msg = new SpreadMembershipMsg(topic.Name, master, MembershipChange.Join, elem, _PresentMembersInNetwork[topic.Name]);
                     General.SafeLaunchEvent(MembershipMsg, this, msg);
                 }
       
         }
 
-		#endregion
+#endregion
 
         /// <summary>
         /// inci, rd-inci, Cd40CfgReg, Cd40RdSrv, Cd40GwReg

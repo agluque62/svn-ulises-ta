@@ -52,15 +52,19 @@ namespace HMI.Presentation.Twr.Views
 		public LcView([ServiceDependency] IModelCmdManagerService cmdManager, [ServiceDependency] StateManagerService stateManager)
 		{
 			InitializeComponent();
-            if (Settings.Default.LcRows == 1)
+			if (!VisualStyle.ModoNocturno) ;
+			else
+				this._LcButtonsTLP.BackColor = System.Drawing.Color.Black;
+			if (Settings.Default.LcRows == 1)
             {
                 this._LcButtonsTLP.RowCount = 2;
                 this._LcButtonsTLP.RowStyles.Clear();
                 this._LcButtonsTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
                 this._LcButtonsTLP.Size = new System.Drawing.Size(800, 85);
                 this.Size = new System.Drawing.Size(800, 85);
+				this._LcButtonsTLP.BackColor = Color.Red;
 
-            }
+			}
             if (global::HMI.Presentation.Twr.Properties.Settings.Default.BigFonts)
             {
                 this._LcButtonsTLP.Font = new System.Drawing.Font("Trebuchet MS", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -169,10 +173,13 @@ namespace HMI.Presentation.Twr.Views
 							break;
 						case LcRxState.Rx:
 						case LcRxState.RxNotif:
-							rx = VisualStyle.Colors.Green;
+							// LALM 210204 DEjo configurables colores de LC
+							// rx = VisualStyle.Colors.Green;
+							rx = VisualStyle.FondoLcRxRx;
 							break;
 						case LcRxState.Mem:
-							rx = VisualStyle.Colors.Orange;
+							// rx = VisualStyle.Colors.Orange;
+							rx = VisualStyle.FondoLcRxMem;
 							break;
 					}
 
@@ -182,15 +189,22 @@ namespace HMI.Presentation.Twr.Views
 						case LcTxState.Out:
 							break;
 						case LcTxState.Tx:
-							tx = VisualStyle.Colors.Green;
+							//LALM 210302 Cambio colore s por variables
+							//tx = VisualStyle.Colors.Green;
+							tx = VisualStyle.FondolcTxtx;
 							break;
 						case LcTxState.Congestion:
-							tx = _SlowBlinkOn ? VisualStyle.Colors.Red : VisualStyle.ButtonColor;
-							_SlowBlinkList[bt] = VisualStyle.Colors.Red;
+							//LALM 210302 Cambio colore s por variables
+							//tx = _SlowBlinkOn ? VisualStyle.Colors.Red : VisualStyle.ButtonColor;
+							// _SlowBlinkList[bt] = VisualStyle.Colors.Red;
+							tx = VisualStyle.FondolcTxCongestion;
+							_SlowBlinkList[bt] = VisualStyle.FondoColorCongestion;
 							_SlowBlinkTimer.Enabled = true;
 							break;
 						case LcTxState.Busy:
-							tx = VisualStyle.Colors.Red;
+							//LALM 210302 Cambio colore s por variables
+							// tx = VisualStyle.Colors.Red;
+							tx = VisualStyle.FondolcTxBusy;
 							break;
 					}
 				}

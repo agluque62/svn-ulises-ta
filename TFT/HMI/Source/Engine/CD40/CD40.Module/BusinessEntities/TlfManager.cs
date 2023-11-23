@@ -47,6 +47,7 @@ namespace HMI.CD40.Module.BusinessEntities
         public event GenericEventHandler<SnmpStringMsg<string, string>> SendSnmpTrapString;
         public event GenericEventHandler<RangeMsg<LlamadaHistorica>> HistoricalOfLocalCallsEngine;
         public event GenericEventHandler<PositionIdMsg> RedirectedCall;
+        public event GenericEventHandler<Dictionary<string, string[]>> TlfRingChanged;//230629
         //230516
         public event GenericEventHandler<RangeMsg<TlfInfo>> ConferenciaPreprogramada;
         //lalm 211007
@@ -240,7 +241,8 @@ namespace HMI.CD40.Module.BusinessEntities
             }
         }
         public TlfConferencePrepro ConferencePrepro { get => _ConferencePrepro; set => _ConferencePrepro = value; }
-
+        public Dictionary< string, string[]> TonosPorLlamada { get => _tonosPorLlamada; set => _tonosPorLlamada = value; }
+       
 
         /// <summary>
         /// 
@@ -259,9 +261,10 @@ namespace HMI.CD40.Module.BusinessEntities
             Top.Sip.CallMoved += OnCallMoved;
             //230516 aqui habria que capturar el evento de cambio de conferencia preprogramada.
             //ConferenciaPreprogramada += OnConferenciaPreprogramada;
-            
-            
 
+
+
+            TlfRingChanged += OnTlfRingChanged;
             for (int i = Tlf.NumDestinations, to = Tlf.NumDestinations + Tlf.NumIaDestinations; i < to; i++)
             {
                 _TlfPositions.Add(i, new TlfIaPosition(i));
@@ -270,6 +273,7 @@ namespace HMI.CD40.Module.BusinessEntities
             _ToneTimer = new Timer(1000);
             _ToneTimer.AutoReset = false;
             _ToneTimer.Elapsed += OnToneEnd;
+            
 
         }
 
@@ -979,13 +983,12 @@ namespace HMI.CD40.Module.BusinessEntities
         }
         public tsalvado GetParamLastCall(int sipCallId)
         {
-            tsalvado salvado = new tsalvado();
             foreach (tsalvado s in lsalvado)
             {
                 if (s.sipCallId == sipCallId)
                     return s;
             }
-            return salvado;
+            return null;
         }
 
 
@@ -1045,7 +1048,7 @@ namespace HMI.CD40.Module.BusinessEntities
         // private int PosInConference = 0;
         private Timer _ToneTimer;
         //private TlfRxAudioVia _RxAudioVia = TlfRxAudioVia.NoAudio;
-
+        private Dictionary<string, string[]> _tonosPorLlamada;//230628
         public TlfManager ()
         {
             _Transfer = new TlfTransfer();
@@ -1115,6 +1118,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		private void OnConfigChanged(object sender)
 		{
 			_ChangingCfg = true;
+            TonosPorLlamada = new Dictionary<string, string[]>();
             try
             {
 			    RangeMsg<TlfInfo> tlfPositions = new RangeMsg<TlfInfo>(0, Tlf.NumDestinations);
@@ -1127,9 +1131,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 //var copiaLink = Top.Cfg.TlfLinks.Select(e => e).ToList();
 
 
-                List<string> copia = Top.Cfg.TlfLinks.Select(e => e.Literal).ToList();
-                List<string> copia1 = Top.Cfg.TlfLinks.Select(e => (e.Literal.Contains("Conf")) ? e.Literal : "").ToList();
-                List<CfgEnlaceInterno> copia2 = Top.Cfg.TlfLinks.Where(o => o.Literal.Contains("Conf")).ToList();
+                //List<string> copia = Top.Cfg.TlfLinks.Select(e => e.Literal).ToList();
+                //List<string> copia1 = Top.Cfg.TlfLinks.Select(e => (e.Literal.Contains("Conf")) ? e.Literal : "").ToList();
+                //List<CfgEnlaceInterno> copia2 = Top.Cfg.TlfLinks.Where(o => o.Literal.Contains("Conf")).ToList();
                 foreach (CfgEnlaceInterno link in Top.Cfg.TlfLinks)
                 {
                     int pos = (int)link.PosicionHMI - 1;
@@ -1513,6 +1517,91 @@ namespace HMI.CD40.Module.BusinessEntities
             }
             return null;
         }
+
+        public void AsignaRing()
+        {
+#if SIN_USAR_RINGDEVICE
+            if (Top.Hw.LCSpeaker)
+            {
+                Top.Mixer.setringdevice(MixerDev.SpkLc);
+            }
+            else if (Top.Hw.AlumnJack)
+            {
+                Top.Mixer.setringdevice(MixerDev.MhpRd);
+            }
+            else if (Top.Hw.InstructorJack)
+            {
+                Top.Mixer.setringdevice(MixerDev.MhpLc);
+            }
+            else if (Top.Hw.RdSpeaker)
+            {
+                Top.Mixer.setringdevice(MixerDev.SpkRd);
+            }
+#endif
+            //Usando el parametro Settings.Default.RingDevice
+            switch (Settings.Default.RingDevice)
+            {
+                case 0:
+                    if ((Top.Hw.InstructorJack) || (Top.Hw.AlumnJack))
+                    {
+                        Top.Mixer.setringdevice(MixerDev.MhpTlf);
+                    }
+                    else if (Top.Hw.LCSpeaker)
+                    {
+                        Top.Mixer.setringdevice(MixerDev.SpkLc);
+                    }
+                    else if (Top.Hw.RdSpeaker)
+                    {
+                        Top.Mixer.setringdevice(MixerDev.SpkRd);
+                    }
+                    break;
+                case 2:
+                    if ((Top.Hw.InstructorJack) || (Top.Hw.AlumnJack))
+                    {
+                        Top.Mixer.setringdevice(MixerDev.MhpRd);
+                    }
+                    else if (Top.Hw.LCSpeaker)
+                    {
+                        Top.Mixer.setringdevice(MixerDev.SpkLc);
+                    }
+                    else if (Top.Hw.RdSpeaker)
+                    {
+                        Top.Mixer.setringdevice(MixerDev.SpkRd);
+                    }
+                    break;
+                case 4:
+                    if (Top.Hw.RdSpeaker)
+                    {
+                        Top.Mixer.setringdevice(MixerDev.SpkRd);
+                    }
+                    else if (Top.Hw.LCSpeaker)
+                    {
+                        Top.Mixer.setringdevice(MixerDev.SpkLc);
+                    }
+                    else if ((Top.Hw.InstructorJack) || (Top.Hw.AlumnJack))
+                    {
+                        Top.Mixer.setringdevice(MixerDev.MhpTlf);
+                    }
+                    break;
+                default:
+                    if (Top.Hw.LCSpeaker)
+                    {
+                        Top.Mixer.setringdevice(MixerDev.SpkLc);
+                    }
+                    else if ((Top.Hw.InstructorJack) || (Top.Hw.AlumnJack))
+                    {
+                        Top.Mixer.setringdevice(MixerDev.MhpTlf);
+                    }
+                    else if (Top.Hw.RdSpeaker)
+                    {
+                        Top.Mixer.setringdevice(MixerDev.SpkRd);
+                    }
+                    break;
+            }
+
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -1526,6 +1615,7 @@ namespace HMI.CD40.Module.BusinessEntities
 		{
 			TlfPosition replace = null;
              _Logger.Debug("OnIncomingCall: " + inInfo.SrcId);
+            AsignaRing();
             if (_Forward.State == FunctionState.Executing)
             {
                 answer.Value = SipAgent.SIP_MOVED_TEMPORARILY;
@@ -1590,8 +1680,14 @@ namespace HMI.CD40.Module.BusinessEntities
                     }
                     else
                     {
-                        answer.Value = SipAgent.SIP_BUSY;
-                        return;
+                        //incidencia #8993 Ocasionalmente realizando llamadas de telefonía entre dos puestos,
+                        //sin teclas de AD entre ellos, utilizando marcador o tecla +1, provoca que una de ellas impida
+                        //recibir llamadas entrantes. Al llamr de un puesto a otro po linea de la agenda, se queda el telefono
+                        // con el tono de invitacion de a marcar y no permite recibir llamada.
+                        //230522
+                        // soluciona incidencia
+                        //answer.Value = SipAgent.SIP_BUSY;
+                        //return;
                     }
                 }
                 answer.Value  = tlf.HandleIncomingCall(call, call2replace, info, inInfo, out string reason);
@@ -1959,15 +2055,16 @@ namespace HMI.CD40.Module.BusinessEntities
                 // Quito el parametro recused, irá en la proxima revision.
                 string recused = "";
                 
+
+                // 230612 trazas
                 if (tlf.State==TlfState.Out || tlf.State == TlfState.Hold || tlf.State == TlfState.Set)
                 { 
                     tsalvado ts = Top.Tlf.GetParamLastCall(tlf.CallId);
-                    if (ts.sipCallId!=-1)
+                    if (ts?.sipCallId >0)
+                    {
+                        _Logger.Debug("Recupero lascall id:" + ts.sipCallId.ToString()+ "dst:" + ts._dstUri);
                         recused = ts._dstUri;
-                }
-                else
-                {
-                    recused = "";
+                    }
                 }
                 
                 //TlfInfo daSt = new TlfInfo(tlf.Literal, tlf.State, tlf.ChAllowsPriority(), TlfType.Unknown, tlf.IsTop, tlf.ChAllowsForward, tlf.Uri);
@@ -2041,7 +2138,8 @@ namespace HMI.CD40.Module.BusinessEntities
 			TlfIaPosition tlf = (TlfIaPosition)sender;
 			TlfState st = tlf.State;
 
-			TlfStateChanged(tlf, st);
+
+            TlfStateChanged(tlf, st);
 
 			if (!_ChangingCfg)
 			{
@@ -2061,9 +2159,20 @@ namespace HMI.CD40.Module.BusinessEntities
                         st = TlfState.Idle;
                     }
 				}
+                // 230612 trazas
+                string recused = "";
+                if (tlf.State == TlfState.Out || tlf.State == TlfState.Hold || tlf.State == TlfState.Set)
+                {
+                    tsalvado ts = Top.Tlf.GetParamLastCall(tlf.CallId);
+                    if (ts?.sipCallId > 0)
+                    {
+                        _Logger.Debug("Recupero lascall id:" + ts.sipCallId.ToString() + "dst:" + ts._dstUri);
+                        recused = ts._dstUri;
+                    }
+                }
 
                 MensajesDeIntrusion(tlf);
-				TlfIaDestination iaSt = new TlfIaDestination(tlf.Literal, tlf.Number, st, tlf.IsTop, tlf.ChAllowsForward,tlf.Uri);
+				TlfIaDestination iaSt = new TlfIaDestination(tlf.Literal, tlf.Number, st, tlf.IsTop, tlf.ChAllowsForward,recused);
 				RangeMsg<TlfIaDestination> state = new RangeMsg<TlfIaDestination>(tlf.Pos, iaSt);
 				General.SafeLaunchEvent(IaPositionsChanged, this, state);
 
@@ -2564,6 +2673,15 @@ namespace HMI.CD40.Module.BusinessEntities
             _ConferencePrepro.Add(sala,user);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        private void OnTlfRingChanged(object sender,Dictionary<string,string[]> tonosporllamada)//230628
+        {
+            TonosPorLlamada = tonosporllamada;
+        }
+
         //lalm 210930
         //Peticiones #3638, anulada, solo puede existir una lina de AI.
 #if PETICION_3638
@@ -2634,4 +2752,4 @@ namespace HMI.CD40.Module.BusinessEntities
 #endif
         #endregion
     }
-}
+    }

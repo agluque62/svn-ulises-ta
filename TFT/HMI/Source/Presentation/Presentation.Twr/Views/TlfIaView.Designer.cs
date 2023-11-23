@@ -10,6 +10,8 @@
 // Latest version of this Guidance Package: http://go.microsoft.com/fwlink/?LinkId=62182
 //----------------------------------------------------------------------------------------
 
+using HMI.Model.Module.UI;
+
 namespace HMI.Presentation.Twr.Views
 {
 	partial class TlfIaView
@@ -42,8 +44,9 @@ namespace HMI.Presentation.Twr.Views
 		/// </summary>
 		private void InitializeComponent()
 		{
+
 			this.components = new System.ComponentModel.Container();
-			System.Windows.Forms.TableLayoutPanel _TlfIaTLP;
+			
 			System.Windows.Forms.TableLayoutPanel _IaFunctionsTLP;
 			this._IaToolsWS = new Microsoft.Practices.CompositeUI.WinForms.DeckWorkspace();
 			this._MemBT = new HMI.Model.Module.UI.HMIButton();
@@ -54,27 +57,27 @@ namespace HMI.Presentation.Twr.Views
 			this._Num4BT = new HMI.Model.Module.UI.HMIButton();
 			this._SlowBlinkTimer = new System.Windows.Forms.Timer(this.components);
 			this._DescolgarTimer = new System.Windows.Forms.Timer(this.components);
-			_TlfIaTLP = new System.Windows.Forms.TableLayoutPanel();
+			this._TlfIaTLP = new System.Windows.Forms.TableLayoutPanel();
 			_IaFunctionsTLP = new System.Windows.Forms.TableLayoutPanel();
-			_TlfIaTLP.SuspendLayout();
+			this._TlfIaTLP.SuspendLayout();
 			_IaFunctionsTLP.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// _TlfIaTLP
 			// 
-			_TlfIaTLP.ColumnCount = 2;
-			_TlfIaTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 55F));
-			_TlfIaTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 45F));
-			_TlfIaTLP.Controls.Add(this._IaToolsWS, 0, 0);
-			_TlfIaTLP.Controls.Add(_IaFunctionsTLP, 1, 0);
-			_TlfIaTLP.Dock = System.Windows.Forms.DockStyle.Fill;
-			_TlfIaTLP.Location = new System.Drawing.Point(0, 0);
-			_TlfIaTLP.Margin = new System.Windows.Forms.Padding(0);
-			_TlfIaTLP.Name = "_TlfIaTLP";
-			_TlfIaTLP.RowCount = 1;
-			_TlfIaTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			_TlfIaTLP.Size = new System.Drawing.Size(440, 350);
-			_TlfIaTLP.TabIndex = 4;
+			this._TlfIaTLP.ColumnCount = 2;
+			this._TlfIaTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 55F));
+			this._TlfIaTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 45F));
+			this._TlfIaTLP.Controls.Add(this._IaToolsWS, 0, 0);
+			this._TlfIaTLP.Controls.Add(_IaFunctionsTLP, 1, 0);
+			this._TlfIaTLP.Dock = System.Windows.Forms.DockStyle.Fill;
+			this._TlfIaTLP.Location = new System.Drawing.Point(0, 0);
+			this._TlfIaTLP.Margin = new System.Windows.Forms.Padding(0);
+			this._TlfIaTLP.Name = "this._TlfIaTLP";
+			this._TlfIaTLP.RowCount = 1;
+			this._TlfIaTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this._TlfIaTLP.Size = new System.Drawing.Size(440, 350);
+			this._TlfIaTLP.TabIndex = 4;
 			// 
 			// _IaToolsWS
 			// 
@@ -201,10 +204,10 @@ namespace HMI.Presentation.Twr.Views
 			// TlfIaView
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-			this.Controls.Add(_TlfIaTLP);
+			this.Controls.Add(this._TlfIaTLP);
 			this.Name = "TlfIaView";
 			this.Size = new System.Drawing.Size(440, 350);
-			_TlfIaTLP.ResumeLayout(false);
+			this._TlfIaTLP.ResumeLayout(false);
 			_IaFunctionsTLP.ResumeLayout(false);
 			this.ResumeLayout(false);
 
@@ -221,7 +224,7 @@ namespace HMI.Presentation.Twr.Views
 		private Microsoft.Practices.CompositeUI.WinForms.DeckWorkspace _IaToolsWS;
 		private System.Windows.Forms.Timer _SlowBlinkTimer;
 		private System.Windows.Forms.Timer _DescolgarTimer;
-
+		private System.Windows.Forms.TableLayoutPanel _TlfIaTLP;
 	}
 }
 

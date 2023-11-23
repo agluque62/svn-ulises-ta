@@ -698,6 +698,9 @@ namespace HMI.CD40.Module.BusinessEntities
                 /** 20170706. AGL. Control de configuracion sw en OID */
                 SnmpAgent.Store.Add(new SnmpStringObject(Settings.Default.CurrentSwVersionOid, (new Utilities.VersionDetails("versiones.json")).ToString(), maintenanceTrapEp));
                 /***********/
+                //LALM 231107 Frecuencia no desasignable en rx desasignada.
+                SnmpAgent.Store.Add(new SnmpStringObject(Settings.Default.RxDesasignadoOid, "", maintenanceTrapEp));
+
                 System.Threading.Thread.Sleep(300);
 
 				_Logger.Info("Iniciado agente SNMP. Puerto TRAP: {0}", maintenanceTrapEp.Port);
@@ -816,7 +819,7 @@ namespace HMI.CD40.Module.BusinessEntities
 
 
         #region pruebas
-
+       
         static void test1()
         {
             try
